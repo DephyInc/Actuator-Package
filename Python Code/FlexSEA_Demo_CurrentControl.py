@@ -21,12 +21,12 @@ displayDiv = 5       # We refresh the display every 50th packet
 flexSEAScheduler = sched.scheduler(perf_counter, sleep)
 
 # Current gains:
-I_KP = 100
-I_KI = 1
+I_KP = 10
+I_KI = 3
 
 # controller gains:
-Z_K = 15
-Z_B = 6
+##Z_K = 0
+##Z_B = 0
 
 # This is called by the timer:
 def timerEvent():
@@ -40,7 +40,7 @@ def timerEvent():
 
 # State machine
 state = 'init'
-holdCurrent = 2
+holdCurrent = 100
 def stateMachineDemo1():
 
 	global state
@@ -50,7 +50,8 @@ def stateMachineDemo1():
 		# Set Control mode to Open
 		print('Setting controller to Open...')
 		setControlMode(CTRL_CURRENT)
-		setZGains(Z_K, Z_B, I_KP, I_KI)
+		##setZGains(Z_K, Z_B, I_KP, I_KI)
+		setZGains(I_KP, I_KI, 0, 0)
 		##holdPosition = myRigid.ex.enc_ang[0]
 		setMotorCurrent(holdCurrent) # Start the current 
 		
@@ -59,7 +60,8 @@ def stateMachineDemo1():
 
 	elif state == 'hold':
 		# Equilibrium position
-		dumb_val = 1 # just chill in this state
+		pass # just chill in this state
+
 		##setMotorCurrent(holdCurrent)
 
 	else:
