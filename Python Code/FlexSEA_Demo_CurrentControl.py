@@ -40,7 +40,7 @@ def timerEvent():
 
 # State machine
 state = 'init'
-holdCurrent = 1
+holdCurrent = 2
 def stateMachineDemo1():
 
 	global state

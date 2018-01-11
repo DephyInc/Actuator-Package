@@ -114,7 +114,7 @@ def setZGains(z_k, z_b, i_kp, i_ki):
 #minOffs & maxOffs control what offsets are read (0: IMU, joint enc., etc., 
 # 1: motor ang/vel/acc, board state, etc., 2: genVar (used for 6-ch Strain), ...)
 #printDiv: values will be displayed on the terminal every printDiv samples
-def readActPack(minOffs, maxOffs, printDiv):
+def readActPack(minOffs, maxOffs, printDiv, displayFlexSEA=True):
 
 	requestReadActPack(offs(minOffs, maxOffs))
 	bytes = serialBytesReady(100, COMM_STR_LEN)
@@ -141,8 +141,10 @@ def readActPack(minOffs, maxOffs, printDiv):
 		if(newActPackPacket):
 			#print('New Rigid packet(s) available\n')
 			flexsea.getLastRigidData(byref(myRigid));
-			i = printActPack(printDiv)
-			return i
+			
+			if displayFlexSEA:
+				i = printActPack(printDiv)
+				return i
 		#else:
 			#print('This is not a Rigid packet')
 	#else:

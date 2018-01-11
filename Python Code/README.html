@@ -184,11 +184,26 @@
 	To exit the script while it's running press Ctrl+C.</p>
 
 	<h3 id='impedance'>FlexSEA_Demo_Impedance.py</h3>
-	<p>This script demonstrates a position controller operating on the FlexSEA. The motor will toggle between two equilibrium positions, forever.<br>
+	<p>This script demonstrates an impedance controller operating on the FlexSEA. The motor will toggle between two equilibrium positions, forever.<br>
 	All the major sensors will be displayed in the terminal. The controller gains when moving to the first and second position are set by the impedance gain values Z_K_a, Z_B_a, Z_K_b, and Z_B_b in the script. These values can be adjusted to tune performance when the motor is under different loads, or is unloaded.<br>
 	For this example the positions that the FlexSEA oscillates between are absolute positions defined when the board is powered on, and are not related to the motor position when the script is run. It's a good idea to run this script only directly after the FlexSEA board is powered on and before the motor is moved.<br>
 	It is important to use a high quality power supply when running this demo as the control can become unstable with a switch-mode power supply or any power supply with too low of a current limit.<br>
 	To exit the script while it's running press Ctrl+C.</p>
+
+	<h3 id='positionControl'>FlexSEA_Demo_PositionControl.py</h3>
+	<p>This script demonstrates a position controller operating on the FlexSEA. The motor will toggle between two equilibrium positions, forever.<br>
+	All the major sensors will be displayed in the terminal. The controller gains holding the position feedback gain values pos_KP and pos_KI in the script. These values can be adjusted to tune performance when the motor is under different loads, or is unloaded.<br>
+	For this example the position that the FlexSEA holds is defined when the motor position when the script is run.<br>
+	It is important to use a high quality power supply when running this demo as the control can become unstable with a switch-mode power supply or any power supply with too low of a current limit.<br>
+	To exit the script while it's running press Ctrl+C.</p>
+
+	<h3 id='twoPositionControl'>FlexSEA_Demo_TwoPositionControl.py</h3>
+	<p>This script demonstrates a position controller operating on the FlexSEA. The motor will toggle between two equilibrium positions, forever.<br>
+	All the major sensors will be displayed in the terminal. The controller gains when moving to the first and second position are set by the impedance gain values pos_KP and pos_Ki in the script. These values can be adjusted to tune performance when the motor is under different loads, or is unloaded.<br>
+	For this example the positions that the FlexSEA oscillates between are absolute positions defined when the board is powered on, and are not related to the motor position when the script is run. It's a good idea to run this script only directly after the FlexSEA board is powered on and before the motor is moved.<br>
+	It is important to use a high quality power supply when running this demo as the control can become unstable with a switch-mode power supply or any power supply with too low of a current limit.<br>
+	To exit the script while it's running press Ctrl+C.</p>
+
 
 	<h3 id='userDefined'>FlexSEA_Demo_UserDefined.py</h3>
 	<p>This script is meant to be an easy starting template for getting familiar with the FlexSEA actuator.<br>
