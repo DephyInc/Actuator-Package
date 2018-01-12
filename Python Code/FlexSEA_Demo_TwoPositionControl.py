@@ -40,7 +40,7 @@ def timerEvent():
 # State machine
 state = 'init'
 fsmLoopCounter = 0
-stateTime = 800
+stateTime = 300
 hold_position_a = 0
 hold_position_b = 6000
 def stateMachineDemo1():
