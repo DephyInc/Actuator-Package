@@ -21,8 +21,8 @@ displayDiv = 5       # We refresh the display every 50th packet
 flexSEAScheduler = sched.scheduler(perf_counter, sleep)
 
 # Current gains:
-I_KP = 10
-I_KI = 3
+I_KP = 20
+I_KI = 1
 
 # controller gains:
 ##Z_K = 0
@@ -59,7 +59,6 @@ def stateMachineDemo1():
 		state = 'hold'
 
 	elif state == 'hold':
-		# Equilibrium position
 		pass # just chill in this state
 
 		##setMotorCurrent(holdCurrent)
@@ -72,6 +71,9 @@ def stateMachineDemo1():
 # Housekeeping before we quit:
 def beforeExiting():
 	print('closing com')
+	setMotorCurrent(0)
+	readActPack(0, 2, displayDiv) ## call once more to pass settings to flexSEA
+	sleep(1)
 	setControlMode(0)
 	sleep(0.5)
 	hser.close()
