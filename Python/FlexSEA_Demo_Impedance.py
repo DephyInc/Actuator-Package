@@ -14,7 +14,7 @@ import sched
 
 # User setup:
 # COM = '/dev/ttyACM0' # for Linux/Raspbian
-COM = 'COM3' # for windows
+COM = 'COM5' # for windows
 refreshRate = 0.005   # seconds, communication & FSM
 displayDiv = 5       # We refresh the display every 50th packet
 flexSEAScheduler = sched.scheduler(perf_counter, sleep)
@@ -27,8 +27,8 @@ I_KI = 1
 # Impedance gains (2 sets):
 Z_K_a = 3
 Z_B_a = 0
-Z_K_b = 5
-Z_B_b = 0
+Z_K_b = 15
+Z_B_b = 10
 
 # This is called by the timer:
 def timerEvent():
@@ -57,8 +57,8 @@ def stateMachineDemo1():
 	
 	if state == 'init':
 		
-		# Set Control mode to Open
-		print('Setting controller to Open...')
+		# Set Control mode to Impedance
+		print('Setting controller to Impedance...')
 		setControlMode(CTRL_IMPEDANCE)
 		setZGains(Z_K_a, Z_B_a, I_KP, I_KI)
 		ePos1 = myRigid.ex.enc_ang[0]
@@ -66,8 +66,10 @@ def stateMachineDemo1():
 		setPosition(ePos1) # Start where we are
 		
 		# Transition:
-		fsmLoopCounter = 0
-		state = 'pos1'
+		fsmLoopCounter += 1
+		if(fsmLoopCounter > 2):
+			fsmLoopCounter = 0
+			state = 'pos1'
 		
 	elif state == 'pos1':
 		

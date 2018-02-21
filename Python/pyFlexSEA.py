@@ -108,7 +108,7 @@ def setZGains(z_k, z_b, i_kp, i_ki):
 	g1 = c_int16(z_b)
 	g2 = c_int16(i_kp)
 	g3 = c_int16(i_ki)
-	setGains = c_ubyte(CHANGE)
+	setGains = c_uint8(CHANGE)
 
 #ActPack is used to read sensor values, and write controller options & setpoint
 #minOffs & maxOffs control what offsets are read (0: IMU, joint enc., etc., 
@@ -155,7 +155,8 @@ def requestReadActPack(offset):
 	global setGains
 	flexsea.ptx_cmd_actpack_rw(FLEXSEA_MANAGE_1, byref(nb), commStr, offset, controller, setpoint, setGains, g0, g1, g2, g3, system);
 	hser.write(commStr)
-	setGains = c_ubyte(KEEP)
+	if(setGains.value == CHANGE):
+		setGains = c_uint8(KEEP)
 
 #Display functions:
 #==================
@@ -183,28 +184,21 @@ def printRigid():
 #Print ActPack data (Rigid + controller info):
 def printActPack(div):
 	if(printDiv(div) == 0):
-		global controller
-		global setpoint
-		global g0
-		global g1
-		global g2
-		global g3
 		if sys.platform.lower().startswith('win'):
 			os.system('cls') #Clear terminal (Win)
 		elif sys.platform.lower().startswith('linux'):
 			os.system('clear') #Clear terminal (Unix)
-		printController(controller, setpoint, g0, g1, g2, g3)
+		printController(controller, setpoint, g0, g1, g2, g3, setGains)
 		printRigid()
 		return 0
 	return 1
 
 #Prints easy to read info about the controller
-def printController(ctrl, sp, g0, g1, g2, g3):
+def printController(ctrl, sp, g0, g1, g2, g3, sg):
 	c = mapCtrlText[ctrl.value]
 	s = sp.value
 	print('\nController:', c, '|', 'Setpoint:', s)
-	global setGains
-	print('Gains: [', g0.value, ', ', g1.value, ', ', g2.value, ', ', g3.value, '] (', setGains.value, ')\n')
+	print('Gains: [', g0.value, ', ', g1.value, ', ', g2.value, ', ', g3.value, '] (', sg.value, ')\n')
 
 #Controller index to string mapping
 mapCtrlText = { 0 : 'CTRL_NONE',
