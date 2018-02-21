@@ -44,4 +44,4 @@ sleep(0.1)
 
 #Send calibration command
 print('Finding poles...')
-findPoles()
+findPoles(1)

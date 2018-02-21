@@ -172,9 +172,16 @@ def actPackFSM2(on):
 	hser.write(commStr)
 
 #Sends a request to Execute. Make sure to disable FSM2 first.
-def findPoles():
+def findPoles(block):
 	flexsea.ptx_cmd_calibration_mode_rw(FLEXSEA_EXECUTE_1, byref(nb), commStr, c_uint8(CALIBRATION_FIND_POLES))
 	hser.write(commStr)
+	if not block:
+		return
+	else:
+		for s in range(60,0, -1):
+			print(s,'seconds...')
+			sleep(1)
+		print('Ready!')
 
 #Display functions:
 #==================
