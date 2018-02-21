@@ -1,7 +1,7 @@
 /****************************************************************************
 	[Project] FlexSEA: Flexible & Scalable Electronics Architecture
-	[Sub-project] 'flexsea-comm' Communication stack
-	Copyright (C) 2017 Dephy, Inc. <http://dephy.com/>
+	[Sub-project] 'user/MIT_2DoF_Ankle' MIT Biomechatronics 2-dof Ankle
+	Copyright (C) 2016 Dephy, Inc. <http://dephy.com/>
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -21,46 +21,57 @@
 	Biomechatronics research group <http://biomech.media.mit.edu/>
 	[Contributors]
 *****************************************************************************
-	[This file] flexsea_interface: simple in & out functions
-*****************************************************************************
-	[Change log] (Convention: YYYY-MM-DD | author | comment)
-	* 2017-09-11 | jfduval | Initial release
+	[This file] cmd-MIT_2DoF_Ankle: Custom commands for this project
 ****************************************************************************/
 
-#ifndef INC_FLEXSEA_INTERFACE_H_
-#define INC_FLEXSEA_INTERFACE_H_
+#ifdef INCLUDE_UPROJ_MIT_A2DOF
+
+#ifndef INC_FLEXSEA_CMD_MITA2DOF_H
+#define INC_FLEXSEA_CMD_MITA2DOF_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+//****************************************************************************
+// Include(s)
+//****************************************************************************
+
 #include <stdint.h>
-#include "flexsea.h"
 
 //****************************************************************************
 // Prototype(s):
 //****************************************************************************
 
-void receiveFlexSEAPacket(Port p, uint8_t *newPacketFlag, \
-							uint8_t *parsedPacketFlag, uint8_t *watch);
-uint8_t receiveFlexSEABytes(uint8_t *d, uint8_t len, uint8_t autoParse);
+void tx_cmd_ankle2dof_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+							uint16_t *len, uint8_t slave);
+void tx_cmd_ankle2dof_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+							uint16_t *len, uint8_t slave, uint8_t controller, \
+							int16_t ctrl_i, int16_t ctrl_o);
+void rx_cmd_ankle2dof_rw(uint8_t *buf, uint8_t *info);
+void rx_cmd_ankle2dof_rr(uint8_t *buf, uint8_t *info);
+
+/*
+uint32_t tx_cmd_ctrl_special_5(uint8_t receiver, uint8_t cmd_type, uint8_t *buf, uint32_t len, \
+								uint8_t slave, uint8_t controller, int16_t ctrl_i, int16_t ctrl_o);
+void rx_cmd_special_5(uint8_t *buf);
+*/
 
 //****************************************************************************
 // Definition(s):
 //****************************************************************************
 
 //****************************************************************************
+// Structure(s):
+//****************************************************************************
+
+//****************************************************************************
 // Shared variable(s)
 //****************************************************************************
-
-
-//****************************************************************************
-// Macro(s):
-//****************************************************************************
-
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif
+#endif	//INC_FLEXSEA_CMD_MITA2DOF_H
+#endif //INCLUDE_UPROJ_MIT_A2DOF

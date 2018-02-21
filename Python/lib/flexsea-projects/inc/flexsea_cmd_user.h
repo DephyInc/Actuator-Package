@@ -1,7 +1,8 @@
 /****************************************************************************
 	[Project] FlexSEA: Flexible & Scalable Electronics Architecture
-	[Sub-project] 'flexsea-comm' Communication stack
-	Copyright (C) 2017 Dephy, Inc. <http://dephy.com/>
+	[Sub-project] 'flexsea-user' System commands & functions specific to
+	user projects
+	Copyright (C) 2016 Dephy, Inc. <http://dephy.com/>
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -21,46 +22,59 @@
 	Biomechatronics research group <http://biomech.media.mit.edu/>
 	[Contributors]
 *****************************************************************************
-	[This file] flexsea_interface: simple in & out functions
-*****************************************************************************
-	[Change log] (Convention: YYYY-MM-DD | author | comment)
-	* 2017-09-11 | jfduval | Initial release
+	[This file] flexsea_cmd_user: Interface to the user functions
 ****************************************************************************/
 
-#ifndef INC_FLEXSEA_INTERFACE_H_
-#define INC_FLEXSEA_INTERFACE_H_
+#ifndef INC_FLEXSEA_CMD_USER_H
+#define INC_FLEXSEA_CMD_USER_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include <stdint.h>
-#include "flexsea.h"
+
+//****************************************************************************
+// Include(s)
+//****************************************************************************
 
 //****************************************************************************
 // Prototype(s):
 //****************************************************************************
 
-void receiveFlexSEAPacket(Port p, uint8_t *newPacketFlag, \
-							uint8_t *parsedPacketFlag, uint8_t *watch);
-uint8_t receiveFlexSEABytes(uint8_t *d, uint8_t len, uint8_t autoParse);
+void init_flexsea_payload_ptr_user(void);
 
 //****************************************************************************
 // Definition(s):
+//****************************************************************************
+
+//Give nickname to function codes here. Always remember that they have to be
+//in the 100-127 range!
+
+#define CMD_A2DOF					100
+#define CMD_RICNU					101
+#define CMD_MOTORTB					103
+#define CMD_ANGLE_TORQUE_PROFILE	104
+#define CMD_CYCLE_TESTER			105
+#define CMD_DPEB31					106
+#define CMD_DPEB42					CMD_DPEB31
+#define CMD_UTT						107
+#define CMD_GAITSTATS				108
+
+#define CMD_READ_ALL_RIGID			120
+#define CMD_ACTPACK					121
+#define CMD_BILATERAL				125
+#define CMD_USER_DYNAMIC 			126
+
+//***************
+// Structure(s):
 //****************************************************************************
 
 //****************************************************************************
 // Shared variable(s)
 //****************************************************************************
 
-
-//****************************************************************************
-// Macro(s):
-//****************************************************************************
-
-
 #ifdef __cplusplus
 }
 #endif
 
-#endif
+#endif	//INC_FLEXSEA_CMD_USER_H

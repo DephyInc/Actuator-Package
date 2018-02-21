@@ -1,7 +1,7 @@
 /****************************************************************************
 	[Project] FlexSEA: Flexible & Scalable Electronics Architecture
-	[Sub-project] 'flexsea-comm' Communication stack
-	Copyright (C) 2017 Dephy, Inc. <http://dephy.com/>
+	[Sub-project] 'flexsea-user' User projects
+	Copyright (C) 2016 Dephy, Inc. <http://dephy.com/>
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -16,51 +16,52 @@
 	You should have received a copy of the GNU General Public License
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *****************************************************************************
-	[Lead developper] Jean-Francois (JF) Duval, jfduval at dephy dot com.
-	[Origin] Based on Jean-Francois Duval's work at the MIT Media Lab
+	[Lead developper] Luke Mooney, lmooney at dephy dot com.
+	[Origin] Based on Jean-Francois Duval's work at the MIT Media Lab 
 	Biomechatronics research group <http://biomech.media.mit.edu/>
 	[Contributors]
 *****************************************************************************
-	[This file] flexsea_interface: simple in & out functions
+	[This file] user-ex-MIT_2DoF_Ankle_v1: User code running on Execute
 *****************************************************************************
 	[Change log] (Convention: YYYY-MM-DD | author | comment)
-	* 2017-09-11 | jfduval | Initial release
+	* 2016-10-28 | jfduval | New release
+	*
 ****************************************************************************/
 
-#ifndef INC_FLEXSEA_INTERFACE_H_
-#define INC_FLEXSEA_INTERFACE_H_
+#ifdef INCLUDE_UPROJ_MIT_A2DOF
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "main.h"
 
-#include <stdint.h>
-#include "flexsea.h"
+#ifdef BOARD_TYPE_FLEXSEA_EXECUTE
+
+#ifndef INC_ANKLE_2DOF_H
+#define INC_ANKLE_2DOF_H
 
 //****************************************************************************
-// Prototype(s):
+// Include(s)
 //****************************************************************************
 
-void receiveFlexSEAPacket(Port p, uint8_t *newPacketFlag, \
-							uint8_t *parsedPacketFlag, uint8_t *watch);
-uint8_t receiveFlexSEABytes(uint8_t *d, uint8_t len, uint8_t autoParse);
+	
+//****************************************************************************
+// Shared variable(s)
+//****************************************************************************
+
+//****************************************************************************
+// Public Function Prototype(s):
+//****************************************************************************
+
+void init_ankle_2dof(void);
+void ankle_fsm(void);
 
 //****************************************************************************
 // Definition(s):
 //****************************************************************************
 
 //****************************************************************************
-// Shared variable(s)
+// Structure(s)
 //****************************************************************************
+	
+#endif	//INC_ANKLE_2DOF_H
 
-
-//****************************************************************************
-// Macro(s):
-//****************************************************************************
-
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif
+#endif //BOARD_TYPE_FLEXSEA_EXECUTE
+#endif //INCLUDE_UPROJ_MIT_A2DOF

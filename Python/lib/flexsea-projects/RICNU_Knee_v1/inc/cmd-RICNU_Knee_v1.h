@@ -1,7 +1,7 @@
 /****************************************************************************
 	[Project] FlexSEA: Flexible & Scalable Electronics Architecture
-	[Sub-project] 'flexsea-comm' Communication stack
-	Copyright (C) 2017 Dephy, Inc. <http://dephy.com/>
+	[Sub-project] 'user/RICNU_Knee_v1' RIC/NU Knee
+	Copyright (C) 2016 Dephy, Inc. <http://dephy.com/>
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -21,46 +21,60 @@
 	Biomechatronics research group <http://biomech.media.mit.edu/>
 	[Contributors]
 *****************************************************************************
-	[This file] flexsea_interface: simple in & out functions
-*****************************************************************************
-	[Change log] (Convention: YYYY-MM-DD | author | comment)
-	* 2017-09-11 | jfduval | Initial release
+	[This file] cmd-RICNU_Knee_v1: Custom commands for this project
 ****************************************************************************/
 
-#ifndef INC_FLEXSEA_INTERFACE_H_
-#define INC_FLEXSEA_INTERFACE_H_
+#ifdef INCLUDE_UPROJ_RICNU_KNEE_V1
+
+#ifndef INC_FLEXSEA_CMD_RICNU_KNEE_1_H
+#define INC_FLEXSEA_CMD_RICNU_KNEE_1_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+//****************************************************************************
+// Include(s)
+//****************************************************************************
+
 #include <stdint.h>
-#include "flexsea.h"
 
 //****************************************************************************
 // Prototype(s):
 //****************************************************************************
 
-void receiveFlexSEAPacket(Port p, uint8_t *newPacketFlag, \
-							uint8_t *parsedPacketFlag, uint8_t *watch);
-uint8_t receiveFlexSEABytes(uint8_t *d, uint8_t len, uint8_t autoParse);
+void rx_cmd_ricnu_rw(uint8_t *buf, uint8_t *info);
+void rx_cmd_ricnu_w(uint8_t *buf, uint8_t *info);
+void rx_cmd_ricnu_rr(uint8_t *buf, uint8_t *info);
+
+void tx_cmd_ricnu_rw(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+					uint16_t *len, uint8_t offset, uint8_t controller, \
+					int32_t setpoint, uint8_t setGains, int16_t g0, int16_t g1,\
+					int16_t g2, int16_t g3);
+void tx_cmd_ricnu_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+					uint16_t *len, uint8_t offset);
+void tx_cmd_ricnu_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
+					uint16_t *len, uint8_t offset);
+
+//Decoding:
+void rx_cmd_ricnu_Action1(uint8_t controller, int32_t setpoint, uint8_t setGains,
+						int16_t g0,	int16_t g1,	int16_t g2, int16_t g3);
 
 //****************************************************************************
 // Definition(s):
 //****************************************************************************
 
 //****************************************************************************
+// Structure(s):
+//****************************************************************************
+
+//****************************************************************************
 // Shared variable(s)
 //****************************************************************************
-
-
-//****************************************************************************
-// Macro(s):
-//****************************************************************************
-
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif
+#endif	//INC_FLEXSEA_CMD_RICNU_KNEE_1_H
+#endif //INCLUDE_UPROJ_RICNU_KNEE_V1

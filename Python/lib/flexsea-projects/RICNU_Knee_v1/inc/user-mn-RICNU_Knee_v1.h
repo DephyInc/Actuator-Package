@@ -1,7 +1,7 @@
 /****************************************************************************
 	[Project] FlexSEA: Flexible & Scalable Electronics Architecture
-	[Sub-project] 'flexsea-comm' Communication stack
-	Copyright (C) 2017 Dephy, Inc. <http://dephy.com/>
+	[Sub-project] 'flexsea-execute' Advanced Motion Controller
+	Copyright (C) 2016 Dephy, Inc. <http://dephy.com/>
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -16,51 +16,52 @@
 	You should have received a copy of the GNU General Public License
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *****************************************************************************
-	[Lead developper] Jean-Francois (JF) Duval, jfduval at dephy dot com.
-	[Origin] Based on Jean-Francois Duval's work at the MIT Media Lab
+	[Lead developper] Luke Mooney, lmooney at dephy dot com.
+	[Origin] Based on Jean-Francois Duval's work at the MIT Media Lab 
 	Biomechatronics research group <http://biomech.media.mit.edu/>
-	[Contributors]
+	[Contributors] Luke Mooney, Elliott Rouse
 *****************************************************************************
-	[This file] flexsea_interface: simple in & out functions
+	[This file] knee: knee functions
 *****************************************************************************
 	[Change log] (Convention: YYYY-MM-DD | author | comment)
-	* 2017-09-11 | jfduval | Initial release
+	* 2016-09-29 | jfduval | Released under GPL-3.0 release
+	*
 ****************************************************************************/
 
-#ifndef INC_FLEXSEA_INTERFACE_H_
-#define INC_FLEXSEA_INTERFACE_H_
+#ifdef INCLUDE_UPROJ_RICNU_KNEE_V1
+#include "main.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#ifdef BOARD_TYPE_FLEXSEA_MANAGE
 
-#include <stdint.h>
-#include "flexsea.h"
+#ifndef INC_RICNU_KNEE_H
+#define INC_RICNU_KNEE_H
 
 //****************************************************************************
-// Prototype(s):
+// Include(s)
 //****************************************************************************
 
-void receiveFlexSEAPacket(Port p, uint8_t *newPacketFlag, \
-							uint8_t *parsedPacketFlag, uint8_t *watch);
-uint8_t receiveFlexSEABytes(uint8_t *d, uint8_t len, uint8_t autoParse);
+
+//****************************************************************************
+// Shared variable(s)
+//****************************************************************************
+
+//****************************************************************************
+// Public Function Prototype(s):
+//****************************************************************************
+
+void init_ricnu_knee(void);
+void ricnu_knee_fsm_1(void);
+void ricnu_knee_fsm_2(void);
 
 //****************************************************************************
 // Definition(s):
 //****************************************************************************
 
 //****************************************************************************
-// Shared variable(s)
+// Structure(s)
 //****************************************************************************
 
+#endif	//INC_RICNU_KNEE_H
 
-//****************************************************************************
-// Macro(s):
-//****************************************************************************
-
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif
+#endif //BOARD_TYPE_FLEXSEA_MANAGE
+#endif //INCLUDE_UPROJ_RICNU_KNEE_V1

@@ -1,66 +1,53 @@
 /****************************************************************************
 	[Project] FlexSEA: Flexible & Scalable Electronics Architecture
-	[Sub-project] 'flexsea-comm' Communication stack
+	[Sub-project] 'flexsea-user' User projects
 	Copyright (C) 2017 Dephy, Inc. <http://dephy.com/>
-
-	This program is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *****************************************************************************
-	[Lead developper] Jean-Francois (JF) Duval, jfduval at dephy dot com.
+	[Lead developper] Luke Mooney, lmooney at dephy dot com.
 	[Origin] Based on Jean-Francois Duval's work at the MIT Media Lab
 	Biomechatronics research group <http://biomech.media.mit.edu/>
-	[Contributors]
+	[Contributors] Jean-Francois Duval, Elliott Rouse
 *****************************************************************************
-	[This file] flexsea_interface: simple in & out functions
+	[This file] user-mn-Rigid: FlexSEA-Rigid Manage user code
 *****************************************************************************
 	[Change log] (Convention: YYYY-MM-DD | author | comment)
-	* 2017-09-11 | jfduval | Initial release
+	* 2017-05-24 | jfduval | New file
+	*
 ****************************************************************************/
 
-#ifndef INC_FLEXSEA_INTERFACE_H_
-#define INC_FLEXSEA_INTERFACE_H_
+#include "main.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#ifdef BOARD_TYPE_FLEXSEA_MANAGE
 
-#include <stdint.h>
-#include "flexsea.h"
+#ifndef INC_USER_RIGID_H
+#define INC_USER_RIGID_H
 
 //****************************************************************************
-// Prototype(s):
+// Include(s)
 //****************************************************************************
 
-void receiveFlexSEAPacket(Port p, uint8_t *newPacketFlag, \
-							uint8_t *parsedPacketFlag, uint8_t *watch);
-uint8_t receiveFlexSEABytes(uint8_t *d, uint8_t len, uint8_t autoParse);
-
-//****************************************************************************
-// Definition(s):
-//****************************************************************************
 
 //****************************************************************************
 // Shared variable(s)
 //****************************************************************************
 
+//****************************************************************************
+// Public Function Prototype(s):
+//****************************************************************************
+
+void rigid_fsm_1(void);
+void rigid_fsm_2(void);
 
 //****************************************************************************
-// Macro(s):
+// Definition(s):
 //****************************************************************************
 
+#define RIGID_FSM2_POWER_ON_DELAY		5000
 
-#ifdef __cplusplus
-}
-#endif
+//****************************************************************************
+// Structure(s)
+//****************************************************************************
 
-#endif
+#endif	//INC_USER_RIGID_H
+
+#endif //BOARD_TYPE_FLEXSEA_MANAGE

@@ -85,7 +85,7 @@ class fx_rigid_mn_s(Structure):
 					("magneto", xyz_s),
 					("analog", c_uint16 * 4),
 					("status", c_uint16),
-					("genVar", c_int16 * 10),
+					("genVar", c_int16 * 20),
 					("decoded", decoded_fx_rigid_mn_s)]
 
 class fx_rigid_ctrl_s(Structure):
@@ -112,11 +112,11 @@ class fx_rigid_ex_s(Structure):
 					("ctrl", ctrl_s)]
 
 class rigid_s(Structure):
-		_fields_ = [("re", fx_rigid_re_s),
-		("mn", fx_rigid_mn_s),
-		("ex", fx_rigid_ex_s),
-		("ctrl", fx_rigid_ctrl_s),
-		("lastOffsetDecoded", c_uint8)]
+					_fields_ = [("re", fx_rigid_re_s),
+					("mn", fx_rigid_mn_s),
+					("ex", fx_rigid_ex_s),
+					("ctrl", fx_rigid_ctrl_s),
+					("lastOffsetDecoded", c_uint8)]
 
 #Constants:
 FLEXSEA_PLAN_1 = 10
