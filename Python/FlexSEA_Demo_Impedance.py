@@ -47,6 +47,7 @@ stateTime = 200
 ePos1 = 0
 ePos2 = 0
 toggle = 0
+
 def stateMachineDemo1():
 
 	global state
@@ -57,6 +58,16 @@ def stateMachineDemo1():
 	
 	if state == 'init':
 		
+		#Skip a few cycles to make sure we are receiving replies
+	
+		# Transition:
+		fsmLoopCounter += 1
+		if(fsmLoopCounter > 2):
+			fsmLoopCounter = 0
+			state = 'setController'
+	
+	elif state == 'setController':
+		
 		# Set Control mode to Impedance
 		print('Setting controller to Impedance...')
 		setControlMode(CTRL_IMPEDANCE)
@@ -66,10 +77,8 @@ def stateMachineDemo1():
 		setPosition(ePos1) # Start where we are
 		
 		# Transition:
-		fsmLoopCounter += 1
-		if(fsmLoopCounter > 2):
-			fsmLoopCounter = 0
-			state = 'pos1'
+		fsmLoopCounter = 0
+		state = 'pos1'
 		
 	elif state == 'pos1':
 		

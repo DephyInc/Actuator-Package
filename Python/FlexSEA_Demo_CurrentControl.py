@@ -24,10 +24,6 @@ flexSEAScheduler = sched.scheduler(perf_counter, sleep)
 I_KP = 20
 I_KI = 1
 
-# controller gains:
-##Z_K = 0
-##Z_B = 0
-
 # This is called by the timer:
 def timerEvent():
 	# Read data & display it:
@@ -40,19 +36,18 @@ def timerEvent():
 
 # State machine
 state = 'init'
-holdCurrent = 1000
+holdCurrent = 1000		#1000mA
+
 def stateMachineDemo1():
 
 	global state
 	global holdCurrent
 	
 	if state == 'init':
-		# Set Control mode to Open
-		print('Setting controller to Open...')
+		# Set Control mode to Current
+		print('Setting controller to Current...')
 		setControlMode(CTRL_CURRENT)
-		##setZGains(Z_K, Z_B, I_KP, I_KI)
 		setZGains(I_KP, I_KI, 0, 0)
-		##holdPosition = myRigid.ex.enc_ang[0]
 		setMotorCurrent(holdCurrent) # Start the current 
 		
 		# Transition:
@@ -60,8 +55,6 @@ def stateMachineDemo1():
 
 	elif state == 'hold':
 		pass # just chill in this state
-
-		##setMotorCurrent(holdCurrent)
 
 	else:
 		# Invalid state - stay here and complain
@@ -72,7 +65,7 @@ def stateMachineDemo1():
 def beforeExiting():
 	print('closing com')
 	setMotorCurrent(0)
-	readActPack(0, 2, displayDiv) ## call once more to pass settings to flexSEA
+	readActPack(0, 2, displayDiv) ## call once more to pass settings to FlexSEA
 	sleep(1)
 	setControlMode(0)
 	sleep(0.5)

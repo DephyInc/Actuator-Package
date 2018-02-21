@@ -14,18 +14,15 @@ import sched
 
 # User setup:
 # COM = '/dev/ttyACM0' # for Linux/Raspbian
-COM = 'COM3' # for windows
+COM = 'COM5' # for windows
 refreshRate = 0.005   # seconds, communication & FSM
 displayDiv = 5       # We refresh the display every 50th packet
 flexSEAScheduler = sched.scheduler(perf_counter, sleep)
 
-# Current gains:
-I_KP = 100
-I_KI = 1
-
 # position controller gains:
-pos_KP = 20 # proportional gain
-pos_KI = 6 # integral gain
+pos_KP = 20 		# proportional gain
+pos_KI = 6 			# integral gain
+deltaPos = 10000	# Position difference
 
 # This is called by the timer:
 def timerEvent():
@@ -42,7 +39,8 @@ state = 'init'
 fsmLoopCounter = 0
 stateTime = 300
 hold_position_a = 0
-hold_position_b = 6000
+hold_position_b = 0
+
 def stateMachineDemo1():
 
 	global state
@@ -51,11 +49,22 @@ def stateMachineDemo1():
 	global hold_position_b
 	
 	if state == 'init':
-		# Set Control mode to Open
-		print('Setting controller to Open...')
+		
+		#Skip a few cycles to make sure we are receiving replies
+		
+		# Transition:
+		fsmLoopCounter += 1
+		if(fsmLoopCounter > 2):
+			fsmLoopCounter = 0
+			state = 'setController'
+
+	elif state == 'setController':
+		# Set Control mode to Position
+		print('Setting controller to Position...')
 		setControlMode(CTRL_POSITION)
-		setZGains(pos_KP, pos_KI, I_KP, I_KI)
+		setZGains(pos_KP, pos_KI, 0, 0)
 		hold_position_a = myRigid.ex.enc_ang[0]
+		hold_position_b = hold_position_a + deltaPos
 		setPosition(hold_position_a) # Start where we are
 		
 		# Transition:
