@@ -158,6 +158,24 @@ def requestReadActPack(offset):
 	if(setGains.value == CHANGE):
 		setGains = c_uint8(KEEP)
 
+#Use this function to enable or disable FSM2. Controller will be reset.
+def actPackFSM2(on):
+	global system
+	global controller
+	controller = c_uint8(CTRL_NONE)	#Disable controller
+	if on:
+		system = c_uint8(SYS_NORMAL)
+	else:
+		system = c_uint8(SYS_DISABLE_FSM2)
+
+	flexsea.ptx_cmd_actpack_rw(FLEXSEA_MANAGE_1, byref(nb), commStr, c_uint8(0), controller, setpoint, setGains, g0, g1, g2, g3, system);
+	hser.write(commStr)
+
+#Sends a request to Execute. Make sure to disable FSM2 first.
+def findPoles():
+	flexsea.ptx_cmd_calibration_mode_rw(FLEXSEA_EXECUTE_1, byref(nb), commStr, c_uint8(CALIBRATION_FIND_POLES))
+	hser.write(commStr)
+
 #Display functions:
 #==================
 

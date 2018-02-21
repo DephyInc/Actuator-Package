@@ -82,6 +82,12 @@ void rx_cmd_calibration_mode_rw(uint8_t *buf, uint8_t *info);
 */
 void rx_cmd_calibration_mode_w(uint8_t *buf, uint8_t *info);
 
+//****************************************************************************
+// Prototype(s) - simplified functions (DLL):
+//****************************************************************************
+
+void ptx_cmd_calibration_mode_rw(uint8_t slaveId, uint16_t *numb, uint8_t *commStr, uint8_t calibrationMode);
+
 #ifdef __cplusplus
 }
 #endif
