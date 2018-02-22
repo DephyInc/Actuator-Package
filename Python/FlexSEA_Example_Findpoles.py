@@ -1,6 +1,6 @@
 # FlexSEA_Example_Findpoles
 #=-=-=-=-=-=-=-=-=-=-=-=
-# This script will send a FindPoles calibration command to Exception
+# This script will send a FindPoles calibration command to Ex
 # Make sure that the motor can freely move before calling this
 # Hit Ctrl+C to exit
 # 2018/02/21, Dephy, Inc.
