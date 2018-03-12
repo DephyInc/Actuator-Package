@@ -155,7 +155,7 @@ def requestReadActPack(offset):
 	global setGains
 	flexsea.ptx_cmd_actpack_rw(FLEXSEA_MANAGE_1, byref(nb), commStr, offset, controller, setpoint, setGains, g0, g1, g2, g3, system);
 	hser.write(commStr)
-	if(setGains.value == CHANGE):
+	if(offset == 0 and setGains.value == CHANGE):
 		setGains = c_uint8(KEEP)
 
 #Use this function to enable or disable FSM2. Controller will be reset.
