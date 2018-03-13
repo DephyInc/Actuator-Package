@@ -15,7 +15,7 @@ import sched
 
 # User setup:
 # COM = '/dev/ttyACM0' # for Linux/Raspbian
-COM = 'COM5' # for windows
+COM = 'COM9' # for windows
 refreshRate = 0.005   # seconds, communication & FSM
 displayDiv = 5       # We refresh the display every 50th packet
 flexSEAScheduler = sched.scheduler(perf_counter, sleep)

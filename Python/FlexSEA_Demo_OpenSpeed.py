@@ -14,7 +14,7 @@ import sched # python task scheduler library
 
 # User setup:
 #COM = '/dev/ttyACM1' # for Linux/Raspbian
-COM = 'COM5' # for windows
+COM = 'COM9' # for windows
 refreshRate = 0.01   # seconds, communication & FSM
 displayDiv = 5       # we refresh the display every 5th packet
 flexSEAScheduler = sched.scheduler(perf_counter, sleep) # global scheduler

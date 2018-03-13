@@ -1,2 +1,3 @@
 # Actuator-Package
-FlexSEA Rigid actuator package library and sample programs for Python
+FlexSEA-Rigid Actuator Package library and sample programs
+Please refer to README.html for all the details.
