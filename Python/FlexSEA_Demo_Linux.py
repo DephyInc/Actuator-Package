@@ -13,8 +13,7 @@ import sys
 import sched
 
 #User setup:
-#COM = '/dev/ttyACM0'
-COM = '/dev/ttyACM1'
+COM = comPortFromFile()
 refreshRate = 0.002   #seconds
 displayDiv = 50       #We refresh the display every 50th packet
 flexSEAScheduler = sched.scheduler(perf_counter, sleep) # global scheduler

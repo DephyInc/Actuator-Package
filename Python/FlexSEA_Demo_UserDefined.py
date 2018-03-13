@@ -13,8 +13,7 @@ import sys
 import sched # python task scheduler library
 
 # User setup:
-#COM = '/dev/ttyACM0' for linux / raspberry pi use
-COM = 'COM3'
+COM = comPortFromFile()
 refreshRate = 0.005   # seconds, communication & FSM
 displayDiv = 50       # We refresh the display every 50th packet
 flexSEAScheduler = sched.scheduler(perf_counter, sleep) # global scheduler

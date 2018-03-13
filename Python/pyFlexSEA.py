@@ -54,6 +54,13 @@ def setPyFlexSEASerialPort(s):
 	global hser
 	hser = s
 
+#Read serial port from com.txt file
+def comPortFromFile():
+	file = open("com.txt", "r")
+	s = file.read()
+	#print(s)
+	return s
+	
 #Did we receive new serial bytes?
 def serialBytesReady(timeout, b):
 	i = 0

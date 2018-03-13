@@ -13,8 +13,7 @@ import sys
 import sched
 
 # User setup:
-# COM = '/dev/ttyACM0' # for Linux/Raspbian
-COM = 'COM5' # for windows
+COM = comPortFromFile()
 refreshRate = 0.005   # seconds, communication & FSM
 displayDiv = 5       # We refresh the display every 50th packet
 

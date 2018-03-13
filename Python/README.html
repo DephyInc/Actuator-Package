@@ -60,8 +60,8 @@
 	<ol>
 		<li>Connect the FlexSEA board to your computer via a USB cable using the micro USB connection labelled 'Mn' mounted closest to the main processor. Note: on Rigid 0.2 there is only 1 USB connector; it's the one you need.</li>
 
-		<li>Turn on the FlexSEA. Your computer should see the board and assign it a COM port number. Each Python script has a 'COM' variable defined near the top. Make sure this variable matches the COM number your computer assigned.<br>
-		For Windows this will be something like 'COM2', or 'COM3', or 'COM4', etc<br>
+		<li>Turn on the FlexSEA. Your computer should see the board and assign it a COM port number. Make sure that the name in com.txt matches the COM number your computer assigned. findPorts.py can help you find available ports.<br>
+		For Windows this will be something like 'COM2', or 'COM3', or 'COM4', etc.<br>
 		For Rasbian this will probably be '/dev/ttyACM1' or '/dev/ttyACM0'</li>
 
 		<li>To power the motor connect the main power leads to a 20V power supply. Sensor readings will all	work even when the motor isn't powered, but any commands sent to move the motor won't work.<br>Note: the supported voltage range is 15-48V. 20V is a good, safe value for initial testing.</li>
@@ -123,7 +123,7 @@
 	<ol start='8'>
 		<li>Connect the FlexSEA board to your computer via a USB cable using the micro USB connection labelled 'Mn' mounted closest to the main processor, not 'Ex' or 'Reg'.<br>Note: on Rigid 0.2 there is only 1 USB connector; it's the one you need.</li>
 
-		<li>Your computer should see the board and assign it a COM port number. Each Python script has a 'COM' variable defined near the top. Make sure this variable matches the COM number your computer assigned. For Windows this will be something like 'COM4', or 'COM5'. You can see your computer port names using Windows Device Manager and checking the 'Ports (COM &amp; LPT)' section.</li>
+		<li>Your computer should see the board and assign it a COM port number. Make sure that the name in com.txt matches the COM number your computer assigned. findPorts.py can help you find available ports. For Windows this will be something like 'COM4', or 'COM5'. You can see your computer port names using Windows Device Manager and checking the 'Ports (COM &amp; LPT)' section.</li>
 
 		<li>Power the motor by connecting the main power leads to a 20V power supply. Sensor readings will all	work even when the motor isn't powered, but any commands sent to move the motor won't work.<br>Note: the supported voltage range is 15-48V. 20V is a good, safe value for initial testing.</li>
 	</ol>
@@ -157,7 +157,7 @@
 
 	<h3>Connect FlexSEA to your computer</h3>
 	<ol start='3'>
-		<li>Connect the FlexSEA board to your computer via a USB cable using the micro USB connection labelled 'Mn' mounted closest to the main processor, not 'Ex' or 'Reg'.<br>Note: on Rigid 0.2 there is only 1 USB connector; it's the one you need.</li>
+		<li>Connect the FlexSEA board to your computer via a USB cable using the micro USB connection labeled 'Mn' mounted closest to the main processor, not 'Ex' or 'Reg'.<br>Note: on Rigid 0.2 there is only 1 USB connector; it's the one you need.</li>
 		<li>Your computer should see the board and assign it a port number. Each Python script has a 'COM' variable defined near the top. Make sure this variable matches the port name your computer assigned to FlexSEA. For Raspbian this will be something like '/dev/ttyACM0', or '/dev/ttyACM1'. You can see your computer port names by typing:
 		<blockquote class='cmd'>ls /dev/tty*</blockquote>
 		with your FlexSEA board disconnected and then while connected to see which port is added. To power the motor connect the main power leads to a 20V power supply. Sensor readings will all 
@@ -232,8 +232,7 @@
 	<ul>
 		<li>you have the wrong Python distribution. Check that it is version 3.4 or newer and 32-bit</li>
 		<li>you have the wrong pyserial library. Check that you have the correct one for python3, not python2</li>
-		<li>you're trying to connect to the wrong COM port. Check that you are renaming the 'COM' variable
-	to the right port name, probably 'COM4' or 'COM5' for Windows, and '/dev/ttyACM0', or 
+		<li>you're trying to connect to the wrong COM port. Check that you have the right port listed in com.txt, probably 'COM4' or 'COM5' for Windows, and '/dev/ttyACM0', or 
 	'/dev/ttyACM1' for Raspbian.</li>
 	</ul></blockquote>
 
@@ -258,8 +257,8 @@
 	<blockquote>The rate at which we communicate with the FlexSEA is not the same rate at which we print values on the display for you to see. The easiest way to adjust the display frequency is to change the <b>displayDiv</b> value defined near the top of each Python script. Lowering the value will print sensor readings more frequently. Feel free to adjust this as you please, just know that refreshing the display too often can slow down calculations. The parameter <b>displayDiv</b> does need to be an integer greater than 1.</blockquote>
 
 	<i>"I can't speed up the scripts beyond ~400 Hz"</i>
-	<blockquote>We can't either. sorry :(</blockquote>
+	<blockquote>This is the maximum we have been able to reach too.</blockquote>
 
 	<i>"I have a problem that isn't one the four described here"</i>
-	<blockquote>Send us an email :)</blockquote>
+	<blockquote>Send us an email!</blockquote>
 </div>
