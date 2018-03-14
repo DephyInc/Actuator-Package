@@ -17,6 +17,7 @@ arrLen = c_ubyte(10)
 commStr = (c_ubyte * COMM_STR_LEN)()
 cBytes = (c_uint8 * COMM_STR_LEN)()
 myRigid = rigid_s();
+myPocket = pocket_s();
 
 #ActPack variables:
 controller = c_uint8(CTRL_NONE)
@@ -190,6 +191,59 @@ def findPoles(block):
 			sleep(1)
 		print('Ready!')
 
+#Pocket is used to read sensor values, and write controller options & setpoint (FlexSEA-Pocket only)
+#minOffs & maxOffs control what offsets are read 
+# 0: IMU, voltages and other Mn + Re variables 
+# 1: Right motor
+# 2: Left motor
+# 3: genVars
+#printDiv: values will be displayed on the terminal every printDiv samples
+def readPocket(minOffs, maxOffs, printDiv, displayFlexSEA=True):
+
+	requestReadPocket(offs(minOffs, maxOffs))
+	bytes = serialBytesReady(100, COMM_STR_LEN)
+	
+	#s = hser.read(bytes)
+	s = hser.read(COMM_STR_LEN) #Reading a fixed length for now
+	for i in range(0,bytes-1):
+		#print(s[i], end=' ')
+		cBytes[i] = s[i]
+	#print(']')
+	
+	ppFlag = c_uint8(0)
+	#print("Bytes:", bytes)
+	ppFlag = flexsea.receiveFlexSEABytes(byref(cBytes), bytes, 1);
+	if(ppFlag):
+		#print('We parsed a packet: ', end='')
+		cmd = c_uint8(0)
+		type = c_uint8(0)
+		flexsea.getSignatureOfLastPayloadParsed(byref(cmd), byref(type));
+		#print('cmd:', cmd, 'type:', type)
+		
+		newPocketPacket = c_uint8(0)
+		newPocketPacket = flexsea.newPocketRRpacketAvailable();
+		
+		if(newPocketPacket):
+			#print('New Rigid packet(s) available\n')
+			flexsea.getLastPocketData(byref(myPocket));
+			
+			if displayFlexSEA:
+				i = printPocket(printDiv)
+				return i
+		#else:
+			#print('This is not a Rigid packet')
+	#else:
+		#print('Invalid packet')
+
+#Send Read Request ActPack:
+def requestReadPocket(offset):
+	#global setGains
+	#flexsea.ptx_cmd_actpack_rw(FLEXSEA_MANAGE_1, byref(nb), commStr, offset, controller, setpoint, setGains, g0, g1, g2, g3, system);
+	flexsea.ptx_cmd_pocket_r(FLEXSEA_MANAGE_1, byref(nb), commStr, offset);
+	hser.write(commStr)
+	#if(offset == 0 and setGains.value == CHANGE):
+	#	setGains = c_uint8(KEEP)
+
 #Display functions:
 #==================
 
@@ -213,6 +267,40 @@ def printRigid():
 	print('6-ch strain #0:  ', myRigid.mn.genVar[0])
 	print('...              ')
 
+#Print Pocket data:
+def printPocket_s():
+	print('Gyro X:          ', myPocket.mn.gyro.x)
+	print('Gyro Y:          ', myPocket.mn.gyro.y)
+	print('Gyro Z:          ', myPocket.mn.gyro.z)
+	print('Accel X:         ', myPocket.mn.accel.x)
+	print('Accel Y:         ', myPocket.mn.accel.y)
+	print('Accel Z:         ', myPocket.mn.accel.z)
+	print('Analog[0]:       ', myPocket.mn.analog[0])
+	print('Analog[0]:       ', myPocket.mn.analog[1])
+	
+	print('M1 Angle:        ', myPocket.ex[0].enc_ang[0])
+	print('M1 Velocity:     ', myPocket.ex[0].enc_ang_vel[0])
+	print('M1 Current:      ', myPocket.ex[0].mot_current)
+	print('M1 Voltage:      ', myPocket.ex[0].mot_volt)
+	print('M1 Strain:       ', myPocket.ex[0].strain)
+	
+	print('M2 Angle:        ', myPocket.ex[1].enc_ang[0])
+	print('M2 Velocity:     ', myPocket.ex[1].enc_ang_vel[0])
+	print('M2 Current:      ', myPocket.ex[1].mot_current)
+	print('M2 Voltage:      ', myPocket.ex[1].mot_volt)
+	print('M2 Strain:       ', myPocket.ex[1].strain)
+	
+	print('+VB:             ', myPocket.re.vb)
+	print('Battery current: ', myPocket.re.current)
+	print('Temperature:     ', myPocket.re.temp)
+	print('Status:          ', myPocket.re.status)
+	
+	print('genVar[0]:       ', myPocket.mn.genVar[0])
+	print('genVar[1]:       ', myPocket.mn.genVar[1])
+	print('genVar[2]:       ', myPocket.mn.genVar[2])
+	print('genVar[3]:       ', myPocket.mn.genVar[3])
+	print('...              ')
+
 #Print ActPack data (Rigid + controller info):
 def printActPack(div):
 	if(printDiv(div) == 0):
@@ -222,6 +310,18 @@ def printActPack(div):
 			os.system('clear') #Clear terminal (Unix)
 		printController(controller, setpoint, g0, g1, g2, g3, setGains)
 		printRigid()
+		return 0
+	return 1
+
+#Print Pocket data (pocket_s + controller info):
+def printPocket(div):
+	if(printDiv(div) == 0):
+		if sys.platform.lower().startswith('win'):
+			os.system('cls') #Clear terminal (Win)
+		elif sys.platform.lower().startswith('linux'):
+			os.system('clear') #Clear terminal (Unix)
+		printController(controller, setpoint, g0, g1, g2, g3, setGains)
+		printPocket_s()
 		return 0
 	return 1
 
