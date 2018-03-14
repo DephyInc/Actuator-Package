@@ -1,7 +1,6 @@
 /****************************************************************************
 	[Project] FlexSEA: Flexible & Scalable Electronics Architecture
-	[Sub-project] 'flexsea-user' System commands & functions specific to
-	user projects
+	[Sub-project] 'plan-gui' Graphical User Interface
 	Copyright (C) 2016 Dephy, Inc. <http://dephy.com/>
 
 	This program is free software: you can redistribute it and/or modify
@@ -22,60 +21,73 @@
 	Biomechatronics research group <http://biomech.media.mit.edu/>
 	[Contributors]
 *****************************************************************************
-	[This file] flexsea_cmd_user: Interface to the user functions
+	[This file] flexsea_board: configuration and functions for this
+	particular board
+*****************************************************************************
+	[Change log] (Convention: YYYY-MM-DD | author | comment)
+	* 2016-09-09 | jfduval | Initial GPL-3.0 release
+	*
 ****************************************************************************/
 
-#ifndef INC_FLEXSEA_CMD_USER_H
-#define INC_FLEXSEA_CMD_USER_H
+#ifndef INC_FLEXSEA_BOARD_H
+#define INC_FLEXSEA_BOARD_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-
-//****************************************************************************
-// Include(s)
-//****************************************************************************
-
-//****************************************************************************
-// Prototype(s):
-//****************************************************************************
-
-void init_flexsea_payload_ptr_user(void);
+// Although it's a part of the FlexSEA stack that file doesn't live in
+// flexsea-comm or flexsea-system, as it needs to be unique to each board.
 
 //****************************************************************************
 // Definition(s):
 //****************************************************************************
 
-//Give nickname to function codes here. Always remember that they have to be
-//in the 100-127 range!
+#ifdef BUILD_SHARED_LIB_DLL
 
-#define CMD_A2DOF					100
-#define CMD_RICNU					101
-#define CMD_MOTORTB					103
-#define CMD_ANGLE_TORQUE_PROFILE	104
-#define CMD_CYCLE_TESTER			105
-#define CMD_DPEB31					106
-#define CMD_DPEB42					CMD_DPEB31
-#define CMD_UTT						107
-#define CMD_GAITSTATS				108
+//Enabled the required FlexSEA Buffers for this board:
+#define ENABLE_FLEXSEA_BUF_1        //USB
+#define ENABLE_FLEXSEA_BUF_2        //SPI
+//#define ENABLE_FLEXSEA_BUF_3      //
+//#define ENABLE_FLEXSEA_BUF_4      //
+//#define ENABLE_FLEXSEA_BUF_5      //
 
-#define CMD_READ_ALL_POCKET			119
-#define CMD_READ_ALL_RIGID			120
-#define CMD_ACTPACK					121
-#define CMD_BILATERAL				125
-#define CMD_USER_DYNAMIC 			126
+#endif	//BUILD_SHARED_LIB_DLL
 
-//***************
-// Structure(s):
 //****************************************************************************
+// Include(s)
+//****************************************************************************
+
+#ifdef BUILD_SHARED_LIB_DLL
+#include <stdint.h>
+#include "../flexsea-comm/inc/flexsea_comm.h"
+//#include "../flexsea-comm/inc/flexsea.h"
+#endif	//BUILD_SHARED_LIB_DLL
+
+//****************************************************************************
+// Prototype(s):
+//****************************************************************************
+
+void flexsea_send_serial_slave(PacketWrapper* p);
+void flexsea_send_serial_master(PacketWrapper* p);
+
+#ifdef BUILD_SHARED_LIB_DLL
+uint8_t getBoardID(void);
+uint8_t getBoardUpID(void);
+uint8_t getBoardSubID(uint8_t sub, uint8_t idx);
+uint8_t getSlaveCnt(uint8_t sub);
+#endif	//BUILD_SHARED_LIB_DLL
 
 //****************************************************************************
 // Shared variable(s)
 //****************************************************************************
 
+#ifdef BUILD_SHARED_LIB_DLL
+extern uint8_t board_id;
+#endif	//BUILD_SHARED_LIB_DLL
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif	//INC_FLEXSEA_CMD_USER_H
+#endif  //INC_FLEXSEA_BOARD_H

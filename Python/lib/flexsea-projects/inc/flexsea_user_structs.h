@@ -143,6 +143,15 @@ struct rigid_s
 	uint8_t lastOffsetDecoded;
 };
 
+struct pocket_s
+{
+	struct fx_rigid_re_s re;
+	struct fx_rigid_mn_s mn;
+	struct fx_rigid_ex_s ex[2];
+	struct fx_rigid_ctrl_s	ctrl;
+	uint8_t lastOffsetDecoded;
+};
+
 struct utt_s
 {
 	uint8_t ctrl;
@@ -168,6 +177,7 @@ struct dual_utt_s
 extern struct motortb_s motortb;
 extern int16_t globvar[10];
 extern struct rigid_s rigid1, rigid2;
+extern struct pocket_s pocket1;
 extern int16_t globvar[10];
 extern struct dual_utt_s utt;
 

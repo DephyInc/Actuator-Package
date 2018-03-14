@@ -34,13 +34,16 @@
 void init_ActPack(void);
 void ActPack_fsm_1(void);
 void ActPack_fsm_2(void);
-void init_current_controller(void);
+void init_current_controller(uint8_t ch);
 
-void setMotorVoltage(int32_t v);
-void setMotorCurrent(int32_t i);
-void setControlMode(uint8_t m);
-void setControlGains(int16_t g0, int16_t g1, int16_t g2, int16_t g3);
-void setMotorPosition(int32_t i);
+void setMotorVoltage(int32_t v, uint8_t ch);
+void setMotorCurrent(int32_t i, uint8_t ch);
+void setControlMode(uint8_t m, uint8_t ch);
+void setControlGains(int16_t g0, int16_t g1, int16_t g2, int16_t g3, uint8_t ch);
+void setMotorPosition(int32_t i, uint8_t ch);
+
+void enableActPackFSM2(void);
+void disableActPackFSM2(void);
 
 //****************************************************************************
 // Accessor(s)
@@ -55,6 +58,9 @@ void setMotorPosition(int32_t i);
 #define CTRL_I_KP					100
 #define CTRL_I_KI					1
 #define CTRL_P_KP					200
+
+#define APC_FSM2_DISABLED			0
+#define APC_FSM2_ENABLED			1
 
 //****************************************************************************
 // Structure(s)
@@ -72,12 +78,13 @@ typedef struct {
 // Shared variable(s)
 //****************************************************************************
 
-extern struct ctrl_s ctrl;
+extern struct ctrl_s ctrl[2];
 extern struct rigid_s dpRigid;
 extern int32_t dp_ank_ang_zero;
 extern int32_t dp_mot_ang_zero;
 extern int32_t mot_ang_offset;
 extern int32_t ank_ang_offset;
+extern writeEx_s writeEx[2];
 
 #endif	//INC_ACTPACK_MN_H
 

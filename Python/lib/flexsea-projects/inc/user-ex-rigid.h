@@ -90,7 +90,7 @@ void user_fsm(void);
 //Step 1) Select active project (from list):
 //==========================================
 
-#define ACTIVE_PROJECT			PROJECT_DEPHY
+#define ACTIVE_PROJECT			PROJECT_POCKET_2XDC
 #define ACTIVE_SUBPROJECT		SUBPROJECT_A //A is Left
 
 //Step 2) Customize the enabled/disabled sub-modules:
@@ -290,7 +290,7 @@ void user_fsm(void);
 
 	//Enable/Disable sub-modules:
 	#define USE_RS485
-	#define USE_USB
+	//#define USE_USB
 	#define USE_COMM			//Requires USE_RS485 and/or USE_USB
 	#define USE_QEI
 	//#define USE_TRAPEZ
@@ -306,6 +306,62 @@ void user_fsm(void);
 	#define MOTOR_COMMUT		COMMUT_SINE
 	#define MOTOR_TYPE			MOTOR_BRUSHLESS
 	#define MOTOR_ORIENTATION 	CLOCKWISE_ORIENTATION
+
+	//Runtime finite state machine (FSM):
+    #define CO_ENABLE_ACTPACK
+	//#define FINDPOLES //define if you want to find the poles
+
+	#ifdef FINDPOLES
+		#define RUNTIME_FSM	 DISABLED
+	#else
+		#ifdef USE_TRAPEZ
+			#define RUNTIME_FSM	 DISABLED
+		#else
+			#define RUNTIME_FSM	 ENABLED
+		#endif
+	#endif
+
+	//Encoders:
+	#define ENC_CONTROL			ENC_QUADRATURE
+	#define ENC_COMMUT			ENC_QUADRATURE
+	#define ENC_DISPLAY			ENC_QUADRATURE
+	
+	#define CTRL_ENC_FCT(x) 	(x)  
+	#define CTRL_ENC_VEL_FCT(x) (x)    
+    #define CURRENT_ZERO		((int32)2048)
+
+	//Slave ID:
+	#define SLAVE_ID			FLEXSEA_EXECUTE_1
+
+	//Project specific definitions:
+	//...
+
+#endif  //PROJECT_BIO_RIGID
+
+//FlexSEA-Pocket v0.1 - 2x BLDC
+#if(ACTIVE_PROJECT == PROJECT_POCKET_2XDC)
+
+	//Enable/Disable sub-modules:
+	#define USE_RS485
+	//#define USE_USB
+	#define USE_COMM			//Requires USE_RS485 and/or USE_USB
+	#define USE_QEI				//Primary quadrature encoder
+	#define USE_QEI2			//	Second channel
+	//#define USE_TRAPEZ
+	#define USE_I2C_0			//3V3, Onboard (Manage)
+	//#define USE_I2C_1			//5V, External (Angle sensor)
+	#define USE_STRAIN			//
+	//#define USE_AS5047		//16-bit Position Sensor, SPI
+	//#define USE_AS5048B		//Joint angle sensor (I2C)
+	#define USE_EEPROM			//
+	#define USE_I2T_LIMIT		//I2t current limit
+
+	//Motor type and commutation:
+	#define MOTOR_COMMUT		COMMUT_NONE
+	#define MOTOR_TYPE			MOTOR_BRUSHED
+	#define MOTOR_ORIENTATION 	CLOCKWISE_ORIENTATION
+	
+	#define CO_ENABLE_ACTPACK	//Enables the ActPack state machine(s)
 
 	//Runtime finite state machine (FSM):
 
@@ -336,7 +392,7 @@ void user_fsm(void);
 	//Project specific definitions:
 	//...
 
-#endif  //PROJECT_SIMPLE_MOTOR
+#endif  //PROJECT_POCKET_2XDC
 
 #if(ACTIVE_PROJECT == PROJECT_DEPHY)
 

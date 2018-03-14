@@ -1,8 +1,7 @@
 /****************************************************************************
 	[Project] FlexSEA: Flexible & Scalable Electronics Architecture
-	[Sub-project] 'flexsea-user' System commands & functions specific to
-	user projects
-	Copyright (C) 2016 Dephy, Inc. <http://dephy.com/>
+	[Sub-project] 'flexsea-projects' User projects
+	Copyright (C) 2018 Dephy, Inc. <http://dephy.com/>
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -17,65 +16,59 @@
 	You should have received a copy of the GNU General Public License
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *****************************************************************************
-	[Lead developper] Jean-Francois (JF) Duval, jfduval at dephy dot com.
+	[Lead developer] Jean-Francois Duval, jfduval at dephy dot com.
 	[Origin] Based on Jean-Francois Duval's work at the MIT Media Lab
 	Biomechatronics research group <http://biomech.media.mit.edu/>
 	[Contributors]
 *****************************************************************************
-	[This file] flexsea_cmd_user: Interface to the user functions
+	[This file] user-mn-MIT-PocketClimb: Demo state machine for Pocket 2x DC
+*****************************************************************************
+	[Change log] (Convention: YYYY-MM-DD | author | comment)
+	* 2018-03-02 | jfduval | New release
 ****************************************************************************/
 
-#ifndef INC_FLEXSEA_CMD_USER_H
-#define INC_FLEXSEA_CMD_USER_H
+#ifdef INCLUDE_UPROJ_MIT_POCKET_CLIMB
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "main.h"
 
+#ifdef BOARD_TYPE_FLEXSEA_MANAGE
+
+#ifndef INC_MIT_POCKET_CLIMB_H
+#define INC_MIT_POCKET_CLIMB_H
 
 //****************************************************************************
 // Include(s)
 //****************************************************************************
 
-//****************************************************************************
-// Prototype(s):
-//****************************************************************************
-
-void init_flexsea_payload_ptr_user(void);
-
-//****************************************************************************
-// Definition(s):
-//****************************************************************************
-
-//Give nickname to function codes here. Always remember that they have to be
-//in the 100-127 range!
-
-#define CMD_A2DOF					100
-#define CMD_RICNU					101
-#define CMD_MOTORTB					103
-#define CMD_ANGLE_TORQUE_PROFILE	104
-#define CMD_CYCLE_TESTER			105
-#define CMD_DPEB31					106
-#define CMD_DPEB42					CMD_DPEB31
-#define CMD_UTT						107
-#define CMD_GAITSTATS				108
-
-#define CMD_READ_ALL_POCKET			119
-#define CMD_READ_ALL_RIGID			120
-#define CMD_ACTPACK					121
-#define CMD_BILATERAL				125
-#define CMD_USER_DYNAMIC 			126
-
-//***************
-// Structure(s):
-//****************************************************************************
 
 //****************************************************************************
 // Shared variable(s)
 //****************************************************************************
 
-#ifdef __cplusplus
-}
-#endif
 
-#endif	//INC_FLEXSEA_CMD_USER_H
+
+//****************************************************************************
+// Public Function Prototype(s):
+//****************************************************************************
+
+void init_MIT_PocketClimb(void);
+void MIT_PocketClimb_fsm_1(void);
+void MIT_PocketClimb_fsm_2(void);
+
+//****************************************************************************
+// Definition(s):
+//****************************************************************************
+
+#define LEFT_MOTOR				0
+#define RIGHT_MOTOR				1
+#define OPEN_PWM_DEMO_HIGH		200	//Range: -500 to +500 (PWM duty cycle)
+#define FORCE_GAIN				10	//pwm = ticks / gain => 5000 = max PWM
+
+//****************************************************************************
+// Structure(s)
+//****************************************************************************
+
+#endif	//INC_MIT_POCKET_CLIMB_H
+
+#endif 	//BOARD_TYPE_FLEXSEA_MANAGE
+#endif //INCLUDE_UPROJ_MIT_POCKET_CLIMB

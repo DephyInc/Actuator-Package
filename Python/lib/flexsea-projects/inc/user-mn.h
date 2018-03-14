@@ -63,6 +63,8 @@ void user_fsm_2(void);
 #define PROJECT_ANKLE_2DOF		4	//Biomechatronics 2-DOF Ankle
 #define PROJECT_RICNU_KNEE		5	//RIC/NU Knee
 #define PROJECT_UMICH_KNEE		6	//University of Michigan's Knee
+#define PROJECT_POCKET_2XDC		7	//FlexSEA-Pocket, 2x Brushed DC
+#define PROJECT_MIT_DLEG		8	//Biomechatronics' Rigid + Relative encoder
 
 //List of sub-projects:
 #define SUBPROJECT_NONE			0
@@ -78,7 +80,7 @@ void user_fsm_2(void);
 //Step 1) Select active project (from list):
 //==========================================
 
-#define ACTIVE_PROJECT			PROJECT_DEPHY
+#define ACTIVE_PROJECT			PROJECT_POCKET_2XDC
 #define ACTIVE_SUBPROJECT		SUBPROJECT_A
 
 //Step 2) Customize the enabled/disabled sub-modules:
@@ -165,7 +167,7 @@ void user_fsm_2(void);
 	//FSM2: Communication, we enabled this state machine to send data
 	//back to the GUI.  Manage will now control execute, rather than the GUI.
 
-	//#define ACTPACK_CO_ENABLED	(WiP, use at your own risk)
+	//#define CO_ENABLE_ACTPACK
 
 	#endif
 
@@ -340,7 +342,68 @@ void user_fsm_2(void);
 	#define RUNTIME_FSM1		ENABLED
 	#define RUNTIME_FSM2		ENABLED
 
-#endif	//PROJECT_BB_RIGID
+#endif	//PROJECT_UMICH_KNEE
+
+//FlexSEA-Pocket
+#if(ACTIVE_PROJECT == PROJECT_POCKET_2XDC)
+
+	//Enable/Disable sub-modules:
+	#define USE_USB
+	#define USE_COMM			//Requires USE_RS485 and/or USE_USB
+	#define USE_I2C_1			//3V3, IMU & Digital pot
+	//#define USE_I2C_2			//3V3, Expansion
+	#define USE_I2C_3			//Onboard, Regulate & Execute
+	#define USE_IMU				//Requires USE_I2C_1
+	#define USE_UART3			//Bluetooth
+	#define USE_EEPROM			//Emulated EEPROM, onboard FLASH
+	#define USE_WATCHDOG		//Independent watchdog (IWDG)
+	//#define USE_SPI_PLAN		//Enables the external SPI port
+
+	//Runtime finite state machine (FSM):
+	#define RUNTIME_FSM1		ENABLED	//Enable only if you DO NOT use Plan
+	#define RUNTIME_FSM2		ENABLED	//Enable at all time, Mn <> Ex comm.
+
+	#define CO_ENABLE_ACTPACK	//Enables the ActPack state machine(s)
+
+	#define MULTI_DOF_N			0
+
+#endif	//PROJECT_POCKET_2XDC
+
+//Biomechatronics' Rigid + Relative encoder
+#if(ACTIVE_PROJECT == PROJECT_MIT_DLEG)
+
+	//Enable/Disable sub-modules:
+	#define USE_USB
+	#define USE_COMM			//Requires USE_RS485 and/or USE_USB
+	#define USE_I2C_1			//3V3, IMU & Digital pot
+	#define USE_I2C_2			//3V3, Expansion
+	#define USE_I2C_3			//Onboard, Regulate & Execute
+	#define USE_IMU				//Requires USE_I2C_1
+	#define USE_UART3			//Bluetooth
+	#define USE_EEPROM			//Emulated EEPROM, onboard FLASH
+	#define USE_WATCHDOG		//Independent watchdog (IWDG)
+	//#define USE_6CH_AMP			//Requires USE_I2C_2. 6-ch Strain Amp.
+	#define USE_SPI_PLAN		//Enables the external SPI port
+
+	//Runtime finite state machine (FSM):
+	#define RUNTIME_FSM1		ENABLED	//Enable only if you DO NOT use Plan
+	#define RUNTIME_FSM2		ENABLED	//Enable at all time, Mn <> Ex comm.
+
+	#define CO_ENABLE_ACTPACK	//Enables the ActPack state machine(s)
+
+	#if(ACTIVE_SUBPROJECT == SUBPROJECT_A)
+
+	#define MULTI_DOF_N			0
+
+	#endif
+
+	#if(ACTIVE_SUBPROJECT == SUBPROJECT_B)
+
+	#define MULTI_DOF_N			1
+
+	#endif
+
+#endif	//PROJECT_MIT_DLEG
 
 #if(ACTIVE_PROJECT == PROJECT_DEPHY)
 
