@@ -1,8 +1,7 @@
 # FlexSEA_Example_Pocket_1
 #=-=-=-=-=-=-=-=-=-=-=-=-=
 # Major sensors will be displayed on the terminal.
-# Right motor toggles between two speeds
-# Left motor toggles between two positions
+# Setpoint comes from CSV file
 # Hit Ctrl+C to exit
 # 2018/03/15, Dephy, Inc.
 
@@ -12,12 +11,14 @@ from pyFlexSEA import *
 import os
 import sys
 import sched
+import csv
 
 # User setup:
 COM = comPortFromFile()
 refreshRate = 0.005		# seconds, communication & FSM
 displayDiv = 5			# We refresh the display every 50th packet
 flexSEAScheduler = sched.scheduler(perf_counter, sleep)
+csvFilename = 'ext/sine.csv';
 
 # position controller gains:
 pos_KP = 800 		# proportional gain
@@ -39,7 +40,6 @@ state = 'init'
 fsmLoopCounter = 0
 stateTime = 400
 hold_position_a = 0
-hold_position_b = 0
 
 def stateMachineDemo1():
 
@@ -65,33 +65,24 @@ def stateMachineDemo1():
 		setControlMode(CTRL_POSITION, LEFT)
 		setZGains(pos_KP, pos_KI, 0, 0, LEFT)
 		hold_position_a = myPocket.ex[LEFT].enc_ang[0]
-		hold_position_b = hold_position_a + deltaPos
 		setPosition(hold_position_a, LEFT) # Start where we are
 		
 		# Transition:
-		state = 'hold_a'
+		state = 'trackCSV'
+		fsmLoopCounter = 0
 
-	elif state == 'hold_a':
-		#CW, Position A
-		setMotorVoltage(200, RIGHT)
-		setPosition(hold_position_b, LEFT)
-	
-		# Transition:
-		fsmLoopCounter += 1
-		if(fsmLoopCounter > stateTime):
-			state = 'hold_b'
-			fsmLoopCounter = 0
+	elif state == 'trackCSV':
 
-	elif state == 'hold_b':
-		#CCW, Position B
-		setMotorVoltage(-200, RIGHT)
-		setPosition(hold_position_a, LEFT)
-	
-		# Transition:
 		fsmLoopCounter += 1
-		if(fsmLoopCounter > stateTime):
-			state = 'hold_a'
-			fsmLoopCounter = 0
+		if(fsmLoopCounter >= csvLen):
+				fsmLoopCounter = 0
+	
+		sOpen = int(csvSetpoint[fsmLoopCounter])
+		sPos = int(csvSetpoint[fsmLoopCounter]) + hold_position_a
+		setMotorVoltage(sOpen, RIGHT)
+		setPosition(sPos, LEFT)
+	
+		# No transition, stay here forever
 
 	else:
 		# Invalid state - stay here and complain
@@ -110,6 +101,14 @@ def beforeExiting():
 # "Main":
 print('\nDemo code - Python project with FlexSEA-Stack DLL')
 print('====================================================\n')
+
+# Open CSV file
+csvSetpoint = []
+csvFile = open(csvFilename)
+reader = csv.reader(csvFile, delimiter=',')
+for row in reader:
+	csvSetpoint.append(row[2])
+csvLen = len(csvSetpoint)
 
 # Open serial port:
 hser = serial.Serial(COM)

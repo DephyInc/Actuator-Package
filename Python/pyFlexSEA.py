@@ -297,7 +297,7 @@ def printPocket_s():
 	print('Accel Y:         ', myPocket.mn.accel.y)
 	print('Accel Z:         ', myPocket.mn.accel.z)
 	print('Analog[0]:       ', myPocket.mn.analog[0])
-	print('Analog[0]:       ', myPocket.mn.analog[1])
+	print('Analog[1]:       ', myPocket.mn.analog[1])
 	
 	print('M1 Angle:        ', myPocket.ex[0].enc_ang[0])
 	print('M1 Velocity:     ', myPocket.ex[0].enc_ang_vel[0])
