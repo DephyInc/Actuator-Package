@@ -3,7 +3,7 @@
 # First Pocket script
 # Major sensors will be displayed on the terminal.
 # Hit Ctrl+C to exit
-# 2018/03/14, Dephy, Inc.
+# 2018/03/15, Dephy, Inc.
 
 import serial
 from time import perf_counter, sleep
@@ -19,25 +19,24 @@ displayDiv = 5			# We refresh the display every 50th packet
 flexSEAScheduler = sched.scheduler(perf_counter, sleep)
 
 # position controller gains:
-pos_KP = 20 		# proportional gain
-pos_KI = 6 			# integral gain
-deltaPos = 10000	# Position difference
+pos_KP = 800 		# proportional gain
+pos_KI = 5 		# integral gain
+deltaPos = 300		# Position difference
 
 # This is called by the timer:
 def timerEvent():
 	# Read data & display it:
-	#i = readActPack(0, 2, displayDiv)
 	i = readPocket(0, 2, displayDiv)
 	if i == 0:
 		print('\nFSM State =', state)
 	# Call state machine:
-	#stateMachineDemo1()
+	stateMachineDemo1()
 	flexSEAScheduler.enter(refreshRate, 1, timerEvent) # adds itself back onto schedule
 
 # State machine
 state = 'init'
 fsmLoopCounter = 0
-stateTime = 300
+stateTime = 400
 hold_position_a = 0
 hold_position_b = 0
 
@@ -60,19 +59,21 @@ def stateMachineDemo1():
 
 	elif state == 'setController':
 		# Set Control mode to Position
-		print('Setting controller to Position...')
-		setControlMode(CTRL_POSITION)
-		setZGains(pos_KP, pos_KI, 0, 0)
-		hold_position_a = myRigid.ex.enc_ang[0]
+		print('Setting controllers: Right = Open, Left = Position...')
+		setPocketControlMode(CTRL_OPEN, RIGHT)
+		setPocketControlMode(CTRL_POSITION, LEFT)
+		setPocketZGains(pos_KP, pos_KI, 0, 0, LEFT)
+		hold_position_a = myPocket.ex[LEFT].enc_ang[0]
 		hold_position_b = hold_position_a + deltaPos
-		setPosition(hold_position_a) # Start where we are
+		setPocketPosition(hold_position_a, LEFT) # Start where we are
 		
 		# Transition:
 		state = 'hold_a'
 
 	elif state == 'hold_a':
-		# Equilibrium position
-		setPosition(hold_position_a)
+		#CW, Position A
+		setPocketMotorVoltage(200, RIGHT)
+		setPocketPosition(hold_position_a, LEFT)
 	
 		# Transition:
 		fsmLoopCounter += 1
@@ -81,7 +82,9 @@ def stateMachineDemo1():
 			fsmLoopCounter = 0
 
 	elif state == 'hold_b':
-		setPosition(hold_position_b)
+		#CCW, Position B
+		setPocketMotorVoltage(-200, RIGHT)
+		setPocketPosition(hold_position_b, LEFT)
 	
 		# Transition:
 		fsmLoopCounter += 1

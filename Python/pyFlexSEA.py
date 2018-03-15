@@ -29,6 +29,23 @@ g2 = c_int16(0)
 g3 = c_int16(0)
 system = c_uint8(0)
 
+#Pocket variables:
+pCtrlR = c_uint8(CTRL_NONE)
+pSetpointR = c_int32(0)
+pSetGainsR = c_uint8(KEEP)
+pG0R = c_int16(0)
+pG1R = c_int16(0)
+pG2R = c_int16(0)
+pG3R = c_int16(0)
+pCtrlL = c_uint8(CTRL_NONE)
+pSetpointL = c_int32(0)
+pSetGainsL = c_uint8(KEEP)
+pG0L = c_int16(0)
+pG1L = c_int16(0)
+pG2L = c_int16(0)
+pG3L = c_int16(0)
+pSystem = c_uint8(0)
+
 #Stack init and support functions:
 #=================================
 
@@ -191,6 +208,9 @@ def findPoles(block):
 			sleep(1)
 		print('Ready!')
 
+#Pocket functions:
+#================
+
 #Pocket is used to read sensor values, and write controller options & setpoint (FlexSEA-Pocket only)
 #minOffs & maxOffs control what offsets are read 
 # 0: IMU, voltages and other Mn + Re variables 
@@ -237,12 +257,69 @@ def readPocket(minOffs, maxOffs, printDiv, displayFlexSEA=True):
 
 #Send Read Request ActPack:
 def requestReadPocket(offset):
-	#global setGains
-	#flexsea.ptx_cmd_actpack_rw(FLEXSEA_MANAGE_1, byref(nb), commStr, offset, controller, setpoint, setGains, g0, g1, g2, g3, system);
-	flexsea.ptx_cmd_pocket_r(FLEXSEA_MANAGE_1, byref(nb), commStr, offset);
+	global pSetGainsL, pSetGainsR
+	flexsea.ptx_cmd_pocket_rw(FLEXSEA_MANAGE_1, byref(nb), commStr, offset, pCtrlR, pSetpointR, pSetGainsR, pG0R, pG1R, pG2R, pG3R, pCtrlL, pSetpointL, pSetGainsL, pG0L, pG1L, pG2L, pG3L, pSystem);
 	hser.write(commStr)
-	#if(offset == 0 and setGains.value == CHANGE):
-	#	setGains = c_uint8(KEEP)
+	if(pSetGainsR.value == CHANGE):
+		pSetGainsR = c_uint8(KEEP)
+	if(pSetGainsL.value == CHANGE):
+		pSetGainsL = c_uint8(KEEP)
+
+#Set Control Mode:
+def setPocketControlMode(ctrlMode, ch):
+	global pCtrlL
+	global pCtrlR
+	if ch == 0:
+		pCtrlR = c_uint8(ctrlMode)
+	if ch == 1:
+		pCtrlL = c_uint8(ctrlMode)
+
+#Set Motor Voltage:
+def setPocketMotorVoltage(mV, ch):
+	global pSetpointL
+	global pSetpointR
+	if ch == 0:
+		pSetpointR = c_int32(mV)
+	if ch == 1:
+		pSetpointL = c_int32(mV)
+
+#Set Motor Current:
+def setPocketMotorCurrent(cur, ch):
+	global pSetpointL
+	global pSetpointR
+	if ch == 0:
+		pSetpointR = c_int32(cur)
+	if ch == 1:
+		pSetpointL = c_int32(cur)
+	
+#Set Position Setpoint (Position & Impedance controllers):
+def setPocketPosition(p, ch):
+	global pSetpointL
+	global pSetpointR
+	if ch == 0:
+		pSetpointR = c_int32(p)
+	if ch == 1:
+		pSetpointL = c_int32(p)
+
+#Set Impedance controller gains.
+#z_k & z_b: Impedance K & B
+#i_kp & i_ki: Current Proportional & Integral
+def setPocketZGains(z_k, z_b, i_kp, i_ki, ch):
+	global pG0L, pG1L, pG2L, pG3L
+	global pG0R, pG1R, pG2R, pG3R
+	global pSetGainsL, pSetGainsR
+	if ch == 0:
+		pG0R = c_int16(z_k)
+		pG1R = c_int16(z_b)
+		pG2R = c_int16(i_kp)
+		pG3R = c_int16(i_ki)
+		pSetGainsR = c_uint8(CHANGE)
+	if ch == 1:
+		pG0L = c_int16(z_k)
+		pG1L = c_int16(z_b)
+		pG2L = c_int16(i_kp)
+		pG3L = c_int16(i_ki)
+		pSetGainsL = c_uint8(CHANGE)
 
 #Display functions:
 #==================
@@ -320,7 +397,8 @@ def printPocket(div):
 			os.system('cls') #Clear terminal (Win)
 		elif sys.platform.lower().startswith('linux'):
 			os.system('clear') #Clear terminal (Unix)
-		printController(controller, setpoint, g0, g1, g2, g3, setGains)
+		printController(pCtrlR, pSetpointR, pG0R, pG1R, pG2R, pG3R, pSetGainsR)
+		printController(pCtrlL, pSetpointL, pG0L, pG1L, pG2L, pG3L, pSetGainsL)
 		printPocket_s()
 		return 0
 	return 1

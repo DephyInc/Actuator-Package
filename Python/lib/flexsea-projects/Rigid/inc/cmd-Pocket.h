@@ -52,6 +52,12 @@ void tx_cmd_pocket_rw(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
 
 void ptx_cmd_pocket_r(uint8_t slaveId, uint16_t *numb, uint8_t *commStr, \
 							uint8_t offset);
+void ptx_cmd_pocket_rw(uint8_t slaveId, uint16_t *numb, uint8_t *commStr, \
+							uint8_t offset, uint8_t controller, \
+							int32_t setpoint, uint8_t setGains, int16_t g0, int16_t g1,\
+							int16_t g2, int16_t g3, uint8_t controllerB, \
+							int32_t setpointB, uint8_t setGainsB, int16_t g0B, int16_t g1B,\
+							int16_t g2B, int16_t g3B, uint8_t system);
 
 uint8_t newPocketRRpacketAvailable(void);
 void getLastPocketData(struct pocket_s *r);
