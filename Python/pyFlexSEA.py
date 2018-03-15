@@ -19,31 +19,15 @@ cBytes = (c_uint8 * COMM_STR_LEN)()
 myRigid = rigid_s();
 myPocket = pocket_s();
 
-#ActPack variables:
-controller = c_uint8(CTRL_NONE)
-setpoint = c_int32(0)
-setGains = c_uint8(KEEP)
-g0 = c_int16(0)
-g1 = c_int16(0)
-g2 = c_int16(0)
-g3 = c_int16(0)
-system = c_uint8(0)
-
-#Pocket variables:
-pCtrlR = c_uint8(CTRL_NONE)
-pSetpointR = c_int32(0)
-pSetGainsR = c_uint8(KEEP)
-pG0R = c_int16(0)
-pG1R = c_int16(0)
-pG2R = c_int16(0)
-pG3R = c_int16(0)
-pCtrlL = c_uint8(CTRL_NONE)
-pSetpointL = c_int32(0)
-pSetGainsL = c_uint8(KEEP)
-pG0L = c_int16(0)
-pG1L = c_int16(0)
-pG2L = c_int16(0)
-pG3L = c_int16(0)
+#Control variables:
+controlChannels = 2
+pCtrl = (c_uint8 * controlChannels)()
+pSetpoint = (c_int32 * controlChannels)()
+pSetGains = (c_uint8 * controlChannels)()
+pG0 = (c_int16 * controlChannels)()
+pG1 = (c_int16 * controlChannels)()
+pG2 = (c_int16 * controlChannels)()
+pG3 = (c_int16 * controlChannels)()
 pSystem = c_uint8(0)
 
 #Stack init and support functions:
@@ -66,6 +50,18 @@ def initPyFlexSEA():
 
 	#Init stack:
 	flexsea.initFlexSEAStack_minimalist(FLEXSEA_PLAN_1);
+	#Initialize control variables:
+	initControlVariables()
+
+def initControlVariables():
+	for i in range(0, controlChannels):
+		pCtrl[i] = c_uint8(CTRL_NONE)
+		pG0[i] = c_int16(0)
+		pG1[i] = c_int16(0)
+		pG2[i] = c_int16(0)
+		pG3[i] = c_int16(0)
+		pSetpoint[i] = c_int32(0)
+		pSetGains[i] = c_uint8(KEEP)
 
 #Get serial port handle from host
 def setPyFlexSEASerialPort(s):
@@ -97,43 +93,15 @@ def offs(min, max):
 		ri_offs = min
 	return ri_offs
 
+#Clears the terminal - use before printing new values
+def clearTerminal():
+	if sys.platform.lower().startswith('win'):
+		os.system('cls') #Clear terminal (Win)
+	elif sys.platform.lower().startswith('linux'):
+		os.system('clear') #Clear terminal (Unix)
+
 #ActPack user functions:
 #=======================
-
-#Set Control Mode:
-def setControlMode(ctrlMode):
-	global controller
-	controller = c_uint8(ctrlMode)
-
-#Set Motor Voltage:
-def setMotorVoltage(mV):
-	global setpoint
-	setpoint = c_int32(mV)
-
-#Set Motor Current:
-def setMotorCurrent(cur):
-	global setpoint
-	setpoint = c_int32(cur)
-	
-#Set Position Setpoint (Position & Impedance controllers):
-def setPosition(p):
-	global setpoint
-	setpoint = c_int32(p)
-
-#Set Impedance controller gains.
-#z_k & z_b: Impedance K & B
-#i_kp & i_ki: Current Proportional & Integral
-def setZGains(z_k, z_b, i_kp, i_ki):
-	global g0
-	global g1
-	global g2
-	global g3
-	global setGains
-	g0 = c_int16(z_k)
-	g1 = c_int16(z_b)
-	g2 = c_int16(i_kp)
-	g3 = c_int16(i_ki)
-	setGains = c_uint8(CHANGE)
 
 #ActPack is used to read sensor values, and write controller options & setpoint
 #minOffs & maxOffs control what offsets are read (0: IMU, joint enc., etc., 
@@ -177,23 +145,23 @@ def readActPack(minOffs, maxOffs, printDiv, displayFlexSEA=True):
 
 #Send Read Request ActPack:
 def requestReadActPack(offset):
-	global setGains
-	flexsea.ptx_cmd_actpack_rw(FLEXSEA_MANAGE_1, byref(nb), commStr, offset, controller, setpoint, setGains, g0, g1, g2, g3, system);
+	global pSetGains
+	flexsea.ptx_cmd_actpack_rw(FLEXSEA_MANAGE_1, byref(nb), commStr, offset, pCtrl[0], pSetpoint[0], pSetGains[0], pG0[0], pG1[0], pG2[0], pG3[0], pSystem);
 	hser.write(commStr)
-	if(offset == 0 and setGains.value == CHANGE):
-		setGains = c_uint8(KEEP)
+	if(offset == 0 and pSetGains[0] == CHANGE):
+		pSetGains[0] = c_uint8(KEEP)
 
 #Use this function to enable or disable FSM2. Controller will be reset.
 def actPackFSM2(on):
-	global system
-	global controller
-	controller = c_uint8(CTRL_NONE)	#Disable controller
+	global pSystem
+	global pCtrl
+	pCtrl[0] = c_uint8(CTRL_NONE)	#Disable controller
 	if on:
-		system = c_uint8(SYS_NORMAL)
+		pSystem = c_uint8(SYS_NORMAL)
 	else:
-		system = c_uint8(SYS_DISABLE_FSM2)
+		pSystem = c_uint8(SYS_DISABLE_FSM2)
 
-	flexsea.ptx_cmd_actpack_rw(FLEXSEA_MANAGE_1, byref(nb), commStr, c_uint8(0), controller, setpoint, setGains, g0, g1, g2, g3, system);
+	flexsea.ptx_cmd_actpack_rw(FLEXSEA_MANAGE_1, byref(nb), commStr, c_uint8(0), pCtrl[0], pSetpoint[0], pG0[0], pG1[0], pG2[0], pG3[0], pSetGains[0], pSystem);
 	hser.write(commStr)
 
 #Sends a request to Execute. Make sure to disable FSM2 first.
@@ -257,69 +225,45 @@ def readPocket(minOffs, maxOffs, printDiv, displayFlexSEA=True):
 
 #Send Read Request ActPack:
 def requestReadPocket(offset):
-	global pSetGainsL, pSetGainsR
-	flexsea.ptx_cmd_pocket_rw(FLEXSEA_MANAGE_1, byref(nb), commStr, offset, pCtrlR, pSetpointR, pSetGainsR, pG0R, pG1R, pG2R, pG3R, pCtrlL, pSetpointL, pSetGainsL, pG0L, pG1L, pG2L, pG3L, pSystem);
+	global pSetGains
+	flexsea.ptx_cmd_pocket_rw(FLEXSEA_MANAGE_1, byref(nb), commStr, offset, pCtrl[0], pSetpoint[0], pSetGains[0], pG0[0], pG1[0], pG2[0], pG3[0], pCtrl[1], pSetpoint[1], pSetGains[1], pG0[1], pG1[1], pG2[1], pG3[1], pSystem);
 	hser.write(commStr)
-	if(pSetGainsR.value == CHANGE):
-		pSetGainsR = c_uint8(KEEP)
-	if(pSetGainsL.value == CHANGE):
-		pSetGainsL = c_uint8(KEEP)
+	if(pSetGains[0] == CHANGE):
+		pSetGains[0] = c_uint8(KEEP)
+	if(pSetGains[1] == CHANGE):
+		pSetGains[1] = c_uint8(KEEP)
 
 #Set Control Mode:
-def setPocketControlMode(ctrlMode, ch):
-	global pCtrlL
-	global pCtrlR
-	if ch == 0:
-		pCtrlR = c_uint8(ctrlMode)
-	if ch == 1:
-		pCtrlL = c_uint8(ctrlMode)
+def setControlMode(ctrlMode, ch=0):
+	global pCtrl
+	pCtrl[ch] = c_uint8(ctrlMode)
 
 #Set Motor Voltage:
-def setPocketMotorVoltage(mV, ch):
-	global pSetpointL
-	global pSetpointR
-	if ch == 0:
-		pSetpointR = c_int32(mV)
-	if ch == 1:
-		pSetpointL = c_int32(mV)
+def setMotorVoltage(mV, ch=0):
+	global pSetpoint
+	pSetpoint[ch] = c_int32(mV)
 
 #Set Motor Current:
-def setPocketMotorCurrent(cur, ch):
-	global pSetpointL
-	global pSetpointR
-	if ch == 0:
-		pSetpointR = c_int32(cur)
-	if ch == 1:
-		pSetpointL = c_int32(cur)
-	
+def setMotorCurrent(cur, ch=0):
+	global pSetpoint
+	pSetpoint[ch] = c_int32(cur)
+
 #Set Position Setpoint (Position & Impedance controllers):
-def setPocketPosition(p, ch):
-	global pSetpointL
-	global pSetpointR
-	if ch == 0:
-		pSetpointR = c_int32(p)
-	if ch == 1:
-		pSetpointL = c_int32(p)
+def setPosition(p, ch=0):
+	global pSetpoint
+	pSetpoint[ch] = c_int32(p)
 
 #Set Impedance controller gains.
 #z_k & z_b: Impedance K & B
 #i_kp & i_ki: Current Proportional & Integral
-def setPocketZGains(z_k, z_b, i_kp, i_ki, ch):
-	global pG0L, pG1L, pG2L, pG3L
-	global pG0R, pG1R, pG2R, pG3R
-	global pSetGainsL, pSetGainsR
-	if ch == 0:
-		pG0R = c_int16(z_k)
-		pG1R = c_int16(z_b)
-		pG2R = c_int16(i_kp)
-		pG3R = c_int16(i_ki)
-		pSetGainsR = c_uint8(CHANGE)
-	if ch == 1:
-		pG0L = c_int16(z_k)
-		pG1L = c_int16(z_b)
-		pG2L = c_int16(i_kp)
-		pG3L = c_int16(i_ki)
-		pSetGainsL = c_uint8(CHANGE)
+def setZGains(z_k, z_b, i_kp, i_ki, ch=0):
+	global pG0, pG1, pG2, pG3
+	global pSetGains
+	pG0[ch] = c_int16(z_k)
+	pG1[ch] = c_int16(z_b)
+	pG2[ch] = c_int16(i_kp)
+	pG3[ch] = c_int16(i_ki)
+	pSetGains[ch] = c_uint8(CHANGE)
 
 #Display functions:
 #==================
@@ -381,11 +325,8 @@ def printPocket_s():
 #Print ActPack data (Rigid + controller info):
 def printActPack(div):
 	if(printDiv(div) == 0):
-		if sys.platform.lower().startswith('win'):
-			os.system('cls') #Clear terminal (Win)
-		elif sys.platform.lower().startswith('linux'):
-			os.system('clear') #Clear terminal (Unix)
-		printController(controller, setpoint, g0, g1, g2, g3, setGains)
+		clearTerminal()
+		printController(pCtrl[0], pSetpoint[0], pG0[0], pG1[0], pG2[0], pG3[0], pSetGains[0])
 		printRigid()
 		return 0
 	return 1
@@ -393,22 +334,19 @@ def printActPack(div):
 #Print Pocket data (pocket_s + controller info):
 def printPocket(div):
 	if(printDiv(div) == 0):
-		if sys.platform.lower().startswith('win'):
-			os.system('cls') #Clear terminal (Win)
-		elif sys.platform.lower().startswith('linux'):
-			os.system('clear') #Clear terminal (Unix)
-		printController(pCtrlR, pSetpointR, pG0R, pG1R, pG2R, pG3R, pSetGainsR)
-		printController(pCtrlL, pSetpointL, pG0L, pG1L, pG2L, pG3L, pSetGainsL)
+		clearTerminal()
+		printController(pCtrl[0], pSetpoint[0], pG0[0], pG1[0], pG2[0], pG3[0], pSetGains[0])
+		printController(pCtrl[1], pSetpoint[1], pG0[1], pG1[1], pG2[1], pG3[1], pSetGains[1])
 		printPocket_s()
 		return 0
 	return 1
 
 #Prints easy to read info about the controller
 def printController(ctrl, sp, g0, g1, g2, g3, sg):
-	c = mapCtrlText[ctrl.value]
-	s = sp.value
+	c = mapCtrlText[ctrl]
+	s = sp
 	print('\nController:', c, '|', 'Setpoint:', s)
-	print('Gains: [', g0.value, ', ', g1.value, ', ', g2.value, ', ', g3.value, '] (', sg.value, ')\n')
+	print('Gains: [', g0, ', ', g1, ', ', g2, ', ', g3, '] (', sg, ')\n')
 
 #Controller index to string mapping
 mapCtrlText = { 0 : 'CTRL_NONE',

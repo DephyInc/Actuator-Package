@@ -60,20 +60,20 @@ def stateMachineDemo1():
 	elif state == 'setController':
 		# Set Control mode to Position
 		print('Setting controllers: Right = Open, Left = Position...')
-		setPocketControlMode(CTRL_OPEN, RIGHT)
-		setPocketControlMode(CTRL_POSITION, LEFT)
-		setPocketZGains(pos_KP, pos_KI, 0, 0, LEFT)
+		setControlMode(CTRL_OPEN, RIGHT)
+		setControlMode(CTRL_POSITION, LEFT)
+		setZGains(pos_KP, pos_KI, 0, 0, LEFT)
 		hold_position_a = myPocket.ex[LEFT].enc_ang[0]
 		hold_position_b = hold_position_a + deltaPos
-		setPocketPosition(hold_position_a, LEFT) # Start where we are
+		setPosition(hold_position_a, LEFT) # Start where we are
 		
 		# Transition:
 		state = 'hold_a'
 
 	elif state == 'hold_a':
 		#CW, Position A
-		setPocketMotorVoltage(200, RIGHT)
-		setPocketPosition(hold_position_a, LEFT)
+		setMotorVoltage(200, RIGHT)
+		setPosition(hold_position_b, LEFT)
 	
 		# Transition:
 		fsmLoopCounter += 1
@@ -83,8 +83,8 @@ def stateMachineDemo1():
 
 	elif state == 'hold_b':
 		#CCW, Position B
-		setPocketMotorVoltage(-200, RIGHT)
-		setPocketPosition(hold_position_b, LEFT)
+		setMotorVoltage(-200, RIGHT)
+		setPosition(hold_position_a, LEFT)
 	
 		# Transition:
 		fsmLoopCounter += 1
