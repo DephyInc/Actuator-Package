@@ -40,9 +40,9 @@ def initPyFlexSEA():
 	#Init code:
 	print('[pySerial Module]\n')
 	global flexsea
-	libraries = [dir_path +'lib/FlexSEA-Stack-Plan', # Windows
-				dir_path +'lib/libFlexSEA-Stack-Plan.so', # Linux
-				dir_path +'lib/rpiFlexSEA-Stack-Plan.so'] # Raspbian
+	libraries = [dir_path +'\lib\FlexSEA-Stack-Plan', # Windows
+				dir_path +'/lib/libFlexSEA-Stack-Plan.so', # Linux
+				dir_path +'/lib/rpiFlexSEA-Stack-Plan.so'] # Raspbian
 	
 	for lib in libraries:
 		try:
