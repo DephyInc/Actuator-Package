@@ -10,6 +10,9 @@ from pyFlexSEA_def import *
 import os
 import sys
 
+#adding currenty directory path
+dir_path = os.path.dirname(os.path.realpath(__file__))
+
 #Variables used to send packets:
 nb = c_ushort(0)
 packetIndex = c_ushort(0)
@@ -37,9 +40,9 @@ def initPyFlexSEA():
 	#Init code:
 	print('[pySerial Module]\n')
 	global flexsea
-	libraries = ['lib/FlexSEA-Stack-Plan', # Windows
-				'lib/libFlexSEA-Stack-Plan.so', # Linux
-				'lib/rpiFlexSEA-Stack-Plan.so'] # Raspbian
+	libraries = [dir_path +'lib/FlexSEA-Stack-Plan', # Windows
+				dir_path +'lib/libFlexSEA-Stack-Plan.so', # Linux
+				dir_path +'lib/rpiFlexSEA-Stack-Plan.so'] # Raspbian
 	
 	for lib in libraries:
 		try:
