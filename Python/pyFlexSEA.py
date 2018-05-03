@@ -9,6 +9,7 @@ from time import sleep
 from pyFlexSEA_def import *
 import os
 import sys
+import platform
 
 #adding currenty directory path
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -40,21 +41,42 @@ def initPyFlexSEA():
 	#Init code:
 	print('[pySerial Module]\n')
 	global flexsea
-	libraries = [dir_path +'\lib\FlexSEA-Stack-Plan', # Windows
-				dir_path +'/lib/libFlexSEA-Stack-Plan.so', # Linux
-				dir_path +'/lib/rpiFlexSEA-Stack-Plan.so'] # Raspbian
+
+	loadSucceeded  = False
+	is_64bits = sys.maxsize > 2**32
+	sysOS = platform.system().lower()
+
+	libraries = []
+	if("win" in sysOS):
+		if(is_64bits):
+			libraries.append( dir_path + '/lib/FlexSEA-Stack-Plan_64' )
+		else:
+			libraries.append( dir_path + '/lib/FlexSEA-Stack-Plan' )
+			
+	elif("darwin" in sysOS):
+		print("FlexseaStack for mac does not exist")
+	elif("linux" in sysOS):
+		libraries.append( dir_path +'/lib/libFlexSEA-Stack-Plan.so' ) # Linux
+	else:
+		libraries.append( dir_path +'/lib/rpiFlexSEA-Stack-Plan.so' ) # Raspbian
 	
 	for lib in libraries:
 		try:
 			flexsea = cdll.LoadLibrary(lib)
+			loadSucceeded = True
 			break
 		except:
 			pass
 
-	#Init stack:
-	flexsea.initFlexSEAStack_minimalist(FLEXSEA_PLAN_1);
-	#Initialize control variables:
-	initControlVariables()
+	if(not loadSucceeded):
+		print("Failed to load shared library. Check library path\n")
+	else:
+		#Init stack:-
+		flexsea.initFlexSEAStack_minimalist(FLEXSEA_PLAN_1);
+		#Initialize control variables:
+		initControlVariables()
+
+	return loadSucceeded
 
 def initControlVariables():
 	for i in range(0, controlChannels):
