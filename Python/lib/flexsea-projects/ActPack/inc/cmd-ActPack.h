@@ -15,8 +15,6 @@
 	*
 ****************************************************************************/
 
-#ifdef INCLUDE_UPROJ_ACTPACK
-
 #ifndef INC_FLEXSEA_CMD_ACTPACK_H
 #define INC_FLEXSEA_CMD_ACTPACK_H
 
@@ -101,4 +99,3 @@ extern uint8_t ActPackSys;
 #endif
 
 #endif	//INC_FLEXSEA_CMD_ACTPACK_H
-#endif //INCLUDE_UPROJ_ACTPACK

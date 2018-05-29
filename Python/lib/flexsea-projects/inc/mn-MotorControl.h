@@ -1,7 +1,7 @@
 /****************************************************************************
 	[Project] FlexSEA: Flexible & Scalable Electronics Architecture
-	[Sub-project] 'flexsea-system' System commands & functions
-	Copyright (C) 2016 Dephy, Inc. <http://dephy.com/>
+	[Sub-project] 'flexsea-manage' Mid-level computing, and networking
+	Copyright (C) 2018 Dephy, Inc. <http://dephy.com/>
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -21,61 +21,68 @@
 	Biomechatronics research group <http://biomech.media.mit.edu/>
 	[Contributors]
 *****************************************************************************
-	[This file] flexsea_cmd_data: Data Commands
+	[This file] mn-MotorControl: Wrappers for motor control functions on Mn
 *****************************************************************************
 	[Change log] (Convention: YYYY-MM-DD | author | comment)
-	* 2016-09-09 | jfduval | Initial GPL-3.0 release
+	* 2018-05-22 | jfduval | Initial GPL-3.0 release
 	*
 ****************************************************************************/
 
-#ifndef INC_FLEXSEA_CMD_DATA_H
-#define INC_FLEXSEA_CMD_DATA_H
+#ifdef BOARD_TYPE_FLEXSEA_MANAGE
+
+#ifndef INC_MN_MOTOR_CONTROL_H
+#define INC_MN_MOTOR_CONTROL_H
 
 //****************************************************************************
 // Include(s)
 //****************************************************************************
 
-#include <stdint.h>
+#include "main.h"
+#include "flexsea_board.h"
+#include "flexsea_sys_def.h"
+#include "flexsea_global_structs.h"
 
 //****************************************************************************
-// Prototype(s):
+// Public Function Prototype(s):
 //****************************************************************************
 
-void init_flexsea_payload_ptr_data(void);
-
-//Read All
-void rx_cmd_data_read_all_rw(uint8_t *buf, uint8_t *info);
-void rx_cmd_data_read_all_rr(uint8_t *buf, uint8_t *info);
-void tx_cmd_data_read_all_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
-					uint16_t *len);
-void tx_cmd_data_read_all_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
-					uint16_t *len);
-
-//User Data
-void rx_cmd_data_user_rw(uint8_t *buf, uint8_t *info);
-void rx_cmd_data_user_rr(uint8_t *buf, uint8_t *info);
-void rx_cmd_data_user_w(uint8_t *buf, uint8_t *info);
-void tx_cmd_data_user_r(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
-						uint16_t *len);
-void tx_cmd_data_user_w(uint8_t *shBuf, uint8_t *cmd, uint8_t *cmdType, \
-						uint16_t *len, uint8_t select_w);
-
-void copyUserWtoStack(struct user_data_s u);
-void readUserRfromStack(struct user_data_s *u);
-void ptx_cmd_data_user_r(uint8_t slaveId, uint16_t *numb, uint8_t *commStr);
-void ptx_cmd_data_user_w(uint8_t slaveId, uint16_t *numb, uint8_t *commStr, \
-							uint8_t select_w);
+void initWriteEx(uint8_t ch);
+void init_current_controller(uint8_t ch);
+void init_position_controller(uint8_t ch);
+void setMotorVoltage(int32_t v, uint8_t ch);
+void setMotorCurrent(int32_t i, uint8_t ch);
+void setControlMode(uint8_t m, uint8_t ch);
+void setControlGains(int16_t g0, int16_t g1, int16_t g2, int16_t g3, uint8_t ch);
+void setMotorPosition(int32_t i, uint8_t ch);
 
 //****************************************************************************
 // Definition(s):
 //****************************************************************************
 
+//Default:
+#define CTRL_I_KP					100
+#define CTRL_I_KI					20
+#define CTRL_P_KP					200
+
 //****************************************************************************
-// Structure(s):
+// Structure(s)
 //****************************************************************************
+
+typedef struct {
+	uint8_t ctrl;
+	int32_t setpoint;
+	uint8_t setGains;
+	uint8_t offset;
+	int16_t g[4];
+} writeEx_s;
 
 //****************************************************************************
 // Shared variable(s)
 //****************************************************************************
 
-#endif	//INC_FLEXSEA_CMD_DATA_H
+extern struct ctrl_s ctrl[];
+extern writeEx_s writeEx[];
+
+#endif	//INC_MN_MOTOR_CONTROL_H
+
+#endif //BOARD_TYPE_FLEXSEA_MANAGE

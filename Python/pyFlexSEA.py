@@ -34,6 +34,9 @@ pG2 = (c_int16 * controlChannels)()
 pG3 = (c_int16 * controlChannels)()
 pSystem = c_uint8(0)
 
+#User R/W:
+myUserRW = user_data_s();
+
 #Stack init and support functions:
 #=================================
 
@@ -200,6 +203,19 @@ def findPoles(block):
 			print(s,'seconds...')
 			sleep(1)
 		print('Ready!')
+
+def writeUser(index, value):
+	global myUserRW
+	myUserRW.w[index] = c_int32(value);
+	flexsea.copyUserWtoStack(myUserRW);
+	flexsea.ptx_cmd_data_user_w(FLEXSEA_MANAGE_1, byref(nb), commStr, c_uint8(index))
+	hser.write(commStr)
+
+def readUser():
+	global myUserRW
+	flexsea.readUserRfromStack(byref(myUserRW))	#Copy last value
+	flexsea.ptx_cmd_data_user_r(FLEXSEA_MANAGE_1, byref(nb), commStr) #Read new one
+	hser.write(commStr)
 
 #Pocket functions:
 #================

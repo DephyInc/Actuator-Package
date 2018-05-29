@@ -125,6 +125,10 @@ class pocket_s(Structure):
 					("ctrl", fx_rigid_ctrl_s),
 					("lastOffsetDecoded", c_uint8)]
 
+class user_data_s(Structure):
+		_fields_ = [("r", c_int32 * 4),
+					("w", c_int32 * 4)]
+
 #Constants:
 FLEXSEA_PLAN_1 = 10
 FLEXSEA_MANAGE_1 = 20

@@ -49,6 +49,7 @@
 void init_user(void);
 void user_fsm_1(void);
 void user_fsm_2(void);
+void reset_user_code(void);
 
 //****************************************************************************
 // Definition(s):
@@ -80,7 +81,7 @@ void user_fsm_2(void);
 //Step 1) Select active project (from list):
 //==========================================
 
-#define ACTIVE_PROJECT			PROJECT_POCKET_2XDC
+#define ACTIVE_PROJECT			PROJECT_DEPHY
 #define ACTIVE_SUBPROJECT		SUBPROJECT_A
 
 //Step 2) Customize the enabled/disabled sub-modules:
@@ -310,6 +311,7 @@ void user_fsm_2(void);
 		//#define USE_WATCHDOG		//Independent watchdog (IWDG)
 		//#define USE_6CH_AMP		//Requires USE_I2C_2. 6-ch Strain Amp.
 		//#define USE_SPI_PLAN		//Enables the external SPI port
+		#define USE_XB24C			//Radio module on UART2 (Expansion port)
 
 		//Runtime finite state machine (FSM):
 		//#define RUNTIME_FSM1		ENABLED	//Enable only if you DO NOT use Plan

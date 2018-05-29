@@ -168,6 +168,7 @@ extern "C" {
 //List of calibration procedures
 #define CALIBRATION_FIND_POLES 				0x01
 #define CALIBRATION_FIND_CURRENT_ZEROES 	0x02
+#define CALIBRATION_BELT					0x04
 
 //  (set gains with CMD_SET_Z_GAINS & CMD_CTRL_I_GAINS_WRITE)
 

@@ -15,8 +15,9 @@
 	*
 ****************************************************************************/
 
-#ifdef INCLUDE_UPROJ_ACTPACK
 #ifdef BOARD_TYPE_FLEXSEA_EXECUTE
+#include "user-ex-rigid.h"
+#if(ACTIVE_PROJECT == PROJECT_ACTPACK)
 
 #ifndef INC_ACTPACK_EX_H
 #define INC_ACTPACK_EX_H
@@ -49,5 +50,5 @@ void ActPack_refresh_values(void);
 
 #endif	//INC_ACTPACK_EX_H
 
+#endif //(ACTIVE_PROJECT == PROJECT_ACTPACK)
 #endif //BOARD_TYPE_FLEXSEA_EXECUTE
-#endif //INCLUDE_UPROJ_ACTPACK
