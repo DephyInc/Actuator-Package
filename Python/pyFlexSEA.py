@@ -216,6 +216,19 @@ def readUser():
 	flexsea.readUserRfromStack(byref(myUserRW))	#Copy last value
 	flexsea.ptx_cmd_data_user_r(FLEXSEA_MANAGE_1, byref(nb), commStr) #Read new one
 	hser.write(commStr)
+	
+	#Read:
+	bytes = serialBytesReady(100, COMM_STR_LEN)
+	
+	#s = hser.read(bytes)
+	s = hser.read(COMM_STR_LEN) #Reading a fixed length for now
+	for i in range(0,bytes-1):
+		#print(s[i], end=' ')
+		cBytes[i] = s[i]
+	#print(']')
+	
+	ppFlag = c_uint8(0)
+	ppFlag = flexsea.receiveFlexSEABytes(byref(cBytes), bytes, 1);
 
 #Pocket functions:
 #================

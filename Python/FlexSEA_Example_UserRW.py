@@ -14,7 +14,7 @@ import sched
 
 # User setup:
 COM = comPortFromFile()
-refreshRate = 0.005		# seconds, communication & FSM
+refreshRate = 0.025		# seconds, communication & FSM
 displayDiv = 5			# We refresh the display every 50th packet
 flexSEAScheduler = sched.scheduler(perf_counter, sleep)
 
@@ -26,7 +26,7 @@ def timerEvent():
 	i = 0
 	if i == 0:
 		#print('\nFSM State =', state)
-		print('User Read[0] =', myUserRW.r[0])
+		print('User Read[] =', myUserRW.r[0], myUserRW.r[1], myUserRW.r[2], myUserRW.r[3])
 	# Call state machine:
 	stateMachineDemo1()
 	flexSEAScheduler.enter(refreshRate, 1, timerEvent) # adds itself back onto schedule
@@ -55,7 +55,7 @@ def stateMachineDemo1():
 		# Write an incrementing value
 
 		fsmLoopCounter += 1
-		if(fsmLoopCounter > 100):
+		if(fsmLoopCounter > 10):
 			fsmLoopCounter = 0
 			# Transition:
 			state = 'readVal'
