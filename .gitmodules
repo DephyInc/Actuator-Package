@@ -1,0 +1,3 @@
+[submodule "acpac_cscripts"]
+	path = acpac_cscripts
+	url = https://github.com/DephyInc/acpac_cscripts.git
