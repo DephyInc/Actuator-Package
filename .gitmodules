@@ -1,3 +1,6 @@
 [submodule "acpac_cscripts"]
 	path = acpac_cscripts
 	url = https://github.com/DephyInc/acpac_cscripts.git
+[submodule "fx_plan_stack"]
+	path = fx_plan_stack
+	url = https://github.com/DephyInc/fx_plan_stack.git
