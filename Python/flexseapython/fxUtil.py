@@ -1,5 +1,5 @@
-from pyFlexsea import *
-from pyFlexsea_def import *
+from flexseapython.pyFlexsea import *
+from flexseapython.pyFlexsea_def import *
 from time import sleep
 
 def loadAndGetDevice(filename, numDevices=None):

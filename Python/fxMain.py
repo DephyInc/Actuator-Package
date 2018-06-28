@@ -1,35 +1,32 @@
-from pyFlexsea import *
-from pyFlexsea_def import *
-from fxUtil import *
+import os, sys
+thisdir = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(thisdir)
 
-from flexsea_demo.readonly import fxReadOnly
-from flexsea_demo.opencontrol import fxOpenControl
-from flexsea_demo.currentcontrol import fxCurrentControl
-from flexsea_demo.positioncontrol import fxPositionControl
-from flexsea_demo.two_devices_positioncontrol import fxTwoDevicePositionControl
-from flexsea_demo.two_devices_leaderfollower import fxLeaderFollower
+from flexseapython.pyFlexsea import *
+from flexseapython.pyFlexsea_def import *
+from flexseapython.fxUtil import *
+from flexseapython.flexsea_demo.readonly import fxReadOnly
+from flexseapython.flexsea_demo.opencontrol import fxOpenControl
+from flexseapython.flexsea_demo.currentcontrol import fxCurrentControl
+from flexseapython.flexsea_demo.positioncontrol import fxPositionControl
+from flexseapython.flexsea_demo.two_devices_positioncontrol import fxTwoDevicePositionControl
+from flexseapython.flexsea_demo.two_devices_leaderfollower import fxLeaderFollower
 
 def fxFindPoles(devId):
 	findPoles(devId, 2)
 
 def main():
-
-	# scriptPath = os.path.dirname(os.path.abspath(__file__))
-	# fpath = scriptPath + '/com.txt'
-	# devIds = loadAndGetDevice(fpath, 2)
-	# print('Got devices: ' + str(devIds))
-
-	devIds = loadAndGetDevice(['COM3', 'COM13'])
-
+	scriptPath = os.path.dirname(os.path.abspath(__file__))
+	fpath = scriptPath + '/flexseapython/com.txt'
+	devIds = loadAndGetDevice(fpath, 2)
+	print('Got devices: ' + str(devIds))
+#	devIds = loadAndGetDevice(['COM3', 'COM13'])
 	try:
-		fxLeaderFollower(devIds[0], devIds[1])
-
-		# expNumb = selectExperiment()
-		# if(expNumb < 5):
-		# 	experiments[expNumb][0](devIds[0])
-		# else:
-		# 	experiments[expNumb][0](devIds[0], devIds[1])
-		
+		expNumb = selectExperiment()
+		if(expNumb < 5):
+			experiments[expNumb][0](devIds[0])
+		else:
+			experiments[expNumb][0](devIds[0], devIds[1])
 	except Exception as e:
 		print("broke: " + str(e))
 		pass
@@ -41,7 +38,7 @@ experiments = [ 							\
 	(fxPositionControl, "Position Control"),\
 	(fxFindPoles, "Find Poles"),			\
 	(fxTwoDevicePositionControl, "Two Device Position Control"), \
-	(fxLeaderFollower, "Two Device Position Control"),
+	(fxLeaderFollower, "Two Device Leader Follower Control"),
 ]
 
 def selectExperiment():

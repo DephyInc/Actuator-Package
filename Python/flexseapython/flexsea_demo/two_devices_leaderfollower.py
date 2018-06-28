@@ -34,6 +34,7 @@ def fxLeaderFollower(devId0, devId1):
 	initialAngles = fxReadDevice(devId0, [FX_ENC_ANG]) + fxReadDevice(devId1, [FX_ENC_ANG])
 	timeout = 10
 	timeoutCount = 0
+
 	while(None in initialAngles):
 		timeoutCount = timeoutCount + 1
 		if(timeoutCount > timeout):
@@ -70,11 +71,11 @@ def fxLeaderFollower(devId0, devId1):
 			angle0 = fxReadDevice(devId0, [FX_ENC_ANG])[0]
 			if(angle0 != None):
 				diff0 = angle0 - initialAngles[0]
-				setPosition(devId1, initialAngles[1] + 10*diff0)
+				setPosition(devId1, initialAngles[1] + 3*diff0)
 
 			count = (count + 1) % 10
 			if(count == 0):
-				os.system('cls')
+				clearTerminal()
 				print("device {} following device {}".format(devId1, devId0))
 				for devId in [devId0, devId1]:
 					data = fxReadDevice(devId, varsToStream)

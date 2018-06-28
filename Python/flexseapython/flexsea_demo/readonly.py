@@ -1,11 +1,11 @@
 import os, sys
 from time import sleep
 
-pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+pardir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(pardir)
-from pyFlexsea import *
-from pyFlexsea_def import *
-from fxUtil import *
+from flexseapython.pyFlexsea import *
+from flexseapython.pyFlexsea_def import *
+from flexseapython.fxUtil import *
 
 labels = ["State time", 											\
 "accel x", "accel y", "accel z", "gyro x", "gyro y", "gyro z", 		\
@@ -31,7 +31,7 @@ def fxReadOnly(devId):
 
 	for i in range(0, 100):
 		sleep(0.5)
-		os.system('cls')
+		clearTerminal()
 		data = fxReadDevice(devId, varsToStream)
 		printData(labels, data)
 
