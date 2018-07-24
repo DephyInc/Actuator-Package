@@ -53,8 +53,8 @@ def fxPositionControl(devId):
 	for i in range(0, 100):
 		sleep(0.1)
 		data = fxReadDevice(devId, varsToStream)
-		os.system('cls')
-		print("Holding position: {}...".format(initialAngle))
+		clearTerminal()
+                print("Holding position: {}...".format(initialAngle))
 		printData(labels, data)
 
 
