@@ -1,11 +1,16 @@
 from flexseapython.pyFlexsea import *
 from flexseapython.pyFlexsea_def import *
 from time import sleep
+import os
 
 def loadAndGetDevice(filename, numDevices=None):
 	loadSuccess = loadFlexsea()
 	if(not loadSuccess):
 		print("Library load failed... quitting")
+
+        isUnix = os.name != 'nt'
+        if(isUnix and os.geteuid() != 0):
+            sys.exit('\nRoot privileges needed for running this script')
 
 	if(numDevices != None):
 		portList = []
@@ -61,7 +66,8 @@ def printData(labels, values):
 
 #Clears the terminal - use before printing new values
 def clearTerminal():
-	if sys.platform.lower().startswith('win'):
+        isWin = os.name == 'nt'
+        if isWin:
 		os.system('cls') #Clear terminal (Win)
-	elif sys.platform.lower().startswith('linux'):
-		os.system('clear') #Clear terminal (Unix)
+        else:
+                os.system('clear') #Clear terminal (Unix)
