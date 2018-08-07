@@ -25,7 +25,7 @@ def fxCurrentControl(devId):
 
 	print('Setting controller to current...')
 	setControlMode(devId, CTRL_CURRENT)
-	setZGains(devId, 20, 1, 0, 0)
+	setZGains(devId, 100, 20, 0, 0)
 	setMotorCurrent(devId, holdCurrent) # Start the current, holdCurrent is in mA 
 
 	try:
