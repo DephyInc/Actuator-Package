@@ -32,8 +32,8 @@ def fxCurrentControl(devId):
 		while(True):
 			sleep(0.1)
 			data = fxReadDevice(devId, varsToStream)
-			os.system('cls')
-			print("Holding Current: {} mA...".format(holdCurrent))
+			clearTerminal()
+                        print("Holding Current: {} mA...".format(holdCurrent))
 			printData(labels, data)
 
 	except:
