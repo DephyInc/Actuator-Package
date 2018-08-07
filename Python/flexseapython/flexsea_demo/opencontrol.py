@@ -34,7 +34,7 @@ def fxOpenControl(devId):
 	numSeconds = 1.0
 	maxVoltage = 3000
 	numTimes = 2
-        sleepInterval = numSeconds / numSteps
+	sleepInterval = numSeconds / numSteps
 	for time in range(0, numTimes):
 
 		for i in range(0, numSteps):
@@ -43,7 +43,7 @@ def fxOpenControl(devId):
 			setMotorVoltage(devId, mV)
 			data = fxReadDevice(devId, varsToStream)
 			clearTerminal()
-                        print('Open control demo...')
+			print('Open control demo...')
 			print("Ramping up open controller...") 
 			printData(labels, data)
 		
