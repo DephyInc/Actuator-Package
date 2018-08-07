@@ -7,10 +7,9 @@ def loadAndGetDevice(filename, numDevices=None):
 	loadSuccess = loadFlexsea()
 	if(not loadSuccess):
 		print("Library load failed... quitting")
-
-        isUnix = os.name != 'nt'
-        if(isUnix and os.geteuid() != 0):
-            sys.exit('\nRoot privileges needed for running this script')
+		isUnix = os.name != 'nt'
+		if(isUnix and os.geteuid() != 0):
+			sys.exit('\nRoot privileges needed for running this script')
 
 	if(numDevices != None):
 		portList = []
@@ -66,8 +65,8 @@ def printData(labels, values):
 
 #Clears the terminal - use before printing new values
 def clearTerminal():
-        isWin = os.name == 'nt'
-        if isWin:
+	isWin = os.name == 'nt'
+	if isWin:
 		os.system('cls') #Clear terminal (Win)
-        else:
-                os.system('clear') #Clear terminal (Unix)
+	else:
+		os.system('clear') #Clear terminal (Unix)
