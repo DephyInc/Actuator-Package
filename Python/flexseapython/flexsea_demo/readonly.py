@@ -12,7 +12,6 @@ labels = ["State time", 											\
 "encoder angle", "ankle angle","motor voltage"
 ]
 
-
 varsToStream = [ 							\
 	FX_STATETIME, 							\
 	FX_ACCELX, FX_ACCELY, FX_ACCELZ, 		\
@@ -29,8 +28,8 @@ def fxReadOnly(devId):
 		print("streaming failed...")
 		sys.exit(-1)
 
-	for i in range(0, 100):
-		sleep(0.5)
+	for i in range(0, 250):
+		sleep(0.1)
 		clearTerminal()
 		data = fxReadDevice(devId, varsToStream)
 		printData(labels, data)

@@ -12,13 +12,16 @@ from flexseapython.flexsea_demo.positioncontrol import fxPositionControl
 from flexseapython.flexsea_demo.two_devices_positioncontrol import fxTwoDevicePositionControl
 from flexseapython.flexsea_demo.two_devices_leaderfollower import fxLeaderFollower
 
+#Specify the number of devices - this has to be consistent with com.txt
+FLEXSEA_DEVICES = 1
+
 def fxFindPoles(devId):
-	findPoles(devId, 2)
+	findPoles(devId, FLEXSEA_DEVICES)
 
 def main():
 	scriptPath = os.path.dirname(os.path.abspath(__file__))
 	fpath = scriptPath + '/flexseapython/com.txt'
-	devIds = loadAndGetDevice(fpath, 2)
+	devIds = loadAndGetDevice(fpath, FLEXSEA_DEVICES)
 	print('Got devices: ' + str(devIds))
 #	devIds = loadAndGetDevice(['COM3', 'COM13'])
 	try:

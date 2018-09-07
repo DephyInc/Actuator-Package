@@ -7,23 +7,23 @@ from pyFlexsea import *
 from pyFlexsea_def import *
 from fxUtil import *
 
+labels = ["State time", 											\
+"accel x", "accel y", "accel z", "gyro x", "gyro y", "gyro z", 		\
+"encoder angle", "motor voltage"									\
+]
+
+varsToStream = [ 							\
+	FX_STATETIME, 							\
+	FX_ACCELX, FX_ACCELY, FX_ACCELZ, 		\
+	FX_GYROX,  FX_GYROY,  FX_GYROZ,			\
+	FX_ENC_ANG,								\
+	FX_MOT_VOLT								\
+]
+
 def fxOpenControl(devId):
 
-	labels = ["State time", 											\
-	"accel x", "accel y", "accel z", "gyro x", "gyro y", "gyro z", 		\
-	"encoder angle", "motor voltage"									\
-	]
-
-	varsToStream = [ 							\
-		FX_STATETIME, 							\
-		FX_ACCELX, FX_ACCELY, FX_ACCELZ, 		\
-		FX_GYROX,  FX_GYROY,  FX_GYROZ,			\
-		FX_ENC_ANG,								\
-		FX_MOT_VOLT								\
-	]
-
 	fxSetStreamVariables(devId, varsToStream)
-	streamSuccess = fxStartStreaming(devId, 100, False, 1)
+	streamSuccess = fxStartStreaming(devId, 100, False, 0)
 	if(not streamSuccess ):
 		print("streaming failed...")
 		sys.exit(-1)
