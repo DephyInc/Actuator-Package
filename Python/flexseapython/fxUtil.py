@@ -6,10 +6,12 @@ import os
 def loadAndGetDevice(filename, numDevices=None):
 	loadSuccess = loadFlexsea()
 	if(not loadSuccess):
-		print("Library load failed... quitting")
-		isUnix = os.name != 'nt'
-		if(isUnix and os.geteuid() != 0):
-			sys.exit('\nRoot privileges needed for running this script')
+#		print("Library load failed... quitting")
+		sys.exit('\nload FlexSEA failed')
+
+	isUnix = os.name != 'nt'
+	if(isUnix and os.geteuid() != 0):
+		sys.exit('\nRoot privileges needed for running this script')
 
 	if(numDevices != None):
 		portList = []
