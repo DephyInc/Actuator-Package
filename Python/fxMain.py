@@ -34,11 +34,11 @@ def main():
 		print("broke: " + str(e))
 		pass
 
-experiments = [ 							\
-	(fxReadOnly, "Read Only"), 				\
+experiments = [ 					\
+	(fxReadOnly, "Read Only"), 			\
 	(fxOpenControl, "Open Control"),		\
-	(fxCurrentControl, "Current Control"),	\
-	(fxPositionControl, "Position Control"),\
+	(fxCurrentControl, "Current Control"),		\
+	(fxPositionControl, "Position Control"),	\
 	(fxFindPoles, "Find Poles"),			\
 	(fxTwoDevicePositionControl, "Two Device Position Control"), \
 	(fxLeaderFollower, "Two Device Leader Follower Control"),
