@@ -4,3 +4,6 @@
 [submodule "fx_plan_stack"]
 	path = fx_plan_stack
 	url = https://github.com/DephyInc/fx_plan_stack.git
+[submodule "MATLAB"]
+	path = MATLAB
+	url = https://github.com/DephyInc/Actuator-Package.git
