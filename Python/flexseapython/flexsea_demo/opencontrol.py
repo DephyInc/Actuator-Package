@@ -35,6 +35,7 @@ def fxOpenControl(devId):
 	maxVoltage = 3000
 	numTimes = 2
 	sleepInterval = numSeconds / numSteps
+
 	for time in range(0, numTimes):
 
 		for i in range(0, numSteps):

@@ -7,17 +7,21 @@ from flexseapython.pyFlexsea import *
 from flexseapython.pyFlexsea_def import *
 from flexseapython.fxUtil import *
 
-labels = ["State time", 											\
-"accel x", "accel y", "accel z", "gyro x", "gyro y", "gyro z", 		\
-"encoder angle", "ankle angle","motor voltage"
+labels = ["State time", 	\
+                "accel x", 	"accel y", 	"accel z", 	\
+                "gyro x", 	"gyro y",	"gyro z", 	\
+		"encoder angle", 	\
+		"ankle angle",		\
+		"motor voltage"		\
 ]
 
-varsToStream = [ 							\
-	FX_STATETIME, 							\
-	FX_ACCELX, FX_ACCELY, FX_ACCELZ, 		\
-	FX_GYROX,  FX_GYROY,  FX_GYROZ,			\
-	FX_ENC_ANG,	FX_ANKLE_ANG,				\
-	FX_MOT_VOLT								\
+varsToStream = [ 		\
+	FX_STATETIME, 		\
+        FX_ACCELX,	FX_ACCELY,	FX_ACCELZ, 	\
+        FX_GYROX,  	FX_GYROY,  	FX_GYROZ,	\
+	FX_ENC_ANG,		\
+        FX_ANKLE_ANG,           \
+	FX_MOT_VOLT		\
 ]
 
 def fxReadOnly(devId):

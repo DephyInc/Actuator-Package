@@ -7,9 +7,11 @@ from pyFlexsea import *
 from pyFlexsea_def import *
 from fxUtil import *
 
-labels = ["State time", 											\
-"accel x", "accel y", "accel z", "gyro x", "gyro y", "gyro z", 		\
-"encoder angle", "motor voltage"									\
+labels = ["State time", 				\
+	"accel x",	"accel y",	"accel z",	\
+	"gyro x", 	"gyro y", 	"gyro z",	\
+	"encoder angle", 					\
+	"motor voltage"						\
 ]
 
 varsToStream = [ 							\
