@@ -175,7 +175,7 @@ def loadFlexsea():
 	else:
 		loadSucceded = True;
 
-	if(not loadSucceeded):
+	if(loadSucceded != True):
 		return False
 
 	print("Loaded!")
