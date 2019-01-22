@@ -7,19 +7,21 @@ from pyFlexsea import *
 from pyFlexsea_def import *
 from fxUtil import *
 
-labels = ["State time", 											\
-"encoder angle", "motor current"									\
+labels = ["State time", 		\
+"Motor angle", "Motor current",	\
+"Battery voltage", "Battery current" \
 ]
 
 varsToStream = [ 							\
 	FX_STATETIME, 							\
 	FX_ENC_ANG,								\
-	FX_MOT_CURR								\
+	FX_MOT_CURR,								\
+	FX_BATT_VOLT, FX_BATT_CURR \
 ]
 
 def fxCurrentControl(devId):
 
-	holdCurrent = 500
+	holdCurrent = 1000
 	fxSetStreamVariables(devId, varsToStream)
 	streamSuccess = fxStartStreaming(devId, 100, False, 0)
 

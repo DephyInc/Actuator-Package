@@ -8,20 +8,28 @@ from flexseapython.pyFlexsea_def import *
 from flexseapython.fxUtil import *
 
 labels = ["State time", 	\
-                "accel x", 	"accel y", 	"accel z", 	\
-                "gyro x", 	"gyro y",	"gyro z", 	\
-		"encoder angle", 	\
-		"ankle angle",		\
-		"motor voltage"		\
+		"Accel X", 	"Accel Y", 	"Accel Z", 	\
+		"Gyro X", 	"Gyro Y",	"Gyro Z", 	\
+		"Motor angle", "Joint angle",		\
+		"Motor voltage", "Motor current",	\
+		"Battery voltage", "Battery current", \
+		"genVar[0]", "genVar[1]", "genVar[2]", \
+		"genVar[3]", "genVar[4]", "genVar[5]", \
+		"genVar[6]", "genVar[7]", "genVar[8]", \
+		"genVar[9]"
 ]
 
 varsToStream = [ 		\
 	FX_STATETIME, 		\
-        FX_ACCELX,	FX_ACCELY,	FX_ACCELZ, 	\
-        FX_GYROX,  	FX_GYROY,  	FX_GYROZ,	\
-	FX_ENC_ANG,		\
-        FX_ANKLE_ANG,           \
-	FX_MOT_VOLT		\
+	FX_ACCELX,	FX_ACCELY,	FX_ACCELZ, 	\
+	FX_GYROX,  	FX_GYROY,  	FX_GYROZ,	\
+	FX_ENC_ANG,	FX_ANKLE_ANG,	\
+	FX_MOT_VOLT, FX_MOT_CURR,	\
+	FX_BATT_VOLT, FX_BATT_CURR, \
+	FX_GEN_VAR_0, FX_GEN_VAR_1, FX_GEN_VAR_2, \
+	FX_GEN_VAR_3, FX_GEN_VAR_4, FX_GEN_VAR_5, \
+	FX_GEN_VAR_6, FX_GEN_VAR_7, FX_GEN_VAR_8, \
+	FX_GEN_VAR_9
 ]
 
 def fxReadOnly(devId):
@@ -39,7 +47,6 @@ def fxReadOnly(devId):
 		printData(labels, data)
 
 	fxStopStreaming(devId)
-
 
 if __name__ == '__main__':
 	ports = sys.argv[1:2]
