@@ -7,19 +7,19 @@ from pyFlexsea import *
 from pyFlexsea_def import *
 from fxUtil import *
 
-labels = ["State time", 		\
-    "accel x",  "accel y",  "accel z",  \
-    "gyro x",   "gyro y",   "gyro z",   \
-    "encoder angle",                    \
-    "motor voltage"			\
+labels = ["State time", 											\
+"Accel X", "Accel Y", "Accel Z", "Gyro X", "Gyro Y", "Gyro Z", 		\
+"Motor angle", "Motor voltage", "Motor current",					\
+"Battery voltage", "Battery current"								\
 ]
 
-varsToStream = [                            \
-        FX_STATETIME,                       \
-        FX_ACCELX,  FX_ACCELY,  FX_ACCELZ,  \
-        FX_GYROX,   FX_GYROY,    FX_GYROZ,  \
-        FX_ENC_ANG,                         \
-        FX_MOT_VOLT                         \
+varsToStream = [ 							\
+	FX_STATETIME, 							\
+	FX_ACCELX, FX_ACCELY, FX_ACCELZ, 		\
+	FX_GYROX,  FX_GYROY,  FX_GYROZ,			\
+	FX_ENC_ANG,								\
+	FX_MOT_VOLT, FX_MOT_CURR,				\
+	FX_BATT_VOLT, FX_BATT_CURR 				\
 ]
 
 def fxTwoDevicePositionControl(devId0, devId1):
