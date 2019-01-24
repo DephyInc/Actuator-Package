@@ -60,9 +60,9 @@ def fxTwoPositionControl(devId):
 
         # Select transition rate and positions
         currentPos = 0
-        transition_time = 40
+        transition_time = 10
         total_time = 200
-        positions = [initialAngle,initialAngle + 6000]
+        positions = [initialAngle,initialAngle + 10000]
 
         # Run demo
 	for i in range(0,total_time):
