@@ -173,9 +173,9 @@ def loadFlexsea():
 	except OSError as arg:
                 print( "\n\nThere was a problem loading the library\n {0}\n".format(arg));
 	else:
-		loadSucceded = True;
+		loadSucceeded  = True;
 
-	if(loadSucceded != True):
+	if(loadSucceeded  != True):
 		return False
 
 	print("Loaded!")
