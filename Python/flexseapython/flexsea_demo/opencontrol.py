@@ -6,6 +6,7 @@ sys.path.append(pardir)
 from pyFlexsea import *
 from pyFlexsea_def import *
 from fxUtil import *
+from streamManager import StreamManager
 
 labels = ["State time", 											\
 "Accel X", "Accel Y", "Accel Z", "Gyro X", "Gyro Y", "Gyro Z", 		\
@@ -21,12 +22,14 @@ varsToStream = [ 							\
 ]
 
 def fxOpenControl(devId):
-
+        stream = StreamManager(devId,rate =100,labels=labels,vars_to_stream = varsToStream)
+        '''
 	fxSetStreamVariables(devId, varsToStream)
 	streamSuccess = fxStartStreaming(devId, 100, False, 0)
 	if(not streamSuccess ):
 		print("streaming failed...")
 		sys.exit(-1)
+        '''
 
 	print("Setting open control...") 
 	setControlMode(devId, CTRL_OPEN)
@@ -42,23 +45,26 @@ def fxOpenControl(devId):
 			sleep(numSeconds / numSteps)
 			mV = maxVoltage * (i*1.0 / numSteps)
 			setMotorVoltage(devId, mV)
-			data = fxReadDevice(devId, varsToStream)
-			clearTerminal()
-			print('Open control demo...')
-			print("Ramping up open controller...") 
-			printData(labels, data)
-		
+			#data = fxReadDevice(devId, varsToStream)
+			#clearTerminal()
+                        preamble = """Open control demo... \nRamping up open controller..."""
+			#printData(labels, data)
+		        stream()
+                        stream.printData(message=preamble)
+
 		for i in range(0, numSteps):
 			sleep(numSeconds / numSteps)
 			mV = maxVoltage * ((numSteps - i)*1.0 / numSteps)
 			setMotorVoltage(devId, mV)
-			data = fxReadDevice(devId, varsToStream)
-			clearTerminal()
-			print('Open control demo...')
-			print("Ramping down open controller...")
-			printData(labels, data)
-
-	fxStopStreaming(devId)
+			#data = fxReadDevice(devId, varsToStream)
+			#clearTerminal()
+			preamble = """Open control demo...\nRamping down open controller..."""
+			#printData(labels, data)
+                        stream()
+                        stream.printData(message=preamble)
+        
+        del stream
+	#fxStopStreaming(devId)
 
 if __name__ == '__main__':
 	ports = sys.argv[1:2]
