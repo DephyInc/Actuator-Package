@@ -22,14 +22,7 @@ varsToStream = [ 							\
 ]
 
 def fxOpenControl(devId):
-        stream = StreamManager(devId,rate =100,labels=labels,vars_to_stream = varsToStream)
-        '''
-	fxSetStreamVariables(devId, varsToStream)
-	streamSuccess = fxStartStreaming(devId, 100, False, 0)
-	if(not streamSuccess ):
-		print("streaming failed...")
-		sys.exit(-1)
-        '''
+	stream = StreamManager(devId,printingRate =10,labels=labels,varsToStream = varsToStream)
 
 	print("Setting open control...") 
 	setControlMode(devId, CTRL_OPEN)
@@ -45,26 +38,19 @@ def fxOpenControl(devId):
 			sleep(numSeconds / numSteps)
 			mV = maxVoltage * (i*1.0 / numSteps)
 			setMotorVoltage(devId, mV)
-			#data = fxReadDevice(devId, varsToStream)
-			#clearTerminal()
-                        preamble = """Open control demo... \nRamping up open controller..."""
-			#printData(labels, data)
-		        stream()
+			preamble = """Open control demo... \nRamping up open controller..."""
+			stream()
                         stream.printData(message=preamble)
 
 		for i in range(0, numSteps):
 			sleep(numSeconds / numSteps)
 			mV = maxVoltage * ((numSteps - i)*1.0 / numSteps)
 			setMotorVoltage(devId, mV)
-			#data = fxReadDevice(devId, varsToStream)
-			#clearTerminal()
 			preamble = """Open control demo...\nRamping down open controller..."""
-			#printData(labels, data)
-                        stream()
+			stream()
                         stream.printData(message=preamble)
-        
-        del stream
-	#fxStopStreaming(devId)
+		
+	del stream
 
 if __name__ == '__main__':
 	ports = sys.argv[1:2]
