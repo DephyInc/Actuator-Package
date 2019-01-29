@@ -1,6 +1,6 @@
 import os, sys
 from time import sleep
-
+import csv
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pardir)
 from pyFlexsea import *
@@ -23,11 +23,22 @@ class StreamManager():
 		self.updateFreq = updateFreq
 
 		# Start stream
-	    	fxSetStreamVariables(self.devId,self.varsToStream)
+		fxSetStreamVariables(self.devId,self.varsToStream)
 		if not fxStartStreaming(self.devId,self.updateFreq,False,0):
 			print("Streaming failed...")
 			sys.exit(-1)
-	
+		
+	def writeToCSV(self):		
+		with open(self.fileName,'a') as fd:
+			writer = csv.writer(fd)
+			writer.writerow(self.data)
+
+	def InitCSV(self,fileName):
+		self.fileName = fileName 
+		with open(self.fileName,'w') as fd:
+			writer = csv.writer(fd)
+			writer.writerow(self.labels)
+
 	def __call__(self):
 		""" Allows the object to be updated by calling it as a function"""
 		self.data = fxReadDevice(self.devId,self.varsToStream)
@@ -36,7 +47,7 @@ class StreamManager():
 	def printData(self, clear_terminal = True, message = None):
 		""" Prints data with a predetermined delay, data must be updated before calling this function """
 		if clear_terminal:
-	        	clearTerminal()
+				clearTerminal()
 		if message != None:
 			print(message)
 		if(self.counter% self.rate == 0):

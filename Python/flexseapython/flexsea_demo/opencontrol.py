@@ -3,8 +3,6 @@ from time import sleep
 
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pardir)
-from pyFlexsea import *
-from pyFlexsea_def import *
 from fxUtil import *
 from streamManager import StreamManager
 
@@ -23,7 +21,7 @@ varsToStream = [ 							\
 
 def fxOpenControl(devId):
 	stream = StreamManager(devId,printingRate =10,labels=labels,varsToStream = varsToStream)
-
+	stream.InitCSV("test.csv")
 	print("Setting open control...") 
 	setControlMode(devId, CTRL_OPEN)
 	numSteps = 100
@@ -40,7 +38,8 @@ def fxOpenControl(devId):
 			setMotorVoltage(devId, mV)
 			preamble = """Open control demo... \nRamping up open controller..."""
 			stream()
-                        stream.printData(message=preamble)
+			stream.printData(message=preamble)
+			stream.writeToCSV()
 
 		for i in range(0, numSteps):
 			sleep(numSeconds / numSteps)
@@ -48,9 +47,10 @@ def fxOpenControl(devId):
 			setMotorVoltage(devId, mV)
 			preamble = """Open control demo...\nRamping down open controller..."""
 			stream()
-                        stream.printData(message=preamble)
-		
-	del stream
+			stream.printData(message=preamble)
+			stream.writeToCSV()
+
+        	del stream
 
 if __name__ == '__main__':
 	ports = sys.argv[1:2]
