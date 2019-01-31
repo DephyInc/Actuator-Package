@@ -1,4 +1,5 @@
 import os, sys
+import time
 from time import sleep
 import csv
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -8,7 +9,7 @@ from pyFlexsea_def import *
 from fxUtil import *
 
 class StreamManager():
-	def __init__(self,devId, varsToStream, printingRate = 10,labels = None,updateFreq = 100):
+	def __init__(self,devId, varsToStream, printingRate = 10,labels = None,updateFreq = 100, shouldLog = False, shouldAuto = 1):
 		""" Intializes stream and printer """
 		#init printer settings
 		self.counter = 0
@@ -20,11 +21,14 @@ class StreamManager():
 		# load stream data
 		self.varsToStream = varsToStream
 		self.devId = devId
+		self.shouldAuto = shouldAuto
 		self.updateFreq = updateFreq
+		self.shouldLog = shouldLog
+		self.prevReadTime = time.time()
 
 		# Start stream
 		fxSetStreamVariables(self.devId,self.varsToStream)
-		if not fxStartStreaming(self.devId,self.updateFreq,False,0):
+		if not fxStartStreaming(self.devId,self.updateFreq,self.shouldLog,self.shouldAuto):
 			print("Streaming failed...")
 			sys.exit(-1)
 		
@@ -41,13 +45,16 @@ class StreamManager():
 
 	def __call__(self):
 		""" Allows the object to be updated by calling it as a function"""
-		self.data = fxReadDevice(self.devId,self.varsToStream)
+		currentTime = time.time()
+		if abs(currentTime - self.prevReadTime) >= (1/self.updateFreq):
+			self.data = fxReadDevice(self.devId,self.varsToStream)
+		self.prevReadTime = currentTime
 		return self.data
 
 	def printData(self, clear_terminal = True, message = None):
 		""" Prints data with a predetermined delay, data must be updated before calling this function """
 		if clear_terminal:
-				clearTerminal()
+			clearTerminal()
 		if message != None:
 			print(message)
 		if(self.counter% self.rate == 0):
@@ -58,5 +65,5 @@ class StreamManager():
 		self.counter += 1
 	
 	def __del__(self):
-	    	""" Closes stream properly """
+		""" Closes stream properly """
 		fxStopStreaming(self.devId)

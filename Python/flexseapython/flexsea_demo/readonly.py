@@ -32,16 +32,15 @@ varsToStream = [ 		\
 ]
 
 def fxReadOnly(devId):
-        stream = StreamManager(devId,printingRate = 10,labels=labels,varsToStream = varsToStream)
-        stream.InitCSV("readall.csv")
+	stream = StreamManager(devId,printingRate = 10,labels=labels,varsToStream = varsToStream,updateFreq = 500,shouldLog = True)
+	stream.InitCSV("readall.csv")
 
-	for i in range(0, 250):
-		sleep(0.1)
-                stream()
-                stream.printData()
-                stream.writeToCSV()
+	for i in range(0,2000):
+		sleep(0.0001)
+		stream()
+		stream.writeToCSV()
 
-        del stream
+	del stream
 
 if __name__ == '__main__':
 	ports = sys.argv[1:2]
