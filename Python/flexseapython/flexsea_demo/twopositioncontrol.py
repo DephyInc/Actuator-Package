@@ -3,9 +3,8 @@ from time import sleep
 
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pardir)
-from pyFlexsea import *
-from pyFlexsea_def import *
 from fxUtil import *
+from streamManager import StreamManager
 
 # Control gain constants
 kp = 20
@@ -28,18 +27,11 @@ varsToStream = [ 							\
 
 def fxTwoPositionControl(devId):
 
-	fxSetStreamVariables(devId, varsToStream)
-	streamSuccess = fxStartStreaming(devId, 500, False, 0)
-	if(not streamSuccess ):
-		print("streaming failed...")
-		sys.exit(-1)
-
+	stream = StreamManager(devId, printingRate =2, labels=labels, varsToStream=varsToStream)
 	sleep(0.4)
-	data = fxReadDevice(devId, varsToStream)
-
-	printData(labels, data)
-	
-	initialAngle = fxReadDevice(devId, [FX_ENC_ANG])[0]	
+	stream()
+	stream.printData()
+	initialAngle = stream([FX_ENC_ANG])[0]	
 	timeout = 100
 	timeoutCount = 0
 	while(initialAngle == None):
@@ -49,35 +41,34 @@ def fxTwoPositionControl(devId):
 			sys.exit(1)
 		else:
 			sleep(0.1)
-			fxReadDevice(devId, [FX_ENC_ANG])[0]
+			initialAngle = stream([FX_ENC_ANG])[0]
 
-        # Intial positions
+	# Intial positions
 	setPosition(devId, initialAngle)
 	setControlMode(devId, CTRL_POSITION)
 	setPosition(devId, initialAngle)
-        # Set gains
+	# Set gains
 	setZGains(devId, kp, ki, 0, 0)
 
-        # Select transition rate and positions
-        currentPos = 0
-        transition_time = 10
-        total_time = 200
-        positions = [initialAngle,initialAngle + 10000]
+	# Select transition rate and positions
+	currentPos = 0
+	transition_time = 10
+	total_time = 200
+	positions = [initialAngle,initialAngle + 10000]
 
-        # Run demo
+		# Run demo
 	for i in range(0,total_time):
-                if i % transition_time == 0:
-                   setPosition(devId, positions[currentPos])
-                   currentPos = (currentPos + 1) % 2 
+		if i % transition_time == 0:
+		   setPosition(devId, positions[currentPos])
+		   currentPos = (currentPos + 1) % 2 
 		sleep(0.1)
-		data = fxReadDevice(devId, varsToStream)
-		clearTerminal()
-		print("Holding position: {}...".format(positions[currentPos]))
-		printData(labels, data)
+		stream()
+		preamble = "Holding position: {}...".format(positions[currentPos])
+        	stream.printData(message = preamble)
 
 	setControlMode(devId, CTRL_NONE)
 	sleep(0.1)
-	fxStopStreaming(devId)
+	del stream
 
 if __name__ == '__main__':
 	ports = sys.argv[1:2]

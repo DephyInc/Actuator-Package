@@ -3,9 +3,8 @@ from time import sleep
 
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pardir)
-from pyFlexsea import *
-from pyFlexsea_def import *
 from fxUtil import *
+from streamManager import StreamManager
 
 labels = ["State time", 											\
 "Accel X", "Accel Y", "Accel Z", "Gyro X", "Gyro Y", "Gyro Z", 		\
@@ -24,18 +23,11 @@ varsToStream = [ 							\
 
 def fxPositionControl(devId):
 
-	fxSetStreamVariables(devId, varsToStream)
-	streamSuccess = fxStartStreaming(devId, 100, False, 0)
-	if(not streamSuccess ):
-		print("streaming failed...")
-		sys.exit(-1)
-
+	stream = StreamManager(devId,printingRate = 2, labels=labels,varsToStream = varsToStream)
 	sleep(0.4)
-	data = fxReadDevice(devId, varsToStream)
-
-	printData(labels, data)
-	
-	initialAngle = fxReadDevice(devId, [FX_ENC_ANG])[0]	
+	initialData = stream()
+	stream.printData()
+	initialAngle = stream([FX_ENC_ANG])[0]	
 	timeout = 100
 	timeoutCount = 0
 	while(initialAngle == None):
@@ -45,7 +37,7 @@ def fxPositionControl(devId):
 			sys.exit(1)
 		else:
 			sleep(0.1)
-			fxReadDevice(devId, [FX_ENC_ANG])[0]
+			initialAngle = stream([FX_ENC_ANG])[0]
 
 	setPosition(devId, initialAngle)
 	setControlMode(devId, CTRL_POSITION)
@@ -54,14 +46,13 @@ def fxPositionControl(devId):
 
 	for i in range(0, 100):
 		sleep(0.1)
-		data = fxReadDevice(devId, varsToStream)
-		clearTerminal()
-		print("Holding position: {}...".format(initialAngle))
-		printData(labels, data)
+		preamble = "Holding position: {}...".format(initialAngle)
+		stream()
+                stream.printData(message=preamble)
 
 	setControlMode(devId, CTRL_NONE)
-	sleep(0.1)
-	fxStopStreaming(devId)
+
+	del stream
 
 if __name__ == '__main__':
 	ports = sys.argv[1:2]

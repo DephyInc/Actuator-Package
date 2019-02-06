@@ -43,13 +43,22 @@ class StreamManager():
 			writer = csv.writer(fd)
 			writer.writerow(self.labels)
 
-	def __call__(self):
+	def __call__(self,data_labels = None):
 		""" Allows the object to be updated by calling it as a function"""
+		data = None
 		currentTime = time.time()
 		if abs(currentTime - self.prevReadTime) >= (1/self.updateFreq):
 			self.data = fxReadDevice(self.devId,self.varsToStream)
 		self.prevReadTime = currentTime
-		return self.data
+		if data_labels != None:
+			data_index =[]
+			for label in data_labels:
+				data_index.append(self.varsToStream.index(label))
+			data = [self.data[index] for index in data_index]	
+		else:
+			data = self.data
+
+		return data
 
 	def printData(self, clear_terminal = True, message = None):
 		""" Prints data with a predetermined delay, data must be updated before calling this function """

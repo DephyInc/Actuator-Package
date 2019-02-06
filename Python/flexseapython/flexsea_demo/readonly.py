@@ -32,13 +32,14 @@ varsToStream = [ 		\
 ]
 
 def fxReadOnly(devId):
-	stream = StreamManager(devId,printingRate = 10,labels=labels,varsToStream = varsToStream,updateFreq = 500,shouldLog = True)
-	stream.InitCSV("readall.csv")
+	stream = StreamManager(devId,printingRate = 10,labels=labels,varsToStream = varsToStream,updateFreq = 100)
+	#stream.InitCSV("readall.csv")
 
 	for i in range(0,2000):
-		sleep(0.0001)
+		sleep(0.001)
 		stream()
-		stream.writeToCSV()
+		#stream.writeToCSV()
+                stream.printData()
 
 	del stream
 
