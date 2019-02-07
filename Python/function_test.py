@@ -26,26 +26,29 @@ def main():
 	devIds = loadAndGetDevice(fpath, FLEXSEA_DEVICES)
 	print('Got devices: ' + str(devIds))
 #	devIds = loadAndGetDevice(['COM3', 'COM13'])
-	for expNumb, experiment in enumerate(experiments):
+	for test_case in test_cases:
 		try:
-			test_results.append(experiments[expNumb][0](devIds[0]))
+			test_results.append(test_case[0](devIds[0],**test_case[2]))
 		except Exception as e:
 			print("broke: " + str(e))
 			pass
-		if all(test_results):
-			print("All tests passed")
-		else:
-			failedTests = [idx for idx,test in enumerate(test_results) if not test]
-			print("The following tests failed:")
-			failedTestNames = [experiments[idx][1] for idx in failedTests]
-                        print(failedTesetNames)
+	if all(test_results):
+		print("All tests passed")
+	else:
+		failedTests = [idx for idx,test in enumerate(test_results) if not test]
+		print("The following tests failed:")
+		failedTestNames = [test_cases[idx][1] for idx in failedTests]
+		print(failedTestNames)
 
-experiments = [ 									\
-		(fxFindPoles,	   "Find Poles"),			\
-		(fxReadOnly,		"Read Only"),	 		\
-		(fxOpenControl,	 "Open Control"),		\
-		(fxCurrentControl,  "Current Control"),		\
-		(fxPositionControl, "Position Control"),	\
-		(fxTwoPositionControl, "Two position control")]
+# The test case in a tuple containing the function to be tested, its name and the
+# parameters used to test it. ** unpacks the parameter dict into named keywords
+test_cases = [ 									\
+		(fxFindPoles,	   "Find Poles", dict()),			\
+		(fxReadOnly,		"Read Only", dict()),	 		\
+		(fxOpenControl,	 "Open Control", dict()),		\
+                (fxCurrentControl,  "Current Control", {'holdCurrent':[300,400,500]}),		\
+                (fxPositionControl, "Position Control", {'resolution':100}),	\
+                (fxTwoPositionControl, "Two position control", {'transition_time':50,'resolution':250})]
+
 
 main()

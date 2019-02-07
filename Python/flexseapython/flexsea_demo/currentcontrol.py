@@ -18,7 +18,7 @@ varsToStream = [ 							\
 	FX_BATT_VOLT, FX_BATT_CURR \
 ]
 
-def fxCurrentControl(devId, holdCurrent = [300,400,500], timeDelay = 4):
+def fxCurrentControl(devId, holdCurrent = [1000], timeDelay = 4):
    	stream = StreamManager(devId,printingRate = 2,labels=labels, varsToStream = varsToStream)
 	result = True
         print('Setting controller to current...')
@@ -58,7 +58,6 @@ def fxCurrentControl(devId, holdCurrent = [300,400,500], timeDelay = 4):
 
 	setControlMode(devId, CTRL_NONE)
 	del stream
-        print(result)
 	return result
 if __name__ == '__main__':
 	ports = sys.argv[1:2]

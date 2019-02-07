@@ -21,10 +21,11 @@ varsToStream = [ 							\
 	FX_BATT_VOLT, FX_BATT_CURR 				\
 ]
 
-def fxPositionControl(devId):
+def fxPositionControl(devId, resolution = 100):
 
 	stream = StreamManager(devId,printingRate = 2, labels=labels,varsToStream = varsToStream)
 	sleep(0.4)
+        result = True
 	initialData = stream()
 	stream.printData()
 	initialAngle = stream([FX_ENC_ANG])[0]	
@@ -49,11 +50,13 @@ def fxPositionControl(devId):
 		preamble = "Holding position: {}...".format(initialAngle)
 		stream()
                 stream.printData(message=preamble)
+                currentAngle = stream([FX_ENC_ANG])[0]
+                result ^= (abs(initialAngle - currentAngle) < resolution)
 
 	setControlMode(devId, CTRL_NONE)
 
 	del stream
-        return True
+        return result
 
 if __name__ == '__main__':
 	ports = sys.argv[1:2]
