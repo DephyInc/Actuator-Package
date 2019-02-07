@@ -53,6 +53,7 @@ def fxPositionControl(devId):
 	setControlMode(devId, CTRL_NONE)
 
 	del stream
+        return True
 
 if __name__ == '__main__':
 	ports = sys.argv[1:2]

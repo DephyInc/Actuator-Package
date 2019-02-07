@@ -51,6 +51,7 @@ def fxOpenControl(devId):
 			stream.writeToCSV()
 
 	del stream
+        return True
 
 if __name__ == '__main__':
 	ports = sys.argv[1:2]

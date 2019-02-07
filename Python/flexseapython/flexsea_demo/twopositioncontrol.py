@@ -69,6 +69,7 @@ def fxTwoPositionControl(devId):
 	setControlMode(devId, CTRL_NONE)
 	sleep(0.1)
 	del stream
+        return True
 
 if __name__ == '__main__':
 	ports = sys.argv[1:2]

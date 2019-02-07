@@ -17,8 +17,10 @@ FLEXSEA_DEVICES = 1
 
 def fxFindPoles(devId):
 	findPoles(devId, FLEXSEA_DEVICES)
+	return True
 
 def main():
+	test_results = []
 	scriptPath = os.path.dirname(os.path.abspath(__file__))
 	fpath = scriptPath + '/flexseapython/com.txt'
 	devIds = loadAndGetDevice(fpath, FLEXSEA_DEVICES)
@@ -26,26 +28,24 @@ def main():
 #	devIds = loadAndGetDevice(['COM3', 'COM13'])
 	for expNumb, experiment in enumerate(experiments):
 		try:
-			dummy_var = raw_input("The " + experiments[expNumb][1] +  " test is about to start. Ready?")
-			if(expNumb < 6):
-				experiments[expNumb][0](devIds[0])
-			elif len(devIds) >= 2 and expNumb >= 6:
-				experiments[expNumb][0](devIds[0], devIds[1])
-			else:
-				print("Skipping experiment")
+			test_results.append(experiments[expNumb][0](devIds[0]))
 		except Exception as e:
 			print("broke: " + str(e))
 			pass
+		if all(test_results):
+			print("All tests passed")
+		else:
+			failedTests = [idx for idx,test in enumerate(test_results) if not test]
+			print("The following tests failed:")
+			failedTestNames = [experiments[idx][1] for idx in failedTests]
+                        print(failedTesetNames)
 
 experiments = [ 									\
+		(fxFindPoles,	   "Find Poles"),			\
 		(fxReadOnly,		"Read Only"),	 		\
 		(fxOpenControl,	 "Open Control"),		\
 		(fxCurrentControl,  "Current Control"),		\
 		(fxPositionControl, "Position Control"),	\
-		(fxFindPoles,	   "Find Poles"),			\
-		(fxTwoPositionControl, "Two position control"), \
-		(fxTwoDevicePositionControl,	"Two Device Position Control"),	 \
-		(fxLeaderFollower,			  "Two Device Leader Follower Control"),
-]
+		(fxTwoPositionControl, "Two position control")]
 
 main()
