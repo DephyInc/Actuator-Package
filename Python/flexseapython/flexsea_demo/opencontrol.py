@@ -3,9 +3,8 @@ from time import sleep
 
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pardir)
-from pyFlexsea import *
-from pyFlexsea_def import *
 from fxUtil import *
+from streamManager import StreamManager
 
 labels = ["State time", 											\
 "Accel X", "Accel Y", "Accel Z", "Gyro X", "Gyro Y", "Gyro Z", 		\
@@ -21,13 +20,8 @@ varsToStream = [ 							\
 ]
 
 def fxOpenControl(devId):
-
-	fxSetStreamVariables(devId, varsToStream)
-	streamSuccess = fxStartStreaming(devId, 100, False, 0)
-	if(not streamSuccess ):
-		print("streaming failed...")
-		sys.exit(-1)
-
+	stream = StreamManager(devId,printingRate =10,labels=labels,varsToStream = varsToStream)
+	stream.InitCSV("test.csv")
 	print("Setting open control...") 
 	setControlMode(devId, CTRL_OPEN)
 	numSteps = 100
@@ -42,23 +36,21 @@ def fxOpenControl(devId):
 			sleep(numSeconds / numSteps)
 			mV = maxVoltage * (i*1.0 / numSteps)
 			setMotorVoltage(devId, mV)
-			data = fxReadDevice(devId, varsToStream)
-			clearTerminal()
-			print('Open control demo...')
-			print("Ramping up open controller...") 
-			printData(labels, data)
-		
+			preamble = """Open control demo... \nRamping up open controller..."""
+			stream()
+			stream.printData(message=preamble)
+			stream.writeToCSV()
+
 		for i in range(0, numSteps):
 			sleep(numSeconds / numSteps)
 			mV = maxVoltage * ((numSteps - i)*1.0 / numSteps)
 			setMotorVoltage(devId, mV)
-			data = fxReadDevice(devId, varsToStream)
-			clearTerminal()
-			print('Open control demo...')
-			print("Ramping down open controller...")
-			printData(labels, data)
+			preamble = """Open control demo...\nRamping down open controller..."""
+			stream()
+			stream.printData(message=preamble)
+			stream.writeToCSV()
 
-	fxStopStreaming(devId)
+	del stream
 
 if __name__ == '__main__':
 	ports = sys.argv[1:2]
