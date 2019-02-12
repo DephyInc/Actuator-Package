@@ -171,9 +171,9 @@ def loadFlexsea():
 		print("loading... " + librarypath)
 		flexsea = cdll.LoadLibrary(librarypath)
 	except OSError as arg:
-                print( "\n\nThere was a problem loading the library\n {0}\n".format(arg));
+                print( "\n\nThere was a problem loading the library\n {0}\n".format(arg))
 	else:
-		loadSucceeded  = True;
+		loadSucceeded  = True
 
 	if(loadSucceeded  != True):
 		return False

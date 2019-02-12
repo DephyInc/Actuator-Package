@@ -35,14 +35,14 @@ def main():
 		pass
 
 experiments = [ 									\
-        (fxReadOnly,        "Read Only"),	 		\
-        (fxOpenControl,     "Open Control"),		\
+		(fxReadOnly,		"Read Only"),	 		\
+		(fxOpenControl,	 "Open Control"),		\
 		(fxCurrentControl,  "Current Control"),		\
 		(fxPositionControl, "Position Control"),	\
-        (fxFindPoles,       "Find Poles"),			\
-        (fxTwoPositionControl, "Two position control"), \
-        (fxTwoDevicePositionControl,    "Two Device Position Control"),     \
-        (fxLeaderFollower,              "Two Device Leader Follower Control"),
+		(fxFindPoles,	   "Find Poles"),			\
+		(fxTwoPositionControl, "Two position control"), \
+		(fxTwoDevicePositionControl,	"Two Device Position Control"),	 \
+		(fxLeaderFollower,			  "Two Device Leader Follower Control"),
 ]
 
 def selectExperiment():

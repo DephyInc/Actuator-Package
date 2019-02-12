@@ -46,9 +46,9 @@ test_cases = [ 									\
 		(fxFindPoles,	   "Find Poles", dict()),			\
 		(fxReadOnly,		"Read Only", dict()),	 		\
 		(fxOpenControl,	 "Open Control", dict()),		\
-                (fxCurrentControl,  "Current Control", {'holdCurrent':[300,400,500]}),		\
-                (fxPositionControl, "Position Control", {'resolution':100}),	\
-                (fxTwoPositionControl, "Two position control", {'transition_time':50,'resolution':250})]
+		(fxCurrentControl,  "Current Control", {'holdCurrent':[300,400,500]}),		\
+		(fxPositionControl, "Position Control", {'resolution':100}),	\
+		(fxTwoPositionControl, "Two position control", {'transition_time':50,'resolution':250})]
 
 
 main()

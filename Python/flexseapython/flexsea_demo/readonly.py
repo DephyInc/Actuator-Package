@@ -39,10 +39,10 @@ def fxReadOnly(devId):
 		sleep(0.001)
 		stream()
 		#stream.writeToCSV()
-                stream.printData()
+		stream.printData()
 
 	del stream
-        return True
+	return True
 
 if __name__ == '__main__':
 	ports = sys.argv[1:2]
