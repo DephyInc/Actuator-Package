@@ -21,7 +21,7 @@ varsToStream = [ 							\
 	FX_BATT_VOLT, FX_BATT_CURR 				\
 ]
 
-def fxPositionControl(devId, resolution = 100):
+def fxPositionControl(devId, time = 2, time_step = 0.1,  resolution = 100):
 
 	stream = StreamManager(devId,printingRate = 2, labels=labels,varsToStream = varsToStream)
 	sleep(0.4)
@@ -44,9 +44,9 @@ def fxPositionControl(devId, resolution = 100):
 	setControlMode(devId, CTRL_POSITION)
 	setPosition(devId, initialAngle)
 	setZGains(devId, 50, 3, 0, 0)
-
-	for i in range(0, 100):
-		sleep(0.1)
+	num_time_steps = int(time/time_step)
+	for i in range(num_time_steps):
+		sleep(time_step)
 		preamble = "Holding position: {}...".format(initialAngle)
 		stream()
 		stream.printData(message=preamble)

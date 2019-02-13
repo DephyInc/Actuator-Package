@@ -1,6 +1,7 @@
 import os, sys
 thisdir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(thisdir)
+from time import sleep
 
 from flexseapython.pyFlexsea import *
 from flexseapython.pyFlexsea_def import *
@@ -26,12 +27,14 @@ def main():
 	devIds = loadAndGetDevice(fpath, FLEXSEA_DEVICES)
 	print('Got devices: ' + str(devIds))
 #	devIds = loadAndGetDevice(['COM3', 'COM13'])
-	for test_case in test_cases:
+	for test_num, test_case in enumerate(test_cases):
+		clearTerminal()
+		print(""" **** Commencing test number """, test_num, """ of """,len(test_cases))
+		sleep(1)
 		try:
 			test_results.append(test_case[0](devIds[0],**test_case[2]))
 		except Exception as e:
 			print("broke: " + str(e))
-			pass
 	if all(test_results):
 		print("All tests passed")
 	else:
@@ -43,12 +46,12 @@ def main():
 # The test case in a tuple containing the function to be tested, its name and the
 # parameters used to test it. ** unpacks the parameter dict into named keywords
 test_cases = [ 									\
-		(fxFindPoles,	   "Find Poles", dict()),			\
-		(fxReadOnly,		"Read Only", dict()),	 		\
-		(fxOpenControl,	 "Open Control", dict()),		\
-		(fxCurrentControl,  "Current Control", {'holdCurrent':[300,400,500]}),		\
-		(fxPositionControl, "Position Control", {'resolution':100}),	\
-		(fxTwoPositionControl, "Two position control", {'transition_time':50,'resolution':250})]
+		#(fxFindPoles, "Find Poles", dict()),			\
+		(fxReadOnly, "Read Only", {"time": 1}), \
+		(fxPositionControl, "Position Control", {"time":1,'resolution':150}),	\
+		(fxOpenControl, "Open Control", {}),		\
+		(fxCurrentControl, "Current Control", {'holdCurrent':[200,300,400]}),		\
+		(fxTwoPositionControl, "Two position control", {'time' : 4, 'time_step': 0.1, 'transition_time':2 ,'resolution': 500})]
 
 
 main()

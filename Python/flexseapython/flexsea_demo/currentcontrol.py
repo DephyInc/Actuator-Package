@@ -18,31 +18,32 @@ varsToStream = [ 							\
 	FX_BATT_VOLT, FX_BATT_CURR \
 ]
 
-def fxCurrentControl(devId, holdCurrent = [1000], timeDelay = 4):
+def fxCurrentControl(devId, holdCurrent = [1000], time = 4, time_step = 0.1):
    	stream = StreamManager(devId,printingRate = 2,labels=labels, varsToStream = varsToStream)
 	result = True
 	print('Setting controller to current...')
 	setControlMode(devId, CTRL_CURRENT)
-	setZGains(devId, 100, 20, 0, 0)
-	sleepTime = 0.1
-	currentCurrent = holdCurrent[0]
+	setZGains(devId, 50, 32, 0, 0)
+	prevCurrent = holdCurrent[0]
+	num_time_steps = int(time/time_step)
 	for current in holdCurrent:
-		setMotorCurrent(devId, current) # Start the current, holdCurrent is in mA
-				sleep(0.2)
-		for i in range(int(timeDelay/sleepTime)):
-			sleep(0.1)
-				preamble = "Holding Current: {} mA...".format(holdCurrent)
-				stream()
-				stream.printData()
-				measuredCurrent = stream([FX_MOT_CURR])[0]
-				result ^= (abs(measuredCurrent - current) <= 0.15 * current) 
-		currentCurrent = current
+		for i in range(num_time_steps):
+			desCurrent = int((current-prevCurrent) * (i / float(num_time_steps)) + prevCurrent)
+			print(i, num_time_steps, (float(i)/float(num_time_steps)), desCurrent, (current - prevCurrent))
+			setMotorCurrent(devId, desCurrent) # Start the current, holdCurrent is in mA
+			sleep(time_step)
+			preamble = "Holding Current: {} mA...".format(desCurrent)
+			stream()
+			stream.printData(message=preamble)
+			measuredCurrent = stream([FX_MOT_CURR])[0]
+			result ^= (abs(measuredCurrent - desCurrent) <= 0.2 * desCurrent) 
+		prevCurrent = current
 
 	print('Turning off current control...')
 	# ramp down first
 	n = 50
 	for i in range(0, n):
-		setMotorCurrent(devId, currentCurrent * (n-i)/n)
+		setMotorCurrent(devId, prevCurrent * (n-i)/n)
 		sleep(0.04)
 
 	# wait for motor to spin down

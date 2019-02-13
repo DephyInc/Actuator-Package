@@ -7,8 +7,8 @@ from fxUtil import *
 from streamManager import StreamManager
 
 # Control gain constants
-kp = 20
-ki = 3
+kp = 50
+ki = 5
 
 labels = ["State time", 											\
 "Accel X", "Accel Y", "Accel Z", "Gyro X", "Gyro Y", "Gyro Z", 		\
@@ -25,23 +25,23 @@ varsToStream = [ 							\
 	FX_BATT_VOLT, FX_BATT_CURR 				\
 ]
 
-def fxTwoPositionControl(devId, delta = 10000, transition_time = 25, resolution = 100):
+def fxTwoPositionControl(devId, time = 4, time_step =  0.1, delta = 10000, transition_time = 1, resolution = 500):
 
 	stream = StreamManager(devId, printingRate =2, labels=labels, varsToStream=varsToStream)
 	result = True
-	sleep(0.4)
 	stream()
 	stream.printData()
 	initialAngle = stream([FX_ENC_ANG])[0]	
 	timeout = 100
 	timeoutCount = 0
+	transition_steps = int(transition_time / time_step)
 	while(initialAngle == None):
 		timeoutCount = timeoutCount + 1
 		if(timeoutCount > timeout):
 			print("Timed out waiting for valid encoder value...")
 			sys.exit(1)
 		else:
-			sleep(0.1)
+			sleep(time_step)	
 			initialAngle = stream([FX_ENC_ANG])[0]
 
 	# Intial positions
@@ -53,16 +53,18 @@ def fxTwoPositionControl(devId, delta = 10000, transition_time = 25, resolution 
 
 	# Select transition rate and positions
 	currentPos = 0
-	total_time = 200
+	num_time_steps = int(time/time_step)
 	positions = [initialAngle,initialAngle + delta]
-
+	sleep(0.4)
 		# Run demo
-	for i in range(0,total_time):
-		if i % transition_time == 0:
-			result ^= (abs(positions[currentPos] - stream([FX_ENC_ANG])[0]) < resolution)
+	print(result)
+	for i in range(num_time_steps):
+		if i % transition_steps == 0:
+			delta = abs(positions[currentPos] - stream([FX_ENC_ANG])[0])
+			result &= delta < resolution
 			currentPos = (currentPos + 1) % 2
 			setPosition(devId, positions[currentPos])
-		sleep(0.1)
+		sleep(time_step)
 		stream()
 		preamble = "Holding position: {}...".format(positions[currentPos])
 		stream.printData(message = preamble)
