@@ -4,7 +4,7 @@ from time import sleep
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pardir)
 from fxUtil import *
-from streamManager import StreamManager
+from .streamManager import StreamManager
 
 # Control gain constants
 kp = 50

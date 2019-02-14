@@ -4,7 +4,7 @@ from time import sleep
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pardir)
 from fxUtil import *
-from streamManager import StreamManager
+from .streamManager import StreamManager
 
 labels = ["State time", 		\
 "Motor angle", "Motor current",	\
@@ -19,7 +19,7 @@ varsToStream = [ 							\
 ]
 
 def fxCurrentControl(devId, holdCurrent = [1000], time = 4, time_step = 0.1):
-   	stream = StreamManager(devId,printingRate = 2,labels=labels, varsToStream = varsToStream)
+	stream = StreamManager(devId,printingRate = 2,labels=labels, varsToStream = varsToStream)
 	result = True
 	print('Setting controller to current...')
 	setControlMode(devId, CTRL_CURRENT)
@@ -29,7 +29,6 @@ def fxCurrentControl(devId, holdCurrent = [1000], time = 4, time_step = 0.1):
 	for current in holdCurrent:
 		for i in range(num_time_steps):
 			desCurrent = int((current-prevCurrent) * (i / float(num_time_steps)) + prevCurrent)
-			print(i, num_time_steps, (float(i)/float(num_time_steps)), desCurrent, (current - prevCurrent))
 			setMotorCurrent(devId, desCurrent) # Start the current, holdCurrent is in mA
 			sleep(time_step)
 			preamble = "Holding Current: {} mA...".format(desCurrent)
