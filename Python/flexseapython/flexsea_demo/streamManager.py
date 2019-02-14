@@ -31,6 +31,8 @@ class StreamManager():
 		if not fxStartStreaming(self.devId,self.updateFreq,self.shouldLog,self.shouldAuto):
 			print("Streaming failed...")
 			sys.exit(-1)
+		else:
+			sleep(0.4)
 		
 	def writeToCSV(self):		
 		with open(self.fileName,'a') as fd:

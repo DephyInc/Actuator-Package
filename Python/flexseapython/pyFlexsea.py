@@ -73,8 +73,8 @@ def fxReadDevice(devId, fieldIds):
 	c_successBools, c_n = list_to_bool_arr( [0] * n )
 
 	result = flexsea.fxReadDevice(devId, c_fieldIds, c_successBools, c_n)
-        valsAsList = [result[i] for i in range(n)]
-        #valsAsList = result[:n]
+	valsAsList = [result[i] for i in range(n)]
+	#valsAsList = result[:n]
 	boolsAsList = c_successBools[:n]
 
 	for i in range(0, n):
@@ -171,9 +171,9 @@ def loadFlexsea():
 		print("loading... " + librarypath)
 		flexsea = cdll.LoadLibrary(librarypath)
 	except OSError as arg:
-                print( "\n\nThere was a problem loading the library\n {0}\n".format(arg));
+		print( "\n\nThere was a problem loading the library\n {0}\n".format(arg))
 	else:
-		loadSucceeded  = True;
+		loadSucceeded  = True
 
 	if(loadSucceeded  != True):
 		return False
@@ -198,7 +198,7 @@ def loadFlexsea():
 def list_to_int_arr(l):
 	c_arr = (c_int * len(l))(*l)
 	c_len = c_int(len(l))
-        return c_arr, c_len
+	return c_arr, c_len
 
 def list_to_bool_arr(l):
 	c_arr = (c_bool * len(l))(*l)

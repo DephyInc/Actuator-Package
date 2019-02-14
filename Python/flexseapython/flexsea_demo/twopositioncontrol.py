@@ -7,8 +7,8 @@ from fxUtil import *
 from streamManager import StreamManager
 
 # Control gain constants
-kp = 20
-ki = 3
+kp = 50
+ki = 5
 
 labels = ["State time", 											\
 "Accel X", "Accel Y", "Accel Z", "Gyro X", "Gyro Y", "Gyro Z", 		\
@@ -25,22 +25,23 @@ varsToStream = [ 							\
 	FX_BATT_VOLT, FX_BATT_CURR 				\
 ]
 
-def fxTwoPositionControl(devId):
+def fxTwoPositionControl(devId, time = 4, time_step =  0.1, delta = 10000, transition_time = 1, resolution = 500):
 
 	stream = StreamManager(devId, printingRate =2, labels=labels, varsToStream=varsToStream)
-	sleep(0.4)
+	result = True
 	stream()
 	stream.printData()
 	initialAngle = stream([FX_ENC_ANG])[0]	
 	timeout = 100
 	timeoutCount = 0
+	transition_steps = int(transition_time / time_step)
 	while(initialAngle == None):
 		timeoutCount = timeoutCount + 1
 		if(timeoutCount > timeout):
 			print("Timed out waiting for valid encoder value...")
 			sys.exit(1)
 		else:
-			sleep(0.1)
+			sleep(time_step)	
 			initialAngle = stream([FX_ENC_ANG])[0]
 
 	# Intial positions
@@ -52,23 +53,26 @@ def fxTwoPositionControl(devId):
 
 	# Select transition rate and positions
 	currentPos = 0
-	transition_time = 10
-	total_time = 200
-	positions = [initialAngle,initialAngle + 10000]
-
+	num_time_steps = int(time/time_step)
+	positions = [initialAngle,initialAngle + delta]
+	sleep(0.4)
 		# Run demo
-	for i in range(0,total_time):
-		if i % transition_time == 0:
-		   setPosition(devId, positions[currentPos])
-		   currentPos = (currentPos + 1) % 2 
-		sleep(0.1)
+	print(result)
+	for i in range(num_time_steps):
+		if i % transition_steps == 0:
+			delta = abs(positions[currentPos] - stream([FX_ENC_ANG])[0])
+			result &= delta < resolution
+			currentPos = (currentPos + 1) % 2
+			setPosition(devId, positions[currentPos])
+		sleep(time_step)
 		stream()
 		preamble = "Holding position: {}...".format(positions[currentPos])
-        	stream.printData(message = preamble)
+		stream.printData(message = preamble)
 
 	setControlMode(devId, CTRL_NONE)
 	sleep(0.1)
 	del stream
+	return result
 
 if __name__ == '__main__':
 	ports = sys.argv[1:2]
