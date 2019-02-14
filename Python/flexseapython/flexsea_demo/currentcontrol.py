@@ -29,7 +29,6 @@ def fxCurrentControl(devId, holdCurrent = [1000], time = 4, time_step = 0.1):
 	for current in holdCurrent:
 		for i in range(num_time_steps):
 			desCurrent = int((current-prevCurrent) * (i / float(num_time_steps)) + prevCurrent)
-			print(i, num_time_steps, (float(i)/float(num_time_steps)), desCurrent, (current - prevCurrent))
 			setMotorCurrent(devId, desCurrent) # Start the current, holdCurrent is in mA
 			sleep(time_step)
 			preamble = "Holding Current: {} mA...".format(desCurrent)
