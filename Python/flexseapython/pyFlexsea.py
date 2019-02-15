@@ -146,7 +146,7 @@ def findPoles(devId, block):
 def loadFlexsea():
 	global flexsea
 	#Init code:
-	print('[pySerial Module]\n')
+	print('[pyFlexsea Module]\n')
 
 	loadSucceeded  = False
 	is_64bits = sys.maxsize > 2**32
