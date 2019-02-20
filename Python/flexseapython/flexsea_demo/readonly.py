@@ -4,7 +4,7 @@ from time import sleep
 pardir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(pardir)
 from flexseapython.fxUtil import *
-from streamManager import StreamManager
+from .streamManager import StreamManager
 
 labels = ["State time", 	\
 		"Accel X", 	"Accel Y", 	"Accel Z", 	\
@@ -31,17 +31,18 @@ varsToStream = [ 		\
 	FX_GEN_VAR_9
 ]
 
-def fxReadOnly(devId):
-	stream = StreamManager(devId,printingRate = 10,labels=labels,varsToStream = varsToStream,updateFreq = 100)
+def fxReadOnly(devId, time = 6,time_step = 0.1):
+	stream = StreamManager(devId,printingRate = 4,labels=labels,varsToStream = varsToStream,updateFreq = 100)
 	#stream.InitCSV("readall.csv")
 
-	for i in range(0,2000):
-		sleep(0.001)
+	for i in range(int(time/time_step)):
+		sleep(time_step)
 		stream()
 		#stream.writeToCSV()
-                stream.printData()
+		stream.printData()
 
 	del stream
+	return True
 
 if __name__ == '__main__':
 	ports = sys.argv[1:2]

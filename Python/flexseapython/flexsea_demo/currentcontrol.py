@@ -4,7 +4,7 @@ from time import sleep
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pardir)
 from fxUtil import *
-from streamManager import StreamManager
+from .streamManager import StreamManager
 
 labels = ["State time", 		\
 "Motor angle", "Motor current",	\
@@ -18,30 +18,31 @@ varsToStream = [ 							\
 	FX_BATT_VOLT, FX_BATT_CURR \
 ]
 
-def fxCurrentControl(devId):
-   	stream = StreamManager(devId,printingRate = 2,labels=labels, varsToStream = varsToStream)
-	holdCurrent = 1000
-	fxSetStreamVariables(devId, varsToStream)
+def fxCurrentControl(devId, holdCurrent = [1000], time = 4, time_step = 0.1):
+	stream = StreamManager(devId,printingRate = 2,labels=labels, varsToStream = varsToStream)
+	result = True
 	print('Setting controller to current...')
 	setControlMode(devId, CTRL_CURRENT)
-	setZGains(devId, 100, 20, 0, 0)
-	setMotorCurrent(devId, holdCurrent) # Start the current, holdCurrent is in mA 
-
-	try:
-		while(True):
-			sleep(0.1)
-			preamble = "Holding Current: {} mA...".format(holdCurrent)
+	setZGains(devId, 50, 32, 0, 0)
+	prevCurrent = holdCurrent[0]
+	num_time_steps = int(time/time_step)
+	for current in holdCurrent:
+		for i in range(num_time_steps):
+			desCurrent = int((current-prevCurrent) * (i / float(num_time_steps)) + prevCurrent)
+			setMotorCurrent(devId, desCurrent) # Start the current, holdCurrent is in mA
+			sleep(time_step)
+			preamble = "Holding Current: {} mA...".format(desCurrent)
 			stream()
-			stream.printData()
-
-	except:
-		pass
+			stream.printData(message=preamble)
+			measuredCurrent = stream([FX_MOT_CURR])[0]
+			result ^= (abs(measuredCurrent - desCurrent) <= 0.2 * desCurrent) 
+		prevCurrent = current
 
 	print('Turning off current control...')
 	# ramp down first
 	n = 50
 	for i in range(0, n):
-		setMotorCurrent(devId, holdCurrent * (n-i)/n)
+		setMotorCurrent(devId, prevCurrent * (n-i)/n)
 		sleep(0.04)
 
 	# wait for motor to spin down
@@ -57,7 +58,7 @@ def fxCurrentControl(devId):
 
 	setControlMode(devId, CTRL_NONE)
 	del stream
-
+	return result
 if __name__ == '__main__':
 	ports = sys.argv[1:2]
 	devId = loadAndGetDevice(ports)[0]
