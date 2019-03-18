@@ -17,7 +17,7 @@ varsToStream = [FX_GEN_VAR_0, FX_GEN_VAR_1, FX_GEN_VAR_2, \
 																												
 
 def fxUserRW(devId, time = 2, time_step = 0.1,  resolution = 100):
-	readData = [0,0,0,0]
+	result = True
 	stream = StreamManager(devId,printingRate = 2, labels=labels,varsToStream = varsToStream)
 	sleep(0.4)
 	try:
