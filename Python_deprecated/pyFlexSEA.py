@@ -20,8 +20,8 @@ packetIndex = c_ushort(0)
 arrLen = c_ubyte(10)
 commStr = (c_ubyte * COMM_STR_LEN)()
 cBytes = (c_uint8 * COMM_STR_LEN)()
-myRigid = rigid_s();
-myPocket = pocket_s();
+myRigid = rigid_s()
+myPocket = pocket_s()
 
 #Control variables:
 controlChannels = 2
@@ -35,7 +35,7 @@ pG3 = (c_int16 * controlChannels)()
 pSystem = c_uint8(0)
 
 #User R/W:
-myUserRW = user_data_s();
+myUserRW = user_data_s()
 
 #Stack init and support functions:
 #=================================
@@ -75,7 +75,7 @@ def initPyFlexSEA():
 		print("Failed to load shared library. Check library path\n")
 	else:
 		#Init stack:-
-		flexsea.initFlexSEAStack_minimalist(FLEXSEA_PLAN_1);
+		flexsea.initFlexSEAStack_minimalist(FLEXSEA_PLAN_1)
 		#Initialize control variables:
 		initControlVariables()
 
@@ -148,20 +148,20 @@ def readActPack(minOffs, maxOffs, printDiv, displayFlexSEA=True):
 	#print(']')
 	
 	ppFlag = c_uint8(0)
-	ppFlag = flexsea.receiveFlexSEABytes(byref(cBytes), bytes, 1);
+	ppFlag = flexsea.receiveFlexSEABytes(byref(cBytes), bytes, 1)
 	if(ppFlag):
 		#print('We parsed a packet: ', end='')
 		cmd = c_uint8(0)
 		type = c_uint8(0)
-		flexsea.getSignatureOfLastPayloadParsed(byref(cmd), byref(type));
+		flexsea.getSignatureOfLastPayloadParsed(byref(cmd), byref(type))
 		#print('cmd:', cmd, 'type:', type)
 		
 		newActPackPacket = c_uint8(0)
-		newActPackPacket = flexsea.newActPackRRpacketAvailable();
+		newActPackPacket = flexsea.newActPackRRpacketAvailable()
 		
 		if(newActPackPacket):
 			#print('New Rigid packet(s) available\n')
-			flexsea.getLastRigidData(byref(myRigid));
+			flexsea.getLastRigidData(byref(myRigid))
 			
 			if displayFlexSEA:
 				i = printActPack(printDiv)
@@ -174,7 +174,7 @@ def readActPack(minOffs, maxOffs, printDiv, displayFlexSEA=True):
 #Send Read Request ActPack:
 def requestReadActPack(offset):
 	global pSetGains
-	flexsea.ptx_cmd_actpack_rw(FLEXSEA_MANAGE_1, byref(nb), commStr, offset, pCtrl[0], pSetpoint[0], pSetGains[0], pG0[0], pG1[0], pG2[0], pG3[0], pSystem);
+	flexsea.ptx_cmd_actpack_rw(FLEXSEA_MANAGE_1, byref(nb), commStr, offset, pCtrl[0], pSetpoint[0], pSetGains[0], pG0[0], pG1[0], pG2[0], pG3[0], pSystem)
 	hser.write(commStr)
 	if(offset == 0 and pSetGains[0] == CHANGE):
 		pSetGains[0] = c_uint8(KEEP)
@@ -189,7 +189,7 @@ def actPackFSM2(on):
 	else:
 		pSystem = c_uint8(SYS_DISABLE_FSM2)
 
-	flexsea.ptx_cmd_actpack_rw(FLEXSEA_MANAGE_1, byref(nb), commStr, c_uint8(0), pCtrl[0], pSetpoint[0], pG0[0], pG1[0], pG2[0], pG3[0], pSetGains[0], pSystem);
+	flexsea.ptx_cmd_actpack_rw(FLEXSEA_MANAGE_1, byref(nb), commStr, c_uint8(0), pCtrl[0], pSetpoint[0], pG0[0], pG1[0], pG2[0], pG3[0], pSetGains[0], pSystem)
 	hser.write(commStr)
 
 #Sends a request to Execute. Make sure to disable FSM2 first.
@@ -206,8 +206,8 @@ def findPoles(block):
 
 def writeUser(index, value):
 	global myUserRW
-	myUserRW.w[index] = c_int32(value);
-	flexsea.copyUserWtoStack(myUserRW);
+	myUserRW.w[index] = c_int32(value)
+	flexsea.copyUserWtoStack(myUserRW)
 	flexsea.ptx_cmd_data_user_w(FLEXSEA_MANAGE_1, byref(nb), commStr, c_uint8(index))
 	hser.write(commStr)
 
@@ -228,7 +228,7 @@ def readUser():
 	#print(']')
 	
 	ppFlag = c_uint8(0)
-	ppFlag = flexsea.receiveFlexSEABytes(byref(cBytes), bytes, 1);
+	ppFlag = flexsea.receiveFlexSEABytes(byref(cBytes), bytes, 1)
 
 #Pocket functions:
 #================
@@ -254,20 +254,20 @@ def readPocket(minOffs, maxOffs, printDiv, displayFlexSEA=True):
 	
 	ppFlag = c_uint8(0)
 	#print("Bytes:", bytes)
-	ppFlag = flexsea.receiveFlexSEABytes(byref(cBytes), bytes, 1);
+	ppFlag = flexsea.receiveFlexSEABytes(byref(cBytes), bytes, 1)
 	if(ppFlag):
 		#print('We parsed a packet: ', end='')
 		cmd = c_uint8(0)
 		type = c_uint8(0)
-		flexsea.getSignatureOfLastPayloadParsed(byref(cmd), byref(type));
+		flexsea.getSignatureOfLastPayloadParsed(byref(cmd), byref(type))
 		#print('cmd:', cmd, 'type:', type)
 		
 		newPocketPacket = c_uint8(0)
-		newPocketPacket = flexsea.newPocketRRpacketAvailable();
+		newPocketPacket = flexsea.newPocketRRpacketAvailable()
 		
 		if(newPocketPacket):
 			#print('New Rigid packet(s) available\n')
-			flexsea.getLastPocketData(byref(myPocket));
+			flexsea.getLastPocketData(byref(myPocket))
 			
 			if displayFlexSEA:
 				i = printPocket(printDiv)
@@ -280,7 +280,7 @@ def readPocket(minOffs, maxOffs, printDiv, displayFlexSEA=True):
 #Send Read Request ActPack:
 def requestReadPocket(offset):
 	global pSetGains
-	flexsea.ptx_cmd_pocket_rw(FLEXSEA_MANAGE_1, byref(nb), commStr, offset, pCtrl[0], pSetpoint[0], pSetGains[0], pG0[0], pG1[0], pG2[0], pG3[0], pCtrl[1], pSetpoint[1], pSetGains[1], pG0[1], pG1[1], pG2[1], pG3[1], pSystem);
+	flexsea.ptx_cmd_pocket_rw(FLEXSEA_MANAGE_1, byref(nb), commStr, offset, pCtrl[0], pSetpoint[0], pSetGains[0], pG0[0], pG1[0], pG2[0], pG3[0], pCtrl[1], pSetpoint[1], pSetGains[1], pG0[1], pG1[1], pG2[1], pG3[1], pSystem)
 	hser.write(commStr)
 	if(pSetGains[0] == CHANGE):
 		pSetGains[0] = c_uint8(KEEP)
@@ -424,17 +424,17 @@ def printDiv(div):
 
 #Send Read Request Rigid:
 def requestReadRigid(offset):
-	flexsea.ptx_cmd_rigid_r(FLEXSEA_MANAGE_1, byref(nb), commStr, offset);
+	flexsea.ptx_cmd_rigid_r(FLEXSEA_MANAGE_1, byref(nb), commStr, offset)
 	hser.write(commStr)
 
 #Set Control Mode:
 def setControlMode_manual(ctrlMode):
-	flexsea.ptx_cmd_ctrl_mode_w(FLEXSEA_EXECUTE_1, byref(nb), commStr, ctrlMode);
+	flexsea.ptx_cmd_ctrl_mode_w(FLEXSEA_EXECUTE_1, byref(nb), commStr, ctrlMode)
 	hser.write(commStr)
 
 #Set Motor Voltage:
 def setMotorVoltage_manual(mV):
-	flexsea.ptx_cmd_ctrl_o_w(FLEXSEA_EXECUTE_1, byref(nb), commStr, mV);
+	flexsea.ptx_cmd_ctrl_o_w(FLEXSEA_EXECUTE_1, byref(nb), commStr, mV)
 	hser.write(commStr)
 	
 def readRigid():
@@ -450,20 +450,20 @@ def readRigid():
 	#print(']')
 
 	ppFlag = c_uint8(0)
-	ppFlag = flexsea.receiveFlexSEABytes(byref(cBytes), bytes, 1);
+	ppFlag = flexsea.receiveFlexSEABytes(byref(cBytes), bytes, 1)
 	if(ppFlag):
 		#print('We parsed a packet: ', end='')
 		cmd = c_uint8(0)
 		type = c_uint8(0)
-		flexsea.getSignatureOfLastPayloadParsed(byref(cmd), byref(type));
+		flexsea.getSignatureOfLastPayloadParsed(byref(cmd), byref(type))
 		#print('cmd:', cmd, 'type:', type)
 		
 		newRigidPacket = c_uint8(0)
-		newRigidPacket = flexsea.newRigidRRpacketAvailable();
+		newRigidPacket = flexsea.newRigidRRpacketAvailable()
 		
 		if(newRigidPacket):
 			#print('New Rigid packet(s) available\n')
-			flexsea.getLastRigidData(byref(myRigid));
+			flexsea.getLastRigidData(byref(myRigid))
 			printRigid()
 		#else:
 			#print('This is not a Rigid packet')
