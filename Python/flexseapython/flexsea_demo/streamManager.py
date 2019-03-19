@@ -50,13 +50,18 @@ class StreamManager():
 		data = None
 		currentTime = time.time()
 		if abs(currentTime - self.prevReadTime) >= (1/self.updateFreq):
-			self.data = fxReadDevice(self.devId,self.varsToStream)
+			tempData = fxReadDevice(self.devId,self.varsToStream)
+			if tempData != None:
+				self.data = tempData
+			else:
+				print("Read None value")
+				
 		self.prevReadTime = currentTime
 		if data_labels != None:
 			data_index =[]
 			for label in data_labels:
 				data_index.append(self.varsToStream.index(label))
-			data = [self.data[index] for index in data_index]	
+			data = [self.data[index] for index in data_index]
 		else:
 			data = self.data
 

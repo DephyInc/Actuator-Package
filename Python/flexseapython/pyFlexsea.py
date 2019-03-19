@@ -339,7 +339,7 @@ def writeUser(devId,index, value):
 	flexsea.writeUser(devId,index,value)
 
 def readUser(devId):
- 	global flexsea
+	global flexsea
 	flexsea.readUser(devId)
 
 # Sets the PID controller gains for the given device
