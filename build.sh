@@ -12,8 +12,8 @@ function build_from_scratch
     rm -rf build
     mkdir -p build
     cd build
-    cmake ..
-    make
+    cmake .. -G "Eclipse CDT4 - Ninja"
+    ninja
     cd ${SCRIPT_DIR}
 }
 
@@ -35,18 +35,9 @@ function clean
 
 function build_all
 {
-    # build_from_scratch ${FLEX_LIB_DIR}
-    # cp ${FLEX_LIB_DIR}/build/unix_64/libFlexSEA-Stack-Plan.a ${PLAN_STACK_DIR}/unix64
     build_from_scratch ${PLAN_STACK_DIR}
     build_from_scratch ${ACPAC_DIR}
     echo '/dev/ttyACM0' > ${ACPAC_DIR}/build/com.txt
-}
-
-function clean_all
-{
-    clean ${FLEX_LIB_DIR}
-    clean ${PLAN_STACK_DIR}
-    clean ${ACPAC_DIR}
 }
 
 #
@@ -63,9 +54,7 @@ Options:
 Targets:
     acpac
     plan_stack
-    flexsea_lib
     all
-    lib_check
 Examples:
     ./build.sh acpac
     ./build.sh all
@@ -82,27 +71,18 @@ for ARGUMENT in "$@"; do
             echo '/dev/ttyACM0' > ${ACPAC_DIR}/build/com.txt
             ;;
         plan_stack)
-            clean ${PLAN_STACK_DIR}
-            build ${PLAN_STACK_DIR}
-            ;;
-        flexsea_lib)
-            clean ${FLEX_LIB_DIR}
-            build ${FLEX_LIB_DIR}
-            cp ${FLEX_LIB_DIR}/build/unix_64/libFlexSEA-Stack-Plan.a ${PLAN_STACK_DIR}/unix64
+            cd ${PLAN_STACK_DIR}
+            ./stack_builder.sh
             ;;
         serial)
             build_from_scratch ${SERIAL_DIR}
-            cp ${SERIAL_DIR}/build/libserialc.a ${PLAN_STACK_DIR}/unix64
-            ;;
-        lib_check)
-            sha1sum FlexSEA-Stack-SharedLib/build/unix_64/libFlexSEA-Stack-Plan.a
-            sha1sum Actuator-Package/fx_plan_stack/unix64/libFlexSEA-Stack-Plan.a
-            ;;
-        clean)
-            clean_all
+            cp ${SERIAL_DIR}/build/libserialc.a ${PLAN_STACK_DIR}/libs
             ;;
         all)
-            build_all
+            cd ${PLAN_STACK_DIR}
+            ./stack_builder.sh
+            build_from_scratch ${ACPAC_DIR}
+            echo '/dev/ttyACM0' > ${ACPAC_DIR}/build/com.txt
             ;;
     esac
 
