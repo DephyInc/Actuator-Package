@@ -40,6 +40,13 @@ function build_all
     echo '/dev/ttyACM0' > ${ACPAC_DIR}/build/com.txt
 }
 
+function acpac_run
+{
+    cd acpac_cscripts/build
+    sudo ./main
+    cd ../..
+}
+
 #
 # Argument Processing
 #
@@ -77,6 +84,9 @@ for ARGUMENT in "$@"; do
         serial)
             build_from_scratch ${SERIAL_DIR}
             cp ${SERIAL_DIR}/build/libserialc.a ${PLAN_STACK_DIR}/libs
+            ;;
+        run)
+            acpac_run
             ;;
         all)
             cd ${PLAN_STACK_DIR}
