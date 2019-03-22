@@ -202,13 +202,13 @@ def list_to_bool_arr(l):
 def getUserRead():
 	global flexsea
 	result = flexsea.getUserRead()
-	valAsList = [result[i] for i in range(9)]
+	valAsList = [result[i] for i in range(6)]
 	return valAsList
 
 def getUserWrite():
 	global flexsea
 	result = flexsea.getUserWrite()
-	valAsList = [result[i] for i in range(9)]
+	valAsList = [result[i] for i in range(10)]
 	return valAsList
 
 def writeUser(devId,index, value):
