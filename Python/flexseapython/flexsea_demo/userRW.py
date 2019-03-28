@@ -1,4 +1,5 @@
 import os, sys
+from builtins import input
 
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pardir)
@@ -20,10 +21,7 @@ def fxUserRW(devId, time = 2, time_step = 0.1,  resolution = 100):
 	result = True
 	stream = StreamManager(devId,printingRate = 2, labels=labels,varsToStream = varsToStream)
 	sleep(0.4)
-	try:
-		input = raw_input
-	except NameError:
-		pass
+
 	while True:
 		preamble = ""
 		stream()
@@ -48,7 +46,6 @@ def fxUserRW(devId, time = 2, time_step = 0.1,  resolution = 100):
 			print("Invalid input")
 		
 		sleep(time_step)
-		#stream(nt* getUserWrite())	
 		preamble = "The current read vals are" + str(getUserRead())
 		print(preamble)
 		#stream.printData(message=preamble)
@@ -59,7 +56,7 @@ if __name__ == '__main__':
 	ports = sys.argv[1:2]
 	devId = loadAndGetDevice(ports)[0]
 	try:
-		fxPositionControl(devId)	
+		fxUserRW(devId)	
 	except Exception as e:
 		print("broke: " + str(e))
 		pass

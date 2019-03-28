@@ -13,10 +13,9 @@ platformdir = platformdir.replace('/', '\\')
 stack_build_dir = original_dir + '/fx_plan_stack/build'
 cscript_build_dir = original_dir + '/acpac_cscripts/build'
 
-path_to_dll = original_dir + '/fx_plan_stack/build' + platformdir + '/libfx_plan_stack.dll'
+path_to_dll = original_dir + '/fx_plan_stack/build/libs/libfx_plan_stack.dll'
 
 makeCmd = 'make'
-
 
 if(isWindows):
 	stack_build_dir = stack_build_dir.replace('/', '\\')
