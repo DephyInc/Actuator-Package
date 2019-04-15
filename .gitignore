@@ -1,4 +1,4 @@
-
+*.log
 __pycache__
 *.pyc
 *.project

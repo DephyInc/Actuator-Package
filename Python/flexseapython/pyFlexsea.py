@@ -118,13 +118,13 @@ def setPosition(devId, pos):
 # Sets the PID controller gains for the given device
 # params:
 # 		devId 		: the id of the device 
-# 		z_k			: the proportional gain to set for the active setpoint
-# 		z_b			: the integral gain to set for the active setpoint
-# 		i_kp		: the proportional gain to set for the underlying current controller (only relevant for impedance control)
-# 		i_ki		: the integral gain to set for the underlying current controller (only relevant for impedance control)
-def setZGains(devId, z_k, z_b, i_kp, i_ki):
+# 		g0			: the proportional gain to set for the active setpoint
+# 		g1			: the integral gain to set for the active setpoint
+# 		g2		: the proportional gain to set for the underlying current controller (only relevant for impedance control)
+# 		g3		: the integral gain to set for the underlying current controller (only relevant for impedance control)
+def setGains(devId, g0, g1, g2, g3):
 	global flexsea
-	flexsea.setZGains(devId, int(z_k), int(z_b), int(i_kp), int(i_ki))
+	flexsea.setGains(devId, int(g0), int(g1), int(g2), int(g3))
 
 # Sets the activation state for FSM2 on the given device
 # params:

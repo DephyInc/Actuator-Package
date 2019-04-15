@@ -49,7 +49,7 @@ def fxTwoPositionControl(devId, time = 4, time_step =  0.1, delta = 10000, trans
 	setControlMode(devId, CTRL_POSITION)
 	setPosition(devId, initialAngle)
 	# Set gains
-	setZGains(devId, kp, ki, 0, 0)
+	setGains(devId, kp, ki, 0, 0)
 
 	# Select transition rate and positions
 	currentPos = 0

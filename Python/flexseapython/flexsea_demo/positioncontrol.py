@@ -43,7 +43,7 @@ def fxPositionControl(devId, time = 2, time_step = 0.1,  resolution = 100):
 	setPosition(devId, initialAngle)
 	setControlMode(devId, CTRL_POSITION)
 	setPosition(devId, initialAngle)
-	setZGains(devId, 50, 3, 0, 0)
+	setGains(devId, 50, 3, 0, 0)
 	num_time_steps = int(time/time_step)
 	for i in range(num_time_steps):
 		sleep(time_step)

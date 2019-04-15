@@ -55,7 +55,7 @@ def fxTwoDevicePositionControl(devId0, devId1):
 		setPosition(devId, initialAngles[i])
 		setControlMode(devId, CTRL_POSITION)
 		setPosition(devId, initialAngles[i])
-		setZGains(devId, 50, 3, 0, 0)
+		setGains(devId, 50, 3, 0, 0)
 
 	try:
 		while(True):

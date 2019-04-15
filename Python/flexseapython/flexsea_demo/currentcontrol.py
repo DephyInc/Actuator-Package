@@ -23,7 +23,7 @@ def fxCurrentControl(devId, holdCurrent = [1000], time = 4, time_step = 0.1):
 	result = True
 	print('Setting controller to current...')
 	setControlMode(devId, CTRL_CURRENT)
-	setZGains(devId, 50, 32, 0, 0)
+	setGains(devId, 50, 32, 0, 0)
 	prevCurrent = holdCurrent[0]
 	num_time_steps = int(time/time_step)
 	for current in holdCurrent:

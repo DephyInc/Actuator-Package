@@ -58,14 +58,14 @@ def fxLeaderFollower(devId0, devId1):
 
 	# set first device to current controller with 0 current (0 torque)
 	setControlMode(devId0, CTRL_CURRENT)
-	setZGains(devId0, 100, 20, 0, 0)
+	setGains(devId0, 100, 20, 0, 0)
 	setMotorCurrent(devId0, 0) # Start the current, holdCurrent is in mA 
 
 	# set position controller for second device
 	setPosition(devId1, initialAngles[1])
 	setControlMode(devId1, CTRL_POSITION)
 	setPosition(devId1, initialAngles[1])
-	setZGains(devId1, 50, 3, 0, 0)
+	setGains(devId1, 50, 3, 0, 0)
 
 	count = 0
 	try:
