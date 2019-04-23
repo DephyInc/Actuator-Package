@@ -4,7 +4,7 @@ from time import sleep
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pardir)
 from fxUtil import *
-from .streamManager import StreamManager
+from .streamManager import Stream
 
 labels = ["State time", 		\
 "Motor angle", "Motor current",	\
@@ -18,18 +18,18 @@ varsToStream = [ 							\
 	FX_BATT_VOLT, FX_BATT_CURR \
 ]
 
-def fxCurrentControl(devId, holdCurrent = [1000], time = 4, time_step = 0.1):
-	stream = StreamManager(devId,printingRate = 2,labels=labels, varsToStream = varsToStream)
+def fxCurrentControl(port, holdCurrent = [1000], time = 4, time_step = 0.1):
+	stream = Stream(port,printingRate = 2,labels=labels, varsToStream = varsToStream)
 	result = True
 	print('Setting controller to current...')
-	setControlMode(devId, CTRL_CURRENT)
-	setGains(devId, 50, 32, 0, 0)
+	setControlMode(stream.devId, CTRL_CURRENT)
+	setGains(stream.devId, 50, 32, 0, 0)
 	prevCurrent = holdCurrent[0]
 	num_time_steps = int(time/time_step)
 	for current in holdCurrent:
 		for i in range(num_time_steps):
 			desCurrent = int((current-prevCurrent) * (i / float(num_time_steps)) + prevCurrent)
-			setMotorCurrent(devId, desCurrent) # Start the current, holdCurrent is in mA
+			setMotorCurrent(stream.devId, desCurrent) # Start the current, holdCurrent is in mA
 			sleep(time_step)
 			preamble = "Holding Current: {} mA...".format(desCurrent)
 			stream()
@@ -42,12 +42,12 @@ def fxCurrentControl(devId, holdCurrent = [1000], time = 4, time_step = 0.1):
 	# ramp down first
 	n = 50
 	for i in range(0, n):
-		setMotorCurrent(devId, prevCurrent * (n-i)/n)
+		setMotorCurrent(stream.devId, prevCurrent * (n-i)/n)
 		sleep(0.04)
 
 	# wait for motor to spin down
 
-	setMotorCurrent(devId, 0)
+	setMotorCurrent(stream.devId, 0)
 	lastAngle = stream([FX_ENC_ANG])[0]
 	sleep(0.2)
 	currentAngle = stream([FX_ENC_ANG])[0]
@@ -56,14 +56,13 @@ def fxCurrentControl(devId, holdCurrent = [1000], time = 4, time_step = 0.1):
 		sleep(0.2)
 		currentAngle = stream([FX_ENC_ANG])[0]
 
-	setControlMode(devId, CTRL_NONE)
+	setControlMode(stream.devId, CTRL_NONE)
 	del stream
 	return result
 if __name__ == '__main__':
 	ports = sys.argv[1:2]
-	devId = loadAndGetDevice(ports)[0]
 	try:
-		fxCurrentControl(devId)	
+		fxCurrentControl(ports)	
 	except Exception as e:
 		print("broke: " + str(e))
 		pass

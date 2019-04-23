@@ -13,27 +13,30 @@ from flexseapython.flexsea_demo.two_devices_positioncontrol import fxTwoDevicePo
 from flexseapython.flexsea_demo.two_devices_leaderfollower import fxLeaderFollower
 from flexseapython.flexsea_demo.twopositioncontrol import fxTwoPositionControl
 from flexseapython.flexsea_demo.userRW import fxUserRW
+from flexseapython.flexsea_demo.streamManager import Stream
+
 #Specify the number of devices - this has to be consistent with com.txt
 FLEXSEA_DEVICES = 1
 
-def fxFindPoles(devId):
-	findPoles(devId, FLEXSEA_DEVICES)
+def fxFindPoles(port):
+	stream = Stream(port, printingRate =2, labels=[], varsToStream=[])
+	findPoles(stream.devId, FLEXSEA_DEVICES)
+	del stream
 
 def main():
 	scriptPath = os.path.dirname(os.path.abspath(__file__))
 	fpath = scriptPath + '/flexseapython/com.txt'
-	devIds = loadAndGetDevice(fpath, FLEXSEA_DEVICES)
-	print('Got devices: ' + str(devIds))
-#	devIds = loadAndGetDevice(['COM3', 'COM13'])
+	ports = loadPortsFromFile(fpath, FLEXSEA_DEVICES)
+	print('Loaded ports: ' + str(ports))
+	
 	try:
 		expNumb = selectExperiment()
 		if(expNumb < 7 ):
-			experiments[expNumb][0](devIds[0])
+			experiments[expNumb][0](ports)
 		else:
-			experiments[expNumb][0](devIds[0], devIds[1])
+			experiments[expNumb][0](ports[0], ports[1])
 	except Exception as e:
 		print("broke: " + str(e))
-		pass
 
 experiments = [ 									\
 		(fxReadOnly,		"Read Only"),	 		\

@@ -186,6 +186,7 @@ def loadFlexsea():
 	flexsea.setControlMode.argtypes = [c_int, c_int]
 	flexsea.setMotorVoltage.argtypes = [c_int, c_int]
 	flexsea.setMotorCurrent.argtypes = [c_int, c_int]
+	flexsea.fxClose.argtypes = [c_int]
 
 	return True
 
@@ -219,4 +220,11 @@ def readUser(devId):
 	global flexsea
 	flexsea.readUser(devId)
 
+# Takes in an iterable (example a list) and closes that port
+def closePort(port):
+	global flexsea
+	flexsea.fxClose(port)
 
+def cleanUpStream():
+	global flexsea
+	flexsea.fxCleanup()

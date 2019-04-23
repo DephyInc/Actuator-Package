@@ -8,8 +8,20 @@ from pyFlexsea import *
 from pyFlexsea_def import *
 from fxUtil import *
 
+#Temporary solution
+CURRENT_PORT_ID = 0
+
+# Wrapper that manages multiple streams
 class StreamManager():
-	def __init__(self,devId, varsToStream, printingRate = 10,labels = None,updateFreq = 100, shouldLog = False, shouldAuto = 1):
+	def __init__(self,port, varsToStream, printingRate = 10,labels = None,updateFreq = 100, shouldLog = False, shouldAuto = 1):
+		self.streams = [Stream(port,updateFreq = updateFreq) for port in ports]
+		
+	def __call__(self,data_labels = None):
+		[stream() for stream in streams]
+	
+	
+class Stream():
+	def __init__(self,port, varsToStream, printingRate = 10,labels = None,updateFreq = 100, shouldLog = False, shouldAuto = 1):
 		""" Intializes stream and printer """
 		#init printer settings
 		self.counter = 0
@@ -20,21 +32,46 @@ class StreamManager():
 
 		# load stream data
 		self.varsToStream = varsToStream
-		self.devId = devId
+		global CURRENT_PORT_ID
+		self.port = CURRENT_PORT_ID
+		CURRENT_PORT_ID += 1
+		self.devId = self._connectToDevice(port)
 		self.shouldAuto = shouldAuto
 		self.updateFreq = updateFreq
 		self.shouldLog = shouldLog
 		self.prevReadTime = time.time()
 
 		# Start stream
+		print("Starting stream", self.devId)
 		fxSetStreamVariables(self.devId,self.varsToStream)
+		print("Streaming vars")
 		if not fxStartStreaming(self.devId,self.updateFreq,self.shouldLog,self.shouldAuto):
-			print("Streaming failed...")
-			sys.exit(-1)
+			raise Exception('Streaming failed')
 		else:
 			sleep(0.4)
+
+	def _connectToDevice(self,port):
+		print("connecting")
+		fxOpen(port[0], 0)
+		timeElapsed = 0
+		TIMEOUT_LIMIT = 5
+		print("here")
+		while(timeElapsed <= TIMEOUT_LIMIT and not fxIsOpen(0)):
+			# There is certainly a better way to do this
+			sleep(0.2)
+			timeElapsed += 0.2
+			
+		print("there")
+		if(not fxIsOpen(0)):
+			raise Exception("Couldn't connect to port {}".format(port))
 		
-	def writeToCSV(self):		
+		sleep(0.1)
+		print("Leave")
+		devId = fxGetDeviceIds()[0]
+		return devId
+
+
+	def writeToCSV(self):
 		with open(self.fileName,'a') as fd:
 			writer = csv.writer(fd)
 			writer.writerow(self.data)
@@ -77,4 +114,8 @@ class StreamManager():
 	
 	def __del__(self):
 		""" Closes stream properly """
+		global CURRENT_PORT_ID
+		CURRENT_PORT_ID -= 1
 		fxStopStreaming(self.devId)
+		closePort(self.port)
+		cleanUpStream()

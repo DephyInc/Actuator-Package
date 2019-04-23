@@ -21,18 +21,18 @@ def fxFindPoles(devId):
 	return True
 
 def main():
-	test_results = []
 	scriptPath = os.path.dirname(os.path.abspath(__file__))
 	fpath = scriptPath + '/flexseapython/com.txt'
-	devIds = loadAndGetDevice(fpath, FLEXSEA_DEVICES)
-	print('Got devices: ' + str(devIds))
-#	devIds = loadAndGetDevice(['COM3', 'COM13'])
+	ports = loadPortsFromFile(fpath, FLEXSEA_DEVICES)
+	print('Loaded ports: ' + str(ports))
+	test_results = []
+	
 	for test_num, test_case in enumerate(test_cases):
 		clearTerminal()
 		print(""" **** Commencing test number """, test_num, """ of """,len(test_cases))
 		sleep(1)
 		try:
-			test_results.append(test_case[0](devIds[0],**test_case[2]))
+			test_results.append(test_case[0](ports,**test_case[2]))
 		except Exception as e:
 			print("broke: " + str(e))
 	if all(test_results):

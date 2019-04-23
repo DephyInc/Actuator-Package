@@ -25,14 +25,9 @@ varsToStream = [ 							\
 
 def fxLeaderFollower(devId0, devId1):
 
-	fxSetStreamVariables(devId0, varsToStream)
-	fxSetStreamVariables(devId1, varsToStream)
-	streamSuccess0 = fxStartStreaming(devId0, 100, False, 0)
-	streamSuccess1 = fxStartStreaming(devId1, 100, False, 0)
-
-	if(not (streamSuccess0 and streamSuccess1)):
-		print("streaming failed...")
-		sys.exit(-1)
+	stream = StreamManager(port, printingRate =2, labels=labels, varsToStream=varsToStream)
+	result = True
+	stream()
 
 	initialAngles = fxReadDevice(devId0, [FX_ENC_ANG]) + fxReadDevice(devId1, [FX_ENC_ANG])
 	timeout = 10

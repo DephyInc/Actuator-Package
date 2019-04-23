@@ -4,7 +4,7 @@ from time import sleep
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pardir)
 from fxUtil import *
-from .streamManager import StreamManager
+from .streamManager import Stream
 
 # Control gain constants
 kp = 50
@@ -25,9 +25,9 @@ varsToStream = [ 							\
 	FX_BATT_VOLT, FX_BATT_CURR 				\
 ]
 
-def fxTwoPositionControl(devId, time = 4, time_step =  0.1, delta = 10000, transition_time = 1, resolution = 500):
+def fxTwoPositionControl(port, time = 4, time_step =  0.1, delta = 10000, transition_time = 1, resolution = 500):
 
-	stream = StreamManager(devId, printingRate =2, labels=labels, varsToStream=varsToStream)
+	stream = Stream(port, printingRate =2, labels=labels, varsToStream=varsToStream)
 	result = True
 	stream()
 	stream.printData()
@@ -45,11 +45,11 @@ def fxTwoPositionControl(devId, time = 4, time_step =  0.1, delta = 10000, trans
 			initialAngle = stream([FX_ENC_ANG])[0]
 
 	# Intial positions
-	setPosition(devId, initialAngle)
-	setControlMode(devId, CTRL_POSITION)
-	setPosition(devId, initialAngle)
+	setPosition(stream.devId, initialAngle)
+	setControlMode(stream.devId, CTRL_POSITION)
+	setPosition(stream.devId, initialAngle)
 	# Set gains
-	setGains(devId, kp, ki, 0, 0)
+	setGains(stream.devId, kp, ki, 0, 0)
 
 	# Select transition rate and positions
 	currentPos = 0
@@ -63,22 +63,21 @@ def fxTwoPositionControl(devId, time = 4, time_step =  0.1, delta = 10000, trans
 			delta = abs(positions[currentPos] - stream([FX_ENC_ANG])[0])
 			result &= delta < resolution
 			currentPos = (currentPos + 1) % 2
-			setPosition(devId, positions[currentPos])
+			setPosition(stream.devId, positions[currentPos])
 		sleep(time_step)
 		stream()
 		preamble = "Holding position: {}...".format(positions[currentPos])
 		stream.printData(message = preamble)
 
-	setControlMode(devId, CTRL_NONE)
+	setControlMode(stream.devId, CTRL_NONE)
 	sleep(0.1)
 	del stream
 	return result
 
 if __name__ == '__main__':
 	ports = sys.argv[1:2]
-	devId = loadAndGetDevice(ports)[0]
 	try:
-		fxPositionControl(devId)	
+		fxPositionControl(ports)	
 	except Exception as e:
 		print("broke: " + str(e))
 		pass

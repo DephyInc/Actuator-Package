@@ -3,59 +3,9 @@ from flexseapython.pyFlexsea_def import *
 from time import sleep
 import os
 
-def loadAndGetDevice(filename, numDevices=None):
-	loadSuccess = loadFlexsea()
-	if(not loadSuccess):
-#		print("Library load failed... quitting")
-		sys.exit('\nload FlexSEA failed')
-
-	isUnix = os.name != 'nt'
-	if(isUnix and os.geteuid() != 0):
-		sys.exit('\nRoot privileges needed for running this script')
-
-	if(numDevices != None):
-		portList = []
-		with open(filename, 'r') as f:
-			portList = [ line.strip() for line in f if ( line.strip() != '' ) ]
-	else:
-		portList = filename
-		numDevices = len(portList)
-
-	n = len(portList)
-	if(n > FX_NUM_PORTS):
-		n = FX_NUM_PORTS
-
-	for i in range(0, n):
-		fxOpen(portList[i], i)
-		sleep(0.2)
-	
-	waiting = True
-	waited = 0
-	while(waiting and waited < 5):
-		sleep(0.2)
-		waited = waited + 0.2
-
-		waiting = False
-		for i in range(0, n):
-			if(not fxIsOpen(i)):
-				print("Waiting for port {} to be open".format(i))
-				waiting = True
-
-	if(waiting):
-		print("Couldn't connect...")
-		sys.exit(1)
-	
-	devIds = fxGetDeviceIds()
-
-	while(len(devIds) < numDevices):
-		sleep(0.1)
-		devIds = fxGetDeviceIds()
-	
-	return devIds
-
 def printData(labels, values):
 	if(len(values) != len(labels)):
-		print("Error printing...")
+		print("Error printing...") # add error handling
 	lens = [len(l) for l in labels]
 	maxlen = max(lens)
 	fstring = '{0:' + str(maxlen) + 's}: {1}\n'
@@ -72,3 +22,24 @@ def clearTerminal():
 		os.system('cls') #Clear terminal (Win)
 	else:
 		os.system('clear') #Clear terminal (Unix)
+
+# By default takes just one device from your com.txt file
+# If two arguments are passed, one is the path of the COM.txt file
+# the other is the number of devices expected
+def loadPortsFromFile(filename, numDevices = 1):
+	loadSuccess = loadFlexsea()
+	if(not loadSuccess):
+		raise Exception('load FlexSEA failed')
+	
+	# We should avoid OS or using ROOT (if this fails put it back)
+	"""
+	isUnix = os.name != 'nt'
+	if(isUnix and os.geteuid() != 0):
+		sys.exit('\nRoot privileges needed for running this script') # why??
+	"""
+
+	portList = []
+	with open(filename, 'r') as f:
+		portList = [ line.strip() for line in f if ( line.strip() != '' ) ]
+
+	return portList
