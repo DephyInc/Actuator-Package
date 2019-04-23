@@ -26,7 +26,7 @@ def clearTerminal():
 # By default takes just one device from your com.txt file
 # If two arguments are passed, one is the path of the COM.txt file
 # the other is the number of devices expected
-def loadPortsFromFile(filename, numDevices = 1):
+def loadPortsFromFile(filename):
 	loadSuccess = loadFlexsea()
 	if(not loadSuccess):
 		raise Exception('load FlexSEA failed')

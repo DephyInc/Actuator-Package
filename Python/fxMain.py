@@ -15,18 +15,15 @@ from flexseapython.flexsea_demo.twopositioncontrol import fxTwoPositionControl
 from flexseapython.flexsea_demo.userRW import fxUserRW
 from flexseapython.flexsea_demo.streamManager import Stream
 
-#Specify the number of devices - this has to be consistent with com.txt
-FLEXSEA_DEVICES = 1
-
 def fxFindPoles(port):
 	stream = Stream(port, printingRate =2, labels=[], varsToStream=[])
-	findPoles(stream.devId, FLEXSEA_DEVICES)
+	findPoles(stream.devId, 1)
 	del stream
 
 def main():
 	scriptPath = os.path.dirname(os.path.abspath(__file__))
 	fpath = scriptPath + '/flexseapython/com.txt'
-	ports = loadPortsFromFile(fpath, FLEXSEA_DEVICES)
+	ports = loadPortsFromFile(fpath)
 	print('Loaded ports: ' + str(ports))
 	
 	try:
@@ -34,7 +31,8 @@ def main():
 		if(expNumb < 7 ):
 			experiments[expNumb][0](ports)
 		else:
-			experiments[expNumb][0](ports[0], ports[1])
+			print(experiments[expNumb][0])
+			experiments[expNumb][0]([ports[0]],[ports[1]])
 	except Exception as e:
 		print("broke: " + str(e))
 

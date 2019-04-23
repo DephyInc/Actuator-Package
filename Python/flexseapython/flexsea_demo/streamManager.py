@@ -8,19 +8,10 @@ from pyFlexsea import *
 from pyFlexsea_def import *
 from fxUtil import *
 
-#Temporary solution
-CURRENT_PORT_ID = 0
-
-# Wrapper that manages multiple streams
-class StreamManager():
-	def __init__(self,port, varsToStream, printingRate = 10,labels = None,updateFreq = 100, shouldLog = False, shouldAuto = 1):
-		self.streams = [Stream(port,updateFreq = updateFreq) for port in ports]
-		
-	def __call__(self,data_labels = None):
-		[stream() for stream in streams]
+class Stream:
+	# Class variable that keeps track of the number of connections
+	CURRENT_PORT_ID = 0
 	
-	
-class Stream():
 	def __init__(self,port, varsToStream, printingRate = 10,labels = None,updateFreq = 100, shouldLog = False, shouldAuto = 1):
 		""" Intializes stream and printer """
 		#init printer settings
@@ -32,9 +23,9 @@ class Stream():
 
 		# load stream data
 		self.varsToStream = varsToStream
-		global CURRENT_PORT_ID
-		self.port = CURRENT_PORT_ID
-		CURRENT_PORT_ID += 1
+		#global CURRENT_PORT_ID
+		self.port = Stream.CURRENT_PORT_ID
+		Stream.CURRENT_PORT_ID += 1
 		self.devId = self._connectToDevice(port)
 		self.shouldAuto = shouldAuto
 		self.updateFreq = updateFreq
@@ -82,6 +73,7 @@ class Stream():
 			writer = csv.writer(fd)
 			writer.writerow(self.labels)
 
+	# TODO: Add protection from None type here rather than in all the scripts
 	def __call__(self,data_labels = None):
 		""" Allows the object to be updated by calling it as a function"""
 		data = None
@@ -99,11 +91,11 @@ class Stream():
 
 		return data
 
-	def printData(self, clear_terminal = True, message = None):
+	def printData(self, clear_terminal = True, message = ""):
 		""" Prints data with a predetermined delay, data must be updated before calling this function """
 		if clear_terminal:
 			clearTerminal()
-		if message != None:
+		if message != "":
 			print(message)
 		if(self.counter% self.rate == 0):
 			printData(self.labels,self.data)
@@ -114,8 +106,7 @@ class Stream():
 	
 	def __del__(self):
 		""" Closes stream properly """
-		global CURRENT_PORT_ID
-		CURRENT_PORT_ID -= 1
+		Stream.CURRENT_PORT_ID -= 1
 		fxStopStreaming(self.devId)
 		closePort(self.port)
 		cleanUpStream()
