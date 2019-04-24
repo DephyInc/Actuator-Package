@@ -29,23 +29,25 @@ def main():
 	try:
 		expNumb = selectExperiment()
 		if(expNumb < 7 ):
-			experiments[expNumb][0](ports)
+			experiments[expNumb][0](ports[0])
 		else:
 			print(experiments[expNumb][0])
-			experiments[expNumb][0]([ports[0]],[ports[1]])
+			experiments[expNumb][0](ports[0],ports[1])
+
 	except Exception as e:
 		print("broke: " + str(e))
+	cleanUpStream()
 
-experiments = [ 									\
-		(fxReadOnly,		"Read Only"),	 		\
-		(fxOpenControl,	 "Open Control"),		\
-		(fxCurrentControl,  "Current Control"),		\
+experiments =  [									\
+		(fxReadOnly,		"Read Only"),			\
+		(fxOpenControl, "Open Control"),		\
+		(fxCurrentControl, "Current Control"),	\
 		(fxPositionControl, "Position Control"),	\
-		(fxFindPoles,	   "Find Poles"),			\
 		(fxTwoPositionControl, "Two position control"), \
+		(fxFindPoles,	"Find Poles"),			\
 		(fxUserRW, "User RW"), \
 		(fxTwoDevicePositionControl,	"Two Device Position Control"),	 \
-		(fxLeaderFollower,			  "Two Device Leader Follower Control"),
+		(fxLeaderFollower,	"Two Device Leader Follower Control"),
 ]
 
 def selectExperiment():
@@ -55,7 +57,5 @@ def selectExperiment():
 
 	choice = input('Choose an experiment:\n' + expString )
 	return int(choice)
-
-
 
 main()
