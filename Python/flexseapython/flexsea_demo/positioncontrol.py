@@ -24,7 +24,6 @@ varsToStream = [ 							\
 def fxPositionControl(port, time = 2, time_step = 0.1,  resolution = 100):
 
 	stream = Stream(port,printingRate = 2, labels=labels,varsToStream = varsToStream)
-	sleep(0.4)
 	result = True
 	initialData = stream()
 	stream.printData()
@@ -64,4 +63,3 @@ if __name__ == '__main__':
 		fxPositionControl(ports)	
 	except Exception as e:
 		print("broke: " + str(e))
-		pass

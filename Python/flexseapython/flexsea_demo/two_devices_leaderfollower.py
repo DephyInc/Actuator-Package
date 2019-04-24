@@ -59,11 +59,11 @@ def fxLeaderFollower(leaderPort, followerPort):
 	count = 0
 	try:
 		while(True):
-			sleep(0.05)
+			sleep(0.1)
 			angle0 = leadStream([FX_ENC_ANG])[0]
 			if(angle0 != None):
 				diff0 = angle0 - initialAngles[0]
-				setPosition(followerStream.devId, initialAngles[1] + 3*diff0)
+				setPosition(followerStream.devId, initialAngles[1] + diff0)
 			
 			preamble = "device {} following device {}".format(followerStream.devId, leadStream.devId)
 			followerStream()
