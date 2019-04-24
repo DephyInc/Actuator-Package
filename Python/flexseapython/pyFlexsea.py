@@ -225,6 +225,6 @@ def closePort(port):
 	global flexsea
 	flexsea.fxClose(port)
 
-def cleanUpStream():
+def cleanupPlanStack():
 	global flexsea
 	flexsea.fxCleanup()

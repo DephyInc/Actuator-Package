@@ -35,10 +35,10 @@ def main():
 	else:
 		failedTests = [(idx,device) for idx,(test,device) in enumerate(testResults) if not test]
 		print("The following tests failed:")
-		failedTestNames = [test_cases[idx][1] + " for " + device for idx,device in failedTests]
+		failedTestNames = [test_cases[idx%len(test_cases)][1] + " for " + device for idx,device in failedTests]
 		print(failedTestNames)
 			
-	cleanUpStream()
+	cleanupPlanStack()
 # The test case in a tuple containing the function to be tested, its name and the
 # parameters used to test it. ** unpacks the parameter dict into named keywords
 test_cases = [ 									\
