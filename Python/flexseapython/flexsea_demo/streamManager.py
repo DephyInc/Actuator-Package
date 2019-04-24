@@ -20,45 +20,44 @@ class Stream:
 		self.labels = labels
 		self.data = None
 		self.rate = printingRate
-
-		# load stream data
-		self.varsToStream = varsToStream
-		#global CURRENT_PORT_ID
-		self.port = Stream.CURRENT_PORT_ID
-		Stream.CURRENT_PORT_ID += 1
-		self.devId = self._connectToDevice(port)
 		self.shouldAuto = shouldAuto
 		self.updateFreq = updateFreq
 		self.shouldLog = shouldLog
 		self.prevReadTime = time.time()
 
+		# load stream data
+		self.devId = None
+		self.varsToStream = varsToStream
+		self.port = Stream.CURRENT_PORT_ID
+		self.devId = self._connectToDevice(port)
+		#global CURRENT_PORT_ID
+		Stream.CURRENT_PORT_ID += 1
+
 		# Start stream
-		print("Starting stream", self.devId)
 		fxSetStreamVariables(self.devId,self.varsToStream)
-		print("Streaming vars")
 		if not fxStartStreaming(self.devId,self.updateFreq,self.shouldLog,self.shouldAuto):
 			raise Exception('Streaming failed')
 		else:
 			sleep(0.4)
 
 	def _connectToDevice(self,port):
-		print("connecting")
-		fxOpen(port[0], 0)
+		fxOpen(port, self.port)
 		timeElapsed = 0
 		TIMEOUT_LIMIT = 5
-		print("here")
-		while(timeElapsed <= TIMEOUT_LIMIT and not fxIsOpen(0)):
+		while(timeElapsed <= TIMEOUT_LIMIT and not fxIsOpen(self.port)):
 			# There is certainly a better way to do this
 			sleep(0.2)
 			timeElapsed += 0.2
-			
-		print("there")
-		if(not fxIsOpen(0)):
+
+		if(not fxIsOpen(self.port)):
 			raise Exception("Couldn't connect to port {}".format(port))
 		
 		sleep(0.1)
-		print("Leave")
-		devId = fxGetDeviceIds()[0]
+		devIds = fxGetDeviceIds()
+		if len(devIds) == 0:
+			raise Exception('Failed to get device Id')
+		devId = devIds[self.port]
+		print("Devid is: ", devId)
 		return devId
 
 
@@ -106,7 +105,7 @@ class Stream:
 	
 	def __del__(self):
 		""" Closes stream properly """
-		Stream.CURRENT_PORT_ID -= 1
-		fxStopStreaming(self.devId)
-		closePort(self.port)
-		cleanUpStream()
+		if self.devId:
+			Stream.CURRENT_PORT_ID -= 1
+			fxStopStreaming(self.devId)
+			closePort(self.port)
