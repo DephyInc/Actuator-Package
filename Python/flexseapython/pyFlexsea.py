@@ -153,7 +153,7 @@ def loadFlexsea():
 	sysOS = platform.system().lower()
 	dir_path = os.path.dirname(os.path.realpath(__file__))
 
-	lpath_base = os.path.join(dir_path,'../../fx_plan_stack/libs/win32')
+	lpath_base = os.path.join(dir_path,'../../fx_plan_stack/libs/raspberryPi')
 	librarypath=""
 
 	if("win" in sysOS):

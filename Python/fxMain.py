@@ -36,7 +36,7 @@ def main():
 
 	except Exception as e:
 		print("broke: " + str(e))
-	cleanUpStream()
+	cleanupPlanStack()
 
 experiments =  [									\
 		(fxReadOnly,		"Read Only"),			\

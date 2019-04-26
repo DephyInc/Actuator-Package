@@ -43,7 +43,7 @@ class Stream:
 	def _connectToDevice(self,port):
 		fxOpen(port, self.port)
 		timeElapsed = 0
-		TIMEOUT_LIMIT = 5
+		TIMEOUT_LIMIT = 10
 		while(timeElapsed <= TIMEOUT_LIMIT and not fxIsOpen(self.port)):
 			# There is certainly a better way to do this
 			sleep(0.2)
