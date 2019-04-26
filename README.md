@@ -10,6 +10,8 @@ The repo contains the FlexSEA-Rigid actuator package library and sample programs
 ## What branch should I pull?
 For the most recent version of the libraries and scripts, we recommend using master as it is known to be stable. 
 
+**Note:** It is normal you can't download the entire repository. If the only package missing is Flexsea-dephy, there is nothing to be worried about.
+
 # References
 Introduction to the act pack: http://dephy.com/wiki/flexsea/doku.php?id=dephyactpack
 Information about the scripts: http://dephy.com/wiki/flexsea/doku.php?id=scripts
