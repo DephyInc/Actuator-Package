@@ -53,7 +53,13 @@ class Stream:
 			raise Exception("Couldn't connect to port {}".format(port))
 		
 		sleep(0.1)
+		MAX_DEVICE_ID_ATTEMPTS = 10
+		num_attempts = 0
 		devIds = fxGetDeviceIds()
+		while(num_attempts < MAX_DEVICE_ID_ATTEMPTS and len(devIds) == 0):
+			sleep(0.2)
+			devIds = fxGetDeviceIds()
+		
 		if len(devIds) == 0:
 			raise Exception('Failed to get device Id')
 		devId = devIds[self.port]
