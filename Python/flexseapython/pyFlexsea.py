@@ -118,13 +118,13 @@ def setPosition(devId, pos):
 # Sets the PID controller gains for the given device
 # params:
 # 		devId 		: the id of the device 
-# 		z_k			: the proportional gain to set for the active setpoint
-# 		z_b			: the integral gain to set for the active setpoint
-# 		i_kp		: the proportional gain to set for the underlying current controller (only relevant for impedance control)
-# 		i_ki		: the integral gain to set for the underlying current controller (only relevant for impedance control)
-def setZGains(devId, z_k, z_b, i_kp, i_ki):
+# 		g0			: the proportional gain to set for the active setpoint
+# 		g1			: the integral gain to set for the active setpoint
+# 		g2		: the proportional gain to set for the underlying current controller (only relevant for impedance control)
+# 		g3		: the integral gain to set for the underlying current controller (only relevant for impedance control)
+def setGains(devId, g0, g1, g2, g3):
 	global flexsea
-	flexsea.setZGains(devId, int(z_k), int(z_b), int(i_kp), int(i_ki))
+	flexsea.setGains(devId, int(g0), int(g1), int(g2), int(g3))
 
 # Sets the activation state for FSM2 on the given device
 # params:
@@ -153,12 +153,14 @@ def loadFlexsea():
 	sysOS = platform.system().lower()
 	dir_path = os.path.dirname(os.path.realpath(__file__))
 
-	lpath_base = os.path.join(dir_path,'../../fx_plan_stack/build/libs')
+	
 	librarypath=""
 
 	if("win" in sysOS):
+		lpath_base = os.path.join(dir_path,'../../fx_plan_stack/libs/win32')
 		librarypath = os.path.join(lpath_base,'libfx_plan_stack.dll')
 	else:
+		lpath_base = os.path.join(dir_path,'../../fx_plan_stack/libs/raspberryPi')
 		librarypath = os.path.join(lpath_base,'libfx_plan_stack.so')
 
 	try:
@@ -186,6 +188,7 @@ def loadFlexsea():
 	flexsea.setControlMode.argtypes = [c_int, c_int]
 	flexsea.setMotorVoltage.argtypes = [c_int, c_int]
 	flexsea.setMotorCurrent.argtypes = [c_int, c_int]
+	flexsea.fxClose.argtypes = [c_int]
 
 	return True
 
@@ -219,4 +222,11 @@ def readUser(devId):
 	global flexsea
 	flexsea.readUser(devId)
 
+# Takes in an iterable (example a list) and closes that port
+def closePort(port):
+	global flexsea
+	flexsea.fxClose(port)
 
+def cleanupPlanStack():
+	global flexsea
+	flexsea.fxCleanup()

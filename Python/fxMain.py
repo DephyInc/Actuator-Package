@@ -13,38 +13,41 @@ from flexseapython.flexsea_demo.two_devices_positioncontrol import fxTwoDevicePo
 from flexseapython.flexsea_demo.two_devices_leaderfollower import fxLeaderFollower
 from flexseapython.flexsea_demo.twopositioncontrol import fxTwoPositionControl
 from flexseapython.flexsea_demo.userRW import fxUserRW
-#Specify the number of devices - this has to be consistent with com.txt
-FLEXSEA_DEVICES = 1
+from flexseapython.flexsea_demo.streamManager import Stream
 
-def fxFindPoles(devId):
-	findPoles(devId, FLEXSEA_DEVICES)
+def fxFindPoles(port):
+	stream = Stream(port, printingRate =2, labels=[], varsToStream=[])
+	findPoles(stream.devId, 1)
+	del stream
 
 def main():
 	scriptPath = os.path.dirname(os.path.abspath(__file__))
 	fpath = scriptPath + '/flexseapython/com.txt'
-	devIds = loadAndGetDevice(fpath, FLEXSEA_DEVICES)
-	print('Got devices: ' + str(devIds))
-#	devIds = loadAndGetDevice(['COM3', 'COM13'])
+	ports = loadPortsFromFile(fpath)
+	print('Loaded ports: ' + str(ports))
+	
 	try:
 		expNumb = selectExperiment()
 		if(expNumb < 7 ):
-			experiments[expNumb][0](devIds[0])
+			experiments[expNumb][0](ports[0])
 		else:
-			experiments[expNumb][0](devIds[0], devIds[1])
+			print(experiments[expNumb][0])
+			experiments[expNumb][0](ports[0],ports[1])
+
 	except Exception as e:
 		print("broke: " + str(e))
-		pass
+	cleanupPlanStack()
 
-experiments = [ 									\
-		(fxReadOnly,		"Read Only"),	 		\
-		(fxOpenControl,	 "Open Control"),		\
-		(fxCurrentControl,  "Current Control"),		\
+experiments =  [									\
+		(fxReadOnly,		"Read Only"),			\
+		(fxOpenControl, "Open Control"),		\
+		(fxCurrentControl, "Current Control"),	\
 		(fxPositionControl, "Position Control"),	\
-		(fxFindPoles,	   "Find Poles"),			\
 		(fxTwoPositionControl, "Two position control"), \
+		(fxFindPoles,	"Find Poles"),			\
 		(fxUserRW, "User RW"), \
 		(fxTwoDevicePositionControl,	"Two Device Position Control"),	 \
-		(fxLeaderFollower,			  "Two Device Leader Follower Control"),
+		(fxLeaderFollower,	"Two Device Leader Follower Control"),
 ]
 
 def selectExperiment():
@@ -54,7 +57,5 @@ def selectExperiment():
 
 	choice = input('Choose an experiment:\n' + expString )
 	return int(choice)
-
-
 
 main()

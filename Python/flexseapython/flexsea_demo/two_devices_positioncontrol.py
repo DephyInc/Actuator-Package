@@ -6,6 +6,7 @@ sys.path.append(pardir)
 from pyFlexsea import *
 from pyFlexsea_def import *
 from fxUtil import *
+from .streamManager import Stream
 
 labels = ["State time", 											\
 "Accel X", "Accel Y", "Accel Z", "Gyro X", "Gyro Y", "Gyro Z", 		\
@@ -22,67 +23,59 @@ varsToStream = [ 							\
 	FX_BATT_VOLT, FX_BATT_CURR 				\
 ]
 
-def fxTwoDevicePositionControl(devId0, devId1):
+def fxTwoDevicePositionControl(port0, port1):
 
-	fxSetStreamVariables(devId0, varsToStream)
-	fxSetStreamVariables(devId1, varsToStream)
-	streamSuccess0 = fxStartStreaming(devId0, 100, False, 0)
-	streamSuccess1 = fxStartStreaming(devId1, 100, False, 0)
+	dev0 = Stream(port0, printingRate =2, labels=labels, varsToStream=varsToStream)
+	dev1 = Stream(port1, printingRate =2, labels=labels, varsToStream=varsToStream)
 
-	if(not (streamSuccess0 and streamSuccess1)):
-		print("streaming failed...")
-		sys.exit(-1)
-
-	initialAngles = fxReadDevice(devId0, [FX_ENC_ANG]) + fxReadDevice(devId1, [FX_ENC_ANG])
+	# Concatenates angles of both stream together
+	initialAngles = dev0([FX_ENC_ANG]) + dev1([FX_ENC_ANG])
 	timeout = 10
 	timeoutCount = 0
+
 	while(None in initialAngles):
 		timeoutCount = timeoutCount + 1
 		if(timeoutCount > timeout):
-			print("Timed out waiting for valid encoder value...")
-			sys.exit(1)
+			raise Exception("Timed out trying to read data")
 		else:
 			sleep(0.5)
-			a = fxReadDevice(devId0, [FX_ENC_ANG])
-			b = fxReadDevice(devId1, [FX_ENC_ANG])
-			print(a)
-			print(b)
+			# Concatenates angles of both stream together
+			a = dev0([FX_ENC_ANG])
+			b = dev1([FX_ENC_ANG])
 			initialAngles = a + b
-			print(initialAngles)
 
 	# set position controller for both devices
-	for i, devId in enumerate( [devId0, devId1] ):
+	for i, devId in enumerate( [dev0.devId, dev1.devId] ):
 		setPosition(devId, initialAngles[i])
 		setControlMode(devId, CTRL_POSITION)
 		setPosition(devId, initialAngles[i])
-		setZGains(devId, 50, 3, 0, 0)
+		setGains(devId, 50, 3, 0, 0)
 
 	try:
 		while(True):
 			sleep(0.2)
 			os.system('cls')
-			print("Holding position, two devices: ")
-			for devId in [devId0, devId1]:
-				data = fxReadDevice(devId, varsToStream)
-				print("Device [{}]:".format(devId))
-				printData(labels, data)
+			preamble = "Holding position, two devices: "
+			dev0()
+			dev1()
+			dev0.printData(message = preamble)
+			dev1.printData(clear_terminal = False)
 	except:
 		pass
 
 	print('Turning off position control...')
-	setControlMode(devId0, CTRL_NONE)
-	setControlMode(devId1, CTRL_NONE)
+	setControlMode(dev0.devId, CTRL_NONE)
+	setControlMode(dev1.devId, CTRL_NONE)
 
 	# sleep so that the commmand makes it through before we stop streaming
 	sleep(0.2)
-	fxStopStreaming(devId0)
-	fxStopStreaming(devId1)
+	del followerStream
+	sleep(0.2)
+	del leadStream
 
 if __name__ == '__main__':
 	ports = sys.argv[1:3]
-	devIds = loadAndGetDevice(ports)
 	try:
-		fxTwoDevicePositionControl(devIds[0], devIds[1])	
+		fxTwoDevicePositionControl(ports[0], ports[1])	
 	except Exception as e:
 		print("broke: " + str(e))
-		pass

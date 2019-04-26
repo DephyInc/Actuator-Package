@@ -8,8 +8,11 @@ from pyFlexsea import *
 from pyFlexsea_def import *
 from fxUtil import *
 
-class StreamManager():
-	def __init__(self,devId, varsToStream, printingRate = 10,labels = None,updateFreq = 100, shouldLog = False, shouldAuto = 1):
+class Stream:
+	# Class variable that keeps track of the number of connections
+	CURRENT_PORT_ID = 0
+	
+	def __init__(self,port, varsToStream, printingRate = 10,labels = None,updateFreq = 100, shouldLog = False, shouldAuto = 1):
 		""" Intializes stream and printer """
 		#init printer settings
 		self.counter = 0
@@ -17,24 +20,54 @@ class StreamManager():
 		self.labels = labels
 		self.data = None
 		self.rate = printingRate
-
-		# load stream data
-		self.varsToStream = varsToStream
-		self.devId = devId
 		self.shouldAuto = shouldAuto
 		self.updateFreq = updateFreq
 		self.shouldLog = shouldLog
 		self.prevReadTime = time.time()
 
+		# load stream data
+		self.devId = None
+		self.varsToStream = varsToStream
+		self.port = Stream.CURRENT_PORT_ID
+		self.devId = self._connectToDevice(port)
+		#global CURRENT_PORT_ID
+		Stream.CURRENT_PORT_ID += 1
+
 		# Start stream
 		fxSetStreamVariables(self.devId,self.varsToStream)
 		if not fxStartStreaming(self.devId,self.updateFreq,self.shouldLog,self.shouldAuto):
-			print("Streaming failed...")
-			sys.exit(-1)
+			raise Exception('Streaming failed')
 		else:
 			sleep(0.4)
+
+	def _connectToDevice(self,port):
+		fxOpen(port, self.port)
+		timeElapsed = 0
+		TIMEOUT_LIMIT = 10
+		while(timeElapsed <= TIMEOUT_LIMIT and not fxIsOpen(self.port)):
+			# There is certainly a better way to do this
+			sleep(0.2)
+			timeElapsed += 0.2
+
+		if(not fxIsOpen(self.port)):
+			raise Exception("Couldn't connect to port {}".format(port))
 		
-	def writeToCSV(self):		
+		sleep(0.1)
+		MAX_DEVICE_ID_ATTEMPTS = 10
+		num_attempts = 0
+		devIds = fxGetDeviceIds()
+		while(num_attempts < MAX_DEVICE_ID_ATTEMPTS and len(devIds) == 0):
+			sleep(0.2)
+			devIds = fxGetDeviceIds()
+		
+		if len(devIds) == 0:
+			raise Exception('Failed to get device Id')
+		devId = devIds[self.port]
+		print("Devid is: ", devId)
+		return devId
+
+
+	def writeToCSV(self):
 		with open(self.fileName,'a') as fd:
 			writer = csv.writer(fd)
 			writer.writerow(self.data)
@@ -45,6 +78,7 @@ class StreamManager():
 			writer = csv.writer(fd)
 			writer.writerow(self.labels)
 
+	# TODO: Add protection from None type here rather than in all the scripts
 	def __call__(self,data_labels = None):
 		""" Allows the object to be updated by calling it as a function"""
 		data = None
@@ -62,11 +96,11 @@ class StreamManager():
 
 		return data
 
-	def printData(self, clear_terminal = True, message = None):
+	def printData(self, clear_terminal = True, message = ""):
 		""" Prints data with a predetermined delay, data must be updated before calling this function """
 		if clear_terminal:
 			clearTerminal()
-		if message != None:
+		if message != "":
 			print(message)
 		if(self.counter% self.rate == 0):
 			printData(self.labels,self.data)
@@ -77,4 +111,7 @@ class StreamManager():
 	
 	def __del__(self):
 		""" Closes stream properly """
-		fxStopStreaming(self.devId)
+		if self.devId:
+			Stream.CURRENT_PORT_ID -= 1
+			fxStopStreaming(self.devId)
+			closePort(self.port)

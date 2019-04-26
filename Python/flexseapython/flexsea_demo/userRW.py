@@ -4,7 +4,7 @@ from builtins import input
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pardir)
 from fxUtil import *
-from .streamManager import StreamManager
+from .streamManager import Stream
 
 labels = ["genVar[0]", "genVar[1]", "genVar[2]", \
 		"genVar[3]", "genVar[4]", "genVar[5]", \
@@ -17,10 +17,9 @@ varsToStream = [FX_GEN_VAR_0, FX_GEN_VAR_1, FX_GEN_VAR_2, \
 			    FX_GEN_VAR_9]
 																												
 
-def fxUserRW(devId, time = 2, time_step = 0.1,  resolution = 100):
+def fxUserRW(port, time = 2, time_step = 0.1,  resolution = 100):
 	result = True
-	stream = StreamManager(devId,printingRate = 2, labels=labels,varsToStream = varsToStream)
-	sleep(0.4)
+	stream = Stream(port,printingRate = 2, labels=labels,varsToStream = varsToStream)
 
 	while True:
 		preamble = ""
@@ -31,7 +30,7 @@ def fxUserRW(devId, time = 2, time_step = 0.1,  resolution = 100):
 		if num_args == 1 and commands[0] == 'q':
 			break
 		elif num_args == 1 and commands[0] == 'r':
-			readUser(devId)
+			readUser(stream.devId)
 		elif num_args == 3 and commands[0] == 'w':
 			try:
 				idx = int(commands[1])
@@ -41,7 +40,7 @@ def fxUserRW(devId, time = 2, time_step = 0.1,  resolution = 100):
 			except:
 				# Add better exception handling?
 				pass
-			writeUser(devId,idx,val)
+			writeUser(stream.devId,idx,val)
 		else:
 			print("Invalid input")
 		
@@ -54,9 +53,8 @@ def fxUserRW(devId, time = 2, time_step = 0.1,  resolution = 100):
 
 if __name__ == '__main__':
 	ports = sys.argv[1:2]
-	devId = loadAndGetDevice(ports)[0]
 	try:
-		fxUserRW(devId)	
+		fxUserRW(ports)	
 	except Exception as e:
 		print("broke: " + str(e))
 		pass
