@@ -59,8 +59,6 @@ def initPyFlexSEA():
 	elif("darwin" in sysOS):
 		print("FlexseaStack for mac does not exist")
 	elif("linux" in sysOS):
-		libraries.append( dir_path +'/lib/libFlexSEA-Stack-Plan.so' ) # Linux
-	else:
 		libraries.append( dir_path +'/lib/rpiFlexSEA-Stack-Plan.so' ) # Raspbian
 	
 	for lib in libraries:
@@ -100,6 +98,7 @@ def setPyFlexSEASerialPort(s):
 def comPortFromFile():
 	file = open("com.txt", "r")
 	s = file.read()
+	s = s.rstrip()
 	#print(s)
 	return s
 	
@@ -324,57 +323,57 @@ def setZGains(z_k, z_b, i_kp, i_ki, ch=0):
 
 #Print Rigid data:
 def printRigid():
-	print('Gyro X:          ', myRigid.mn.gyro.x)
-	print('Gyro Y:          ', myRigid.mn.gyro.y)
-	print('Gyro Z:          ', myRigid.mn.gyro.z)
-	print('Accel X:         ', myRigid.mn.accel.x)
-	print('Accel Y:         ', myRigid.mn.accel.y)
-	print('Accel Z:         ', myRigid.mn.accel.z)
-	print('Motor angle:     ', myRigid.ex.enc_ang[0])
+	print('Gyro X:		  ', myRigid.mn.gyro.x)
+	print('Gyro Y:		  ', myRigid.mn.gyro.y)
+	print('Gyro Z:		  ', myRigid.mn.gyro.z)
+	print('Accel X:		 ', myRigid.mn.accel.x)
+	print('Accel Y:		 ', myRigid.mn.accel.y)
+	print('Accel Z:		 ', myRigid.mn.accel.z)
+	print('Motor angle:	 ', myRigid.ex.enc_ang[0])
 	print('Motor velocity:  ', myRigid.ex.enc_ang_vel[0])
 	print('Motor current:   ', myRigid.ex.mot_current)
-	print('Joint angle:     ', myRigid.ex.joint_ang[0])
+	print('Joint angle:	 ', myRigid.ex.joint_ang[0])
 	print('Joint velocity:  ', myRigid.ex.joint_ang_vel[0])
 	print('Joint Ang-Mot:   ', myRigid.ex.joint_ang_from_mot[0])
-	print('+VB:             ', myRigid.re.vb)
+	print('+VB:			 ', myRigid.re.vb)
 	print('Battery current: ', myRigid.re.current)
-	print('Temperature:     ', myRigid.re.temp)
+	print('Temperature:	 ', myRigid.re.temp)
 	print('6-ch strain #0:  ', myRigid.mn.genVar[0])
-	print('...              ')
+	print('...			  ')
 
 #Print Pocket data:
 def printPocket_s():
-	print('Gyro X:          ', myPocket.mn.gyro.x)
-	print('Gyro Y:          ', myPocket.mn.gyro.y)
-	print('Gyro Z:          ', myPocket.mn.gyro.z)
-	print('Accel X:         ', myPocket.mn.accel.x)
-	print('Accel Y:         ', myPocket.mn.accel.y)
-	print('Accel Z:         ', myPocket.mn.accel.z)
-	print('Analog[0]:       ', myPocket.mn.analog[0])
-	print('Analog[1]:       ', myPocket.mn.analog[1])
+	print('Gyro X:		  ', myPocket.mn.gyro.x)
+	print('Gyro Y:		  ', myPocket.mn.gyro.y)
+	print('Gyro Z:		  ', myPocket.mn.gyro.z)
+	print('Accel X:		 ', myPocket.mn.accel.x)
+	print('Accel Y:		 ', myPocket.mn.accel.y)
+	print('Accel Z:		 ', myPocket.mn.accel.z)
+	print('Analog[0]:	   ', myPocket.mn.analog[0])
+	print('Analog[1]:	   ', myPocket.mn.analog[1])
 	
-	print('M1 Angle:        ', myPocket.ex[0].enc_ang[0])
-	print('M1 Velocity:     ', myPocket.ex[0].enc_ang_vel[0])
-	print('M1 Current:      ', myPocket.ex[0].mot_current)
-	print('M1 Voltage:      ', myPocket.ex[0].mot_volt)
-	print('M1 Strain:       ', myPocket.ex[0].strain)
+	print('M1 Angle:		', myPocket.ex[0].enc_ang[0])
+	print('M1 Velocity:	 ', myPocket.ex[0].enc_ang_vel[0])
+	print('M1 Current:	  ', myPocket.ex[0].mot_current)
+	print('M1 Voltage:	  ', myPocket.ex[0].mot_volt)
+	print('M1 Strain:	   ', myPocket.ex[0].strain)
 	
-	print('M2 Angle:        ', myPocket.ex[1].enc_ang[0])
-	print('M2 Velocity:     ', myPocket.ex[1].enc_ang_vel[0])
-	print('M2 Current:      ', myPocket.ex[1].mot_current)
-	print('M2 Voltage:      ', myPocket.ex[1].mot_volt)
-	print('M2 Strain:       ', myPocket.ex[1].strain)
+	print('M2 Angle:		', myPocket.ex[1].enc_ang[0])
+	print('M2 Velocity:	 ', myPocket.ex[1].enc_ang_vel[0])
+	print('M2 Current:	  ', myPocket.ex[1].mot_current)
+	print('M2 Voltage:	  ', myPocket.ex[1].mot_volt)
+	print('M2 Strain:	   ', myPocket.ex[1].strain)
 	
-	print('+VB:             ', myPocket.re.vb)
+	print('+VB:			 ', myPocket.re.vb)
 	print('Battery current: ', myPocket.re.current)
-	print('Temperature:     ', myPocket.re.temp)
-	print('Status:          ', myPocket.re.status)
+	print('Temperature:	 ', myPocket.re.temp)
+	print('Status:		  ', myPocket.re.status)
 	
-	print('genVar[0]:       ', myPocket.mn.genVar[0])
-	print('genVar[1]:       ', myPocket.mn.genVar[1])
-	print('genVar[2]:       ', myPocket.mn.genVar[2])
-	print('genVar[3]:       ', myPocket.mn.genVar[3])
-	print('...              ')
+	print('genVar[0]:	   ', myPocket.mn.genVar[0])
+	print('genVar[1]:	   ', myPocket.mn.genVar[1])
+	print('genVar[2]:	   ', myPocket.mn.genVar[2])
+	print('genVar[3]:	   ', myPocket.mn.genVar[3])
+	print('...			  ')
 
 #Print ActPack data (Rigid + controller info):
 def printActPack(div):
