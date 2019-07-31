@@ -10,3 +10,6 @@
 [submodule "SIMULINK"]
 	path = SIMULINK
 	url = https://github.com/DephyInc/SIMULINK.git
+[submodule "flexsea-core"]
+	path = flexsea-core
+	url = https://github.com/DephyInc/flexsea-core.git
