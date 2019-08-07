@@ -152,14 +152,21 @@ def loadFlexsea():
 	is_64bits = sys.maxsize > 2**32
 	sysOS = platform.system().lower()
 	dir_path = os.path.dirname(os.path.realpath(__file__))
+	# we currently support Ubuntu and Raspbian so need to make sure we are pulling
+	# in correct library depending on which version of linux
+	linux_distro = platform.linux_distribution()[0]
 
-	
 	librarypath=""
-
+	print(platform)
 	if("win" in sysOS):
 		lpath_base = os.path.join(dir_path,'../../fx_plan_stack/libs/win32')
 		librarypath = os.path.join(lpath_base,'libfx_plan_stack.dll')
+	elif("Ubuntu" in linux_distro):
+		lpath_base = os.path.join(dir_path,'../../fx_plan_stack/libs/linux')
+		librarypath = os.path.join(lpath_base,'libfx_plan_stack.so')
 	else:
+		# TODO: as of now we'll assume we're compiling for a raspberry Pi if it's not Ubuntu
+		# or windows but we'll likely want to make OS library versions clearer
 		lpath_base = os.path.join(dir_path,'../../fx_plan_stack/libs/raspberryPi')
 		librarypath = os.path.join(lpath_base,'libfx_plan_stack.so')
 
