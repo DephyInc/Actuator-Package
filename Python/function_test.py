@@ -47,7 +47,7 @@ test_cases = [ 									\
 		(fxReadOnly, "Read Only", {"time": 1}),	\
 		(fxOpenControl, "Open Control", {}),		\
 		(fxCurrentControl, "Current Control", {'holdCurrent':[200,300,400]}),		\
-		(fxTwoPositionControl, "Two position control", {'time' : 4, 'time_step': 0.1, 'transition_time':2 ,'resolution': 500})]
+		(fxTwoPositionControl, "Two position control", {'time' : 4, 'time_step': 0.1, 'transition_time':2 ,'resolution': 1000})]
 
 
 main()
