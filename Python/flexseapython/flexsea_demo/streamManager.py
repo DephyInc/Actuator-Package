@@ -35,6 +35,9 @@ class Stream:
 
 		# Start stream
 		fxSetStreamVariables(self.devId,self.varsToStream)
+		# TODO: evaluate whether we want this embedded in plan stack to carry over for C++
+		# scripts but for now this makes connections much more reliable
+		sleep(0.1)
 		if not fxStartStreaming(self.devId,self.updateFreq,self.shouldLog,self.shouldAuto):
 			raise Exception('Streaming failed')
 		else:
