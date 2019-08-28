@@ -6,3 +6,5 @@ __pycache__
 test_scripts/build/
 
 Python/flexseapython/com_local\.txt
+
+acpac_cscripts/build/
