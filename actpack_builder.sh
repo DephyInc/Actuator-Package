@@ -2,7 +2,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"
 FLEX_LIB_DIR="${SCRIPT_DIR}/fx_plan_stack/FlexSEA-Stack-SharedLib"
 ACT_PACK_DIR="${SCRIPT_DIR}"
 PLAN_STACK_DIR="${SCRIPT_DIR}/fx_plan_stack"
-ACPAC_DIR="${SCRIPT_DIR}/acpac_cscripts"
+ACPAC_DIR="${SCRIPT_DIR}/C"
 SERIAL_DIR="${SCRIPT_DIR}/fx_plan_stack/serial"
 
 function build_from_scratch
