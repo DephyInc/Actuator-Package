@@ -12,7 +12,7 @@ function build_from_scratch
     rm -rf build
     mkdir -p build
     cd build
-    cmake .. -G "Eclipse CDT4 - Ninja"
+    cmake -G Ninja -D CMAKE_C_COMPILER=gcc-7 -D CMAKE_CXX_COMPILER=g++-7 ..
     ninja
     cd ${SCRIPT_DIR}
 }
@@ -90,7 +90,7 @@ for ARGUMENT in "$@"; do
             ;;
         all)
             cd ${PLAN_STACK_DIR}
-            ./stack_builder.sh
+            build_from_scratch ${PLAN_STACK_DIR}
             build_from_scratch ${ACPAC_DIR}
             echo '/dev/ttyACM0' > ${ACPAC_DIR}/build/com.txt
             ;;
