@@ -1,15 +1,6 @@
-[submodule "acpac_cscripts"]
-	path = acpac_cscripts
-	url = https://github.com/DephyInc/acpac_cscripts.git
 [submodule "fx_plan_stack"]
 	path = fx_plan_stack
 	url = https://github.com/DephyInc/fx_plan_stack.git
-[submodule "MATLAB_scripts"]
-	path = MATLAB_scripts
-	url = https://github.com/DephyInc/MATLAB_scripts.git
-[submodule "SIMULINK"]
-	path = SIMULINK
-	url = https://github.com/DephyInc/SIMULINK.git
 [submodule "flexsea-core"]
 	path = flexsea-core
 	url = https://github.com/DephyInc/flexsea-core.git
