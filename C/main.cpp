@@ -34,7 +34,7 @@ char userSelection(void);
 
 void getUserPort(const string filename, string *);
 
-string      configFile = "com.txt";
+string      configFile = "../com.txt";
 const int   MAX_FLEXSEA_DEVS = 3;
 int         deviceIds[ MAX_FLEXSEA_DEVS ];
 bool        shouldQuit = false;
