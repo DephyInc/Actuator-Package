@@ -1,20 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3) 
 project(flexsea_c_scripts)
 
-if(WIN32)
-	set(PLAT_DIR "win")
-elseif(UNIX AND NOT APPLE)
-	set(PLAT_DIR "unix")
-else()
-	message(FATAL_ERROR " host OS not supported, exiting now!")
-endif()
-
-if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-	set(PLAT_DIR "${PLAT_DIR}64")
-else()
-	set(PLAT_DIR "${PLAT_DIR}32")
-endif()
-
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -36,7 +22,7 @@ include_directories(
 	${CMAKE_CURRENT_SOURCE_DIR}/../flexsea-core/flexsea-projects/ActPack/inc
 )
 
-set(SRCS
+set(CSCRIPT_SRCS
 	main.cpp
 	cppFlexSEA.cpp
 	read_all_example.cpp
@@ -47,13 +33,18 @@ set(SRCS
 	two_dev_position_example.cpp
 	leaderfollower.cpp
 	utils.h
-	)
+)
 
-add_executable(main ${SRCS})
+add_executable(main ${CSCRIPT_SRCS})
 
+# only look for a freshly built plan stack library since we're already set up to compile this find_program
+# should not be an issues to have a freshly compiled plan stack to prevent confusion
 find_library(fx_plan_stack_LIBRARY fx_plan_stack_static ${CMAKE_CURRENT_SOURCE_DIR}/../fx_plan_stack/build/libs)
 
+# link plan stack library to our application
 target_link_libraries(main ${fx_plan_stack_LIBRARY})
+
+# there are windows and linux specific libraries that also need to be linked in
 if(WIN32)
 	target_link_libraries(main setupapi hid)
 else()
