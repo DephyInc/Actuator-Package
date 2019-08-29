@@ -5,6 +5,21 @@ PLAN_STACK_DIR="${SCRIPT_DIR}/fx_plan_stack"
 ACPAC_DIR="${SCRIPT_DIR}/C"
 SERIAL_DIR="${SCRIPT_DIR}/fx_plan_stack/serial"
 
+# guest host OS
+if [[ $1 = "-pi" ]]; then
+    HOST_OS="raspberryPi"
+elif [[ "$OSTYPE" == "linux-gnu" ]]; then
+    HOST_OS="linux"
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+    HOST_OS="mac"
+elif [[ "$OSTYPE" == "cygwin" ]]; then
+    HOST_OS="windows"
+elif [[ "$OSTYPE" == "msys" ]]; then
+    HOST_OS="windows"
+else
+    HOST_OS="linux"
+fi
+
 function build_from_scratch
 {
     echo fresh build on $1
@@ -12,7 +27,12 @@ function build_from_scratch
     rm -rf build
     mkdir -p build
     cd build
-    cmake -G Ninja -D CMAKE_C_COMPILER=gcc-7 -D CMAKE_CXX_COMPILER=g++-7 ..
+    if [[ "$HOST_OS" == "linux" ]]; then
+        cmake -G Ninja -D CMAKE_C_COMPILER=gcc-7 -D CMAKE_CXX_COMPILER=g++-7 ..
+    else
+        cmake .. -G Ninja
+    fi
+
     ninja
     cd ${SCRIPT_DIR}
 }
@@ -92,7 +112,7 @@ for ARGUMENT in "$@"; do
             cd ${PLAN_STACK_DIR}
             build_from_scratch ${PLAN_STACK_DIR}
             build_from_scratch ${ACPAC_DIR}
-            echo '/dev/ttyACM0' > ${ACPAC_DIR}/build/com.txt
+            #echo '/dev/ttyACM0' > ${ACPAC_DIR}/build/com.txt
             ;;
     esac
 
