@@ -1,9 +1,7 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"
-FLEX_LIB_DIR="${SCRIPT_DIR}/fx_plan_stack/FlexSEA-Stack-SharedLib"
-ACT_PACK_DIR="${SCRIPT_DIR}"
+
 PLAN_STACK_DIR="${SCRIPT_DIR}/fx_plan_stack"
 ACPAC_DIR="${SCRIPT_DIR}/C"
-SERIAL_DIR="${SCRIPT_DIR}/fx_plan_stack/serial"
 
 # guest host OS
 if [[ $1 = "-pi" ]]; then
@@ -37,34 +35,19 @@ function build_from_scratch
     cd ${SCRIPT_DIR}
 }
 
-function build
+function acpac
 {
-    echo basic build on $1
-    cd $1/build
-    make
+    cd ${ACPAC_DIR}
+    ./cscripts_builder.sh
     cd ${SCRIPT_DIR}
+    #echo '/dev/ttyACM0' > ${ACPAC_DIR}/build/com.txt
 }
 
-function clean
+function plan_stack
 {
-    echo cleaning $1
-    cd $1/build
-    make clean
+    cd ${PLAN_STACK_DIR}
+    ./stack_builder.sh
     cd ${SCRIPT_DIR}
-}
-
-function build_all
-{
-    build_from_scratch ${PLAN_STACK_DIR}
-    build_from_scratch ${ACPAC_DIR}
-    echo '/dev/ttyACM0' > ${ACPAC_DIR}/build/com.txt
-}
-
-function acpac_run
-{
-    cd acpac_cscripts/build
-    sudo ./main
-    cd ../..
 }
 
 #
@@ -94,25 +77,14 @@ for ARGUMENT in "$@"; do
 
     case "$ARGUMENT" in
         acpac)
-            build_from_scratch ${ACPAC_DIR}
-            echo '/dev/ttyACM0' > ${ACPAC_DIR}/build/com.txt
+            acpac
             ;;
         plan_stack)
-            cd ${PLAN_STACK_DIR}
-            ./stack_builder.sh
-            ;;
-        serial)
-            build_from_scratch ${SERIAL_DIR}
-            cp ${SERIAL_DIR}/build/libserialc.a ${PLAN_STACK_DIR}/libs
-            ;;
-        run)
-            acpac_run
+            plan_stack
             ;;
         all)
-            cd ${PLAN_STACK_DIR}
-            build_from_scratch ${PLAN_STACK_DIR}
-            build_from_scratch ${ACPAC_DIR}
-            #echo '/dev/ttyACM0' > ${ACPAC_DIR}/build/com.txt
+            plan_stack
+            acpac
             ;;
     esac
 
