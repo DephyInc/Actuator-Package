@@ -53,8 +53,8 @@ add_executable(main ${SRCS})
 
 find_library(fx_plan_stack_LIBRARY fx_plan_stack_static ${CMAKE_CURRENT_SOURCE_DIR}/../fx_plan_stack/build/libs)
 
-if(WIN32)
-	target_link_libraries(main setupapi)
-endif()
-target_link_libraries(main pthread)
+#target_link_libraries(main pthread)
 target_link_libraries(main ${fx_plan_stack_LIBRARY})
+if(WIN32)
+	target_link_libraries(main setupapi hid)
+endif()
