@@ -32,7 +32,7 @@ int activeDemo = 0;
 void printMenu();
 char userSelection(void);
 
-void getUserPort(const string filename, string *);
+void getUserPort(const string filename, string *ports, int *baudRate);
 
 string      configFile = "../com.txt";
 const int   MAX_FLEXSEA_DEVS = 3;
@@ -62,11 +62,11 @@ int main()
 
     unsigned idx = 0;
     string portName[MAX_FLEXSEA_DEVS];
-
+    int baudRate;
     //
     // Read the COM ports from COM.TXT
     //
-    getUserPort(configFile, portName);
+    getUserPort(configFile, portName, &baudRate);
 
     //
     // Start opening the com port s and reading the
@@ -86,7 +86,7 @@ int main()
         //
         // Open the port
         //
-        fxOpen((char *)portName[idx].c_str(),  idx);
+        fxOpen((char *)portName[idx].c_str(), idx, baudRate);
         this_thread::sleep_for(200ms);
         ++devicesOpened;
     }
@@ -253,21 +253,29 @@ startOfSelection:
     return activeDemo;
 }
 
-void getUserPort(const string filename, string *ports)
+void getUserPort(const string filename, string *ports, int *baudRate)
 {
     cout << "Opening file: " << filename << endl;
     ifstream cfgFile( filename );
 
     if( ! cfgFile)
     {
-        cout << "Couldn't open configuration file: " << filename << endl;
+        cout << endl << "No com.txt found..." << endl;
+        cout << "Please copy com_template.txt to a file named com.txt" << endl;
+        cout << "Be sure to use the same format of baud rate on the first line," \
+            " and com ports on preceding lines" << endl;
         exit(1);
     }
+
+    string line;
+    getline(cfgFile, line);
+    *baudRate = std::stoi(line);
+
+    std::cout << "using baud rate: " << *baudRate << std::endl;
 
     int i = 0;
     while( ! cfgFile.eof() )
     {
-        string line;
         getline(cfgFile, line);
         if(! line.empty())
         {

@@ -12,21 +12,24 @@ from flexseapython.flexsea_demo.positioncontrol import fxPositionControl
 from flexseapython.flexsea_demo.twopositioncontrol import fxTwoPositionControl
 from flexseapython.flexsea_demo.streamManager import Stream
 
-def fxFindPoles(port):
-	stream = Stream(port, printingRate =2, labels=[], varsToStream=[])
+# TODO: this was commented out below, adding in baud rate to all connections so this
+# is not tested currently
+def fxFindPoles(port, baudRate):
+	stream = Stream(port, baudRate, printingRate =2, labels=[], varsToStream=[])
 	findPoles(stream.devId, 1)
 	del stream
 
 def main():
 	scriptPath = os.path.dirname(os.path.abspath(__file__))
 	fpath = scriptPath + '/flexseapython/com.txt'
-	ports = loadPortsFromFile(fpath)
+	ports, baudRate = loadPortsFromFile(fpath)
 	print('Loaded ports: ' + str(ports))
+	print('Using baud rate: ' + str(baudRate))
 	testResults = []
 	for device in ports:
 		for expNumb in range(len(test_cases)):
 			try:
-				testResults.append((test_cases[expNumb][0](device,**test_cases[expNumb][2]), device))
+				testResults.append((test_cases[expNumb][0](device,int(baudRate),**test_cases[expNumb][2]), device))
 				sleep(1)
 			except Exception as e:
 				print("broke: " + str(e))

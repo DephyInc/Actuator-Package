@@ -16,23 +16,24 @@ from flexseapython.flexsea_demo.userRW import fxUserRW
 from flexseapython.flexsea_demo.streamManager import Stream
 
 def fxFindPoles(port):
-	stream = Stream(port, printingRate =2, labels=[], varsToStream=[])
+	stream = Stream(port, baudRate, printingRate =2, labels=[], varsToStream=[])
 	findPoles(stream.devId, 1)
 	del stream
 
 def main():
 	scriptPath = os.path.dirname(os.path.abspath(__file__))
 	fpath = scriptPath + '/flexseapython/com.txt'
-	ports = loadPortsFromFile(fpath)
+	ports, baudRate = loadPortsFromFile(fpath)
 	print('Loaded ports: ' + str(ports))
-	
+	print('Using baud rate: ' + str(baudRate))
+
 	try:
 		expNumb = selectExperiment()
 		if(expNumb < 7 ):
-			experiments[expNumb][0](ports[0])
+			experiments[expNumb][0](ports[0],int(baudRate))
 		else:
 			print(experiments[expNumb][0])
-			experiments[expNumb][0](ports[0],ports[1])
+			experiments[expNumb][0](ports[0],ports[1],int(baudRate))
 
 	except Exception as e:
 		print("broke: " + str(e))

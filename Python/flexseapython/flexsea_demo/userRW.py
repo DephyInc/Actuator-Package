@@ -17,9 +17,9 @@ varsToStream = [FX_GEN_VAR_0, FX_GEN_VAR_1, FX_GEN_VAR_2, \
 			    FX_GEN_VAR_9]
 																												
 
-def fxUserRW(port, time = 2, time_step = 0.1,  resolution = 100):
+def fxUserRW(port, baudRate, time = 2, time_step = 0.1,  resolution = 100):
 	result = True
-	stream = Stream(port,printingRate = 2, labels=labels,varsToStream = varsToStream)
+	stream = Stream(port, baudRate, printingRate = 2, labels=labels, varsToStream = varsToStream)
 
 	while True:
 		preamble = ""
@@ -52,9 +52,10 @@ def fxUserRW(port, time = 2, time_step = 0.1,  resolution = 100):
 	return result
 
 if __name__ == '__main__':
-	ports = sys.argv[1:2]
+	baudRate = sys.argv[1]
+	ports = sys.argv[2:3]
 	try:
-		fxUserRW(ports)	
+		fxUserRW(ports, baudRate)
 	except Exception as e:
 		print("broke: " + str(e))
 		pass

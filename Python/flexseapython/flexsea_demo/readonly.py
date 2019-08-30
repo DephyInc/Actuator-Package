@@ -34,9 +34,9 @@ varsToStream = [ 		\
 	FX_GEN_VAR_9, FX_ANKLE_ANG, FX_ANKLE_ANG_VEL
 ]
 
-def fxReadOnly(port, time = 6,time_step = 0.1):
+def fxReadOnly(port, baudRate, time = 6,time_step = 0.1):
 	print(port)
-	stream = Stream(port,printingRate = 4,labels=labels,varsToStream = varsToStream,updateFreq = 100)
+	stream = Stream(port, baudRate, printingRate = 4, labels=labels, varsToStream = varsToStream, updateFreq = 100)
 	#stream.InitCSV("readall.csv")
 	print("here")
 	for i in range(int(time/time_step)):
@@ -49,9 +49,10 @@ def fxReadOnly(port, time = 6,time_step = 0.1):
 	return True
 
 if __name__ == '__main__':
-	ports = sys.argv[1:2]
+	baudRate = sys.argv[1]
+	ports = sys.argv[2:3]
 	try:
-		fxReadOnly(ports)	
+		fxReadOnly(ports, baudRate)
 	except Exception as e:
 		print("broke: " + str(e))
 		pass

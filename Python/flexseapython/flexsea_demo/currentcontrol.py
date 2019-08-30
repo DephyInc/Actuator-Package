@@ -18,8 +18,8 @@ varsToStream = [ 							\
 	FX_BATT_VOLT, FX_BATT_CURR \
 ]
 
-def fxCurrentControl(port, holdCurrent = [1000], time = 4, time_step = 0.1):
-	stream = Stream(port,printingRate = 2,labels=labels, varsToStream = varsToStream)
+def fxCurrentControl(port, baudRate, holdCurrent = [1000], time = 4, time_step = 0.1):
+	stream = Stream(port, baudRate, printingRate = 2,labels=labels, varsToStream = varsToStream)
 	result = True
 	print('Setting controller to current...')
 	setControlMode(stream.devId, CTRL_CURRENT)
@@ -59,10 +59,12 @@ def fxCurrentControl(port, holdCurrent = [1000], time = 4, time_step = 0.1):
 	setControlMode(stream.devId, CTRL_NONE)
 	del stream
 	return result
+
 if __name__ == '__main__':
-	ports = sys.argv[1:2]
+	baudRate = sys.argv[1]
+	ports = sys.argv[2:3]
 	try:
-		fxCurrentControl(ports)	
+		fxCurrentControl(ports, baudRate)
 	except Exception as e:
 		print("broke: " + str(e))
 		pass
