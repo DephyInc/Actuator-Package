@@ -260,7 +260,10 @@ void getUserPort(const string filename, string *ports, int *baudRate)
 
     if( ! cfgFile)
     {
-        cout << "Couldn't open configuration file: " << filename << endl;
+        cout << endl << "No com.txt found..." << endl;
+        cout << "Please copy com_template.txt to a file named com.txt" << endl;
+        cout << "Be sure to use the same format of baud rate on the first line," \
+            " and com ports on preceding lines" << endl;
         exit(1);
     }
 
