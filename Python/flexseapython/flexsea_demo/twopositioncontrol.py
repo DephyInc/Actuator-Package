@@ -25,9 +25,9 @@ varsToStream = [ 							\
 	FX_BATT_VOLT, FX_BATT_CURR 				\
 ]
 
-def fxTwoPositionControl(port, time = 4, time_step =  0.1, delta = 10000, transition_time = 1, resolution = 500):
+def fxTwoPositionControl(port, baudRate, time = 4, time_step =  0.1, delta = 10000, transition_time = 1, resolution = 500):
 
-	stream = Stream(port, printingRate =2, labels=labels, varsToStream=varsToStream)
+	stream = Stream(port, baudRate, printingRate =2, labels=labels, varsToStream=varsToStream)
 	result = True
 	stream()
 	stream.printData()
@@ -75,9 +75,10 @@ def fxTwoPositionControl(port, time = 4, time_step =  0.1, delta = 10000, transi
 	return result
 
 if __name__ == '__main__':
-	ports = sys.argv[1:2]
+	baudRate = sys.argv[1]
+	ports = sys.argv[2:3]
 	try:
-		fxPositionControl(ports)	
+		fxPositionControl(ports, baudRate)
 	except Exception as e:
 		print("broke: " + str(e))
 		pass

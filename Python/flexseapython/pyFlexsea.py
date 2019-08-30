@@ -7,9 +7,9 @@ global flexsea
 initialized = False
 
 # Opens the given serial port at the given index and looks for devices
-def fxOpen(port, idx):
+def fxOpen(port, idx, baudRate):
 	global flexsea
-	flexsea.fxOpen( port.encode('utf-8') , idx)
+	flexsea.fxOpen( port.encode('utf-8') , idx, baudRate)
 
 # Returns a boolean that indicates whether the port is open
 def fxIsOpen(idx):
@@ -185,7 +185,7 @@ def loadFlexsea():
 	initialized = True
 	flexsea.fxSetup()
 	# set arg types
-	flexsea.fxOpen.argtypes = [c_char_p, c_int]
+	flexsea.fxOpen.argtypes = [c_char_p, c_int, c_int]
 	flexsea.fxSetStreamVariables.restype = c_bool
 	flexsea.fxStartStreaming.argtypes = [c_int, c_int, c_bool, c_int]
 	flexsea.fxStopStreaming.argtypes = [c_int]

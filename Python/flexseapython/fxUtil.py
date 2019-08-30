@@ -39,7 +39,16 @@ def loadPortsFromFile(filename):
 	"""
 
 	portList = []
+	baudRate = []
+	# this now looks for the baud rate in the first line of com.txt and the com
+	# ports on all following lines. I'm also adding a com_template.txt and
+	# gitignoring com.txt so if you change the value it does not make your repo
+	# dirty
+	# TODO: need to check if com.txt exists and if it does not let the user know
+	# they should copy com_template.txt to com.txt
 	with open(filename, 'r') as f:
-		portList = [ line.strip() for line in f if ( line.strip() != '' ) ]
-
-	return portList
+		lines = f.readlines()
+		baudRate = lines[0].strip()
+		for line in lines[1:]:
+			portList.append(line.strip())
+	return portList, baudRate

@@ -12,7 +12,7 @@ class Stream:
 	# Class variable that keeps track of the number of connections
 	CURRENT_PORT_ID = 0
 	
-	def __init__(self,port, varsToStream, printingRate = 10,labels = None,updateFreq = 100, shouldLog = False, shouldAuto = 1):
+	def __init__(self, port, baudRate, varsToStream, printingRate = 10, labels = None, updateFreq = 100, shouldLog = False, shouldAuto = 1):
 		""" Intializes stream and printer """
 		#init printer settings
 		self.counter = 0
@@ -29,6 +29,7 @@ class Stream:
 		self.devId = None
 		self.varsToStream = varsToStream
 		self.port = Stream.CURRENT_PORT_ID
+		self.baudRate = baudRate
 		self.devId = self._connectToDevice(port)
 		#global CURRENT_PORT_ID
 		Stream.CURRENT_PORT_ID += 1
@@ -44,7 +45,7 @@ class Stream:
 			sleep(0.4)
 
 	def _connectToDevice(self,port):
-		fxOpen(port, self.port)
+		fxOpen(port, self.port, self.baudRate)
 		timeElapsed = 0
 		TIMEOUT_LIMIT = 10
 		while(timeElapsed <= TIMEOUT_LIMIT and not fxIsOpen(self.port)):

@@ -24,10 +24,10 @@ varsToStream = [ 							\
 	FX_BATT_VOLT, FX_BATT_CURR 				\
 ]
 
-def fxLeaderFollower(leaderPort, followerPort):
+def fxLeaderFollower(leaderPort, followerPort, baudRate):
 	
-	leadStream = Stream(leaderPort, printingRate =2, labels=labels, varsToStream=varsToStream)
-	followerStream = Stream(followerPort, printingRate =2, labels=labels, varsToStream=varsToStream)
+	leadStream = Stream(leaderPort, baudRate, printingRate =2, labels=labels, varsToStream=varsToStream)
+	followerStream = Stream(followerPort, baudRate, printingRate =2, labels=labels, varsToStream=varsToStream)
 
 	# Concatenates angles of both stream together
 	initialAngles = leadStream([FX_ENC_ANG]) + followerStream([FX_ENC_ANG])
@@ -85,9 +85,10 @@ def fxLeaderFollower(leaderPort, followerPort):
 	del leadStream
 
 if __name__ == '__main__':
-	ports = sys.argv[1:3]
+	baudRate = sys.argv[1]
+	ports = sys.argv[2:4]
 	try:
-		fxLeaderFollower(ports[0], ports[1])
+		fxLeaderFollower(ports[0], ports[1], baudRate)
 	except Exception as e:
 		print("broke: " + str(e))
 		pass

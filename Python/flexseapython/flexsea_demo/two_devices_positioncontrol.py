@@ -23,10 +23,10 @@ varsToStream = [ 							\
 	FX_BATT_VOLT, FX_BATT_CURR 				\
 ]
 
-def fxTwoDevicePositionControl(port0, port1):
+def fxTwoDevicePositionControl(port0, port1, baudRate):
 
-	dev0 = Stream(port0, printingRate =2, labels=labels, varsToStream=varsToStream)
-	dev1 = Stream(port1, printingRate =2, labels=labels, varsToStream=varsToStream)
+	dev0 = Stream(port0, baudRate, printingRate =2, labels=labels, varsToStream=varsToStream)
+	dev1 = Stream(port1, baudRate, printingRate =2, labels=labels, varsToStream=varsToStream)
 
 	# Concatenates angles of both stream together
 	initialAngles = dev0([FX_ENC_ANG]) + dev1([FX_ENC_ANG])
@@ -74,8 +74,9 @@ def fxTwoDevicePositionControl(port0, port1):
 	del leadStream
 
 if __name__ == '__main__':
-	ports = sys.argv[1:3]
+	baudRate = sys.argv[1]
+	ports = sys.argv[2:4]
 	try:
-		fxTwoDevicePositionControl(ports[0], ports[1])	
+		fxTwoDevicePositionControl(ports[0], ports[1], baudRate)
 	except Exception as e:
 		print("broke: " + str(e))
