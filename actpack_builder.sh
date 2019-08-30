@@ -82,6 +82,11 @@ for ARGUMENT in "$@"; do
         plan_stack)
             plan_stack
             ;;
+        run)
+            cd ${ACPAC_DIR}/build
+            ./main
+            cd ${SCRIPT_DIR}
+            ;;
         all)
             plan_stack
             acpac
