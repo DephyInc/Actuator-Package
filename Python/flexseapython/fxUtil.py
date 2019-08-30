@@ -41,14 +41,18 @@ def loadPortsFromFile(filename):
 	portList = []
 	baudRate = []
 	# this now looks for the baud rate in the first line of com.txt and the com
-	# ports on all following lines. I'm also adding a com_template.txt and
-	# gitignoring com.txt so if you change the value it does not make your repo
-	# dirty
-	# TODO: need to check if com.txt exists and if it does not let the user know
-	# they should copy com_template.txt to com.txt
-	with open(filename, 'r') as f:
-		lines = f.readlines()
-		baudRate = lines[0].strip()
-		for line in lines[1:]:
-			portList.append(line.strip())
+	# ports on all following lines. Copy com_template.txt to com.txt and fill
+	# in the correct baud rate and serial ports for your device
+	try:
+		with open(filename, 'r') as f:
+			lines = f.readlines()
+			baudRate = lines[0].strip()
+			for line in lines[1:]:
+				portList.append(line.strip())
+	except IOError:
+		print("\n\nNo com.txt found...")
+		print("Please copy com_template.txt to a file named com.txt"\
+				"Be sure to use the same format of baud rate on the first line,"\
+				" and com ports on preceding lines\n\n")
+		raise
 	return portList, baudRate
