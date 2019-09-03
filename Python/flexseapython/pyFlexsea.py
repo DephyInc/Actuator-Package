@@ -155,11 +155,16 @@ def loadFlexsea():
 	# we currently support Ubuntu and Raspbian so need to make sure we are pulling
 	# in correct library depending on which version of linux
 	linux_distro = platform.linux_distribution()[0]
-
+	# check whether we are running on a 32 or 64 bit machine
+	architecture = platform.architecture()[0]
 	librarypath=""
 	print(platform)
 	if("win" in sysOS):
-		lpath_base = os.path.join(dir_path,'../../fx_plan_stack/libs/win32')
+		# load proper library based on host architecture
+		if architecture == "32bit":
+			lpath_base = os.path.join(dir_path,'../../fx_plan_stack/libs/win32')
+		else:
+			lpath_base = os.path.join(dir_path,'../../fx_plan_stack/libs/win64')
 		librarypath = os.path.join(lpath_base,'libfx_plan_stack.dll')
 	elif("Ubuntu" in linux_distro):
 		lpath_base = os.path.join(dir_path,'../../fx_plan_stack/libs/linux')
