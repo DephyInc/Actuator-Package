@@ -88,7 +88,7 @@ function [ retCode, deviceIds] = loadAndGetDevice( ports )
     
     % Add relative path to library/header file
     disp('Loading library');
-    addpath( '..\fx_plan_stack\lib\win64');
+    addpath( '..\fx_plan_stack\libs\win64');
     addpath( '..\fx_plan_stack\include\flexseastack');
     loadlibrary('libfx_plan_stack', 'com_wrapper');
     if libisloaded( 'libfx_plan_stack' )
@@ -100,7 +100,7 @@ function [ retCode, deviceIds] = loadAndGetDevice( ports )
             if( ports{i} )
                 % Now open the COM port
                 fprintf("Opening port %s\n", ports{i});
-                calllib('libfx_plan_stack', 'fxOpen', ports{i}, i);
+                calllib('libfx_plan_stack', 'fxOpen', ports{i}, i, 230400);
                 pause(.200);
                 retCode = false;
                 iterCount = 10;
