@@ -5,7 +5,7 @@ fprintf('Simulation starting...\n');
 % Load the FX_PLAN_STACK DLL
 % Add relative path to library/header file
     disp('Loading library');
-    addpath( '..\..\fx_plan_stack\lib64');
+    addpath( '..\..\fx_plan_stack\libs\win64');
     addpath( '..\..\fx_plan_stack\include\flexseastack');
     loadlibrary('libfx_plan_stack', 'com_wrapper');
     if ~libisloaded( 'libfx_plan_stack' )
@@ -19,9 +19,9 @@ fprintf('Simulation starting...\n');
     
     % Open the com port 
     % Hard coded to 'COM3' This should go into a DialogPrm
-    com3 =  cellstr(['com3']);
+    com3 =  cellstr(['com4']);
     fprintf("Opening port %s\n", com3{1});
-    calllib('libfx_plan_stack', 'fxOpen', com3{1}, 1);
+    calllib('libfx_plan_stack', 'fxOpen', com3{1}, 1, 230400);
     pause(.200);
     retCode = false;
     iterCount = 10;
