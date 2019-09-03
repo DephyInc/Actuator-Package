@@ -53,12 +53,12 @@ varsToStream = [ 							...
         calllib(libHandle, 'setPosition', devIds(1), initialAngle1);
         calllib(libHandle, 'setControlMode', devIds(1), CTRL_POSITION);
         calllib(libHandle, 'setPosition', devIds(1), initialAngle1);
-        calllib(libHandle, 'setZGains', devIds(1), 50, 3, 0, 0);
+        calllib(libHandle, 'setGains', devIds(1), 50, 3, 0, 0);
 
         calllib(libHandle, 'setPosition', devIds(2), initialAngle2);
         calllib(libHandle, 'setControlMode', devIds(2), CTRL_POSITION);
         calllib(libHandle, 'setPosition', devIds(2), initialAngle2);
-        calllib(libHandle, 'setZGains', devIds(2), 50, 3, 0, 0);
+        calllib(libHandle, 'setGains', devIds(2), 50, 3, 0, 0);
 
         for i  = 100: -1: 0
             pause(.200);

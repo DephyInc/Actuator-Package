@@ -73,14 +73,14 @@ VarEncAngle = [ FX_RIGID_ENC_ANG ];
             fprintf("Turning on position control for device %d to follow %d\n", deviceIds(1), deviceIds(2));
             % set first device to current controller with 0 current (0 torque)
             calllib(libHandle, 'setControlMode', deviceIds(1), CTRL_CURRENT);
-            calllib(libHandle, 'setZGains', deviceIds(1), 100, 20, 0, 0);
+            calllib(libHandle, 'setGains', deviceIds(1), 100, 20, 0, 0);
             calllib(libHandle, 'setMotorCurrent', deviceIds(1), 0);
 
             % set position controller for second device
             calllib(libHandle, 'setPosition', deviceIds(2), initialAngle2);
             calllib(libHandle, 'setControlMode', deviceIds(2), CTRL_POSITION);
             calllib(libHandle, 'setPosition', deviceIds(2), initialAngle2);
-            calllib(libHandle, 'setZGains', deviceIds(2), 50, 3, 0, 0);
+            calllib(libHandle, 'setGains', deviceIds(2), 50, 3, 0, 0);
 
             loopCount = 50;
             while( loopCount )

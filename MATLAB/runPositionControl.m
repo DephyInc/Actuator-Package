@@ -51,7 +51,7 @@ varsToStream = [ 							...
         calllib(libHandle, 'setPosition', devId, initialAngle);
         calllib(libHandle, 'setControlMode', devId, CTRL_POSITION);
         calllib(libHandle, 'setPosition', devId, initialAngle);
-        calllib(libHandle, 'setZGains', devId, 50, 3, 0, 0);
+        calllib(libHandle, 'setGains', devId, 50, 3, 0, 0);
             
         % Now, hold this poisition against user turn
         for i = 100: -1: 0
