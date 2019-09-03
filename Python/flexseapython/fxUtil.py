@@ -50,8 +50,8 @@ def loadPortsFromFile(filename):
 			for line in lines[1:]:
 				portList.append(line.strip())
 	except IOError:
-		print("\n\nNo com.txt found..."\
-				"\nPlease copy com_template.txt to a file named com.txt"\
+		print("\n\nNo com.txt found in the flexseapython directory..."\
+				"\nPlease copy the com_template.txt found there to a file named com.txt"\
 				"\nBe sure to use the same format of baud rate on the first line,"\
 				"\nand com ports on preceding lines\n\n")
 		raise
