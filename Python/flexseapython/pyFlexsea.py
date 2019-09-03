@@ -159,7 +159,7 @@ def loadFlexsea():
 	librarypath=""
 	print(platform)
 	if("win" in sysOS):
-		lpath_base = os.path.join(dir_path,'../../fx_plan_stack/libs/windows')
+		lpath_base = os.path.join(dir_path,'../../fx_plan_stack/libs/win32')
 		librarypath = os.path.join(lpath_base,'libfx_plan_stack.dll')
 	elif("Ubuntu" in linux_distro):
 		lpath_base = os.path.join(dir_path,'../../fx_plan_stack/libs/linux')
