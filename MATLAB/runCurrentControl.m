@@ -32,7 +32,7 @@ varsToStream = [ 		...
     
         fprintf('Setting controller to current control mode...')
         calllib(libHandle, 'setControlMode', devId, CTRL_CURRENT );
-        calllib(libHandle, 'setZGains', devId, 100, 20, 0, 0 );
+        calllib(libHandle, 'setGains', devId, 100, 20, 0, 0 );
         calllib(libHandle, 'setMotorCurrent', devId, holdCurrent );
         
         loopCount = 50;
