@@ -5,6 +5,8 @@
 #include <chrono>
 #include <thread>
 #include "utils.h"
+#include "flexsea_sys_def.h"
+
 using namespace std;
 using namespace std::literals::chrono_literals;
 
