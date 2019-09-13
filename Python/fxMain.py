@@ -9,6 +9,7 @@ from flexseapython.flexsea_demo.readonly import fxReadOnly
 from flexseapython.flexsea_demo.opencontrol import fxOpenControl
 from flexseapython.flexsea_demo.currentcontrol import fxCurrentControl
 from flexseapython.flexsea_demo.positioncontrol import fxPositionControl
+from flexseapython.flexsea_demo.high_speed_test import fxHighSpeedTest
 from flexseapython.flexsea_demo.two_devices_positioncontrol import fxTwoDevicePositionControl
 from flexseapython.flexsea_demo.two_devices_leaderfollower import fxLeaderFollower
 from flexseapython.flexsea_demo.twopositioncontrol import fxTwoPositionControl
@@ -29,7 +30,7 @@ def main():
 
 	try:
 		expNumb = selectExperiment()
-		if(expNumb < 7 ):
+		if(expNumb < 8 ):
 			experiments[expNumb][0](ports[0],int(baudRate))
 		else:
 			print(experiments[expNumb][0])
@@ -45,6 +46,7 @@ experiments =  [									\
 		(fxCurrentControl, "Current Control"),	\
 		(fxPositionControl, "Position Control"),	\
 		(fxTwoPositionControl, "Two position control"), \
+		(fxHighSpeedTest, "High Speed Test"),	\
 		(fxFindPoles,	"Find Poles"),			\
 		(fxUserRW, "User RW"), \
 		(fxTwoDevicePositionControl,	"Two Device Position Control"),	 \
