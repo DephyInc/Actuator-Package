@@ -23,62 +23,50 @@ varsToStream = [ \
 	FX_BATT_CURR \
 ]
 
+# Controller type
 class Controller(Enum):
 	position = 1
 	current = 2
 
-class FuncType(Enum):
+# Signal type to send to controller
+class signal(Enum):
 	sine = 1
 	line = 2
 
-################## Tune the experimental parameters here #########################
-
-# Adjust this to change the desired motor command frequency in Hz
-# Actual motor command frequency will be slower because of running on an OS
-# This can be over 1000Hz but after 2000Hz it will be capped by a constant in fx_plan_stack
-
-COMMAND_FREQUENCY = 1000
-
-# amplitude of signal
-AMPLITUDE = 3500
-
-# frequency of sine wave in Hz
-FREQUENCY = 2.5 
-
-# number of times to run the signal
-NUMBER_OF_LOOPS = 10
-
-# delay between signal cycles (s)
-CYCLE_DELAY = 0
-
-CONTROLLER_TYPE = Controller.position
-SIGNAL_TYPE = FuncType.sine
-
-REQUEST_JITTER = False
-JITTER = 200
-
 
 # generate a sine wave of a specific amplitude and frequency
-def sinGenerator(amplitude, frequency):
-	num_samples = COMMAND_FREQUENCY / frequency
+def sinGenerator(amplitude, frequency, commandFreq):
+	num_samples = commandFreq / frequency
 	in_array = np.linspace(-np.pi, np.pi, num_samples)
 	sin_vals = amplitude * np.sin(in_array)
 	return sin_vals
 
 # generate a line with specific amplitude
-def lineGenerator(amplitude):
-	num_samples = COMMAND_FREQUENCY
+def lineGenerator(amplitude, commandFreq):
+	num_samples = commandFreq
 	line_vals = [ amplitude for i in range(num_samples) ]
 	return line_vals
 
-
-def fxHighSpeedTest(port, baudRate):
+# Port: port with outgoing serial connection to ActPack
+# Baud Rate : baud rate of outgoing serial connection to ActPack
+# Controller Type: Position controller or current controller
+# Signal Type: Sine wave or line
+# Command Freq: Desired frequency of issuing commands to controller, actual 
+#               command frequency will be slower due to OS overhead.
+# Signal Amplitude: Amplitude of signal to send to controller. Encoder position
+#                   if position controller, current in mA if current controller
+# Number of Loops: Number of times to send desired signal to controller
+# Signal Freq: Frequency of sine wave if using sine wave signal
+# Cycle Delay: Delay between signals sent to controller, use with sine wave only
+# Request Jitter: Add jitter amount to every other sample sent to controller
+# Jitter: Amount of jitter
+def fxHighSpeedTest(port, baudRate, controllerType = Controller.position, signalType = signal.sine, commandFreq = 1000, signalAmplitude = 10000, numberOfLoops = 10, signalFreq = 1, cycleDelay = .1, requestJitter = False, jitter = 200):
 	
 	streamFreq = 1000
 	shouldLog = True
 	shouldAutostream = 1 # This makes the loop run slightly faster
 
-	delay_time = float(1/(float(COMMAND_FREQUENCY)))
+	delay_time = float(1/(float(commandFreq)))
 	print(delay_time)
 
 	try:
@@ -90,11 +78,11 @@ def fxHighSpeedTest(port, baudRate):
 		######## Make your changes here #########
 
 		# generate a control profile
-		if (SIGNAL_TYPE == FuncType.sine):
-			samples = sinGenerator(AMPLITUDE, FREQUENCY)
+		if (signalType == signal.sine):
+			samples = sinGenerator(signalAmplitude, signalFreq, commandFreq)
 			signalTypeStr = "sine wave"
-		elif (SIGNAL_TYPE == FuncType.line):
-			samples = lineGenerator(AMPLITUDE)
+		elif (signalType == signal.line):
+			samples = lineGenerator(signalAmplitude, commandFreq)
 			signalTypeStr = "line"
 		else:
 			assert 0		
@@ -109,10 +97,10 @@ def fxHighSpeedTest(port, baudRate):
 		i = 0
 		t0 = 0
 
-		if (CONTROLLER_TYPE == Controller.current):
+		if (controllerType == Controller.current):
 			setControlMode(stream.devId, CTRL_CURRENT)
 			print("Setting up current control demo")
-		elif (CONTROLLER_TYPE == Controller.position):
+		elif (controllerType == Controller.position):
 			setControlMode(stream.devId, CTRL_POSITION)
 			print("Setting up position control demo")
 			initial_pos = stream([FX_ENC_ANG])
@@ -124,20 +112,20 @@ def fxHighSpeedTest(port, baudRate):
 		
 		# record start time of experiment
 		t0 = time()
-		for reps in range(0, NUMBER_OF_LOOPS):
+		for reps in range(0, numberOfLoops):
 			for sample in samples:
-				if (i % 2 == 0 and REQUEST_JITTER):
-					sample = sample + JITTER
+				if (i % 2 == 0 and requestJitter):
+					sample = sample + jitter
 
 				sleep(delay_time)
 
 				# set controller to the next sample
 				# read ActPack data
-				if (CONTROLLER_TYPE == Controller.current):
+				if (controllerType == Controller.current):
 					setMotorCurrent(stream.devId, sample)
 					data = stream([FX_MOT_CURR])
 
-				elif (CONTROLLER_TYPE == Controller.position):
+				elif (controllerType == Controller.position):
 					setPosition(stream.devId, sample) 
 					data = stream([FX_ENC_ANG])
 
@@ -147,22 +135,23 @@ def fxHighSpeedTest(port, baudRate):
 				requests.append(sample)
 				i = i + 1
 
-			# Delay between cycles
-			for j in range(int(CYCLE_DELAY/delay_time)):
-
-				sleep(delay_time)
-				# read data from ActPack
-				if (CONTROLLER_TYPE == Controller.current):
-					data = stream([FX_MOT_CURR])
-
-				elif (CONTROLLER_TYPE == Controller.position):
-					data = stream([FX_ENC_ANG])
-
-				measurements.append(data)
-
-				times.append(time() - t0)
-				requests.append(sample)
-				i = i + 1
+			# Delay between cycles (sine wave only)
+			if (signalType == signal.sine):
+				for j in range(int(cycleDelay/delay_time)):
+	
+					sleep(delay_time)
+					# read data from ActPack
+					if (controllerType == Controller.current):
+						data = stream([FX_MOT_CURR])
+	
+					elif (controllerType == Controller.position):
+						data = stream([FX_ENC_ANG])
+	
+					measurements.append(data)
+	
+					times.append(time() - t0)
+					requests.append(sample)
+					i = i + 1
 
 			# we'll draw a line at the end of every period
 			cycleStopTimes.append(time() - t0)
@@ -182,17 +171,17 @@ def fxHighSpeedTest(port, baudRate):
 		command_frequency = i / elapsed_time
 		print("i: " + str(i) + ", elapsed_time: " + str(elapsed_time))
 
-		if (CONTROLLER_TYPE == Controller.current):
+		if (controllerType == Controller.current):
 			title = "Current control with " + "{:.2f}".format(actual_frequency) + " Hz, " + \
-				str(AMPLITUDE) + " mA amplitude " + signalTypeStr + " and " + "{:.2f}".format(command_frequency) + " Hz commands"
+				str(signalAmplitude) + " mA amplitude " + signalTypeStr + " and " + "{:.2f}".format(command_frequency) + " Hz commands"
 			plt.plot(times, requests, color = 'b', label = 'desired current')
 			plt.plot(times, measurements, color = 'r', label = 'measured current')
 			plt.xlabel("time (s)")
 			plt.ylabel("motor current (mA)")
 
-		elif (CONTROLLER_TYPE == Controller.position):
+		elif (controllerType == Controller.position):
 			title = "Position control with " + "{:.2f}".format(actual_frequency) + " Hz, " + \
-				str(AMPLITUDE) + " amplitude " + signalTypeStr + " and " + "{:.2f}".format(command_frequency) + " Hz commands"
+				str(signalAmplitude) + " amplitude " + signalTypeStr + " and " + "{:.2f}".format(command_frequency) + " Hz commands"
 			plt.plot(times, requests, color = 'b', label = 'desired position')
 			plt.plot(times, measurements, color = 'r', label = 'measured position')
 			plt.xlabel("time (s)")
