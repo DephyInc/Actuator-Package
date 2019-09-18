@@ -19,8 +19,8 @@ varsToStream = [ 							\
 	FX_MOT_VOLT								\
 ]
 
-def fxOpenControl(port, time = 2,num_times = 2, time_resolution = 0.1, maxVoltage = 3000, sign = -1):
-	stream = Stream(port,printingRate = 2,labels=labels,varsToStream = varsToStream)
+def fxOpenControl(port, baudRate, time = 2, num_times = 2, time_resolution = 0.1, maxVoltage = 3000, sign = -1):
+	stream = Stream(port, baudRate, printingRate = 2, labels=labels, varsToStream = varsToStream)
 	#stream.InitCSV("test.csv")
 	print("Setting open control...")
 	setMotorVoltage(stream.devId,0)
@@ -54,9 +54,10 @@ def fxOpenControl(port, time = 2,num_times = 2, time_resolution = 0.1, maxVoltag
 	return True
 
 if __name__ == '__main__':
-	ports = sys.argv[1:2]
+	baudRate = sys.argv[1]
+	ports = sys.argv[2:3]
 	try:
-		fxOpenControl(ports)	
+		fxOpenControl(baudRate)
 	except Exception as e:
 		print("Broke... ")
 		print(str(e))
