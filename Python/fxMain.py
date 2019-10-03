@@ -47,13 +47,13 @@ experiments =  [									\
 		(fxOpenControl, "Open Control"),		\
 		(fxCurrentControl, "Current Control"),	\
 		(fxPositionControl, "Position Control"),	\
-		(fxTwoPositionControl, "Two position control"), \
-		(fxImpedanceControl, "Impedance control"), \
+		(fxTwoPositionControl, "Two Positions Control"), \
+		(fxImpedanceControl, "Impedance Control"), \
 		(fxHighSpeedTest, "High Speed Test"),	\
 		(fxFindPoles,	"Find Poles"),			\
 		(fxUserRW, "User RW"), \
-		(fxTwoDevicePositionControl,	"Two Device Position Control"),	 \
-		(fxLeaderFollower,	"Two Device Leader Follower Control"),
+		(fxTwoDevicePositionControl,	"Two Devices Position Control"),	 \
+		(fxLeaderFollower,	"Two Devices Leader Follower Control"),
 ]
 
 def selectExperiment():

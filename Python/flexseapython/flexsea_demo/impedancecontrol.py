@@ -14,6 +14,7 @@ kp = 100
 ki = 32
 K = 325
 B = 0
+B_Increments = 125
 
 labels = ["State time", 											\
 "Accel X", "Accel Y", "Accel Z", "Gyro X", "Gyro Y", "Gyro Z", 		\
@@ -53,7 +54,6 @@ def fxImpedanceControl(port, baudRate, expTime = 7, time_step = 0.02, delta = 75
 	requests = []
 	measurements = []
 	times = []
-	#cycleStopTimes = []
 	i = 0
 	t0 = 0
 
@@ -76,11 +76,11 @@ def fxImpedanceControl(port, baudRate, expTime = 7, time_step = 0.02, delta = 75
 	
 	# Run demo
 	print(result)
-	B = -125
+	B = -B_Increments # We do that to make sure we start at 0
 	for i in range(num_time_steps):
 		measuredPos = stream([FX_ENC_ANG])[0]
 		if i % transition_steps == 0:
-			B = B + 125	#Starts at 0, increments every cycle
+			B = B + B_Increments	# Increments every cycle
 			setGains(stream.devId, K, B, kp, ki)
 			delta = abs(positions[currentPos] - measuredPos)
 			result &= delta < resolution

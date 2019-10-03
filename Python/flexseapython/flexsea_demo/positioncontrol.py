@@ -21,13 +21,13 @@ varsToStream = [ 							\
 	FX_BATT_VOLT, FX_BATT_CURR 				\
 ]
 
-def fxPositionControl(port, baudRate, time = 2, time_step = 0.1,  resolution = 100):
+def fxPositionControl(port, baudRate, time = 5, time_step = 0.1,  resolution = 100):
 
 	stream = Stream(port, baudRate, printingRate = 2, labels=labels, varsToStream = varsToStream)
 	result = True
 	initialData = stream()
 	stream.printData()
-	initialAngle = stream([FX_ENC_ANG])[0]	
+	initialAngle = stream([FX_ENC_ANG])[0]
 	timeout = 100
 	timeoutCount = 0
 	while(initialAngle == None):
