@@ -176,15 +176,15 @@ def fxHighSpeedTest(port, baudRate, controllerType = Controller.position, signal
 				str(signalAmplitude) + " mA amplitude " + signalTypeStr + " and " + "{:.2f}".format(command_frequency) + " Hz commands"
 			plt.plot(times, requests, color = 'b', label = 'desired current')
 			plt.plot(times, measurements, color = 'r', label = 'measured current')
-			plt.xlabel("time (s)")
-			plt.ylabel("motor current (mA)")
+			plt.xlabel("Time (s)")
+			plt.ylabel("Motor current (mA)")
 
 		elif (controllerType == Controller.position):
 			title = "Position control with " + "{:.2f}".format(actual_frequency) + " Hz, " + \
 				str(signalAmplitude) + " amplitude " + signalTypeStr + " and " + "{:.2f}".format(command_frequency) + " Hz commands"
 			plt.plot(times, requests, color = 'b', label = 'desired position')
 			plt.plot(times, measurements, color = 'r', label = 'measured position')
-			plt.xlabel("time (s)")
+			plt.xlabel("Time (s)")
 			plt.ylabel("Encoder position")
 
 		plt.title(title)
