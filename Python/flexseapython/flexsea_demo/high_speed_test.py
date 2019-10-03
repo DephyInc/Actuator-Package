@@ -3,12 +3,17 @@ from time import sleep, time, strftime
 from enum import Enum
 import numpy as np
 import matplotlib.pyplot as plt
+#Next two lines are used to plot in a browser:
+import matplotlib
+matplotlib.use('WebAgg')
 
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 print(pardir)
 sys.path.append(pardir)
 from fxUtil import *
 from .streamManager import Stream
+
+# Select which variables you want to read:
 
 labels = ["State time", \
 "Motor angle", "Motor current", \
@@ -33,8 +38,7 @@ class signal(Enum):
 	sine = 1
 	line = 2
 
-
-# generate a sine wave of a specific amplitude and frequency
+# Generate a sine wave of a specific amplitude and frequency
 def sinGenerator(amplitude, frequency, commandFreq):
 	num_samples = commandFreq / frequency
 	in_array = np.linspace(-np.pi, np.pi, num_samples)
@@ -64,7 +68,7 @@ def fxHighSpeedTest(port, baudRate, controllerType = Controller.position, signal
 	
 	streamFreq = 1000
 	shouldLog = True
-	shouldAutostream = 1 # This makes the loop run slightly faster
+	shouldAutostream = 1 # ActPack will send data to the script automatically (more efficient)
 
 	delay_time = float(1/(float(commandFreq)))
 	print(delay_time)
@@ -77,7 +81,7 @@ def fxHighSpeedTest(port, baudRate, controllerType = Controller.position, signal
 		############# Main Code ############
 		######## Make your changes here #########
 
-		# generate a control profile
+		# Generate a control profile
 		if (signalType == signal.sine):
 			samples = sinGenerator(signalAmplitude, signalFreq, commandFreq)
 			signalTypeStr = "sine wave"
@@ -85,10 +89,10 @@ def fxHighSpeedTest(port, baudRate, controllerType = Controller.position, signal
 			samples = lineGenerator(signalAmplitude, commandFreq)
 			signalTypeStr = "line"
 		else:
-			assert 0		
+			assert 0
 		print(samples)
 
-		# initialize lists
+		# Initialize lists
 		requests = []
 		measurements = []
 		times = []
@@ -106,11 +110,11 @@ def fxHighSpeedTest(port, baudRate, controllerType = Controller.position, signal
 			initial_pos = stream([FX_ENC_ANG])
 
 		else:
-			assert 0	
+			assert 0
 					
 		setGains(stream.devId, 300, 50, 0, 0)
 		
-		# record start time of experiment
+		# Record start time of experiment
 		t0 = time()
 		for reps in range(0, numberOfLoops):
 			for sample in samples:
@@ -140,7 +144,7 @@ def fxHighSpeedTest(port, baudRate, controllerType = Controller.position, signal
 				for j in range(int(cycleDelay/delay_time)):
 	
 					sleep(delay_time)
-					# read data from ActPack
+					# Read data from ActPack
 					if (controllerType == Controller.current):
 						data = stream([FX_MOT_CURR])
 	
@@ -153,12 +157,12 @@ def fxHighSpeedTest(port, baudRate, controllerType = Controller.position, signal
 					requests.append(sample)
 					i = i + 1
 
-			# we'll draw a line at the end of every period
+			# We'll draw a line at the end of every period
 			cycleStopTimes.append(time() - t0)
 		elapsed_time = time() - t0
 
 		######## End of Main Code #########
-		######## Do not delete the cleanup functions below #########
+		######## Do not delete the cleanup functions below! #########
 
 		setControlMode(stream.devId, CTRL_NONE)
 	
@@ -181,7 +185,7 @@ def fxHighSpeedTest(port, baudRate, controllerType = Controller.position, signal
 
 		elif (controllerType == Controller.position):
 			title = "Position control with " + "{:.2f}".format(actual_frequency) + " Hz, " + \
-				str(signalAmplitude) + " amplitude " + signalTypeStr + " and " + "{:.2f}".format(command_frequency) + " Hz commands"
+				str(signalAmplitude) + " ticks amplitude " + signalTypeStr + " and " + "{:.2f}".format(command_frequency) + " Hz commands"
 			plt.plot(times, requests, color = 'b', label = 'desired position')
 			plt.plot(times, measurements, color = 'r', label = 'measured position')
 			plt.xlabel("Time (s)")
@@ -191,7 +195,7 @@ def fxHighSpeedTest(port, baudRate, controllerType = Controller.position, signal
 
 		plt.legend(loc='upper right')
 
-		# draw a vertical line at the end of each cycle
+		# Draw a vertical line at the end of each cycle
 		for endpoints in cycleStopTimes:
 			plt.axvline(x=endpoints)
 		plt.show()
