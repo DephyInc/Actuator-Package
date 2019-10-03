@@ -39,10 +39,10 @@ class signal(Enum):
 	line = 2
 
 # Generate a sine wave of a specific amplitude and frequency
-def sinGenerator(amplitude, frequency, commandFreq):
+def sinGenerator(amplitude, frequency, offset, commandFreq):
 	num_samples = commandFreq / frequency
 	in_array = np.linspace(-np.pi, np.pi, num_samples)
-	sin_vals = amplitude * np.sin(in_array)
+	sin_vals = amplitude * np.sin(in_array) + offset
 	return sin_vals
 
 # generate a line with specific amplitude
@@ -64,7 +64,7 @@ def lineGenerator(amplitude, commandFreq):
 # Cycle Delay: Delay between signals sent to controller, use with sine wave only
 # Request Jitter: Add jitter amount to every other sample sent to controller
 # Jitter: Amount of jitter
-def fxHighSpeedTest(port, baudRate, controllerType = Controller.position, signalType = signal.sine, commandFreq = 1000, signalAmplitude = 10000, numberOfLoops = 10, signalFreq = 1, cycleDelay = .1, requestJitter = False, jitter = 200):
+def fxHighSpeedTest(port, baudRate, controllerType = Controller.position, signalType = signal.sine, commandFreq = 1000, signalAmplitude = 10000, numberOfLoops = 10, signalFreq = 1, cycleDelay = .1, requestJitter = False, jitter = 20):
 	
 	streamFreq = 1000
 	shouldLog = True
@@ -75,44 +75,64 @@ def fxHighSpeedTest(port, baudRate, controllerType = Controller.position, signal
 
 	try:
 		# Must be called before reading any device data
-		stream = Stream(port, baudRate, varsToStream, 2, labels, streamFreq, shouldLog, shouldAutostream)
+		stream = Stream(port, baudRate, printingRate=2, labels=labels, varsToStream=varsToStream, updateFreq=streamFreq, shouldLog=shouldLog, shouldAuto=shouldAutostream)
+		#stream()
 		sleep(0.4)
 
 		############# Main Code ############
 		######## Make your changes here #########
-
+		
+		if(controllerType == Controller.position):
+			#Get initial position:
+			print('Reading initial position...')
+			initialPos = stream([FX_ENC_ANG])[0]
+			timeout = 100
+			timeoutCount = 0
+			while(initialPos == None):
+				print('Loop...')
+				timeoutCount = timeoutCount + 1
+				if(timeoutCount > timeout):
+					print("Timed out waiting for valid encoder value...")
+					sys.exit(1)
+				else:
+					sleep(delay_time)
+					initialPos = stream([FX_ENC_ANG])[0]
+		else:
+			initialPos = 0
+		
 		# Generate a control profile
+		print('Command table:')
 		if (signalType == signal.sine):
-			samples = sinGenerator(signalAmplitude, signalFreq, commandFreq)
+			samples = sinGenerator(signalAmplitude, signalFreq, initialPos, commandFreq)
 			signalTypeStr = "sine wave"
 		elif (signalType == signal.line):
 			samples = lineGenerator(signalAmplitude, commandFreq)
 			signalTypeStr = "line"
 		else:
 			assert 0
-		print(samples)
+		print(np.int64(samples))
 
 		# Initialize lists
 		requests = []
 		measurements = []
 		times = []
-
 		cycleStopTimes = []
 		i = 0
 		t0 = 0
 
+		# Prepare controller:
 		if (controllerType == Controller.current):
-			setControlMode(stream.devId, CTRL_CURRENT)
 			print("Setting up current control demo")
+			setControlMode(stream.devId, CTRL_CURRENT)
+			setMotorCurrent(stream.devId, 0)
+			setGains(stream.devId, 100, 30, 0, 0)
 		elif (controllerType == Controller.position):
-			setControlMode(stream.devId, CTRL_POSITION)
 			print("Setting up position control demo")
-			initial_pos = stream([FX_ENC_ANG])
-
+			setControlMode(stream.devId, CTRL_POSITION)
+			setPosition(stream.devId, initialPos)
+			setGains(stream.devId, 300, 50, 0, 0)
 		else:
 			assert 0
-					
-		setGains(stream.devId, 300, 50, 0, 0)
 		
 		# Record start time of experiment
 		t0 = time()
