@@ -30,9 +30,9 @@ varsToStream = [ 							\
 	FX_BATT_VOLT, FX_BATT_CURR 				\
 ]
 
-def fxImpedanceControl(port, baudRate, expTime = 5, time_step = 0.01, delta = 7500, transition_time = 1.5, resolution = 500):
+def fxImpedanceControl(port, baudRate, expTime = 7, time_step = 0.02, delta = 7500, transition_time = 0.8, resolution = 500):
 
-	stream = Stream(port, baudRate, printingRate = 2, labels=labels, varsToStream=varsToStream, updateFreq=500)
+	stream = Stream(port, baudRate, printingRate = 10, labels=labels, varsToStream=varsToStream, updateFreq=500)
 	result = True
 	stream()
 	stream.printData()
@@ -62,6 +62,7 @@ def fxImpedanceControl(port, baudRate, expTime = 5, time_step = 0.01, delta = 75
 	setControlMode(stream.devId, CTRL_IMPEDANCE)
 	setPosition(stream.devId, initialAngle)
 	# Set gains
+	global B
 	setGains(stream.devId, K, B, kp, ki)
 
 	# Select transition rate and positions
@@ -75,9 +76,12 @@ def fxImpedanceControl(port, baudRate, expTime = 5, time_step = 0.01, delta = 75
 	
 	# Run demo
 	print(result)
+	B = -125
 	for i in range(num_time_steps):
 		measuredPos = stream([FX_ENC_ANG])[0]
 		if i % transition_steps == 0:
+			B = B + 125	#Starts at 0, increments every cycle
+			setGains(stream.devId, K, B, kp, ki)
 			delta = abs(positions[currentPos] - measuredPos)
 			result &= delta < resolution
 			currentPos = (currentPos + 1) % 2
