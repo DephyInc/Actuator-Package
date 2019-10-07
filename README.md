@@ -9,5 +9,7 @@ The repo contains the FlexSEA-Rigid Actuator Package library and sample programs
 
 ### Getting Started
 The latest instructions for working with the Actuatory Package and sample programs are located on Dephy's Wiki:
+
 [General information about the Dephy Actuator Package](http://dephy.com/wiki/flexsea/doku.php?id=dephyactpack)
+
 [Information about the scripts](http://dephy.com/wiki/flexsea/doku.php?id=scripts)
