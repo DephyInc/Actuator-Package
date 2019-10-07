@@ -1,5 +1,8 @@
 import os, sys
-from time import sleep
+from time import sleep, time, strftime
+import matplotlib
+import matplotlib.pyplot as plt
+matplotlib.use('WebAgg')
 
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pardir)
@@ -7,8 +10,8 @@ from fxUtil import *
 from .streamManager import Stream
 
 # Control gain constants
-kp = 50
-ki = 5
+kp = 25
+ki = 2000
 
 labels = ["State time", 											\
 "Accel X", "Accel Y", "Accel Z", "Gyro X", "Gyro Y", "Gyro Z", 		\
@@ -25,9 +28,9 @@ varsToStream = [ 							\
 	FX_BATT_VOLT, FX_BATT_CURR 				\
 ]
 
-def fxTwoPositionControl(port, baudRate, time = 4, time_step = 0.1, delta = 10000, transition_time = 1, resolution = 500):
+def fxTwoPositionControl(port, baudRate, expTime = 4, time_step = 0.02, delta = 10000, transition_time = 1, resolution = 500):
 
-	stream = Stream(port, baudRate, printingRate =2, labels=labels, varsToStream=varsToStream)
+	stream = Stream(port, baudRate, printingRate =2, labels=labels, varsToStream=varsToStream, updateFreq=500)
 	result = True
 	stream()
 	stream.printData()
@@ -44,6 +47,13 @@ def fxTwoPositionControl(port, baudRate, time = 4, time_step = 0.1, delta = 1000
 			sleep(time_step)
 			initialAngle = stream([FX_ENC_ANG])[0]
 
+	# Initialize lists - matplotlib
+	requests = []
+	measurements = []
+	times = []
+	i = 0
+	t0 = 0
+	
 	# Intial positions
 	setPosition(stream.devId, initialAngle)
 	setControlMode(stream.devId, CTRL_POSITION)
@@ -53,14 +63,19 @@ def fxTwoPositionControl(port, baudRate, time = 4, time_step = 0.1, delta = 1000
 
 	# Select transition rate and positions
 	currentPos = 0
-	num_time_steps = int(time/time_step)
+	num_time_steps = int(expTime/time_step)
 	positions = [initialAngle,initialAngle + delta]
 	sleep(0.4)
-		# Run demo
+	
+	# Record start time of experiment
+	t0 = time()
+	
+	# Run demo
 	print(result)
 	for i in range(num_time_steps):
+		measuredPos = stream([FX_ENC_ANG])[0]
 		if i % transition_steps == 0:
-			delta = abs(positions[currentPos] - stream([FX_ENC_ANG])[0])
+			delta = abs(positions[currentPos] - measuredPos)
 			result &= delta < resolution
 			currentPos = (currentPos + 1) % 2
 			setPosition(stream.devId, positions[currentPos])
@@ -68,9 +83,25 @@ def fxTwoPositionControl(port, baudRate, time = 4, time_step = 0.1, delta = 1000
 		stream()
 		preamble = "Holding position: {}...".format(positions[currentPos])
 		stream.printData(message = preamble)
-
+		# Plotting:
+		measurements.append(measuredPos)
+		times.append(time() - t0)
+		requests.append(positions[currentPos])
+	
+	# Disable controller:
 	setControlMode(stream.devId, CTRL_NONE)
 	sleep(0.1)
+	
+	# Plot before we exit:
+	title = "Two Positions Control Demo"
+	plt.plot(times, requests, color = 'b', label = 'Desired position')
+	plt.plot(times, measurements, color = 'r', label = 'Measured position')
+	plt.xlabel("Time (s)")
+	plt.ylabel("Encoder position")
+	plt.title(title)
+	plt.legend(loc='upper right')
+	plt.show()
+	
 	del stream
 	return result
 
