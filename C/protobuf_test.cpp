@@ -19,20 +19,51 @@
 using namespace std;
 using namespace std::literals::chrono_literals;
 
-void printMenu();
-char userSelection(void);
 void getUserPort(const string filename, string *ports, int *baudRate);
 
-int			activeDemo = 0;
-string		configFile = "com.txt";
-bool		shouldQuit = false;
-const int	CONNECTION_TIMEOUT = 5; // in seconds
+int activeDemo = 0;
+string configFile = "com.txt";
+bool shouldQuit = false;
+const int CONNECTION_TIMEOUT = 5; // in seconds
 
+// This object is used for connecting, sending, and receiving data from a device
+Device exo_device;
+
+// this callback is just to quit the program if someone presses control+c
 void sigint_handler(int s)
 {
 	(void)s;
 	cout << "Caught CTRL-C, exiting...\n";
 	shouldQuit = true;
+}
+
+void test_positions(void)
+{
+	int32_t STARTING_POSITION = -100408;
+	int32_t ENDING_POSITION = 900001;
+	int32_t ITERATIONS = 1;
+	uint32_t message_length = 0;
+
+	int32_t position, i;
+	while(1)
+	{
+		for(i = 0; i < ITERATIONS; i++)
+		{
+			for(position = STARTING_POSITION; position <= ENDING_POSITION; position += 1000)
+			{
+				cout << "Sending motor position " << position << endl;
+				// encode the command using protocol buffers
+				exo_device.setPosition(position);
+
+				if(message_length < 1)
+				{
+					cout << "receive failure" << endl;
+				}
+				cout << "sent and received " << position << " position" << endl;
+				this_thread::sleep_for(1s);
+			}
+		}
+	}
 }
 
 int main()
@@ -62,8 +93,6 @@ int main()
 
 	cout << "Waiting for port: " << portName[idx] << endl;
 
-	Device exo_device;
-
 	exo_device.tryOpen(portName[idx], baudRate);
 	//
 	// Wait for the port to open
@@ -83,7 +112,7 @@ int main()
 		}
 		else
 		{
-			sleep( 1 );
+			this_thread::sleep_for(1s);
 			waited  = waited + 1;
 		}
 	}
