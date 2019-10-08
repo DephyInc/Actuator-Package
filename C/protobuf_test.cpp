@@ -13,6 +13,7 @@
 	#include "windows.h"
 #endif
 
+#include "device.h"
 #include "serial.h"
 
 using namespace std;
@@ -27,7 +28,7 @@ string		configFile = "com.txt";
 bool		shouldQuit = false;
 const int	CONNECTION_TIMEOUT = 5; // in seconds
 
-void my_handler(int s)
+void sigint_handler(int s)
 {
 	(void)s;
 	cout << "Caught CTRL-C, exiting...\n";
@@ -39,7 +40,7 @@ int main()
 	//
 	// Capture the CTRL-C signal
 	//
-	std::signal(SIGINT, my_handler);
+	std::signal(SIGINT, sigint_handler);
 
 	cout << "Protocol buffer test script" << endl;
 
@@ -61,9 +62,9 @@ int main()
 
 	cout << "Waiting for port: " << portName[idx] << endl;
 
-	// port, baudrate, timeout in milliseconds
-	serial::Serial exo_serial_port(portName[idx], baudRate, serial::Timeout::simpleTimeout(1000));
+	Device exo_device;
 
+	exo_device.tryOpen(portName[idx], baudRate);
 	//
 	// Wait for the port to open
 	//
@@ -71,7 +72,7 @@ int main()
 	bool waiting = true;
 	while(waiting)
 	{
-		if(exo_serial_port.isOpen())
+		if(exo_device.getConnectionState() >= OPEN)
 		{
 			waiting = false;
 		}
@@ -103,7 +104,7 @@ int main()
 
 	cout << "Quitting application, closing serial port now" << endl;
 	// close serial port prior to exiting
-	exo_serial_port.close();
+	exo_device.close();
 
 	// wait to make sure the command goes through before we quit
 	this_thread::sleep_for(100ms);

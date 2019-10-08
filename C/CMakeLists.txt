@@ -16,6 +16,7 @@ if(PROTOCOL_TYPE STREQUAL PROTOCOL_BUFFERS)
 	# we also need to add the headers for PB as well
 	include_directories(
 		${CMAKE_CURRENT_SOURCE_DIR}/../flexsea-core/lightweight
+		${CMAKE_CURRENT_SOURCE_DIR}/../fx_plan_stack/lightweight
 		${CMAKE_CURRENT_SOURCE_DIR}/../fx_plan_stack/serial/include
 		${CMAKE_CURRENT_SOURCE_DIR}/../fx_plan_stack/serial/include/serial
 	)
