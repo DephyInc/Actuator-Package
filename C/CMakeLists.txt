@@ -13,24 +13,29 @@ if(PROTOCOL_TYPE STREQUAL PROTOCOL_BUFFERS)
 	include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 	set(CSCRIPT_SRCS protobuf_test.cpp)
 
-	# let's add our new lightweight plan stack to the project
-	include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../fx_plan_stack/lightweight)
-	set(CSCRIPT_SRCS
-		${CSCRIPT_SRCS}
-		${CMAKE_CURRENT_SOURCE_DIR}/../fx_plan_stack/lightweight/protobuf_local.c
-	)
-
-	# there is a CMakeLists.txt in the lightweight directory that pulls in
-	# all necessary protocol buffer files
-	add_subdirectory(
-		${CMAKE_CURRENT_SOURCE_DIR}/../flexsea-core/lightweight
-		${CMAKE_CURRENT_SOURCE_DIR}/../flexsea-core/lightweight/build
-	)
 	# we also need to add the headers for PB as well
-	include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../flexsea-core/lightweight)
+	include_directories(
+		${CMAKE_CURRENT_SOURCE_DIR}/../flexsea-core/lightweight
+		${CMAKE_CURRENT_SOURCE_DIR}/../fx_plan_stack/serial/include
+		${CMAKE_CURRENT_SOURCE_DIR}/../fx_plan_stack/serial/include/serial
+	)
 
 	# build the executable
 	add_executable(protobuf ${CSCRIPT_SRCS} ${PROTOBUF_SRCS})
+
+	# only look for a freshly built plan stack library since we're already set up to compile this find_program
+	# should not be an issues to have a freshly compiled plan stack to prevent confusion
+	find_library(fx_plan_stack_LIBRARY fx_plan_stack_static ${CMAKE_CURRENT_SOURCE_DIR}/../fx_plan_stack/build/libs)
+
+	# link plan stack library to our application
+	target_link_libraries(protobuf ${fx_plan_stack_LIBRARY})
+
+	# there are windows and linux specific libraries that also need to be linked in
+	if(WIN32)
+		target_link_libraries(protobuf setupapi hid)
+	else()
+		target_link_libraries(protobuf pthread)
+	endif()
 
 else()
 	# traditional FlexSEA drivers

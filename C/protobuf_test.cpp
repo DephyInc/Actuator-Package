@@ -13,6 +13,8 @@
 	#include "windows.h"
 #endif
 
+#include "serial.h"
+
 using namespace std;
 using namespace std::literals::chrono_literals;
 
@@ -20,9 +22,10 @@ void printMenu();
 char userSelection(void);
 void getUserPort(const string filename, string *ports, int *baudRate);
 
-int		activeDemo = 0;
-string	configFile = "com.txt";
-bool	shouldQuit = false;
+int			activeDemo = 0;
+string		configFile = "com.txt";
+bool		shouldQuit = false;
+const int	CONNECTION_TIMEOUT = 5; // in seconds
 
 void my_handler(int s)
 {
@@ -58,32 +61,39 @@ int main()
 
 	cout << "Waiting for port: " << portName[idx] << endl;
 
+	// port, baudrate, timeout in milliseconds
+	serial::Serial exo_serial_port(portName[idx], baudRate, serial::Timeout::simpleTimeout(1000));
+
 	//
 	// Wait for the port to open
 	//
 	unsigned waited  = 0;
 	bool waiting = true;
-	while (waiting )
+	while(waiting)
 	{
-		if(waited >= 5)
+		if(exo_serial_port.isOpen())
 		{
-			cout << "device didn't open in time "<< idx << endl;
+			waiting = false;
+		}
+		else if(waited >= CONNECTION_TIMEOUT)
+		{
+			cout << "device didn't open in time "<< portName[idx] << endl;
 			break;
 		}
-		sleep( 1 );
-		waited  = waited + 1;
-		waiting = true;
-
-		// if( fxIsOpen(idx))
-		// {
-		// 	waiting = false;
-		// }
+		else
+		{
+			sleep( 1 );
+			waited  = waited + 1;
+		}
 	}
+
 	if(waiting)
 	{
 		cout << "Couldn't connect " << endl;
 		exit(0);
 	}
+
+	cout << "Successful connection to " << portName[idx] << endl;
 
 	while(!shouldQuit)
 	{
