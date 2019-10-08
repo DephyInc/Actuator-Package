@@ -19,17 +19,20 @@
 using namespace std;
 using namespace std::literals::chrono_literals;
 
+// read the com port out of com.txt
 void getUserPort(const string filename, string *ports, int *baudRate);
 
-int activeDemo = 0;
+// file to look for the com port names in
 string configFile = "com.txt";
+// this flag gets set when ctrl+c is pressed
 bool shouldQuit = false;
+// how long to wait for the device to connect
 const int CONNECTION_TIMEOUT = 5; // in seconds
 
-// This object is used for connecting, sending, and receiving data from a device
+// this object is used for connecting, sending, and receiving data from a device
 Device exo_device;
 
-// this callback is just to quit the program if someone presses control+c
+// this callback is just to quit the program if someone presses ctrl+c
 void sigint_handler(int s)
 {
 	(void)s;
@@ -37,7 +40,8 @@ void sigint_handler(int s)
 	shouldQuit = true;
 }
 
-void test_positions(void)
+// sending a large number of position commands
+void test_position_commands(void)
 {
 	int32_t STARTING_POSITION = -100408;
 	int32_t ENDING_POSITION = 900001;
@@ -45,22 +49,24 @@ void test_positions(void)
 	uint32_t message_length = 0;
 
 	int32_t position, i;
-	while(1)
-	{
-		for(i = 0; i < ITERATIONS; i++)
-		{
-			for(position = STARTING_POSITION; position <= ENDING_POSITION; position += 1000)
-			{
-				cout << "Sending motor position " << position << endl;
-				// encode the command using protocol buffers
-				exo_device.setPosition(position);
 
-				if(message_length < 1)
-				{
-					cout << "receive failure" << endl;
-				}
-				cout << "sent and received " << position << " position" << endl;
-				this_thread::sleep_for(1s);
+	for(i = 0; i < ITERATIONS; i++)
+	{
+		for(position = STARTING_POSITION; position <= ENDING_POSITION; position += 1000)
+		{
+			cout << "Sending motor position " << position << endl;
+			// encode the command using protocol buffers
+			exo_device.setPosition(position);
+
+			if(message_length < 1)
+			{
+				cout << "receive failure" << endl;
+			}
+			cout << "sent and received " << position << " position" << endl;
+			this_thread::sleep_for(100ms);
+			if(shouldQuit)
+			{
+				return;
 			}
 		}
 	}
@@ -127,7 +133,7 @@ int main()
 
 	while(!shouldQuit)
 	{
-		printf("alive\r\n");
+		test_position_commands();
 		this_thread::sleep_for(1s);
 	}
 
