@@ -101,24 +101,12 @@ int main()
 		this_thread::sleep_for(1s);
 	}
 
-	// //
-	// // Close all of the FlexSEA devices
-	// //
-	// cout << "closing ports" << endl;
-	// for(uint8_t i = 0; i < devicesOpened; ++i)
-	// {
-	// 	fxClose( i );
-	// }
+	cout << "Quitting application, closing serial port now" << endl;
+	// close serial port prior to exiting
+	exo_serial_port.close();
 
-	// //
-	// // Cleanup and shutdown the FlexSEA environment
-	// //
-	// cout << "Turning device control off..." << endl;
-	// fxCleanup();
-
-
-	// // wait to make sure the command goes through before we quit
-	// this_thread::sleep_for(100ms);
+	// wait to make sure the command goes through before we quit
+	this_thread::sleep_for(100ms);
 
 	return 0;
 }
