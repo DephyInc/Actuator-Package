@@ -46,7 +46,6 @@ void test_position_commands(void)
 	int32_t STARTING_POSITION = -100408;
 	int32_t ENDING_POSITION = 900001;
 	int32_t ITERATIONS = 1;
-	uint32_t message_length = 0;
 
 	int32_t position, i;
 
@@ -54,18 +53,12 @@ void test_position_commands(void)
 	{
 		for(position = STARTING_POSITION; position <= ENDING_POSITION; position += 1000)
 		{
-			cout << "Sending motor position " << position << endl;
 			// encode the command using protocol buffers
 			exo_device.setPosition(position);
-
-			if(message_length < 1)
-			{
-				cout << "receive failure" << endl;
-			}
-			cout << "sent and received " << position << " position" << endl;
-			this_thread::sleep_for(100ms);
+			this_thread::sleep_for(1ms);
 			if(shouldQuit)
 			{
+				cout << "Ending position test early" << endl;
 				return;
 			}
 		}
@@ -134,7 +127,6 @@ int main()
 	while(!shouldQuit)
 	{
 		test_position_commands();
-		this_thread::sleep_for(1s);
 	}
 
 	cout << "Quitting application, closing serial port now" << endl;
