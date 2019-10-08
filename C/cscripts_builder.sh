@@ -27,7 +27,11 @@ if  [[ "$HOST_OS" = "raspberryPi" ]]; then
 	cmake .. -G Ninja -DCMAKE_TOOLCHAIN_FILE=CMAKE_RASPBERRY_PI_TOOLCHAIN_FILE
 elif  [[ "$HOST_OS" = "windows" ]]; then
 	cmake .. -G Ninja
-else # linux
+elif [[ $1 = "proto" ]]; then # protocol buffer test
+	# force gcc 7
+	cmake -G Ninja -D CMAKE_C_COMPILER=gcc-7 -D CMAKE_CXX_COMPILER=g++-7 \
+		-DPROTOCOL_TYPE=PROTOCOL_BUFFERS ..
+else
 	# force gcc 7
 	cmake -G Ninja -D CMAKE_C_COMPILER=gcc-7 -D CMAKE_CXX_COMPILER=g++-7 ..
 fi
