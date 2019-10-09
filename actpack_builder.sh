@@ -43,10 +43,25 @@ function acpac
     #echo '/dev/ttyACM0' > ${ACPAC_DIR}/build/com.txt
 }
 
+function cscripts_proto
+{
+    cd ${ACPAC_DIR}
+    ./cscripts_builder.sh proto
+    cd ${SCRIPT_DIR}
+    #echo '/dev/ttyACM0' > ${ACPAC_DIR}/build/com.txt
+}
+
 function plan_stack
 {
     cd ${PLAN_STACK_DIR}
     ./stack_builder.sh
+    cd ${SCRIPT_DIR}
+}
+
+function stack_proto
+{
+    cd ${PLAN_STACK_DIR}
+    ./stack_builder.sh proto
     cd ${SCRIPT_DIR}
 }
 
@@ -81,6 +96,15 @@ for ARGUMENT in "$@"; do
             ;;
         plan_stack)
             plan_stack
+            ;;
+        proto)
+            stack_proto
+            cscripts_proto
+            ;;
+        doit)
+            cd ${ACPAC_DIR}/build
+            ./protobuf
+            cd ${SCRIPT_DIR}
             ;;
         run)
             cd ${ACPAC_DIR}/build

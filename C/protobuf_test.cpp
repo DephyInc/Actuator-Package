@@ -23,7 +23,7 @@ using namespace std::literals::chrono_literals;
 void getUserPort(const string filename, string *ports, int *baudRate);
 
 // file to look for the com port names in
-string configFile = "com.txt";
+string configFile = "../com.txt";
 // this flag gets set when ctrl+c is pressed
 bool shouldQuit = false;
 // how long to wait for the device to connect
