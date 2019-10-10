@@ -26,11 +26,9 @@ void getUserPort(const string filename, string *ports, int *baudRate);
 string configFile = "../com.txt";
 // this flag gets set when ctrl+c is pressed
 bool shouldQuit = false;
-// how long to wait for the device to connect
-const int CONNECTION_TIMEOUT = 5; // in seconds
 
 // this object is used for connecting, sending, and receiving data from a device
-Device exo_device;
+Device* exo_device;
 
 // this callback is just to quit the program if someone presses ctrl+c
 void sigint_handler(int s)
@@ -54,7 +52,7 @@ void test_position_commands(void)
 		for(position = STARTING_POSITION; position <= ENDING_POSITION; position += 1000)
 		{
 			// encode the command using protocol buffers
-			exo_device.setPosition(position);
+			exo_device->setPosition(position);
 			this_thread::sleep_for(1ms);
 			if(shouldQuit)
 			{
@@ -85,40 +83,20 @@ int main()
 	cout << "Connecting to port: " << portName[0] << endl;
 
 	//
-	// Open the port
+	// Construct the device
 	//
-	// fxOpen((char *)portName[idx].c_str(), idx, baudRate);
-	this_thread::sleep_for(200ms);
-
-	cout << "Waiting for port: " << portName[idx] << endl;
-
-	exo_device.tryOpen(portName[idx], baudRate);
-	//
-	// Wait for the port to open
-	//
-	unsigned waited  = 0;
-	bool waiting = true;
-	while(waiting)
+	try 
 	{
-		if(exo_device.getConnectionState() >= OPEN)
-		{
-			waiting = false;
-		}
-		else if(waited >= CONNECTION_TIMEOUT)
-		{
-			cout << "device didn't open in time "<< portName[idx] << endl;
-			break;
-		}
-		else
-		{
-			this_thread::sleep_for(1s);
-			waited  = waited + 1;
-		}
+		exo_device = new Device(portName[idx], baudRate);
 	}
-
-	if(waiting)
+	catch (const std::exception& e)
 	{
-		cout << "Couldn't connect " << endl;
+		cout << "Exception: " << e.what() << endl;
+		exit(0);
+	}	
+	catch (...)
+	{
+		cout << "Unexpected error occured" << endl;
 		exit(0);
 	}
 
@@ -130,11 +108,6 @@ int main()
 	}
 
 	cout << "Quitting application, closing serial port now" << endl;
-	// close serial port prior to exiting
-	exo_device.close();
-
-	// wait to make sure the command goes through before we quit
-	this_thread::sleep_for(100ms);
 
 	return 0;
 }
