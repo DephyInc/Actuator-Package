@@ -54,7 +54,7 @@ void test_position_commands(void)
 			// encode the command using protocol buffers
 			exo_device->setPosition(position);
 			exo_device->read();
-			this_thread::sleep_for(1s);
+			this_thread::sleep_for(10ms);
 			if(shouldQuit)
 			{
 				cout << "Ending position test early" << endl;
