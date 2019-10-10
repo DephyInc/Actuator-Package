@@ -1,3 +1,4 @@
+#!/bin/bash
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"
 
 PLAN_STACK_DIR="${SCRIPT_DIR}/fx_plan_stack"
