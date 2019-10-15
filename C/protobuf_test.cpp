@@ -41,18 +41,30 @@ void sigint_handler(int s)
 // sending a large number of position commands
 void test_position_commands(void)
 {
-	int32_t STARTING_POSITION = -100408;
-	int32_t ENDING_POSITION = 900001;
+	int32_t STARTING_POSITION = 0;
+	int32_t ENDING_POSITION = 10000;
 	int32_t ITERATIONS = 1;
 
 	int32_t position, i;
 
-	for(i = 0; i < ITERATIONS; i++)
+	while(!shouldQuit)
 	{
 		for(position = STARTING_POSITION; position <= ENDING_POSITION; position += 1000)
 		{
 			// encode the command using protocol buffers
-			//exo_device->sendMotorCommand(ControllerType::EPosition, position);
+			exo_device->sendMotorCommand(ControllerType::EPosition, position);
+			exo_device->read();
+			this_thread::sleep_for(10ms);
+			if(shouldQuit)
+			{
+				cout << "Ending position test early" << endl;
+				return;
+			}
+		}
+		for(position = ENDING_POSITION; position >= STARTING_POSITION; position -= 1000)
+		{
+			// encode the command using protocol buffers
+			exo_device->sendMotorCommand(ControllerType::EPosition, position);
 			exo_device->read();
 			this_thread::sleep_for(10ms);
 			if(shouldQuit)
