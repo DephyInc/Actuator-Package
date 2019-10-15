@@ -52,7 +52,7 @@ void test_position_commands(void)
 		for(position = STARTING_POSITION; position <= ENDING_POSITION; position += 1000)
 		{
 			// encode the command using protocol buffers
-			exo_device->sendMotorCommand(ControllerType::EPosition, position);
+			//exo_device->sendMotorCommand(ControllerType::EPosition, position);
 			exo_device->read();
 			this_thread::sleep_for(10ms);
 			if(shouldQuit)
