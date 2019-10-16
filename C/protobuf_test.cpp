@@ -48,7 +48,8 @@ void test_position_commands(void)
 	int32_t position, i;
 
 	// Enable auto streaming to have exo automatically send data
-	exo_device->startStreaming();
+	bool shouldLog = true;
+	exo_device->startStreaming(shouldLog);
 	while(!shouldQuit)
 	{
 		for(position = STARTING_POSITION; position <= ENDING_POSITION; position += 1000)
@@ -76,6 +77,7 @@ void test_position_commands(void)
 			}
 		}
 	}
+	exo_device->stopStreaming();
 }
 
 int main()
@@ -118,14 +120,12 @@ int main()
 	cout << "Successful connection to " << portName[idx] << endl;
 
 	bool doLog = true;
-	exo_device->startStreaming(doLog);
 
 	while(!shouldQuit)
 	{
 		test_position_commands();
 	}
 	
-	exo_device->stopStreaming();
 
 	cout << "Quitting application, closing serial port now" << endl;
 
