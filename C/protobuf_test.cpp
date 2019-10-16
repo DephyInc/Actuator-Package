@@ -19,18 +19,18 @@
 using namespace std;
 using namespace std::literals::chrono_literals;
 
-// read the com port out of com.txt
+// Read the com port out of com.txt
 void getUserPort(const string filename, string *ports, int *baudRate);
 
-// file to look for the com port names in
+// File to look for the com port names in
 string configFile = "../com.txt";
-// this flag gets set when ctrl+c is pressed
+// This flag gets set when ctrl+c is pressed
 bool shouldQuit = false;
 
-// this object is used for connecting, sending, and receiving data from a device
+// This object is used for connecting, sending, and receiving data from a device
 Device* exo_device;
 
-// this callback is just to quit the program if someone presses ctrl+c
+// This callback is just to quit the program if someone presses ctrl+c
 void sigint_handler(int s)
 {
 	(void)s;
@@ -38,7 +38,7 @@ void sigint_handler(int s)
 	shouldQuit = true;
 }
 
-// sending a large number of position commands
+// Sending a large number of position commands
 void test_position_commands(void)
 {
 	int32_t STARTING_POSITION = 0;
@@ -47,11 +47,13 @@ void test_position_commands(void)
 
 	int32_t position, i;
 
+	// Enable auto streaming to have exo automatically send data
+	exo_device->startStreaming();
 	while(!shouldQuit)
 	{
 		for(position = STARTING_POSITION; position <= ENDING_POSITION; position += 1000)
 		{
-			// encode the command using protocol buffers
+			// Queue up a command using protocol buffers
 			exo_device->sendMotorCommand(ControllerType::EPosition, position);
 			exo_device->read();
 			this_thread::sleep_for(10ms);
@@ -63,7 +65,7 @@ void test_position_commands(void)
 		}
 		for(position = ENDING_POSITION; position >= STARTING_POSITION; position -= 1000)
 		{
-			// encode the command using protocol buffers
+			// Queue up a command using protocol buffers
 			exo_device->sendMotorCommand(ControllerType::EPosition, position);
 			exo_device->read();
 			this_thread::sleep_for(10ms);
