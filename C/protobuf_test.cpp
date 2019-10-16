@@ -102,7 +102,7 @@ int main()
 	//
 	try 
 	{
-		exo_device = new Device(portName[idx], baudRate);
+		exo_device = new Device(portName[idx], baudRate, 200, 0);
 	}
 	catch (const std::exception& e)
 	{
@@ -117,12 +117,18 @@ int main()
 
 	cout << "Successful connection to " << portName[idx] << endl;
 
+	bool doLog = true;
+	exo_device->startStreaming(doLog);
+
 	while(!shouldQuit)
 	{
 		test_position_commands();
 	}
+	
+	exo_device->stopStreaming();
 
 	cout << "Quitting application, closing serial port now" << endl;
+
 
 	return 0;
 }
