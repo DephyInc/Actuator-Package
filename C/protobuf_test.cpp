@@ -86,28 +86,28 @@ void test_position_commands(void)
 
 	while(!shouldQuit)
 	{
-		for(position = start_position; position <= start_position + 50000; position += 5000)
+		for(position = start_position; position <= start_position + 50000; position += 100)
 		{
 			// Queue up a command using protocol buffers
 			exo_device->sendMotorCommand(ControllerType::EPosition, position);
 			exo_device->read(state);
 			// Print out the motor and sensor data
 			display_state(state);
-			this_thread::sleep_for(1000ms);
+			this_thread::sleep_for(10ms);
 			if(shouldQuit)
 			{
 				cout << "Ending position test early" << endl;
 				return;
 			}
 		}
-		for(position = start_position + 50000; position >= start_position; position -= 5000)
+		for(position = start_position + 50000; position >= start_position; position -= 100)
 		{
 			// Queue up a command using protocol buffers
 			exo_device->sendMotorCommand(ControllerType::EPosition, position);
 			exo_device->read(state);
 			// Print out the motor and sensor data
 			display_state(state);
-			this_thread::sleep_for(1000ms);
+			this_thread::sleep_for(10ms);
 			if(shouldQuit)
 			{
 				cout << "Ending position test early" << endl;
