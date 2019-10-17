@@ -9,20 +9,19 @@
 #include <thread>
 #include <fstream>
 
-#include "com_wrapper.h"
-#include "flexsea_config.h"
-#include "cppFlexSEA.h"
+#include "device_wrapper.h"
+#include "Exo.h"
 #ifdef _WIN32
 	#include "windows.h"
 #endif
-#include "hold_position_example.h"
-#include "open_speed_example.h"
+//#include "hold_position_example.h"
+//#include "open_speed_example.h"
 #include "read_all_example.h"
-#include "current_control.h"
-#include "findpolesexample.h"
-#include "two_dev_position_example.h"
-#include "leaderfollower.h"
-#include "cmd-ActPack.h"
+//#include "current_control.h"
+//#include "findpolesexample.h"
+//#include "two_dev_position_example.h"
+//#include "leaderfollower.h"
+//#include "cmd-ActPack.h"
 
 using namespace std;
 using namespace std::literals::chrono_literals;
@@ -35,8 +34,8 @@ char userSelection(void);
 void getUserPort(const string filename, string *ports, int *baudRate);
 
 string      configFile = "../com.txt";
-const int   MAX_FLEXSEA_DEVS = 3;
-int         deviceIds[ MAX_FLEXSEA_DEVS ];
+const int   MAX_FLEXSEA_DEVS = 4;
+int         deviceIds[MAX_FLEXSEA_DEVS];
 bool        shouldQuit = false;
 
 void my_handler(int s)
@@ -55,10 +54,6 @@ int main()
 
     cout << "Demo code - C++ project with FlexSEA-Stack DLL" << endl;
 
-    //
-    // Initialize the FlexSEA environment
-    //
-    fxSetup();
 
     unsigned idx = 0;
     string portName[MAX_FLEXSEA_DEVS];
@@ -86,69 +81,12 @@ int main()
         //
         // Open the port
         //
-        fxOpen((char *)portName[idx].c_str(), idx, baudRate);
-        this_thread::sleep_for(200ms);
-        ++devicesOpened;
-    }
-
-    //
-    // Wait for device to be open
-    for(idx = 0; idx < devicesOpened; ++idx)
-    {
-        //
-        // Stop looking at the first empty port name
-        //
-        if(portName[idx].empty())
-            break;
-
-        cout << "Waiting for port: " << portName[idx] << endl;
-
-        //
-        // Wait for the port to open
-        //
-        unsigned waited  = 0;
-        bool     waiting = true;
-        while (waiting )
-        {
-            if(waited >= 5)
-            {
-                cout << "device didn't open in time "<< idx << endl;
-                break;
-            }
-            sleep( 1 );
-            waited  = waited + 1;
-            waiting = true;
-
-            if( fxIsOpen(idx))
-            {
-                waiting = false;
-            }
-        }
-        if(waiting)
-        {
-            cout << "Couldn't connect " << endl;
-        }
-
-
-        //
-        // Make sure a FlexSEA device is connected to the port.
-        // If there are any, select the first one for all single
-        //  device tests. Select the first 2 for two device tests.
-        //
-        int deviceCount = 0;
-        fxGetDeviceIds(deviceIds, MAX_FLEXSEA_DEVS);
-
-        for (int i = 0; i < MAX_FLEXSEA_DEVS; i++)
-        {
-             if( deviceIds[i] != -1)
-                 ++deviceCount;
-        }
-        cout << "Found " << deviceCount << " devices\n" << endl;
-        if(0 == deviceCount)
-        {
-            cout << "No FlexSEA devices were found..." << endl;
-            exit(1);
-        }
+	int devId = fxOpen((char *)portName[idx].c_str(), baudRate, 200, 0); 
+        if (devId != -1)
+	{
+		cout << "Connected to device: " << devId << endl;
+		deviceIds[devicesOpened++] = devId;
+	}
     }
 
     //
@@ -156,8 +94,6 @@ int main()
     //
     printMenu();
     userSelection();
-
-    this_thread::sleep_for(1s);
 
     try {
 
@@ -167,22 +103,22 @@ int main()
                 runReadAll(deviceIds[0], &shouldQuit);
                 break;
             case 1:
-                runOpenSpeed(deviceIds[0], &shouldQuit);
+    //            runOpenSpeed(deviceIds[0], &shouldQuit);
                 break;
             case 2:
-                runCurrentControl(deviceIds[0], &shouldQuit);
+      //          runCurrentControl(deviceIds[0], &shouldQuit);
                 break;
             case 3:
-                runHoldPosition(deviceIds[0], &shouldQuit);
+     //           runHoldPosition(deviceIds[0], &shouldQuit);
                 break;
             case 4:
-                runFindPoles(deviceIds[0]);
+     //           runFindPoles(deviceIds[0]);
                 break;
             case 5:
-                runTwoDevicePositionControl(deviceIds[0], deviceIds[1], &shouldQuit);
+     //           runTwoDevicePositionControl(deviceIds[0], deviceIds[1], &shouldQuit);
                 break;
             case 6:
-                runLeaderFollower(deviceIds[0], deviceIds[1], &shouldQuit);
+     //           runLeaderFollower(deviceIds[0], deviceIds[1], &shouldQuit);
                 break;
             default:
                 break;
@@ -195,21 +131,11 @@ int main()
     //
     // Close all of the FlexSEA devices
     //
-    cout << "closing ports" << endl;
     for(uint8_t i = 0; i < devicesOpened; ++i)
     {
-        fxClose( i );
+	cout << "Closing device " << deviceIds[i] << endl;
+        fxClose(deviceIds[i]);
     }
-
-    //
-    // Cleanup and shutdown the FlexSEA environment
-    //
-    cout << "Turning device control off..." << endl;
-    fxCleanup();
-
-
-    // wait to make sure the command goes through before we quit
-    this_thread::sleep_for(100ms);
 
     return 0;
 }

@@ -3,7 +3,7 @@ project(flexsea_c_scripts)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
+set(CMAKE_BUILD_TYPE DEBUG)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # this PROTOCOL_TYPE cmake variable is set by the build script
@@ -43,29 +43,22 @@ else()
 	include(${CMAKE_CURRENT_SOURCE_DIR}/../fx_plan_stack/plan_definitions.cmake)
 
 	include_directories(
-		.
-		${CMAKE_CURRENT_SOURCE_DIR}/../include
-		${CMAKE_CURRENT_SOURCE_DIR}/../fx_plan_stack/include/flex_lib
-		${CMAKE_CURRENT_SOURCE_DIR}/../fx_plan_stack/include/flexseastack
+		${CMAKE_CURRENT_SOURCE_DIR}/../flexsea-core/lightweight
+		${CMAKE_CURRENT_SOURCE_DIR}/../fx_plan_stack/lightweight
 		${CMAKE_CURRENT_SOURCE_DIR}/../fx_plan_stack/serial/include
-		${CMAKE_CURRENT_SOURCE_DIR}/../flexsea-core/flexsea-comm/inc
-		${CMAKE_CURRENT_SOURCE_DIR}/../flexsea-core/flexsea-dephy/inc
-		${CMAKE_CURRENT_SOURCE_DIR}/../flexsea-core/flexsea-shared/inc
-		${CMAKE_CURRENT_SOURCE_DIR}/../flexsea-core/flexsea-system/inc
-		${CMAKE_CURRENT_SOURCE_DIR}/../flexsea-core/flexsea-projects/inc
-		${CMAKE_CURRENT_SOURCE_DIR}/../flexsea-core/flexsea-projects/ActPack/inc
+		${CMAKE_CURRENT_SOURCE_DIR}/../fx_plan_stack/serial/include/serial
 	)
 
 	set(CSCRIPT_SRCS
 		main.cpp
-		cppFlexSEA.cpp
+		#cppFlexSEA.cpp
 		read_all_example.cpp
-		open_speed_example.cpp
-		current_control.cpp
-		hold_position_example.cpp
-		findpolesexample.cpp
-		two_dev_position_example.cpp
-		leaderfollower.cpp
+		#open_speed_example.cpp
+		#current_control.cpp
+		#hold_position_example.cpp
+		#findpolesexample.cpp
+		#two_dev_position_example.cpp
+		#leaderfollower.cpp
 		utils.h
 	)
 
