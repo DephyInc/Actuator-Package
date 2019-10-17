@@ -38,6 +38,17 @@ void sigint_handler(int s)
 	shouldQuit = true;
 }
 
+void display_state(struct ExoState& state)
+{
+	cout << "imu: " << state._manage._imu._accelx << state._manage._imu._accely << \
+		state._manage._imu._accelz << endl;
+	cout << "motor: " << state._execute._motor_data._motor_angle << " angle, " << \
+		state._execute._motor_data._motor_voltage << " mV" << endl;
+	cout <<"battery: " << state._regulate._battery._battery_voltage << " mV, " << \
+		state._regulate._battery._battery_current << " mA, " << \
+		state._regulate._battery._battery_temperature << " C" << endl; 
+}
+
 // Sending a large number of position commands
 void test_position_commands(void)
 {
@@ -46,6 +57,9 @@ void test_position_commands(void)
 	int32_t ITERATIONS = 1;
 
 	int32_t position, i;
+
+	// State stores the device's sensor and motor data and can be passed into the read method 
+	ExoState state;
 
 	// Enable auto streaming to have exo automatically send data
 	bool shouldLog = true;
@@ -56,7 +70,9 @@ void test_position_commands(void)
 		{
 			// Queue up a command using protocol buffers
 			exo_device->sendMotorCommand(ControllerType::EPosition, position);
-			exo_device->read();
+			exo_device->read(state);
+			// Print out the motor and sensor data
+			display_state(state);
 			this_thread::sleep_for(10ms);
 			if(shouldQuit)
 			{
@@ -68,7 +84,9 @@ void test_position_commands(void)
 		{
 			// Queue up a command using protocol buffers
 			exo_device->sendMotorCommand(ControllerType::EPosition, position);
-			exo_device->read();
+			exo_device->read(state);
+			// Print out the motor and sensor data
+			display_state(state);
 			this_thread::sleep_for(10ms);
 			if(shouldQuit)
 			{
