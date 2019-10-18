@@ -4,48 +4,23 @@ from time import sleep
 pardir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(pardir)
 from flexseapython.fxUtil import *
-from .streamManager import Stream
-
-labels = ["State time", 	\
-		"Accel X", 	"Accel Y", 	"Accel Z", 	\
-		"Gyro X", 	"Gyro Y",	"Gyro Z", 	\
-		"Motor angle", "Joint angle",		\
-		"Motor voltage", "Motor current",	\
-		"Battery voltage", "Battery current", \
-		"Battery temperature", "Manage status", \
-		"Execute status", "Regulate status", \
-		"genVar[0]", "genVar[1]", "genVar[2]", \
-		"genVar[3]", "genVar[4]", "genVar[5]", \
-		"genVar[6]", "genVar[7]", "genVar[8]", \
-		"genVar[9]", "Ankle angle", "Ankle velocity"
-]
-
-varsToStream = [ 		\
-	FX_STATETIME, 		\
-	FX_ACCELX,	FX_ACCELY,	FX_ACCELZ, 	\
-	FX_GYROX,  	FX_GYROY,  	FX_GYROZ,	\
-	FX_ENC_ANG,	FX_ANKLE_ANG,	\
-	FX_MOT_VOLT, FX_MOT_CURR,	\
-	FX_BATT_VOLT, FX_BATT_CURR, FX_BATT_TEMP, \
-	FX_MN_STATUS, FX_EX_STATUS, FX_RE_STATUS, \
-	FX_GEN_VAR_0, FX_GEN_VAR_1, FX_GEN_VAR_2, \
-	FX_GEN_VAR_3, FX_GEN_VAR_4, FX_GEN_VAR_5, \
-	FX_GEN_VAR_6, FX_GEN_VAR_7, FX_GEN_VAR_8, \
-	FX_GEN_VAR_9, FX_ANKLE_ANG, FX_ANKLE_ANG_VEL
-]
 
 def fxReadOnly(port, baudRate, time = 6,time_step = 0.1):
 	print(port)
-	stream = Stream(port, baudRate, printingRate = 4, labels=labels, varsToStream = varsToStream, updateFreq = 100)
-	#stream.InitCSV("readall.csv")
-	print("here")
+	
+	devId =	fxOpen(port, baudRate)
+	print(devId)
+	fxStartStreaming(devId, True)
+    
 	for i in range(int(time/time_step)):
+		exoState = fxReadDevice(devId)
+		print('accelx: ', exoState._manage._imu._accelx, ', accely: ', exoState._manage._imu._accely, ' accelz: ', exoState._manage._imu._accelz)
+		print('gyrox: ', exoState._manage._imu._gyrox, ', gyroy: ', exoState._manage._imu._gyroy, ' gyroz: ', exoState._manage._imu._gyroz)
+		print('motor position: ', exoState._execute._motor_data._motor_angle)
+		print('battery current: ', exoState._regulate._battery._battery_current, ' , battery current: ', exoState._regulate._battery._battery_current, ' , battery temperature: ', exoState._regulate._battery._battery_temperature)
+		sys.stdout.flush()
 		sleep(time_step)
-		stream()
-		#stream.writeToCSV()
-		stream.printData()
-
-	del stream
+		
 	return True
 
 if __name__ == '__main__':
