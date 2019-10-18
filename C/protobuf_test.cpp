@@ -46,7 +46,9 @@ void display_state(struct ExoState& state)
 		state._execute._motor_data._motor_voltage << " mV" << endl;
 	cout <<"battery: " << state._regulate._battery._battery_voltage << " mV, " << \
 		state._regulate._battery._battery_current << " mA, " << \
-		state._regulate._battery._battery_temperature << " C" << endl << endl; 
+		state._regulate._battery._battery_temperature << " C" << endl;
+	cout << "genVar: " << state._genvars._gv0 << ", " << state._genvars._gv1 << endl;
+	cout << "ankle angle: " << state._manage._ankle_angle << endl << endl;
 }
 
 void cleanup(void)
@@ -79,6 +81,7 @@ void test_open_commands(void)
 			mV = maxVoltage * (i*1.0 / numSteps);
 			// Queue up a command using protocol buffers
 			exo_device->sendMotorCommand(ControllerType::EOpen, mV);
+			// Read the latest state of the device
 			exo_device->read(state);
 			// Print out the motor and sensor data
 			display_state(state);
@@ -97,6 +100,7 @@ void test_open_commands(void)
 			mV = maxVoltage * ((numSteps - j)*1.0 / numSteps);
 			// Queue up a command using protocol buffers
 			exo_device->sendMotorCommand(ControllerType::EOpen, mV);
+			// Read the latest state of the device
 			exo_device->read(state);
 			// Print out the motor and sensor data
 			display_state(state);
@@ -146,6 +150,7 @@ void test_position_commands(void)
 		{
 			// Queue up a command using protocol buffers
 			exo_device->sendMotorCommand(ControllerType::EPosition, position);
+			// Read the latest state of the device
 			exo_device->read(state);
 			// Print out the motor and sensor data
 			display_state(state);
@@ -160,6 +165,7 @@ void test_position_commands(void)
 		{
 			// Queue up a command using protocol buffers
 			exo_device->sendMotorCommand(ControllerType::EPosition, position);
+			// Read the latest state of the device
 			exo_device->read(state);
 			// Print out the motor and sensor data
 			display_state(state);
@@ -217,8 +223,8 @@ int main()
 
 	while(!shouldQuit)
 	{
-		test_open_commands();
-		//test_position_commands();
+		//test_open_commands();
+		test_position_commands();
 	}
 	
 
