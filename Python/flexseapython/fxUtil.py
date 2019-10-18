@@ -1,19 +1,6 @@
 from flexseapython.pyFlexsea import *
-from flexseapython.pyFlexsea_def import *
 from time import sleep
 import os
-
-def printData(labels, values):
-	if(len(values) != len(labels)):
-		print("Error printing...") # add error handling
-	lens = [len(l) for l in labels]
-	maxlen = max(lens)
-	fstring = '{0:' + str(maxlen) + 's}: {1}\n'
-	s = 'Flexsea Device Data:\n'
-	for i in range(0, len(values)):
-		s = s + fstring.format(labels[i], values[i])
-
-	print(s)
 
 #Clears the terminal - use before printing new values
 def clearTerminal():

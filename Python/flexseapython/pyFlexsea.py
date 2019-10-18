@@ -4,143 +4,290 @@ import sys
 import platform
 
 global flexsea
-initialized = False
 
-# Opens the given serial port at the given index and looks for devices
-def fxOpen(port, idx, baudRate):
+################### Motor Controller Enums #######################
+(EPosition,
+ EVoltage,
+ ECurrent,
+ EImpedence) = map(c_int, range(4))
+
+###################### Error Code Enums ##########################
+
+(ESuccess,
+ EInvalidDevice,
+ EInvalidParam,
+ ENotStreaming,
+ EStreamFailed,
+ ENoReadData,
+ EInvalidCommand,
+ ECommandFailed) = map(c_int, range(8))
+
+##################### Redefine ExoState Structure #################
+# See "Exo.h" for C definition
+
+MAX_STRING_LENGTH = 32
+
+class ImuData(Structure):
+	_fields_ = [("_accelx", c_long),
+		("_accely", c_long),
+		("_accelz", c_long),
+		("_gyrox", c_long),
+		("_gyroy", c_long),
+		("_gyroz", c_long)]
+
+class ManageState(Structure):
+	_fields_ = [("_status", c_ulong),
+		("_software_version_len", c_int),
+		("_software_version", c_char * MAX_STRING_LENGTH),
+		("_imu", ImuData),
+		("_ankle_angle", c_long),
+		("_ankle_angle_velocity", c_long)]
+
+class MotorData(Structure):
+	_fields_ = [("_motor_angle", c_long),
+		("_motor_velocity", c_long),
+		("_motor_acceleration", c_long),
+		("_motor_current", c_long),
+		("_motor_voltage", c_long)]
+
+class ExecuteState(Structure):
+	_fields_ = [("_status", c_ulong),
+		("_motor_data", MotorData),
+		("_software_version_len", c_int),
+		("_software_version", c_char * MAX_STRING_LENGTH)]
+
+class BatteryData(Structure):
+	_fields_ = [("_battery_voltage", c_ulong),
+		("_battery_current", c_long),
+		("_battery_temperature", c_long)]
+
+class RegulateState(Structure):
+	_fields_ = [("_status", c_ulong),
+		("_battery", BatteryData),
+		("_software_version_len", c_int),
+		("_software_version", c_char * MAX_STRING_LENGTH)]
+
+class ExoState(Structure):
+	_fields_ = [("_manage", ManageState),
+		("_execute", ExecuteState),
+		("_regulate", RegulateState)]
+
+####################### Begin API ##################################
+
+### Device ID is an alphanumeric ID used to refer to a specific FlexSEA device.
+### Device ID is returned by fxOpen upon establishing a connection with a 
+### FlexSEA device, and is used by most of the functions in this library to 
+### specify which device to run that function on.
+
+def fxOpen(port, baudRate, frequency = 100, logLevel = 4):
+	"""
+	Establish a connection with a FlexSEA device.
+
+	Parameters:
+	portName (string): The name of the serial port to open (e.g. "COM3")
+
+	baudRate (int): The baud rate used i.e. 115200, 230400, etc.
+
+	frequency (int): The frequency of communcation with the FlexSEA device. 
+	This applies for streaming device data as well as sending commands to the 
+	device.
+
+	logLevel (int): is the logging level for this device. 0 is most verbose and
+	6 is the least verbose. Values greater than 6 are floored to 6.
+	
+	Raises:
+	IOError if we fail to open the device.
+	"""
 	global flexsea
-	flexsea.fxOpen( port.encode('utf-8') , idx, baudRate)
 
-# Returns a boolean that indicates whether the port is open
-def fxIsOpen(idx):
+	devId = flexsea.fxOpen(port.encode('utf-8'), baudRate, frequency, logLevel)
+
+	if (devId == -1):
+		raise IOError('Failed to open device')
+
+	return devId
+
+def fxClose(devId):
+	"""
+	Disconnect from a FlexSEA device with the given device ID.
+	
+	Parameters:
+	devId (int): The ID of the device to close
+	
+	Raises:
+	ValueError if the device ID is invalid
+	"""
 	global flexsea
-	return flexsea.fxIsOpen(idx)
+	retCode = flexsea.fxClose(devId)
+	if (retCode == EInvalidDevice):
+		raise ValueError('fxClose: invalid device ID')
 
-# Returns a list of device ids corresponding to connected devices
 def fxGetDeviceIds():
+	"""
+	Get the device IDs of all connected FlexSEA devices. 
+	
+	The device ID is used by the functions in this API to specify which 
+	FlexSEA device to communicate with. The C library requires a fixed
+	array so we give a size of n = 10 but feel free to increase this.
+
+	Returns:
+	A list containing either valid device IDs or -1 (invalid device).
+	"""
 	global flexsea
-	n = 6
-	l = [-1] * 6
+	n = 10
+	l = [-1] * 10
 	c_l, c_n = list_to_int_arr(l)
 	flexsea.fxGetDeviceIds(c_l, c_n)
 	asList = c_l[:n]
 	asList = asList[: asList.index(-1) ]
 	return asList
 
-# Starts streaming data read commands and act pack commands for the given device
-# params:
-# 		devId 		: the id of the device to stream
-# 		freq 		: the frequency to stream at
-# 		shouldLog 	: whether to log data received from this device to a log file
-# 		shouldAuto 	: whether to use autostreaming or manual streaming
-# returns:
-# 		c_bool value indicating whether the request was a success
-def fxStartStreaming(devId, freq, shouldLog, shouldAuto):
-	global flexsea
-	return	flexsea.fxStartStreaming(devId, freq, shouldLog, shouldAuto)
+def fxStartStreaming(devId, shouldLog):
+	"""
+	Start streaming data from a FlexSEA device.
 
-# Stops streaming data read commands and act pack commands for the given device
-# params:
-# 		devId 		: the id of the device to stop streaming
-# returns:
-# 		c_bool value indicating whether the request was a success
+	Parameters:
+	devId (int): The device ID 
+
+	shouldLog (bool): If set true, the program logs all received data to
+	a file.
+
+	The name of the file is formed as follows:
+
+	< FlexSEA model >_id< device ID >_< date and time >.csv
+
+	for example:
+
+	rigid_id3904_Tue_Nov_13_11_03_50_2018.csv
+
+	The file is formatted as a CSV file. The first line of the file will be 
+	headers for all columns. Each line after that will contain the data read 
+	from the device.
+	
+	Raises:
+	ValueError if the device ID is invalid
+	RuntimeError if the stream failed
+	"""
+	global flexsea
+
+	if (shouldLog == True):
+		retCode = flexsea.fxStartStreaming(devId, 1)
+	else:
+		retCode = flexsea.fxStartStreaming(devId, 0)
+
+	if (retCode == EInvalidDevice):
+		raise ValueError('fxStartStreaming: invalid device ID')
+	elif (retCode == EStreamFailed):
+		raise RuntimeError('fxStartStreaming: stream failed')
+
 def fxStopStreaming(devId):
+	"""
+	Stop streaming data from a FlexSEA device.
+
+	Parameters:
+	devId (int): Is the device ID 
+	"""
 	global flexsea
-	return	flexsea.fxStopStreaming(devId)
+	flexsea.fxStopStreaming(devId)
 
-# Sets the active stream variables for the given device
-# Note: changing the stream variables during a logged stream has undefined behaviour
-# params:
-# 		devId 		: the id of the device to set fields for
-# 		fieldIds 	: a list containing the fields to stream 
-def fxSetStreamVariables(devId, fieldIds):
+def fxSetCommunicationFrequency(devId, frequency):
+	"""
+	Set the communication frequency with the FlexSEA device. This
+	applies for streaming device data as well as sending commands to the
+	device.
+
+	Parameters:
+	devId (int): The device ID
+
+	frequency (int): The desired frequency of communication
+
+	Raises:
+	ValueError if invalid device ID
+	"""
 	global flexsea
-	c_fi, c_n = list_to_int_arr(fieldIds)
-	flexsea.fxSetStreamVariables(devId, c_fi, c_n)
+	if (flexsea.fxSetCommuncationFrequency(devId, frequency) == EInvalidDevice):
+		raise ValueError('fxSetCommunicationFrequency: invalid device ID')
 
-# Reads the most recent data received from the device
-# params:
-# 		devId 		: the id of the device to read
-# 		fieldIds 	: a list containing the fields to read 
-# returns:
-# 		a python list containing the values of the requested fields 
-#		(in the order requested), or None for fields that errored
-def fxReadDevice(devId, fieldIds):
+def fxReadDevice(devId):
+	"""
+	Read the most recent data from a streaming FlexSEA device stream.
+	IMPORTANT! Must call fxStartStreaming before calling this.
+
+	Parameters:
+	devId (int): The device ID of the device to read from.
+
+	Returns:
+	exoState (ExoState): Contains the most recent data from the device
+
+	Raises:
+	ValueError if invalid device ID
+	RuntimeError if no read data
+	"""
 	global flexsea
-	n = len(fieldIds)	
 
-	c_fieldIds, c_n = list_to_int_arr(fieldIds)
-	c_successBools, c_n = list_to_bool_arr( [0] * n )
+	exoState = ExoState();
+	retCode = flexsea.fxReadDevice(devId, byref(exoState))
+	
+	if (retCode == EInvalidDevice):
+		raise ValueError('fxReadDevice: invalid device ID')
+	elif (retCode == ENoReadData):
+		raise RuntimeError('fxReadDevice: no read data')
 
-	result = flexsea.fxReadDevice(devId, c_fieldIds, c_successBools, c_n)
-	valsAsList = [result[i] for i in range(n)]
-	#valsAsList = result[:n]
-	boolsAsList = c_successBools[:n]
+	return exoState 
 
-	for i in range(0, n):
-		if(boolsAsList[i] == 0):
-			valsAsList[i] = None
+def fxSetGains(devId, g0, g1, g2, g3):
+	"""
+	Sets the gains used by PID controllers on the FlexSEA device.
+	
+	Parameters:
+	devId (int): The device ID.
 
-	return valsAsList
+	g0 (int): Proportional gain (Kp) 
 
-# Sets the control mode for the given device
-# params:
-# 		devId 		: the id of the device 
-# 		ctrlMode 	: the control mode to use [must be one of values provided in pyFlexsea_def.py]
-def setControlMode(devId, ctrlMode):
+	g1 (int): Integral gain (Ki)
+
+	g2 (int): Stiffness (K) (used in impedence control only)
+
+	g3 (int): Damping (B) (used in impedance control only)
+
+	Raises:
+	ValueError if the device ID is invalid
+	"""
 	global flexsea
-	flexsea.setControlMode(devId, int(ctrlMode))
+	retCode = flexsea.fxSetGains(devId, g0, g1, g2, g3)
+        
+	if (retCode == EInvalidDevice):
+		raise ValueError('fxSetGains: invalid device ID')
 
-# Sets the voltage setpoint for the given device
-# params:
-# 		devId 		: the id of the device 
-# 		mV 			: the voltage to set in milliVolts
-def setMotorVoltage(devId, mV):
-	global flexsea
-	flexsea.setMotorVoltage(devId, int(mV))
+def fxSendMotorCommand(devId, controlType, value):
+	"""
+	Send a command to the device.
+	
+	Parameters:
+	devId (int): The device ID.
 
-# Sets the current setpoint for the given device
-# params:
-# 		devId 		: the id of the device 
-# 		cur			: the current to use as setpoint in milliAmps
-def setMotorCurrent(devId, cur):
-	global flexsea
-	flexsea.setMotorCurrent(devId, int(cur))
+	controlMode (int): The control mode we will use to send this command.
+	Possible values are: EPosition, ECurrent, EVoltage, EImpedence
 
-# Sets the position setpoint for the given device
-# params:
-# 		devId 		: the id of the device 
-# 		pos			: the absolute encoder position to use as setpoint
-def setPosition(devId, pos):
+	value (int): The value to use for the controlMode. 
+	EPosition - encoder value
+	ECurrent - current in mA
+	EVoltage - voltage in mV
+	EImpedence - current in mA
+	
+	Raises:
+	ValueError if invalid device ID
+	ValueError if invalid controlType
+	"""
 	global flexsea
-	flexsea.setPosition(devId, int(pos))
 
-# Sets the PID controller gains for the given device
-# params:
-# 		devId 		: the id of the device 
-# 		g0			: the proportional gain to set for the active setpoint
-# 		g1			: the integral gain to set for the active setpoint
-# 		g2		: the proportional gain to set for the underlying current controller (only relevant for impedance control)
-# 		g3		: the integral gain to set for the underlying current controller (only relevant for impedance control)
-def setGains(devId, g0, g1, g2, g3):
-	global flexsea
-	flexsea.setGains(devId, int(g0), int(g1), int(g2), int(g3))
+	if (controlType > EImpedence):
+		raise ValueError('fxSendMotorCommand: invalid controlType')
 
-# Sets the activation state for FSM2 on the given device
-# params:
-# 		devId 		: the id of the device 
-# 		on			: whether to set the FSM on or off
-def actPackFSM2(devId, on):
-	global flexsea
-	flexsea.actPackFSM2(devId, int(on))
+	retCode = flexsea.fxSendMotorCommand(devId, controlType, value)
 
-# Tells the given device to run a find poles routine
-# params:
-# 		devId 		: the id of the device 
-# 		block 		: whether to block for 60 seconds while the device runs the routine
-def findPoles(devId, block):
-	global flexsea
-	flexsea.findPoles(devId, int(block))
+	if (retCode == EInvalidDevice):
+		raise ValueError('fxSendMotorCommand: invalid device ID')
 
 # Loads the library from the c lib
 def loadFlexsea():
@@ -187,20 +334,33 @@ def loadFlexsea():
 		return False
 
 	print("Loaded!")
-	initialized = True
-	flexsea.fxSetup()
+	
 	# set arg types
-	flexsea.fxOpen.argtypes = [c_char_p, c_int, c_int]
-	flexsea.fxSetStreamVariables.restype = c_bool
-	flexsea.fxStartStreaming.argtypes = [c_int, c_int, c_bool, c_int]
-	flexsea.fxStopStreaming.argtypes = [c_int]
-	flexsea.fxReadDevice.restype = POINTER(c_int)
-	flexsea.getUserRead.restype = POINTER(c_int)
-	flexsea.getUserWrite.restype = POINTER(c_int)
-	flexsea.setControlMode.argtypes = [c_int, c_int]
-	flexsea.setMotorVoltage.argtypes = [c_int, c_int]
-	flexsea.setMotorCurrent.argtypes = [c_int, c_int]
-	flexsea.fxClose.argtypes = [c_int]
+	flexsea.fxOpen.argtypes = [c_char_p, c_uint, c_uint, c_uint]
+	flexsea.fxOpen.restype = c_int
+	
+	flexsea.fxClose.argtypes = [c_uint]
+	flexsea.fxClose.restype = c_int
+
+	flexsea.fxGetDeviceIds.argtypes = [POINTER(c_int), c_uint]
+
+	flexsea.fxStartStreaming.argtypes = [c_uint, c_bool]
+	flexsea.fxStartStreaming.restype = c_int
+	
+	flexsea.fxStopStreaming.argtypes = [c_uint]
+	flexsea.fxStopStreaming.restype = c_int
+
+	flexsea.fxSetCommunicationFrequency.argtypes = [c_uint, c_uint]
+	flexsea.fxSetCommunicationFrequency.restype = c_int
+
+	flexsea.fxReadDevice.argtypes = [c_uint, POINTER(ExoState)]
+	flexsea.fxReadDevice.restype = c_int
+
+	flexsea.fxSetGains.argtypes = [c_uint, c_uint, c_uint, c_uint, c_uint]
+	flexsea.fxSetGains.restype = c_int
+
+	flexsea.fxSendMotorCommand.argtypes = [c_uint, c_int, c_int]
+	flexsea.fxSendMotorCommand.restype = c_int
 
 	return True
 
@@ -209,36 +369,3 @@ def list_to_int_arr(l):
 	c_len = c_int(len(l))
 	return c_arr, c_len
 
-def list_to_bool_arr(l):
-	c_arr = (c_bool * len(l))(*l)
-	c_len = c_int(len(l))
-	return c_arr, c_len
-
-def getUserRead():
-	global flexsea
-	result = flexsea.getUserRead()
-	valAsList = [result[i] for i in range(6)]
-	return valAsList
-
-def getUserWrite():
-	global flexsea
-	result = flexsea.getUserWrite()
-	valAsList = [result[i] for i in range(10)]
-	return valAsList
-
-def writeUser(devId,index, value):
-	global flexsea
-	flexsea.writeUser(devId,index,value)
-
-def readUser(devId):
-	global flexsea
-	flexsea.readUser(devId)
-
-# Takes in an iterable (example a list) and closes that port
-def closePort(port):
-	global flexsea
-	flexsea.fxClose(port)
-
-def cleanupPlanStack():
-	global flexsea
-	flexsea.fxCleanup()
