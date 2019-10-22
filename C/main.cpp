@@ -15,7 +15,7 @@
 	#include "windows.h"
 #endif
 //#include "hold_position_example.h"
-//#include "open_speed_example.h"
+#include "open_speed_example.h"
 #include "read_all_example.h"
 //#include "current_control.h"
 //#include "findpolesexample.h"
@@ -103,7 +103,7 @@ int main()
                 runReadAll(deviceIds[0], &shouldQuit);
                 break;
             case 1:
-    //            runOpenSpeed(deviceIds[0], &shouldQuit);
+                runOpenSpeed(deviceIds[0], &shouldQuit);
                 break;
             case 2:
       //          runCurrentControl(deviceIds[0], &shouldQuit);

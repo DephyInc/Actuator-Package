@@ -11,24 +11,8 @@ pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 print(pardir)
 sys.path.append(pardir)
 from fxUtil import *
-from .streamManager import Stream
 
-# Select which variables you want to read:
-
-labels = ["State time", \
-"Motor angle", "Motor current", \
-"Battery voltage", "Battery current" \
-]
-
-varsToStream = [ \
-	FX_STATETIME, \
-	FX_ENC_ANG, \
-	FX_MOT_CURR, \
-	FX_BATT_VOLT, 
-	FX_BATT_CURR \
-]
-
-# Controller type
+# Controller type to send to controller
 class Controller(Enum):
 	position = 1
 	current = 2
@@ -56,176 +40,158 @@ def lineGenerator(amplitude, commandFreq):
 # Controller Type: Position controller or current controller
 # Signal Type: Sine wave or line
 # Command Freq: Desired frequency of issuing commands to controller, actual 
-#               command frequency will be slower due to OS overhead.
+#	command frequency will be slower due to OS overhead.
 # Signal Amplitude: Amplitude of signal to send to controller. Encoder position
-#                   if position controller, current in mA if current controller
+#	if position controller, current in mA if current controller
 # Number of Loops: Number of times to send desired signal to controller
 # Signal Freq: Frequency of sine wave if using sine wave signal
 # Cycle Delay: Delay between signals sent to controller, use with sine wave only
 # Request Jitter: Add jitter amount to every other sample sent to controller
 # Jitter: Amount of jitter
-def fxHighSpeedTest(port, baudRate, controllerType = Controller.position, signalType = signal.sine, commandFreq = 1000, signalAmplitude = 10000, numberOfLoops = 10, signalFreq = 1, cycleDelay = .1, requestJitter = False, jitter = 20):
+def fxHighSpeedTest(port, baudRate, controllerType = Controller.current, signalType = signal.sine, commandFreq = 500, signalAmplitude = 1000, numberOfLoops = 10, signalFreq = 1, cycleDelay = .1, requestJitter = False, jitter = 20):
 	
-	streamFreq = 1000
-	shouldLog = True
-	shouldAutostream = 1 # ActPack will send data to the script automatically (more efficient)
+	debugLoggingLevel = 0 # 6 is least verbose, 0 is most verbose
+	dataLog = True # Data log logs device data
 
 	delay_time = float(1/(float(commandFreq)))
 	print(delay_time)
 
-	try:
-		# Must be called before reading any device data
-		stream = Stream(port, baudRate, printingRate=2, labels=labels, varsToStream=varsToStream, updateFreq=streamFreq, shouldLog=shouldLog, shouldAuto=shouldAutostream)
-		#stream()
-		sleep(0.4)
+	########### Open the device and start streaming ############
+	devId = fxOpen(port, baudRate, commandFreq, debugLoggingLevel) 
+	fxStartStreaming(devId, dataLog)
+	print('Connected to device with ID ',devId)
 
-		############# Main Code ############
-		######## Make your changes here #########
-		
-		if(controllerType == Controller.position):
-			#Get initial position:
-			print('Reading initial position...')
-			initialPos = stream([FX_ENC_ANG])[0]
-			timeout = 100
-			timeoutCount = 0
-			while(initialPos == None):
-				print('Loop...')
-				timeoutCount = timeoutCount + 1
-				if(timeoutCount > timeout):
-					print("Timed out waiting for valid encoder value...")
-					sys.exit(1)
-				else:
-					sleep(delay_time)
-					initialPos = stream([FX_ENC_ANG])[0]
-		else:
-			initialPos = 0
-		
-		# Generate a control profile
-		print('Command table:')
+	############# Main Code ############
+	######## Make your changes here #########
+	
+	if(controllerType == Controller.position):
+		#Get initial position:
+		print('Reading initial position...')
+		data = fxReadDevice(devId)
+		initialPos = data._execute._motor_data._motor_angle
+		timeout = 100
+		timeoutCount = 0
+		while(initialPos == None):
+			print('Loop...')
+			timeoutCount = timeoutCount + 1
+			if(timeoutCount > timeout):
+				print("Timed out waiting for valid encoder value...")
+				sys.exit(1)
+			else:
+				sleep(delay_time)
+				data = fxReadDevice(devId)
+				initialPos = data._execute._motor_data._motor_angle
+	else:
+		initialPos = 0
+	
+	# Generate a control profile
+	print('Command table:')
+	if (signalType == signal.sine):
+		samples = sinGenerator(signalAmplitude, signalFreq, initialPos, commandFreq)
+		signalTypeStr = "sine wave"
+	elif (signalType == signal.line):
+		samples = lineGenerator(signalAmplitude, commandFreq)
+		signalTypeStr = "line"
+	else:
+		assert 0
+	print(np.int64(samples))
+
+	# Initialize lists
+	requests = []
+	measurements = []
+	times = []
+	cycleStopTimes = []
+	i = 0
+	t0 = 0
+
+	# Prepare controller:
+	if (controllerType == Controller.current):
+		print("Setting up current control demo")
+		fxSetGains(devId, 300, 50, 0, 0)
+	elif (controllerType == Controller.position):
+		print("Setting up position control demo")
+		fxSetGains(devId, 300, 50, 0, 0)
+	else:
+		assert 0
+	
+	# Record start time of experiment
+	t0 = time()
+	for reps in range(0, numberOfLoops):
+		for sample in samples:
+			if (i % 2 == 0 and requestJitter):
+				sample = sample + jitter
+
+			sleep(delay_time)
+
+			# set controller to the next sample
+			# read ActPack data
+			data = fxReadDevice(devId)
+			if (controllerType == Controller.current):
+				fxSendMotorCommand(devId, ECurrent, sample)
+				measurements.append(data._execute._motor_data._motor_current)
+			elif (controllerType == Controller.position):
+				fxSendMotorCommand(devId, EPosition, sample - initialPos)
+				measurements.append(data._execute._motor_data._motor_angle)
+
+
+			times.append(time() - t0)
+			requests.append(sample)
+			i = i + 1
+
+		# Delay between cycles (sine wave only)
 		if (signalType == signal.sine):
-			samples = sinGenerator(signalAmplitude, signalFreq, initialPos, commandFreq)
-			signalTypeStr = "sine wave"
-		elif (signalType == signal.line):
-			samples = lineGenerator(signalAmplitude, commandFreq)
-			signalTypeStr = "line"
-		else:
-			assert 0
-		print(np.int64(samples))
-
-		# Initialize lists
-		requests = []
-		measurements = []
-		times = []
-		cycleStopTimes = []
-		i = 0
-		t0 = 0
-
-		# Prepare controller:
-		if (controllerType == Controller.current):
-			print("Setting up current control demo")
-			setControlMode(stream.devId, CTRL_CURRENT)
-			setMotorCurrent(stream.devId, 0)
-			setGains(stream.devId, 100, 30, 0, 0)
-		elif (controllerType == Controller.position):
-			print("Setting up position control demo")
-			setControlMode(stream.devId, CTRL_POSITION)
-			setPosition(stream.devId, initialPos)
-			setGains(stream.devId, 300, 50, 0, 0)
-		else:
-			assert 0
-		
-		# Record start time of experiment
-		t0 = time()
-		for reps in range(0, numberOfLoops):
-			for sample in samples:
-				if (i % 2 == 0 and requestJitter):
-					sample = sample + jitter
+			for j in range(int(cycleDelay/delay_time)):
 
 				sleep(delay_time)
-
-				# set controller to the next sample
-				# read ActPack data
+				# Read data from ActPack
+				data = fxReadDevice(devId)
 				if (controllerType == Controller.current):
-					setMotorCurrent(stream.devId, sample)
-					data = stream([FX_MOT_CURR])
+					measurements.append(data._execute._motor_data._motor_current)
 
 				elif (controllerType == Controller.position):
-					setPosition(stream.devId, sample) 
-					data = stream([FX_ENC_ANG])
-
-				measurements.append(data)
+					measurements.append(data._execute._motor_data._motor_angle)
 
 				times.append(time() - t0)
 				requests.append(sample)
 				i = i + 1
 
-			# Delay between cycles (sine wave only)
-			if (signalType == signal.sine):
-				for j in range(int(cycleDelay/delay_time)):
-	
-					sleep(delay_time)
-					# Read data from ActPack
-					if (controllerType == Controller.current):
-						data = stream([FX_MOT_CURR])
-	
-					elif (controllerType == Controller.position):
-						data = stream([FX_ENC_ANG])
-	
-					measurements.append(data)
-	
-					times.append(time() - t0)
-					requests.append(sample)
-					i = i + 1
+		# We'll draw a line at the end of every period
+		cycleStopTimes.append(time() - t0)
+	elapsed_time = time() - t0
 
-			# We'll draw a line at the end of every period
-			cycleStopTimes.append(time() - t0)
-		elapsed_time = time() - t0
+	######## End of Main Code #########
 
-		######## End of Main Code #########
-		######## Do not delete the cleanup functions below! #########
+	######## Plotting Code, you can edit this ##################
 
-		setControlMode(stream.devId, CTRL_NONE)
-	
-		del stream
+	actual_period = cycleStopTimes[0]
+	actual_frequency = 1 / actual_period
+	command_frequency = i / elapsed_time
+	print("i: " + str(i) + ", elapsed_time: " + str(elapsed_time))
 
-		######## Plotting Code, you can edit this ##################
+	if (controllerType == Controller.current):
+		title = "Current control with " + "{:.2f}".format(actual_frequency) + " Hz, " + \
+			str(signalAmplitude) + " mA amplitude " + signalTypeStr + " and " + "{:.2f}".format(command_frequency) + " Hz commands"
+		plt.plot(times, requests, color = 'b', label = 'desired current')
+		plt.plot(times, measurements, color = 'r', label = 'measured current')
+		plt.xlabel("Time (s)")
+		plt.ylabel("Motor current (mA)")
 
-		actual_period = cycleStopTimes[0]
-		actual_frequency = 1 / actual_period
-		command_frequency = i / elapsed_time
-		print("i: " + str(i) + ", elapsed_time: " + str(elapsed_time))
+	elif (controllerType == Controller.position):
+		title = "Position control with " + "{:.2f}".format(actual_frequency) + " Hz, " + \
+			str(signalAmplitude) + " ticks amplitude " + signalTypeStr + " and " + "{:.2f}".format(command_frequency) + " Hz commands"
+		plt.plot(times, requests, color = 'b', label = 'desired position')
+		plt.plot(times, measurements, color = 'r', label = 'measured position')
+		plt.xlabel("Time (s)")
+		plt.ylabel("Encoder position")
 
-		if (controllerType == Controller.current):
-			title = "Current control with " + "{:.2f}".format(actual_frequency) + " Hz, " + \
-				str(signalAmplitude) + " mA amplitude " + signalTypeStr + " and " + "{:.2f}".format(command_frequency) + " Hz commands"
-			plt.plot(times, requests, color = 'b', label = 'desired current')
-			plt.plot(times, measurements, color = 'r', label = 'measured current')
-			plt.xlabel("Time (s)")
-			plt.ylabel("Motor current (mA)")
+	plt.title(title)
 
-		elif (controllerType == Controller.position):
-			title = "Position control with " + "{:.2f}".format(actual_frequency) + " Hz, " + \
-				str(signalAmplitude) + " ticks amplitude " + signalTypeStr + " and " + "{:.2f}".format(command_frequency) + " Hz commands"
-			plt.plot(times, requests, color = 'b', label = 'desired position')
-			plt.plot(times, measurements, color = 'r', label = 'measured position')
-			plt.xlabel("Time (s)")
-			plt.ylabel("Encoder position")
+	plt.legend(loc='upper right')
 
-		plt.title(title)
-
-		plt.legend(loc='upper right')
-
-		# Draw a vertical line at the end of each cycle
-		for endpoints in cycleStopTimes:
-			plt.axvline(x=endpoints)
-		plt.show()
-
-
-	except:
-		# Run the cleanup no matter how you exit
-		setControlMode(stream.devId, CTRL_NONE)
-	
-		del stream
+	# Draw a vertical line at the end of each cycle
+	for endpoints in cycleStopTimes:
+		plt.axvline(x=endpoints)
+	plt.show()
 
 if __name__ == '__main__':
 	baudRate = sys.argv[1]

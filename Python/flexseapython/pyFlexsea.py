@@ -2,30 +2,44 @@ from ctypes import *
 import os
 import sys
 import platform
+from enum import Enum
 
 global flexsea
 
 ################### Motor Controller Enums #######################
+
 (EPosition,
  EVoltage,
  ECurrent,
- EImpedence) = map(c_int, range(4))
+ EImpedance) = map(c_int, range(4))
 
 ###################### Error Code Enums ##########################
 
 (ESuccess,
- EInvalidDevice,
+ EFailure,
  EInvalidParam,
+ EInvalidDevice,
  ENotStreaming,
  EStreamFailed,
- ENoReadData,
- EInvalidCommand,
- ECommandFailed) = map(c_int, range(8))
+ ENoReadData) = map(c_int, range(7))
 
 ##################### Redefine ExoState Structure #################
 # See "Exo.h" for C definition
 
 MAX_STRING_LENGTH = 32
+
+class GenericVariables(Structure):
+	_fields_ = [("_gv0", c_long),
+		("_gv1", c_long),
+		("_gv2", c_long),
+		("_gv3", c_long),
+		("_gv4", c_long),
+		("_gv5", c_long),
+		("_gv6", c_long),
+		("_gv7", c_long),
+		("_gv8", c_long),
+		("_gv9", c_long)]
+
 
 class ImuData(Structure):
 	_fields_ = [("_accelx", c_long),
@@ -68,9 +82,12 @@ class RegulateState(Structure):
 		("_software_version", c_char * MAX_STRING_LENGTH)]
 
 class ExoState(Structure):
-	_fields_ = [("_manage", ManageState),
+	_fields_ = [("_timestamp", c_ulong),
+	        ("_board_id", c_ulong),
+		("_manage", ManageState),
 		("_execute", ExecuteState),
-		("_regulate", RegulateState)]
+		("_regulate", RegulateState),
+		("_genvars", GenericVariables)]
 
 ####################### Begin API ##################################
 
@@ -177,7 +194,7 @@ def fxStartStreaming(devId, shouldLog):
 
 	if (retCode == EInvalidDevice):
 		raise ValueError('fxStartStreaming: invalid device ID')
-	elif (retCode == EStreamFailed):
+	elif (retCode == EFailure):
 		raise RuntimeError('fxStartStreaming: stream failed')
 
 def fxStopStreaming(devId):
@@ -255,7 +272,7 @@ def fxSetGains(devId, g0, g1, g2, g3):
 	"""
 	global flexsea
 	retCode = flexsea.fxSetGains(devId, g0, g1, g2, g3)
-        
+		
 	if (retCode == EInvalidDevice):
 		raise ValueError('fxSetGains: invalid device ID')
 
@@ -266,7 +283,7 @@ def fxSendMotorCommand(devId, controlType, value):
 	Parameters:
 	devId (int): The device ID.
 
-	controlMode (int): The control mode we will use to send this command.
+	controlMode (c_int): The control mode we will use to send this command.
 	Possible values are: EPosition, ECurrent, EVoltage, EImpedence
 
 	value (int): The value to use for the controlMode. 
@@ -281,13 +298,16 @@ def fxSendMotorCommand(devId, controlType, value):
 	"""
 	global flexsea
 
-	if (controlType > EImpedence):
-		raise ValueError('fxSendMotorCommand: invalid controlType')
-
-	retCode = flexsea.fxSendMotorCommand(devId, controlType, value)
+	retCode = flexsea.fxSendMotorCommand(devId, controlType, c_int(int(value)))
 
 	if (retCode == EInvalidDevice):
 		raise ValueError('fxSendMotorCommand: invalid device ID')
+	if (retCode == EFailure):
+		raise IOError('fxSendMotorCommand: command failed')	
+	if (retCode == EInvalidParam):
+		raise ValueError('fxSendMotorCommand: invalid controlType')	
+
+
 
 # Loads the library from the c lib
 def loadFlexsea():

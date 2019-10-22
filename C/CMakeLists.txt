@@ -53,7 +53,7 @@ else()
 		main.cpp
 		#cppFlexSEA.cpp
 		read_all_example.cpp
-		#open_speed_example.cpp
+		open_speed_example.cpp
 		#current_control.cpp
 		#hold_position_example.cpp
 		#findpolesexample.cpp
