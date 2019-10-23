@@ -1,173 +1,101 @@
-#include "cppFlexSEA.h"
-#include "two_dev_position_example.h"
+#include "leaderfollower.h"
+#include "read_all_example.h"
 
 #include <chrono>
 #include <thread>
 #include <iostream>
 #include "utils.h"
-#include "flexsea_sys_def.h"
+#include "Exo.h"
+#include "device_wrapper.h"
 
 using namespace std;
 using namespace std::literals::chrono_literals;
 
-static int varsToStream[] = {
-    FX_RIGID_STATETIME,
-    FX_RIGID_ACCELX,	FX_RIGID_ACCELY,	FX_RIGID_ACCELZ,
-    FX_RIGID_GYROX,  	FX_RIGID_GYROY,  	FX_RIGID_GYROZ,
-    FX_RIGID_ENC_ANG,
-    FX_RIGID_MOT_VOLT
-   };
-
-static string varLabels[] = {
-    "State time",
-    "Accel X", "Accel Y", "Accel Z",
-    "Gyro X",  "Gyro Y",  "Gyro Z",
-    "Enc Angle",
-    "Motor Voltage"
-};
-static const int VARSTOSTREAMSIZE = sizeof(varsToStream) / sizeof(int);
-
-
-
-
 void runLeaderFollower( int devId0, int devId1, bool *shouldQuit)
 {
-    uint8_t streamSuccess0, streamSuccess1;
-    uint8_t success[VARSTOSTREAMSIZE];
+	FxError errCode[2];
 
-    //
-    // Set up the variables to monitor
-    //
-    fxSetStreamVariables(devId0, varsToStream, VARSTOSTREAMSIZE );
-    fxSetStreamVariables(devId1, varsToStream, VARSTOSTREAMSIZE );
+	ExoState readData[2];
+	
+	//
+	// Start streaming the data
+	//
+	errCode[0] = fxStartStreaming(devId0, true);
+	errCode[1] = fxStartStreaming(devId1, true);
+	if(errCode[0] != ESuccess || errCode[1] != ESuccess)
+	{
+		cout << "Streaming failed ..." << endl;
+		return;
+	}
 
-    //
-    // Start streaming the data
-    //
-    streamSuccess0 = fxStartStreaming( devId0, 100, false, 0);
-    streamSuccess1 = fxStartStreaming( devId1, 100, false, 0);
-    if( ! streamSuccess0 || ! streamSuccess1)
-    {
-        cout << "Streaming failed ..." << endl;
-        exit(2);
-    }
+	//
+	// Find the initial angles
+	//
+	int initialAngle[2] = {-1, -1};
+	
+	errCode[0] = fxReadDevice(devId0, &readData[0]);
+	errCode[1] = fxReadDevice(devId1, &readData[1]);
+	if(errCode[0] != ESuccess || errCode[1] != ESuccess)
+	{
+		cout << "Reading failed ..." << endl;
+		return;
+	}
 
-    //
-    // Read the initial angles
-    //
-    int *retData;
-    int initialAngle0 = -1;
-    int initialAngle1 = -1;
-    int timeout = 100;
+	initialAngle[0] = readData[0]._execute._motor_data._motor_angle;
+	initialAngle[1] = readData[1]._execute._motor_data._motor_angle;
 
-    while(timeout > 0)
-    {
-        this_thread::sleep_for(50ms);
-        retData = fxReadDevice(devId0, varsToStream, success, VARSTOSTREAMSIZE);
-        if( success[7] )
-        {
-            initialAngle0 = retData[7];
-            break;
-        }
-        else
-        {
-            --timeout;
-        }
-    }
+	cout << "Initial angles are: " << initialAngle[0] << ", " << initialAngle[1] << endl;
 
-    if( ! timeout )
-    {
-        cout << "Timed out waiting for valid encoder value from " << devId0 << endl;
-        fxStopStreaming(devId0);
-        fxStopStreaming(devId1);
-        return;
-    }
-    timeout = 100;
-    while(timeout > 0)
-    {
-        this_thread::sleep_for(50ms);
-        retData = fxReadDevice(devId1, varsToStream, success, VARSTOSTREAMSIZE);
-        if( success[7] )
-        {
-            initialAngle1 = retData[7];
-            break;
-        }
-        else
-        {
-            --timeout;
-        }
-    }
-    if( ! timeout )
-    {
-        cout << "Timed out waiting for valid encoder value from " << devId1<< endl;
-        fxStopStreaming(devId0);
-        fxStopStreaming(devId1);
-        return;
-    }
+	//
+	// Setup both devices
+	//
+	fxSetGains(devId0, 100, 20, 0, 0);
+	fxSendMotorCommand(devId0, ECurrent, 0);
 
-    //
-    // Set position controller for both devices
-    //
-    cout << "Turning on position control..." << endl;
-    setControlMode(devId0, CTRL_CURRENT);
-    setGains(devId0, 100, 20, 0, 0);
-    setMotorCurrent(devId0, 0);
+	fxSetGains(devId1, 50, 3, 0, 0);
+	fxSendMotorCommand(devId1, EPosition, initialAngle[1]);
 
-    setPosition(devId1, initialAngle1);
-    setControlMode(devId1, CTRL_POSITION);
-    setPosition(devId1, initialAngle1);
-    setGains(devId1, 50, 3, 0, 0);
+	int diff  = 0;
+	int angle[2] = {0};
+	while(! *shouldQuit)
+	{
+		//
+		// Read device 0 angle
+		//
+		this_thread::sleep_for(50ms);
+		
+		errCode[0] = fxReadDevice(devId0, &readData[0]);
+		if(errCode[0] != ESuccess)
+		{
+			cout << "Reading failed ..." << endl;
+			return;
+		}
+		angle[0] = readData[0]._execute._motor_data._motor_angle;
 
-    int diff0  = 0;
-    while(! *shouldQuit)
-    {
-        //
-        // Read device 0 angle
-        //
-        this_thread::sleep_for(50ms);
-        int angle0 = 0;
-        retData = fxReadDevice(devId0, varsToStream, success, VARSTOSTREAMSIZE);
-        if( success[7] )
-            angle0 = retData[7];
-        else
-        {
-            continue;
-        }
+		//
+		// Set device 1 angle
+		//
+		diff = angle[0] - initialAngle[0];
+		fxSendMotorCommand(devId1, EPosition, initialAngle[1] + diff);
+		
+		this_thread::sleep_for(50ms);
 
-        //
-        // Set device 1 angle
-        //
-        diff0  = angle0 - initialAngle0;
-        setPosition(devId1, initialAngle1 + 3*diff0 );
+		clearScreen();
+		
+		errCode[0] = fxReadDevice(devId0, &readData[0]);
+		errCode[1] = fxReadDevice(devId1, &readData[1]);
+		if(errCode[0] != ESuccess || errCode[1] != ESuccess)
+		{
+			cout << "Reading failed ..." << endl;
+			return;
+		}
 
-        this_thread::sleep_for(50ms);
-        int angle1 = 0;
-        retData = fxReadDevice(devId1, varsToStream, success, VARSTOSTREAMSIZE);
-        if( success[7] )
-            angle1 = retData[7];
-        else
-        {
-            continue;
-        }
+		cout << "Device " << devId0 << " following device " << devId1 << endl;
+		cout << "Device [  " << devId0 << " ]" << endl;
+		displayState(readData[0]);
+		cout << "Device [ " << devId1 << " ]" << endl;
+		displayState(readData[1]);
 
-        clearScreen();
-        cout << "Device " << devId0 << " following device " << devId1 << endl;
-        cout << "Device [  " << devId0 << " ]" << endl;
-        printDevice(devId0, varsToStream, varLabels, VARSTOSTREAMSIZE);
+	}
 
-        retData = fxReadDevice(devId1, varsToStream, success, VARSTOSTREAMSIZE);
-        cout << "Device [ " << devId1 << " ]" << endl;
-        printDevice(devId1, varsToStream, varLabels, VARSTOSTREAMSIZE);
-    }
-
-    cout << "Turning off position control..." << endl;
-    setControlMode(devId0, CTRL_NONE);
-    setControlMode(devId1, CTRL_NONE);
-
-    //
-    // Let the command process before we stop streaming
-    //
-    this_thread::sleep_for(200ms);
-    fxStopStreaming(devId0);
-    fxStopStreaming(devId1);
 }

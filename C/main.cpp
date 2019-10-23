@@ -14,14 +14,13 @@
 #ifdef _WIN32
 	#include "windows.h"
 #endif
-//#include "hold_position_example.h"
+#include "hold_position_example.h"
 #include "open_speed_example.h"
 #include "read_all_example.h"
-//#include "current_control.h"
+#include "current_control.h"
 //#include "findpolesexample.h"
-//#include "two_dev_position_example.h"
-//#include "leaderfollower.h"
-//#include "cmd-ActPack.h"
+#include "two_dev_position_example.h"
+#include "leaderfollower.h"
 
 using namespace std;
 using namespace std::literals::chrono_literals;
@@ -106,19 +105,19 @@ int main()
                 runOpenSpeed(deviceIds[0], &shouldQuit);
                 break;
             case 2:
-      //          runCurrentControl(deviceIds[0], &shouldQuit);
+                runCurrentControl(deviceIds[0], &shouldQuit);
                 break;
             case 3:
-     //           runHoldPosition(deviceIds[0], &shouldQuit);
+                runHoldPosition(deviceIds[0], &shouldQuit);
                 break;
             case 4:
      //           runFindPoles(deviceIds[0]);
                 break;
             case 5:
-     //           runTwoDevicePositionControl(deviceIds[0], deviceIds[1], &shouldQuit);
+                runTwoDevicePositionControl(deviceIds[0], deviceIds[1], &shouldQuit);
                 break;
             case 6:
-     //           runLeaderFollower(deviceIds[0], deviceIds[1], &shouldQuit);
+                runLeaderFollower(deviceIds[0], deviceIds[1], &shouldQuit);
                 break;
             default:
                 break;

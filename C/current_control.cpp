@@ -1,103 +1,116 @@
+#include "current_control.h"
 #include "read_all_example.h"
-#include "cppFlexSEA.h"
 
 #include <chrono>
 #include <thread>
 #include <iostream>
 #include "utils.h"
-#include "flexsea_sys_def.h"
+#include "Exo.h"
+#include "device_wrapper.h"
 
 using namespace std;
 using namespace std::literals::chrono_literals;
 
-static string labels[] = {
-    "State time",
-    "encoder angle",
-    "motor current"
-};
-
-static int varsToStream[] = {
-    FX_RIGID_STATETIME,
-    FX_RIGID_ENC_ANG,
-    FX_RIGID_MOT_CURR
-};
-
-static const int VARSTOSTREAMSIZE = sizeof(varsToStream) / sizeof(int);
-
 void runCurrentControl(int devId, bool* shouldQuit)
 {
-    int     holdCurrent = 500;
-    int     streamSuccess = 0;
-    int     *retData;
-    uint8_t success[MAX_FLEXSEA_VARS];
+	int holdCurrent = 500;
+	ExoState readData;
+	FxError errCode;
 
-    fxSetStreamVariables(devId, varsToStream, VARSTOSTREAMSIZE);
-    streamSuccess = fxStartStreaming(devId, 100, false, 0);
-    if(! streamSuccess)
-    {
-        cout << "Streaming Failed..." << endl;
-        exit(2);
-    }
+	errCode = fxStartStreaming(devId, true);
+	if(errCode != ESuccess)
+	{
+		cout << "Streaming Failed..." << endl;
+		return;
+	}
 
-    cout << "Setting controller to current..." << endl;
-    setControlMode(devId, CTRL_CURRENT);
-    setGains(devId, 100, 20, 0, 0);
-    setMotorCurrent(devId, holdCurrent);     // Start the current, holdCurrent is in mA
+	cout << "Setting controller to current..." << endl;
+	
+	// Start the current, holdCurrent is in mA
+	fxSetGains(devId, 100, 20, 0, 0);
+	fxSendMotorCommand(devId, ECurrent, holdCurrent);	 
 
-    int n = 0;
-    while(! *shouldQuit)
-    {
-        this_thread::sleep_for(100ms);
-        clearScreen();                              //Clear terminal (Win)
-        printDevice(devId, varsToStream, labels, VARSTOSTREAMSIZE);
-        cout << "Holding Current: "<< holdCurrent << " mA" << endl;
-    }
+	int n = 0;
+	while(! *shouldQuit)
+	{
+		this_thread::sleep_for(100ms);
+		clearScreen();	                          //Clear terminal (Win)
+		
+		
+		errCode = fxReadDevice(devId, &readData);
+		if(errCode != ESuccess)
+		{
+			cout << "Reading Failed..." << endl;
+			return;
+		}
 
-    cout << "Turning off current control..." << endl;
 
-    //
-    // Ramp down first
-    //
-    n = 50;
-    for(int i =0; i < n; ++i)
-    {
-        setMotorCurrent(devId, holdCurrent * (n-i)/n);
-        this_thread::sleep_for(40ms);
-    }
+		// displayState deffined in read_all_example.h
+		displayState(readData);
 
-    //
-    // Wait for motor to spin down
-    //
-    cout << "Waiting for motor to spin down..." << endl;
-    setMotorCurrent(devId, 0);
+		cout << "Holding Current: "<< holdCurrent << " mA" << endl;
+	}
 
-    // Read "last" encode angle
-    int lastAngle = 0;
-    retData = fxReadDevice(devId, varsToStream, success, VARSTOSTREAMSIZE);
-    if( success[1] )
-        lastAngle = retData[1];
-    this_thread::sleep_for(200ms);
+	cout << "Turning off current control..." << endl;
 
-    // Read "Current" encoder angle
-    int currentAngle = 0;
-    retData = fxReadDevice(devId, varsToStream, success, VARSTOSTREAMSIZE);
-    if( success[1] )
-        currentAngle = retData[1];
-    this_thread::sleep_for(200ms);
+	//
+	// Ramp down first
+	//
+	n = 50;
+	for(int i =0; i < n; ++i)
+	{
+		fxSendMotorCommand(devId, ECurrent, holdCurrent * (n-i)/n);	 
+		this_thread::sleep_for(40ms);
+	}
 
-    // Wait for motor to stop spinning
-    while( abs(currentAngle - lastAngle) > 100)
-    {
-        this_thread::sleep_for(200ms);
-        lastAngle    = currentAngle;
-        retData = fxReadDevice(devId, varsToStream, success, VARSTOSTREAMSIZE);
-        if( success[1] )
-        {
-            currentAngle = retData[1];
-        }
-    }
+	//
+	// Wait for motor to spin down
+	//
+	cout << "Waiting for motor to spin down..." << endl;
+	fxSendMotorCommand(devId, ECurrent, 0);	 
 
-    setControlMode(devId, CTRL_NONE);
-    fxStopStreaming(devId);
+	// Read "last" encode angle
+	int lastAngle = 0;
+	
+	errCode = fxReadDevice(devId, &readData);
+	if(errCode != ESuccess)
+	{
+		cout << "Reading Failed..." << endl;
+		exit(2);
+	}
+
+	lastAngle = readData._execute._motor_data._motor_angle;
+	this_thread::sleep_for(200ms);
+
+	// Read "Current" encoder angle
+	int currentAngle = 0;
+	
+	errCode = fxReadDevice(devId, &readData);
+	if(errCode != ESuccess)
+	{
+		cout << "Reading Failed..." << endl;
+		exit(2);
+	}
+
+	currentAngle = readData._execute._motor_data._motor_angle;
+	this_thread::sleep_for(200ms);
+
+	// Wait for motor to stop spinning
+	while( abs(currentAngle - lastAngle) > 100)
+	{
+	
+		lastAngle = currentAngle;
+		
+		errCode = fxReadDevice(devId, &readData);
+		if(errCode != ESuccess)
+		{
+			cout << "Reading Failed..." << endl;
+			exit(2);
+		}
+	
+		currentAngle = readData._execute._motor_data._motor_angle;
+
+	}
+
 }
 

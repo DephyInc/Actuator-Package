@@ -14,7 +14,7 @@ void runOpenSpeed(int devId, bool *shouldQuit)
 	if(fxStartStreaming(devId, true) != ESuccess )
 	{
 		cout << "Streaming failed..." << endl;
-		exit(2);
+		return;
 	}
 
 	cout << "Setting open control..." << endl;
@@ -38,8 +38,8 @@ void runOpenSpeed(int devId, bool *shouldQuit)
 
 			if (fxReadDevice(devId, &readData) == ESuccess)
 			{
-
-				display_state(readData);
+				// Display State is defined in read_all_example.h
+				displayState(readData);
 			}
 			else
 			{
@@ -61,7 +61,7 @@ void runOpenSpeed(int devId, bool *shouldQuit)
 			if (fxReadDevice(devId, &readData) == ESuccess)
 			{
 
-				display_state(readData);
+				displayState(readData);
 			}
 			else
 			{

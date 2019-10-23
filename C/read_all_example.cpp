@@ -10,7 +10,7 @@
 using namespace std;
 using namespace std::literals::chrono_literals;
 
-void display_state(struct ExoState& state)
+void displayState(struct ExoState& state)
 {
 	cout << endl << "imu: " << state._manage._imu._accelx << ", " << state._manage._imu._accely << \
 		", " << state._manage._imu._accelz << endl;
@@ -30,7 +30,7 @@ void runReadAll(int devId, bool *shouldQuit)
     if(fxStartStreaming(devId, true) != ESuccess )
     {
         cout << "Streaming failed ..." << endl;
-        exit(2);
+        return;
     }
 
     //
@@ -43,7 +43,7 @@ void runReadAll(int devId, bool *shouldQuit)
         clearScreen();
 	fxReadDevice(devId, &exoState);
 	
-	display_state(exoState);
+	displayState(exoState);
 
         cout << endl;
     }
