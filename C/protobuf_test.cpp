@@ -40,8 +40,11 @@ void sigint_handler(int s)
 
 void display_state(struct ExoState& state)
 {
-	cout << "id: " << state._board_id << endl;
-	cout << endl << "imu: " << state._manage._imu._accelx << ", " << state._manage._imu._accely << \
+	char ascii_hex_id[10] = {0};
+	snprintf(ascii_hex_id, 9, "Exo-%02X%02X", (unsigned char)((state._board_id >> 8) & 0xFF),
+												(unsigned char)(state._board_id & 0xFF));
+	cout << "id: " << ascii_hex_id << endl;
+	cout << "imu: " << state._manage._imu._accelx << ", " << state._manage._imu._accely << \
 		", " << state._manage._imu._accelz << endl;
 	cout << "motor: " << state._execute._motor_data._motor_angle << " angle, " << \
 		state._execute._motor_data._motor_voltage << " mV" << endl;
