@@ -53,7 +53,7 @@ void display_state(struct ExoState& state)
 void cleanup(void)
 {
 	// Turn off controller and stop streaming
-	exo_device->setMotorGains(0, 0, 0);
+	exo_device->setMotorGains(0, 0, 0, 0);
 	exo_device->stopStreaming();
 }
 
@@ -70,7 +70,7 @@ void test_position_commands(void)
 	bool shouldLog = true;
 	exo_device->startStreaming(shouldLog);
 	// Set the gains for the position controller
-	exo_device->setMotorGains(100, 3, 0);
+	exo_device->setMotorGains(100, 3, 0, 0);
 	// Get the initial state of the exo
 	if(exo_device->read(state))
 	{
