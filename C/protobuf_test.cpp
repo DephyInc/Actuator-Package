@@ -70,7 +70,7 @@ void test_position_commands(void)
 	ExoState state;
 
 	// Enable auto streaming to have exo automatically send data
-	bool shouldLog = true;
+	bool shouldLog = false;
 	exo_device->startStreaming(shouldLog);
 	// Set the gains for the position controller
 	exo_device->setMotorGains(100, 3, 0, 0);
