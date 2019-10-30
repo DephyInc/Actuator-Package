@@ -12,7 +12,7 @@ from flexseapython.flexsea_demo.readonly import fxReadOnly
 #from flexseapython.flexsea_demo.positioncontrol import fxPositionControl
 from flexseapython.flexsea_demo.high_speed_test import fxHighSpeedTest
 #from flexseapython.flexsea_demo.two_devices_positioncontrol import fxTwoDevicePositionControl
-#from flexseapython.flexsea_demo.impedancecontrol import fxImpedanceControl
+from flexseapython.flexsea_demo.impedancecontrol import fxImpedanceControl
 #from flexseapython.flexsea_demo.two_devices_leaderfollower import fxLeaderFollower
 #from flexseapython.flexsea_demo.twopositioncontrol import fxTwoPositionControl
 
@@ -47,7 +47,7 @@ experiments =  [									\
 #		(fxCurrentControl, "Current Control"),	\
 #		(fxPositionControl, "Position Control"),	\
 #		(fxTwoPositionControl, "Two Positions Control"), \
-#		(fxImpedanceControl, "Impedance Control"), \
+		(fxImpedanceControl, "Impedance Control"), \
 		(fxHighSpeedTest, "High Speed Test"),	\
 #		(fxFindPoles,	"Find Poles"),			\
 #		(fxUserRW, "User RW"), \
