@@ -70,7 +70,7 @@ void test_position_commands(void)
 	ExoState state;
 
 	// Enable auto streaming to have exo automatically send data
-	bool shouldLog = true;
+	bool shouldLog = false;
 	exo_device->startStreaming(shouldLog);
 	// Set the gains for the position controller
 	exo_device->setMotorGains(100, 3, 0, 0);
@@ -97,7 +97,7 @@ void test_position_commands(void)
 			exo_device->read(state);
 			// Print out the motor and sensor data
 			display_state(state);
-			this_thread::sleep_for(10ms);
+			this_thread::sleep_for(1ms);
 			if(shouldQuit)
 			{
 				cout << "Ending position test early" << endl;
@@ -111,7 +111,7 @@ void test_position_commands(void)
 			exo_device->read(state);
 			// Print out the motor and sensor data
 			display_state(state);
-			this_thread::sleep_for(10ms);
+			this_thread::sleep_for(1ms);
 			if(shouldQuit)
 			{
 				cout << "Ending position test early" << endl;
@@ -146,7 +146,7 @@ int main()
 	//
 	try 
 	{
-		exo_device = new Device(portName[idx], baudRate, 200, 0);
+		exo_device = new Device(portName[idx], baudRate, 1000, 0);
 	}
 	catch (const std::exception& e)
 	{
