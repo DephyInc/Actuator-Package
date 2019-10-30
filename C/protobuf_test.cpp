@@ -146,7 +146,7 @@ int main()
 	//
 	try 
 	{
-		exo_device = new Device(portName[idx], baudRate, 1000, 0);
+		exo_device = new Device(portName[idx], baudRate, 500, 0);
 	}
 	catch (const std::exception& e)
 	{
