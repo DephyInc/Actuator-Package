@@ -60,6 +60,40 @@ void cleanup(void)
 	exo_device->stopStreaming();
 }
 
+void test_training_commands(void)
+{
+	// State stores the device's sensor and motor data and can be passed into the read method 
+	ExoState state;
+
+	// Enable auto streaming to have exo automatically send data
+	bool shouldLog = false;
+	exo_device->startStreaming(shouldLog);
+
+	// Get the initial state of the exo
+	if(exo_device->read(state))
+	{
+		cout << "Able to read from device, sending training commands now" << endl;
+	}
+	else
+	{
+		cout << "Unable to read from the device so we are exiting now" << endl;
+		// We were unable to read from the device so let's clean up and quit
+		cleanup();
+		shouldQuit = true;
+	}
+
+	while(!shouldQuit)
+	{
+		// Queue up a command using protocol buffers
+		exo_device->sendTrainingCommand(_TRAINING_START_COMMAND);
+		exo_device->read(state);
+		// Print out the motor and sensor data
+		display_state(state);
+		this_thread::sleep_for(500ms);
+	}
+	cleanup();
+}
+
 // Sending a large number of position commands
 void test_position_commands(void)
 {
@@ -165,7 +199,8 @@ int main()
 
 	while(!shouldQuit)
 	{
-		test_position_commands();
+		// test_position_commands();
+		test_training_commands();
 	}
 	
 
