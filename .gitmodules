@@ -1,6 +1,3 @@
 [submodule "fx_plan_stack"]
 	path = fx_plan_stack
 	url = https://github.com/DephyInc/fx_plan_stack.git
-[submodule "flexsea-core"]
-	path = flexsea-core
-	url = https://github.com/DephyInc/flexsea-core.git

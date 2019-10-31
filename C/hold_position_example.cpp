@@ -4,7 +4,6 @@
 #include <iostream>
 #include <chrono>
 #include <thread>
-#include "Exo.h"
 #include "device_wrapper.h"
 #include "utils.h"
 
