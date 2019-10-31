@@ -48,10 +48,10 @@ def lineGenerator(amplitude, commandFreq):
 # Cycle Delay: Delay between signals sent to controller, use with sine wave only
 # Request Jitter: Add jitter amount to every other sample sent to controller
 # Jitter: Amount of jitter
-def fxHighSpeedTest(port, baudRate, controllerType = Controller.current, signalType = signal.sine, commandFreq = 500, signalAmplitude = 1000, numberOfLoops = 10, signalFreq = 1, cycleDelay = .1, requestJitter = False, jitter = 20):
+def fxHighSpeedTest(port, baudRate, controllerType = Controller.position, signalType = signal.sine, commandFreq = 1000, signalAmplitude = 10000, numberOfLoops = 10, signalFreq = 5, cycleDelay = .1, requestJitter = False, jitter = 20):
 	
 	debugLoggingLevel = 0 # 6 is least verbose, 0 is most verbose
-	dataLog = True # Data log logs device data
+	dataLog = False # Data log logs device data
 
 	delay_time = float(1/(float(commandFreq)))
 	print(delay_time)
@@ -107,10 +107,10 @@ def fxHighSpeedTest(port, baudRate, controllerType = Controller.current, signalT
 	# Prepare controller:
 	if (controllerType == Controller.current):
 		print("Setting up current control demo")
-		fxSetGains(devId, 300, 50, 0, 0)
+		fxSetGains(devId, 300, 50, 0, 0, 0)
 	elif (controllerType == Controller.position):
 		print("Setting up position control demo")
-		fxSetGains(devId, 300, 50, 0, 0)
+		fxSetGains(devId, 300, 50, 0, 0, 0)
 	else:
 		assert 0
 	
@@ -127,10 +127,10 @@ def fxHighSpeedTest(port, baudRate, controllerType = Controller.current, signalT
 			# read ActPack data
 			data = fxReadDevice(devId)
 			if (controllerType == Controller.current):
-				fxSendMotorCommand(devId, ECurrent, sample)
+				fxSendMotorCommand(devId, FxCurrent, sample)
 				measurements.append(data._execute._motor_data._motor_current)
 			elif (controllerType == Controller.position):
-				fxSendMotorCommand(devId, EPosition, sample - initialPos)
+				fxSendMotorCommand(devId, FxPosition, sample - initialPos)
 				measurements.append(data._execute._motor_data._motor_angle)
 
 

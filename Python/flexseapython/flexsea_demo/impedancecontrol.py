@@ -7,7 +7,6 @@ matplotlib.use('WebAgg')
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pardir)
 from fxUtil import *
-from .streamManager import Stream
 
 # Control gain constants
 kp = 100
@@ -16,39 +15,19 @@ K = 325
 B = 0
 B_Increments = 125
 
-labels = ["State time", 											\
-"Accel X", "Accel Y", "Accel Z", "Gyro X", "Gyro Y", "Gyro Z", 		\
-"Motor angle", "Motor voltage", "Motor current",					\
-"Battery voltage", "Battery current"								\
-]
-
-varsToStream = [ 							\
-	FX_STATETIME, 							\
-	FX_ACCELX, FX_ACCELY, FX_ACCELZ, 		\
-	FX_GYROX,  FX_GYROY,  FX_GYROZ,			\
-	FX_ENC_ANG,								\
-	FX_MOT_VOLT, FX_MOT_CURR,				\
-	FX_BATT_VOLT, FX_BATT_CURR 				\
-]
-
 def fxImpedanceControl(port, baudRate, expTime = 7, time_step = 0.02, delta = 7500, transition_time = 0.8, resolution = 500):
 
-	stream = Stream(port, baudRate, printingRate = 10, labels=labels, varsToStream=varsToStream, updateFreq=500)
+	devId = fxOpen(port, baudRate, resolution, 0) 
+	fxStartStreaming(devId, True)
+	
 	result = True
-	stream()
-	stream.printData()
-	initialAngle = stream([FX_ENC_ANG])[0]
+	
+	data = fxReadDevice(devId)
+	initialAngle = data._execute._motor_data._motor_angle
+	
 	timeout = 100
 	timeoutCount = 0
 	transition_steps = int(transition_time / time_step)
-	while(initialAngle == None):
-		timeoutCount = timeoutCount + 1
-		if(timeoutCount > timeout):
-			print("Timed out waiting for valid encoder value...")
-			sys.exit(1)
-		else:
-			sleep(time_step)
-			initialAngle = stream([FX_ENC_ANG])[0]
 			
 	# Initialize lists - matplotlib
 	requests = []
@@ -57,13 +36,10 @@ def fxImpedanceControl(port, baudRate, expTime = 7, time_step = 0.02, delta = 75
 	i = 0
 	t0 = 0
 
-	# Intial position
-	setPosition(stream.devId, initialAngle)
-	setControlMode(stream.devId, CTRL_IMPEDANCE)
-	setPosition(stream.devId, initialAngle)
+	fxSendMotorCommand(devId, FxImpedance, initialAngle)
 	# Set gains
 	global B
-	setGains(stream.devId, K, B, kp, ki)
+	fxSetGains(devId, kp, ki, 0, K, B)
 
 	# Select transition rate and positions
 	currentPos = 0
@@ -78,26 +54,25 @@ def fxImpedanceControl(port, baudRate, expTime = 7, time_step = 0.02, delta = 75
 	print(result)
 	B = -B_Increments # We do that to make sure we start at 0
 	for i in range(num_time_steps):
-		measuredPos = stream([FX_ENC_ANG])[0]
+		data = fxReadDevice(devId)
+		measuredPos = data._execute._motor_data._motor_angle
 		if i % transition_steps == 0:
 			B = B + B_Increments	# Increments every cycle
-			setGains(stream.devId, K, B, kp, ki)
+			fxSetGains(devId, kp, ki, 0, K, B)
 			delta = abs(positions[currentPos] - measuredPos)
 			result &= delta < resolution
 			currentPos = (currentPos + 1) % 2
-			setPosition(stream.devId, positions[currentPos])
+			fxSendMotorCommand(devId, FxImpedance, positions[currentPos])
 		sleep(time_step)
-		stream()
 		preamble = "Holding position: {}...".format(positions[currentPos])
-		stream.printData(message = preamble)
+		print(preamble)	
 		# Plotting:
 		measurements.append(measuredPos)
 		times.append(time() - t0)
 		requests.append(positions[currentPos])
 
-	# Disable controller:
-	setControlMode(stream.devId, CTRL_NONE)
-	sleep(0.1)
+	# Close device and do device cleanup
+	fxClose(devId)
 	
 	# Plot before we exit:
 	title = "Impedance Control Demo"
@@ -109,7 +84,6 @@ def fxImpedanceControl(port, baudRate, expTime = 7, time_step = 0.02, delta = 75
 	plt.legend(loc='upper right')
 	plt.show()
 	
-	del stream
 	return result
 
 if __name__ == '__main__':
