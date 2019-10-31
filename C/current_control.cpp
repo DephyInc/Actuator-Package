@@ -5,7 +5,6 @@
 #include <thread>
 #include <iostream>
 #include "utils.h"
-#include "Exo.h"
 #include "device_wrapper.h"
 
 using namespace std;

@@ -10,7 +10,6 @@
 #include <fstream>
 
 #include "device_wrapper.h"
-#include "Exo.h"
 #ifdef _WIN32
 	#include "windows.h"
 #endif

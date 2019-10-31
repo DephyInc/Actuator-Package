@@ -4,7 +4,6 @@
 #include <thread>
 #include <iostream>
 #include "utils.h"
-#include "Exo.h"
 #include "device_wrapper.h"
 
 using namespace std;
@@ -15,6 +14,7 @@ void displayState(struct ExoState& state)
 	cout << endl << "imu: " << state._manage._imu._accelx << ", " << state._manage._imu._accely << \
 		", " << state._manage._imu._accelz << endl;
 	cout << "motor: " << state._execute._motor_data._motor_angle << " angle, " << \
+		state._execute._motor_data._motor_current << " mA, " <<\
 		state._execute._motor_data._motor_voltage << " mV" << endl;
 	cout <<"battery: " << state._regulate._battery._battery_voltage << " mV, " << \
 		state._regulate._battery._battery_current << " mA, " << \

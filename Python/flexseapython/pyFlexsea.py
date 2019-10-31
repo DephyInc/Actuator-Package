@@ -24,7 +24,7 @@ global flexsea
  FxNoReadData) = map(c_int, range(7))
 
 ##################### Redefine ExoState Structure #################
-# See "Exo.h" for C definition
+# See "ExoState.h" for C definition
 
 MAX_STRING_LENGTH = 32
 
@@ -331,17 +331,17 @@ def loadFlexsea():
 	if("win" in sysOS):
 		# load proper library based on host architecture
 		if architecture == "32bit":
-			lpath_base = os.path.join(dir_path,'../../fx_plan_stack/libs/win32')
+			lpath_base = os.path.join(dir_path,'../../libs/win32')
 		else:
-			lpath_base = os.path.join(dir_path,'../../fx_plan_stack/libs/win64')
+			lpath_base = os.path.join(dir_path,'../../libs/win64')
 		librarypath = os.path.join(lpath_base,'libfx_plan_stack.dll')
 	elif("Ubuntu" in linux_distro):
-		lpath_base = os.path.join(dir_path,'../../fx_plan_stack/libs/linux')
+		lpath_base = os.path.join(dir_path,'../../libs/linux')
 		librarypath = os.path.join(lpath_base,'libfx_plan_stack.so')
 	else:
 		# TODO: as of now we'll assume we're compiling for a raspberry Pi if it's not Ubuntu
 		# or windows but we'll likely want to make OS library versions clearer
-		lpath_base = os.path.join(dir_path,'../../fx_plan_stack/libs/raspberryPi')
+		lpath_base = os.path.join(dir_path,'../../libs/raspberryPi')
 		librarypath = os.path.join(lpath_base,'libfx_plan_stack.so')
 
 	try:

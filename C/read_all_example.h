@@ -1,7 +1,7 @@
 #ifndef READ_ALL_EXAMPLE_H
 #define READ_ALL_EXAMPLE_H
 
-#include "Exo.h"
+struct ExoState;
 
 void runReadAll(int devId, bool* shouldQuit);
 void displayState(ExoState &exoState);
