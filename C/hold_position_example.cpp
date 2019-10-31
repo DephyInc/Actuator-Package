@@ -19,7 +19,7 @@ void runHoldPosition(int devId, bool *shouldQuit)
 	//
 	// Start streaming the data
 	//
-	if(fxStartStreaming( devId, true) != ESuccess)
+	if(fxStartStreaming( devId, true) != FxSuccess)
 	{
 		cout << "Streaming failed ..." << endl;
 		return;
@@ -34,7 +34,7 @@ void runHoldPosition(int devId, bool *shouldQuit)
 	int initialAngle = 0;
 		
 	errCode = fxReadDevice(devId, &readData);
-	if(errCode != ESuccess)
+	if(errCode != FxSuccess)
 	{
 		cout << "Reading failed ..." << endl;
 		return;
@@ -45,8 +45,8 @@ void runHoldPosition(int devId, bool *shouldQuit)
 	//
 	// Set the motor control
 	//
-	fxSetGains(devId, 50, 3, 0, 0);
-	fxSendMotorCommand(devId, EPosition, initialAngle);	 
+	fxSetGains(devId, 50, 3, 0, 0, 0);
+	fxSendMotorCommand(devId, FxPosition, initialAngle);	 
 
 	while(!(*shouldQuit))
 	{
@@ -55,7 +55,7 @@ void runHoldPosition(int devId, bool *shouldQuit)
 		cout << "Holding position " << initialAngle << endl;
 	
 		errCode = fxReadDevice(devId, &readData);
-		if(errCode != ESuccess)
+		if(errCode != FxSuccess)
 		{	
 			cout << "Reading failed ..." << endl;
 			return;

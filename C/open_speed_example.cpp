@@ -11,7 +11,7 @@ using namespace std::literals::chrono_literals;
 
 void runOpenSpeed(int devId, bool *shouldQuit)
 {
-	if(fxStartStreaming(devId, true) != ESuccess )
+	if(fxStartStreaming(devId, true) != FxSuccess )
 	{
 		cout << "Streaming failed..." << endl;
 		return;
@@ -19,7 +19,7 @@ void runOpenSpeed(int devId, bool *shouldQuit)
 
 	cout << "Setting open control..." << endl;
 
-	fxSetGains(devId, 100, 30, 0, 0);
+	fxSetGains(devId, 100, 30, 0, 0, 0);
 	const int numSteps	 = 100;
 	int maxVoltage   = 3000;
 	int numTimes	 = 2;
@@ -31,12 +31,12 @@ void runOpenSpeed(int devId, bool *shouldQuit)
 		{
 			this_thread::sleep_for(100ms);
 			mV = maxVoltage * (i*1.0 / numSteps);
-			fxSendMotorCommand(devId, EVoltage, mV);
+			fxSendMotorCommand(devId, FxVoltage, mV);
 			clearScreen();
 			cout << "Ramping up open controller..." << endl;
 				
 
-			if (fxReadDevice(devId, &readData) == ESuccess)
+			if (fxReadDevice(devId, &readData) == FxSuccess)
 			{
 				// Display State is defined in read_all_example.h
 				displayState(readData);
@@ -55,10 +55,10 @@ void runOpenSpeed(int devId, bool *shouldQuit)
 		{
 			this_thread::sleep_for(100ms);
 			mV = maxVoltage * ((numSteps - j)*1.0 / numSteps);
-			fxSendMotorCommand(devId, EVoltage, mV);
+			fxSendMotorCommand(devId, FxVoltage, mV);
 			clearScreen();
 			cout << "Ramping down open controller..." << endl;
-			if (fxReadDevice(devId, &readData) == ESuccess)
+			if (fxReadDevice(devId, &readData) == FxSuccess)
 			{
 
 				displayState(readData);

@@ -17,7 +17,7 @@ B_Increments = 125
 
 def fxImpedanceControl(port, baudRate, expTime = 7, time_step = 0.02, delta = 7500, transition_time = 0.8, resolution = 500):
 
-	devId = fxOpen(port, baudRate, resolution) 
+	devId = fxOpen(port, baudRate, resolution, 0) 
 	fxStartStreaming(devId, True)
 	
 	result = True
@@ -36,10 +36,10 @@ def fxImpedanceControl(port, baudRate, expTime = 7, time_step = 0.02, delta = 75
 	i = 0
 	t0 = 0
 
-	fxSendMotorCommand(devId, EImpedance, initialAngle)
+	fxSendMotorCommand(devId, FxImpedance, initialAngle)
 	# Set gains
 	global B
-	fxSetGains(devId, ki, kp, K, B)
+	fxSetGains(devId, kp, ki, 0, K, B)
 
 	# Select transition rate and positions
 	currentPos = 0
@@ -58,11 +58,11 @@ def fxImpedanceControl(port, baudRate, expTime = 7, time_step = 0.02, delta = 75
 		measuredPos = data._execute._motor_data._motor_angle
 		if i % transition_steps == 0:
 			B = B + B_Increments	# Increments every cycle
-			fxSetGains(devId, ki, kp, K, B)
+			fxSetGains(devId, kp, ki, 0, K, B)
 			delta = abs(positions[currentPos] - measuredPos)
 			result &= delta < resolution
 			currentPos = (currentPos + 1) % 2
-			fxSendMotorCommand(devId, EImpedance, positions[currentPos])
+			fxSendMotorCommand(devId, FxImpedance, positions[currentPos])
 		sleep(time_step)
 		preamble = "Holding position: {}...".format(positions[currentPos])
 		print(preamble)	

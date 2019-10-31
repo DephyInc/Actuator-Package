@@ -27,7 +27,7 @@ void runReadAll(int devId, bool *shouldQuit)
     //
     // Start streaming the data
     //
-    if(fxStartStreaming(devId, true) != ESuccess )
+    if(fxStartStreaming(devId, true) != FxSuccess )
     {
         cout << "Streaming failed ..." << endl;
         return;

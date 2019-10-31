@@ -8,20 +8,20 @@ global flexsea
 
 ################### Motor Controller Enums #######################
 
-(EPosition,
- EVoltage,
- ECurrent,
- EImpedance) = map(c_int, range(4))
+(FxPosition,
+ FxVoltage,
+ FxCurrent,
+ FxImpedance) = map(c_int, range(4))
 
 ###################### Error Code Enums ##########################
 
-(ESuccess,
- EFailure,
- EInvalidParam,
- EInvalidDevice,
- ENotStreaming,
- EStreamFailed,
- ENoReadData) = map(c_int, range(7))
+(FxSuccess,
+ FxFailure,
+ FxInvalidParam,
+ FxInvalidDevice,
+ FxNotStreaming,
+ FxStreamFailed,
+ FxNoReadData) = map(c_int, range(7))
 
 ##################### Redefine ExoState Structure #################
 # See "Exo.h" for C definition
@@ -136,7 +136,7 @@ def fxClose(devId):
 	"""
 	global flexsea
 	retCode = flexsea.fxClose(devId)
-	if (retCode == EInvalidDevice):
+	if (retCode == FxInvalidDevice):
 		raise ValueError('fxClose: invalid device ID')
 
 def fxGetDeviceIds():
@@ -192,9 +192,9 @@ def fxStartStreaming(devId, shouldLog):
 	else:
 		retCode = flexsea.fxStartStreaming(devId, 0)
 
-	if (retCode == EInvalidDevice):
+	if (retCode == FxInvalidDevice):
 		raise ValueError('fxStartStreaming: invalid device ID')
-	elif (retCode == EFailure):
+	elif (retCode == FxFailure):
 		raise RuntimeError('fxStartStreaming: stream failed')
 
 def fxStopStreaming(devId):
@@ -222,7 +222,7 @@ def fxSetCommunicationFrequency(devId, frequency):
 	ValueError if invalid device ID
 	"""
 	global flexsea
-	if (flexsea.fxSetCommuncationFrequency(devId, frequency) == EInvalidDevice):
+	if (flexsea.fxSetCommuncationFrequency(devId, frequency) == FxInvalidDevice):
 		raise ValueError('fxSetCommunicationFrequency: invalid device ID')
 
 def fxReadDevice(devId):
@@ -245,35 +245,37 @@ def fxReadDevice(devId):
 	exoState = ExoState();
 	retCode = flexsea.fxReadDevice(devId, byref(exoState))
 	
-	if (retCode == EInvalidDevice):
+	if (retCode == FxInvalidDevice):
 		raise ValueError('fxReadDevice: invalid device ID')
-	elif (retCode == ENoReadData):
+	elif (retCode == FxNoReadData):
 		raise RuntimeError('fxReadDevice: no read data')
 
 	return exoState 
 
-def fxSetGains(devId, g0, g1, g2, g3):
+def fxSetGains(devId, kp, ki, kd, K, B):
 	"""
 	Sets the gains used by PID controllers on the FlexSEA device.
 	
 	Parameters:
 	devId (int): The device ID.
 
-	g0 (int): Proportional gain (Kp) 
+	kp (int): Proportional gain 
 
-	g1 (int): Integral gain (Ki)
+	ki (int): Integral gain
+	
+	kd (int): Differential gain
 
-	g2 (int): Stiffness (K) (used in impedence control only)
+	K (int): Stiffness (used in impedence control only)
 
-	g3 (int): Damping (B) (used in impedance control only)
+	B (int): Damping (used in impedance control only)
 
 	Raises:
 	ValueError if the device ID is invalid
 	"""
 	global flexsea
-	retCode = flexsea.fxSetGains(devId, g0, g1, g2, g3)
+	retCode = flexsea.fxSetGains(devId, kp, ki, kd, K, B)
 		
-	if (retCode == EInvalidDevice):
+	if (retCode == FxInvalidDevice):
 		raise ValueError('fxSetGains: invalid device ID')
 
 def fxSendMotorCommand(devId, controlType, value):
@@ -284,13 +286,13 @@ def fxSendMotorCommand(devId, controlType, value):
 	devId (int): The device ID.
 
 	controlMode (c_int): The control mode we will use to send this command.
-	Possible values are: EPosition, ECurrent, EVoltage, EImpedence
+	Possible values are: FxPosition, FxCurrent, FxVoltage, FxImpedence
 
 	value (int): The value to use for the controlMode. 
-	EPosition - encoder value
-	ECurrent - current in mA
-	EVoltage - voltage in mV
-	EImpedence - current in mA
+	FxPosition - encoder value
+	FxCurrent - current in mA
+	FxVoltage - voltage in mV
+	FxImpedence - current in mA
 	
 	Raises:
 	ValueError if invalid device ID
@@ -300,11 +302,11 @@ def fxSendMotorCommand(devId, controlType, value):
 
 	retCode = flexsea.fxSendMotorCommand(devId, controlType, c_int(int(value)))
 
-	if (retCode == EInvalidDevice):
+	if (retCode == FxInvalidDevice):
 		raise ValueError('fxSendMotorCommand: invalid device ID')
-	if (retCode == EFailure):
+	if (retCode == FxFailure):
 		raise IOError('fxSendMotorCommand: command failed')	
-	if (retCode == EInvalidParam):
+	if (retCode == FxInvalidParam):
 		raise ValueError('fxSendMotorCommand: invalid controlType')	
 
 
@@ -376,7 +378,7 @@ def loadFlexsea():
 	flexsea.fxReadDevice.argtypes = [c_uint, POINTER(ExoState)]
 	flexsea.fxReadDevice.restype = c_int
 
-	flexsea.fxSetGains.argtypes = [c_uint, c_uint, c_uint, c_uint, c_uint]
+	flexsea.fxSetGains.argtypes = [c_uint, c_uint, c_uint, c_uint, c_uint, c_uint]
 	flexsea.fxSetGains.restype = c_int
 
 	flexsea.fxSendMotorCommand.argtypes = [c_uint, c_int, c_int]

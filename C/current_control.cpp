@@ -18,7 +18,7 @@ void runCurrentControl(int devId, bool* shouldQuit)
 	FxError errCode;
 
 	errCode = fxStartStreaming(devId, true);
-	if(errCode != ESuccess)
+	if(errCode != FxSuccess)
 	{
 		cout << "Streaming Failed..." << endl;
 		return;
@@ -27,8 +27,8 @@ void runCurrentControl(int devId, bool* shouldQuit)
 	cout << "Setting controller to current..." << endl;
 	
 	// Start the current, holdCurrent is in mA
-	fxSetGains(devId, 100, 20, 0, 0);
-	fxSendMotorCommand(devId, ECurrent, holdCurrent);	 
+	fxSetGains(devId, 100, 20, 0, 0, 0);
+	fxSendMotorCommand(devId, FxCurrent, holdCurrent);	 
 
 	int n = 0;
 	while(! *shouldQuit)
@@ -38,7 +38,7 @@ void runCurrentControl(int devId, bool* shouldQuit)
 		
 		
 		errCode = fxReadDevice(devId, &readData);
-		if(errCode != ESuccess)
+		if(errCode != FxSuccess)
 		{
 			cout << "Reading Failed..." << endl;
 			return;
@@ -59,7 +59,7 @@ void runCurrentControl(int devId, bool* shouldQuit)
 	n = 50;
 	for(int i =0; i < n; ++i)
 	{
-		fxSendMotorCommand(devId, ECurrent, holdCurrent * (n-i)/n);	 
+		fxSendMotorCommand(devId, FxCurrent, holdCurrent * (n-i)/n);	 
 		this_thread::sleep_for(40ms);
 	}
 
@@ -67,13 +67,13 @@ void runCurrentControl(int devId, bool* shouldQuit)
 	// Wait for motor to spin down
 	//
 	cout << "Waiting for motor to spin down..." << endl;
-	fxSendMotorCommand(devId, ECurrent, 0);	 
+	fxSendMotorCommand(devId, FxCurrent, 0);	 
 
 	// Read "last" encode angle
 	int lastAngle = 0;
 	
 	errCode = fxReadDevice(devId, &readData);
-	if(errCode != ESuccess)
+	if(errCode != FxSuccess)
 	{
 		cout << "Reading Failed..." << endl;
 		exit(2);
@@ -86,7 +86,7 @@ void runCurrentControl(int devId, bool* shouldQuit)
 	int currentAngle = 0;
 	
 	errCode = fxReadDevice(devId, &readData);
-	if(errCode != ESuccess)
+	if(errCode != FxSuccess)
 	{
 		cout << "Reading Failed..." << endl;
 		exit(2);
@@ -102,7 +102,7 @@ void runCurrentControl(int devId, bool* shouldQuit)
 		lastAngle = currentAngle;
 		
 		errCode = fxReadDevice(devId, &readData);
-		if(errCode != ESuccess)
+		if(errCode != FxSuccess)
 		{
 			cout << "Reading Failed..." << endl;
 			exit(2);
