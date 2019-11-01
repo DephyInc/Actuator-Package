@@ -9,7 +9,7 @@
 using namespace std;
 using namespace std::literals::chrono_literals;
 
-void displayState(struct ExoState& state)
+void displayState(struct ActPackState& state)
 {
 	cout << endl << "imu: " << state._manage._imu._accelx << ", " << state._manage._imu._accely << \
 		", " << state._manage._imu._accelz << endl;
@@ -36,7 +36,7 @@ void runReadAll(int devId, bool *shouldQuit)
     //
     // Read and display the data
     //
-    ExoState exoState;
+    ActPackState exoState;
     while(!(*shouldQuit))
     {
 	this_thread::sleep_for(10ms);

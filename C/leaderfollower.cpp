@@ -14,7 +14,7 @@ void runLeaderFollower( int devId0, int devId1, bool *shouldQuit)
 {
 	FxError errCode[2];
 
-	ExoState readData[2];
+	ActPackState readData[2];
 	
 	//
 	// Start streaming the data

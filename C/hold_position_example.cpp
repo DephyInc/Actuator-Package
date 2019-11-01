@@ -12,7 +12,7 @@ using namespace std::literals::chrono_literals;
 
 void runHoldPosition(int devId, bool *shouldQuit)
 {
-	ExoState readData;
+	ActPackState readData;
 	FxError errCode;
 
 	//

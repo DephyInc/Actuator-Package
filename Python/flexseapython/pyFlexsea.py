@@ -24,7 +24,7 @@ global flexsea
  FxNoReadData) = map(c_int, range(7))
 
 ##################### Redefine ExoState Structure #################
-# See "ExoState.h" for C definition
+# See "ActPackState.h" for C definition
 
 MAX_STRING_LENGTH = 32
 
@@ -81,9 +81,8 @@ class RegulateState(Structure):
 		("_software_version_len", c_int),
 		("_software_version", c_char * MAX_STRING_LENGTH)]
 
-class ExoState(Structure):
+class ActPackState(Structure):
 	_fields_ = [("_timestamp", c_ulong),
-	        ("_board_id", c_ulong),
 		("_manage", ManageState),
 		("_execute", ExecuteState),
 		("_regulate", RegulateState),
@@ -242,15 +241,15 @@ def fxReadDevice(devId):
 	"""
 	global flexsea
 
-	exoState = ExoState();
-	retCode = flexsea.fxReadDevice(devId, byref(exoState))
+	actPackState = ActPackState();
+	retCode = flexsea.fxReadDevice(devId, byref(actPackState))
 	
 	if (retCode == FxInvalidDevice):
 		raise ValueError('fxReadDevice: invalid device ID')
 	elif (retCode == FxNoReadData):
 		raise RuntimeError('fxReadDevice: no read data')
 
-	return exoState 
+	return actPackState 
 
 def fxSetGains(devId, kp, ki, kd, K, B):
 	"""
@@ -375,7 +374,7 @@ def loadFlexsea():
 	flexsea.fxSetCommunicationFrequency.argtypes = [c_uint, c_uint]
 	flexsea.fxSetCommunicationFrequency.restype = c_int
 
-	flexsea.fxReadDevice.argtypes = [c_uint, POINTER(ExoState)]
+	flexsea.fxReadDevice.argtypes = [c_uint, POINTER(ActPackState)]
 	flexsea.fxReadDevice.restype = c_int
 
 	flexsea.fxSetGains.argtypes = [c_uint, c_uint, c_uint, c_uint, c_uint, c_uint]

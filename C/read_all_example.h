@@ -1,9 +1,9 @@
 #ifndef READ_ALL_EXAMPLE_H
 #define READ_ALL_EXAMPLE_H
 
-struct ExoState;
+struct ActPackState;
 
 void runReadAll(int devId, bool* shouldQuit);
-void displayState(ExoState &exoState);
+void displayState(ActPackState &exoState);
 
 #endif // READ_ALL_EXAMPLE_H

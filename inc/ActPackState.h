@@ -71,9 +71,8 @@ struct RegulateState {
 };
 
 /* Structure that holds a deserialized ExoState-message. */
-struct ExoState {
+struct ActPackState {
     unsigned long _timestamp;
-    unsigned long _board_id;
     struct ManageState _manage;
     struct ExecuteState _execute;
     struct RegulateState _regulate;

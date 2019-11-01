@@ -24,7 +24,7 @@ void runOpenSpeed(int devId, bool *shouldQuit)
 	int maxVoltage   = 3000;
 	int numTimes	 = 2;
 	int mV		   = 0;
-	ExoState readData;
+	ActPackState readData;
 	for( int time = 0; time < numTimes; ++time)
 	{
 		for(int i= 0; i < numSteps; ++i)

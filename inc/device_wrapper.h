@@ -2,7 +2,7 @@
 #define DEVICE_WRAPPER_H
 
 #include <stdbool.h>
-#include "ExoState.h"
+#include "ActPackState.h"
 
 #ifdef __cplusplus
 extern "C" 
@@ -129,10 +129,10 @@ FxError fxSetCommunicationFrequency(const unsigned int deviceId, const unsigned 
 /// 
 /// @param deviceId is the device ID of the device to read from.
 ///
-/// @param ExoState contains the most recent data from the device
+/// @param ActPackState contains the most recent data from the device
 ///
 /// @returns ENoReadData if there is no data to read.
-FxError fxReadDevice(const unsigned int deviceId, ExoState* readData);
+FxError fxReadDevice(const unsigned int deviceId, ActPackState* readData);
 
 /// \brief Sets the gains used by PID controllers on the FlexSEA device.
 ///

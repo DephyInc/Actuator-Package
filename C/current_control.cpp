@@ -13,7 +13,7 @@ using namespace std::literals::chrono_literals;
 void runCurrentControl(int devId, bool* shouldQuit)
 {
 	int holdCurrent = 500;
-	ExoState readData;
+	ActPackState readData;
 	FxError errCode;
 
 	errCode = fxStartStreaming(devId, true);

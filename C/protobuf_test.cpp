@@ -38,7 +38,7 @@ void sigint_handler(int s)
 	shouldQuit = true;
 }
 
-void display_state(struct ExoState& state)
+void display_state(struct ActPackState& state)
 {
 	char ascii_hex_id[10] = {0};
 	snprintf(ascii_hex_id, 9, "Exo-%02X%02X", (unsigned char)((state._board_id >> 8) & 0xFF),
@@ -63,7 +63,7 @@ void cleanup(void)
 void test_training_commands(void)
 {
 	// State stores the device's sensor and motor data and can be passed into the read method 
-	ExoState state;
+	ActPackState state;
 
 	// Enable auto streaming to have exo automatically send data
 	bool shouldLog = false;
@@ -101,7 +101,7 @@ void test_position_commands(void)
 	int32_t position, i;
 
 	// State stores the device's sensor and motor data and can be passed into the read method 
-	ExoState state;
+	ActPackState state;
 
 	// Enable auto streaming to have exo automatically send data
 	bool shouldLog = false;
