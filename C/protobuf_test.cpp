@@ -40,10 +40,6 @@ void sigint_handler(int s)
 
 void display_state(struct ActPackState& state)
 {
-	char ascii_hex_id[10] = {0};
-	snprintf(ascii_hex_id, 9, "Exo-%02X%02X", (unsigned char)((state._board_id >> 8) & 0xFF),
-												(unsigned char)(state._board_id & 0xFF));
-	cout << "id: " << ascii_hex_id << endl;
 	cout << "imu: " << state._manage._imu._accelx << ", " << state._manage._imu._accely << \
 		", " << state._manage._imu._accelz << endl;
 	cout << "motor: " << state._execute._motor_data._motor_angle << " angle, " << \
@@ -66,7 +62,7 @@ void test_training_commands(void)
 	ActPackState state;
 
 	// Enable auto streaming to have exo automatically send data
-	bool shouldLog = false;
+	bool shouldLog = true;
 	exo_device->startStreaming(shouldLog);
 
 	// Get the initial state of the exo
@@ -127,7 +123,7 @@ void test_position_commands(void)
 		for(position = start_position; position <= start_position + 50000; position += 100)
 		{
 			// Queue up a command using protocol buffers
-			exo_device->sendMotorCommand(ControllerType::FxPosition, position);
+			exo_device->sendMotorCommand(ControllerType::EPosition, position);
 			exo_device->read(state);
 			// Print out the motor and sensor data
 			display_state(state);
@@ -141,7 +137,7 @@ void test_position_commands(void)
 		for(position = start_position + 50000; position >= start_position; position -= 100)
 		{
 			// Queue up a command using protocol buffers
-			exo_device->sendMotorCommand(ControllerType::FxPosition, position);
+			exo_device->sendMotorCommand(ControllerType::EPosition, position);
 			exo_device->read(state);
 			// Print out the motor and sensor data
 			display_state(state);
@@ -199,8 +195,8 @@ int main()
 
 	while(!shouldQuit)
 	{
-		// test_position_commands();
-		test_training_commands();
+		test_position_commands();
+		//test_training_commands();
 	}
 	
 
