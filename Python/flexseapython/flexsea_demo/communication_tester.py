@@ -77,7 +77,7 @@ def THDN(signal, sample_rate):
 
 	plt.show()
 
-def sineAnalyzer(data_log):
+def sineAnalyzer(data_log, streaming_frequency):
 	timestamps = []
 	sine_samples = []
 	with open(data_log, mode='r') as csv_file:
@@ -94,9 +94,40 @@ def sineAnalyzer(data_log):
 	start_time = timestamps[0]
 	timestamps[:] = [time-start_time for time in timestamps[:]]
 	sine_samples[:] = [sample-16384 for sample in sine_samples[:]]
-	return timestamps, sine_samples
+	THDN(sine_samples, streaming_frequency)
 
-def fxCommunicationTester(port, baudRate, streaming_frequency = 500):
+def timeErrorChecker(timestamps, frequency):
+	ideal_interval = 1000 / frequency
+	last_time = timestamps[0]
+	total_packets = len(timestamps)
+	missed_packets = 0
+	print(timestamps)
+	for time in timestamps:
+		if time != last_time:
+			missed_packets += 1
+			print("miss: ", time, " != ", last_time)
+		last_time = time + ideal_interval
+	error_rate = missed_packets / total_packets * 100
+	success_rate = 100 - error_rate
+	print("dropped: ", missed_packets, "total: ", len(timestamps))
+	print("success_rate: ", success_rate, "error_rate: ", error_rate)
+
+def timeAnalyzer(data_log, streaming_frequency):
+	timestamps = []
+	with open(data_log, mode='r') as csv_file:
+		csv_reader = csv.DictReader(csv_file)
+		line_count = 0
+		for row in csv_reader:
+			if line_count == 0:
+				print(f'Device data fields: {", ".join(row)}')
+				line_count += 1
+			timestamps.append(int(row["timestamp"]))
+			line_count += 1
+		print(f'Processed {line_count} lines.')
+	start_time = timestamps[0]
+	timeErrorChecker(timestamps, streaming_frequency)
+
+def fxCommunicationTester(port, baudRate, streaming_frequency = 10):
 	# Connect to the Device Under Test (DUT)
 	devId = fxOpen(port, baudRate, streaming_frequency, 0)
 	# Print out the device ID
@@ -105,7 +136,7 @@ def fxCommunicationTester(port, baudRate, streaming_frequency = 500):
 	fxStartStreaming(devId, True)
 	# Allow the device class to handle processing the streaming data in the background
 	# this total will give us about two full waves based on 1000 samples per wave
-	sleep(2000/streaming_frequency)
+	sleep(100/streaming_frequency)
 	# Close the device so it stops streaming and no longer writes to the csv file
 	fxClose(devId)
 	# Give a moment for the csv file to cleanly close
@@ -115,9 +146,12 @@ def fxCommunicationTester(port, baudRate, streaming_frequency = 500):
 	data_logs = glob.glob("Data*")
 	last_log = data_logs[-1]
 	print("Log file under analysis is ", last_log)
-	timestamps, sine_samples = sineAnalyzer(last_log)
-	print("received ", len(timestamps), " samples")
-	THDN(sine_samples, streaming_frequency)
+
+	timeAnalyzer(last_log, streaming_frequency)
+
+	# If the manage device was outputting a sine wave on genVar[0] we can run the sineAnalyzer
+	# on the data log and it will check the quality of the signal
+	# sineAnalyzer(last_log, streaming_frequency)
 
 	return True
 
