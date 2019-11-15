@@ -13,8 +13,8 @@
 	#include "windows.h"
 #endif
 
-#include "device.h"
-#include "serial.h"
+#include "device_wrapper.h"
+#include "utils.h"
 
 using namespace std;
 using namespace std::literals::chrono_literals;
@@ -27,9 +27,6 @@ string configFile = "../com.txt";
 // This flag gets set when ctrl+c is pressed
 bool shouldQuit = false;
 
-// This object is used for connecting, sending, and receiving data from a device
-Device* exo_device;
-
 // This callback is just to quit the program if someone presses ctrl+c
 void sigint_handler(int s)
 {
@@ -38,96 +35,97 @@ void sigint_handler(int s)
 	shouldQuit = true;
 }
 
-void display_state(struct ActPackState& state)
+void displayState(struct ActPackState& state)
 {
-	cout << "imu: " << state._manage._imu._accelx << ", " << state._manage._imu._accely << \
+	cout << endl << "imu: " << state._manage._imu._accelx << ", " << state._manage._imu._accely << \
 		", " << state._manage._imu._accelz << endl;
 	cout << "motor: " << state._execute._motor_data._motor_angle << " angle, " << \
+		state._execute._motor_data._motor_current << " mA, " <<\
 		state._execute._motor_data._motor_voltage << " mV" << endl;
 	cout <<"battery: " << state._regulate._battery._battery_voltage << " mV, " << \
 		state._regulate._battery._battery_current << " mA, " << \
-		state._regulate._battery._battery_temperature << " C" << endl << endl;
+		state._regulate._battery._battery_temperature << " C" << endl << endl; 
 }
 
-void cleanup(void)
-{
-	// Turn off controller and stop streaming
-	exo_device->setMotorGains(0, 0, 0, 0, 0);
-	exo_device->stopStreaming();
-}
-
-void test_training_commands(void)
+void test_training_commands(int devId)
 {
 	// State stores the device's sensor and motor data and can be passed into the read method 
 	ActPackState state;
 
 	// Enable auto streaming to have exo automatically send data
-	bool shouldLog = true;
-	exo_device->startStreaming(shouldLog);
+	if(fxStartStreaming(devId, true) != FxSuccess )
+	{
+		cout << "Streaming failed..." << endl;
+		return;
+	}
 
 	// Get the initial state of the exo
-	if(exo_device->read(state))
+	if(fxReadDevice(devId, &state) == FxSuccess)
 	{
 		cout << "Able to read from device, sending training commands now" << endl;
 	}
 	else
 	{
 		cout << "Unable to read from the device so we are exiting now" << endl;
-		// We were unable to read from the device so let's clean up and quit
-		cleanup();
 		shouldQuit = true;
 	}
 
 	while(!shouldQuit)
 	{
 		// Queue up a command using protocol buffers
-		exo_device->sendTrainingCommand(_TRAINING_START_COMMAND);
-		exo_device->read(state);
+		// exo_device->sendTrainingCommand(_TRAINING_START_COMMAND);
+		fxReadDevice(devId, &state);
 		// Print out the motor and sensor data
-		display_state(state);
+		displayState(state);
 		this_thread::sleep_for(500ms);
 	}
-	cleanup();
 }
 
 // Sending a large number of position commands
-void test_position_commands(void)
+void test_position_commands(int devId)
 {
-	int32_t start_position, stop_position;
+	int32_t start_position = 0, stop_position;
 	int32_t position, i;
 
 	// State stores the device's sensor and motor data and can be passed into the read method 
 	ActPackState state;
 
 	// Enable auto streaming to have exo automatically send data
-	bool shouldLog = false;
-	exo_device->startStreaming(shouldLog);
+	if(fxStartStreaming(devId, true) != FxSuccess )
+	{
+		cout << "Streaming failed..." << endl;
+		return;
+	}
+
 	// Set the gains for the position controller
-	exo_device->setMotorGains(100, 3, 0, 0, 0);
-	// Get the initial state of the exo
-	if(exo_device->read(state))
-	{
-		start_position = state._execute._motor_data._motor_angle;
-		cout << "Our starting position will be " << start_position << endl;
-	}
-	else
-	{
-		cout << "Unable to read from the device so we are exiting now" << endl;
-		// We were unable to read from the device so let's clean up and quit
-		cleanup();
-		shouldQuit = true;
-	}
+	fxSetGains(devId, 100, 3, 0, 0, 0);
+
+	// Allow for the device to start streaming
+	this_thread::sleep_for(1000ms);
+
+	// // Get the initial state of the exo
+	// if(fxReadDevice(devId, &state))
+	// {
+	// 	start_position = state._execute._motor_data._motor_angle;
+	// 	cout << "Our starting position will be " << start_position << endl;
+	// }
+	// else
+	// {
+	// 	cout << "Unable to read from the device so we are exiting now" << endl;
+	// 	// We were unable to read from the device so let's clean up and quit
+	// 	shouldQuit = true;
+	// }
 
 	while(!shouldQuit)
 	{
 		for(position = start_position; position <= start_position + 50000; position += 100)
 		{
 			// Queue up a command using protocol buffers
-			exo_device->sendMotorCommand(ControllerType::EPosition, position);
-			exo_device->read(state);
+			fxSendMotorCommand(devId, FxPosition, position);
+			fxReadDevice(devId, &state);
 			// Print out the motor and sensor data
-			display_state(state);
-			this_thread::sleep_for(1ms);
+			displayState(state);
+			this_thread::sleep_for(10ms);
 			if(shouldQuit)
 			{
 				cout << "Ending position test early" << endl;
@@ -137,11 +135,11 @@ void test_position_commands(void)
 		for(position = start_position + 50000; position >= start_position; position -= 100)
 		{
 			// Queue up a command using protocol buffers
-			exo_device->sendMotorCommand(ControllerType::EPosition, position);
-			exo_device->read(state);
+			fxSendMotorCommand(devId, FxPosition, position);
+			fxReadDevice(devId, &state);
 			// Print out the motor and sensor data
-			display_state(state);
-			this_thread::sleep_for(1ms);
+			displayState(state);
+			this_thread::sleep_for(10ms);
 			if(shouldQuit)
 			{
 				cout << "Ending position test early" << endl;
@@ -149,7 +147,6 @@ void test_position_commands(void)
 			}
 		}
 	}
-	cleanup();
 }
 
 int main()
@@ -171,37 +168,23 @@ int main()
 
 	cout << "Connecting to port: " << portName[0] << endl;
 
-	//
-	// Construct the device
-	//
-	try 
+	int deviceId = fxOpen((char *)portName[idx].c_str(), baudRate, 100, 0);
+
+	if (deviceId == -1)
 	{
-		exo_device = new Device(portName[idx], baudRate, 500, 0);
-	}
-	catch (const std::exception& e)
-	{
-		cout << "Exception: " << e.what() << endl;
-		exit(0);
-	}	
-	catch (...)
-	{
-		cout << "Unexpected error occured" << endl;
+		cout << "Failed to connect on port " << portName[idx] << endl;
 		exit(0);
 	}
 
 	cout << "Successful connection to " << portName[idx] << endl;
 
-	bool doLog = true;
-
 	while(!shouldQuit)
 	{
-		test_position_commands();
+		test_position_commands(deviceId);
 		//test_training_commands();
 	}
-	
 
 	cout << "Quitting application, closing serial port now" << endl;
-
 
 	return 0;
 }
