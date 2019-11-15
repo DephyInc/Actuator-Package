@@ -36,33 +36,17 @@ function build_from_scratch
     cd ${SCRIPT_DIR}
 }
 
-function acpac
+function cscripts
 {
     cd ${ACPAC_DIR}
     ./cscripts_builder.sh
     cd ${SCRIPT_DIR}
-    #echo '/dev/ttyACM0' > ${ACPAC_DIR}/build/com.txt
-}
-
-function cscripts_proto
-{
-    cd ${ACPAC_DIR}
-    ./cscripts_builder.sh proto
-    cd ${SCRIPT_DIR}
-    #echo '/dev/ttyACM0' > ${ACPAC_DIR}/build/com.txt
 }
 
 function plan_stack
 {
     cd ${PLAN_STACK_DIR}
     ./stack_builder.sh
-    cd ${SCRIPT_DIR}
-}
-
-function stack_proto
-{
-    cd ${PLAN_STACK_DIR}
-    ./stack_builder.sh proto
     cd ${SCRIPT_DIR}
 }
 
@@ -78,12 +62,11 @@ Usage: $(basename $0) [options] [target-board] ...
 Options:
 
 Targets:
-    acpac
     plan_stack
     all
 Examples:
-    ./build.sh acpac
-    ./build.sh all
+    ./actpack_builder.sh all
+    ./actpack_builder.sh run
 EOF
     exit 0
 fi
@@ -92,19 +75,12 @@ fi
 for ARGUMENT in "$@"; do
 
     case "$ARGUMENT" in
-        acpac)
-            acpac
-            ;;
         plan_stack)
             plan_stack
             ;;
-        proto)
-            stack_proto
-            cscripts_proto
-            ;;
         doit)
             cd ${ACPAC_DIR}/build
-            ./protobuf
+            ./communication_tester
             cd ${SCRIPT_DIR}
             ;;
         run)
@@ -114,7 +90,7 @@ for ARGUMENT in "$@"; do
             ;;
         all)
             plan_stack
-            acpac
+            cscripts
             ;;
     esac
 
