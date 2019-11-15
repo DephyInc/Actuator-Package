@@ -101,16 +101,19 @@ def timeErrorChecker(timestamps, frequency):
 	last_time = timestamps[0]
 	total_packets = len(timestamps)
 	missed_packets = 0
-	print(timestamps)
 	for time in timestamps:
-		if time != last_time:
+		if time != int(last_time):
 			missed_packets += 1
-			print("miss: ", time, " != ", last_time)
+			print("miss: ", time, " != ", int(last_time))
 		last_time = time + ideal_interval
 	error_rate = missed_packets / total_packets * 100
 	success_rate = 100 - error_rate
-	print("dropped: ", missed_packets, "total: ", len(timestamps))
-	print("success_rate: ", success_rate, "error_rate: ", error_rate)
+	print("COMMUNICATION TESTER RESULTS ARE IN!")
+	sleep(1)
+	print("packets received: ", len(timestamps))
+	print("packets dropped: ", missed_packets)
+	print("success_rate: ", success_rate, "%")
+	print("error_rate: ", error_rate, "%")
 
 def timeAnalyzer(data_log, streaming_frequency):
 	timestamps = []
@@ -136,7 +139,7 @@ def fxCommunicationTester(port, baudRate, streaming_frequency = 10):
 	fxStartStreaming(devId, True)
 	# Allow the device class to handle processing the streaming data in the background
 	# this total will give us about two full waves based on 1000 samples per wave
-	sleep(100/streaming_frequency)
+	sleep(10)
 	# Close the device so it stops streaming and no longer writes to the csv file
 	fxClose(devId)
 	# Give a moment for the csv file to cleanly close
