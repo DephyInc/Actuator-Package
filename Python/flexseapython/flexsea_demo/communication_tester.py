@@ -38,7 +38,7 @@ def find_range(f, x):
 			break
 	return (lowermin, uppermin)
 
-def THDN(signal, sample_rate):
+def harmonic_distortion_calculator(signal, sample_rate, drop_rate):
 	# Get rid of DC and window the signal
 	signal -= mean(signal) # TODO: Do this in the frequency domain, and take any skirts with it
 	windowed = signal * blackmanharris(len(signal))  # TODO Kaiser?
@@ -59,6 +59,13 @@ def THDN(signal, sample_rate):
 	THDN = rms_flat(noise) / total_rms
 	print("THD+N:     %.4f%% or %.1f dB" % (THDN * 100, 20 * log10(THDN)))
 
+	thdn_str = "{0:.2f}".format(THDN*100)
+	drop_str = "{0:.2f}".format(drop_rate)
+	frequency_str = "{0:.2f}".format(sample_rate)
+
+	main_title = "Communication Quality Test at " + frequency_str + " Hz ---> Total Harmonic Distortion: " + thdn_str + "%, Packet Drop Rate: " + drop_str + "%"
+	plt.suptitle(main_title, fontsize=16)
+
 	plt.subplot(2, 2, 1)
 	plt.plot(signal)
 	plt.title("signal")
@@ -77,7 +84,9 @@ def THDN(signal, sample_rate):
 
 	plt.show()
 
-def sineAnalyzer(data_log, streaming_frequency):
+# TODO: having trouble typing so passing through drop_rate to wrap this up
+# the graphing should be independent of these functions
+def sineAnalyzer(data_log, streaming_frequency, drop_rate):
 	timestamps = []
 	sine_samples = []
 	with open(data_log, mode='r') as csv_file:
@@ -94,7 +103,7 @@ def sineAnalyzer(data_log, streaming_frequency):
 	start_time = timestamps[0]
 	timestamps[:] = [time-start_time for time in timestamps[:]]
 	sine_samples[:] = [sample-16384 for sample in sine_samples[:]]
-	THDN(sine_samples, streaming_frequency)
+	harmonic_distortion_calculator(sine_samples, streaming_frequency, drop_rate)
 
 def timeErrorChecker(timestamps, frequency):
 	ideal_interval = 1000 / frequency
@@ -114,6 +123,7 @@ def timeErrorChecker(timestamps, frequency):
 	print("packets dropped: ", missed_packets)
 	print("success_rate: ", success_rate, "%")
 	print("error_rate: ", error_rate, "%")
+	return error_rate
 
 def timeAnalyzer(data_log, streaming_frequency):
 	timestamps = []
@@ -128,9 +138,9 @@ def timeAnalyzer(data_log, streaming_frequency):
 			line_count += 1
 		print(f'Processed {line_count} lines.')
 	start_time = timestamps[0]
-	timeErrorChecker(timestamps, streaming_frequency)
+	return timeErrorChecker(timestamps, streaming_frequency)
 
-def fxCommunicationTester(port, baudRate, streaming_frequency = 10):
+def fxCommunicationTester(port, baudRate, streaming_frequency = 200):
 	# Connect to the Device Under Test (DUT)
 	devId = fxOpen(port, baudRate, streaming_frequency, 0)
 	# Print out the device ID
@@ -150,11 +160,11 @@ def fxCommunicationTester(port, baudRate, streaming_frequency = 10):
 	last_log = data_logs[-1]
 	print("Log file under analysis is ", last_log)
 
-	timeAnalyzer(last_log, streaming_frequency)
+	drop_rate = timeAnalyzer(last_log, streaming_frequency)
 
 	# If the manage device was outputting a sine wave on genVar[0] we can run the sineAnalyzer
 	# on the data log and it will check the quality of the signal
-	# sineAnalyzer(last_log, streaming_frequency)
+	sineAnalyzer(last_log, streaming_frequency, drop_rate)
 
 	return True
 
