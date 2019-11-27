@@ -15,7 +15,6 @@ from flexseapython.flexsea_demo.high_speed_test import fxHighSpeedTest
 from flexseapython.flexsea_demo.impedancecontrol import fxImpedanceControl
 #from flexseapython.flexsea_demo.two_devices_leaderfollower import fxLeaderFollower
 #from flexseapython.flexsea_demo.twopositioncontrol import fxTwoPositionControl
-from flexseapython.flexsea_demo.communication_tester import fxCommunicationTester
 
 def fxFindPoles(port):
 	stream = Stream(port, baudRate, printingRate = 2, labels=[], varsToStream=[])
@@ -44,7 +43,6 @@ def main():
 
 experiments =  [									\
 		(fxReadOnly,		"Read Only"),			\
-		(fxCommunicationTester, "Communication Tester"),			\
 #		(fxOpenControl, "Open Control"),		\
 #		(fxCurrentControl, "Current Control"),	\
 #		(fxPositionControl, "Position Control"),	\
