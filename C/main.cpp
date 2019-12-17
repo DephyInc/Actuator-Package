@@ -79,7 +79,7 @@ int main()
         //
         // Open the port
         //
-	int devId = fxOpen((char *)portName[idx].c_str(), baudRate, 200, 0); 
+	int devId = fxOpen((char *)portName[idx].c_str(), baudRate, 0); 
         if (devId != -1)
 	{
 		cout << "Connected to device: " << devId << endl;
@@ -110,7 +110,7 @@ int main()
                 runHoldPosition(deviceIds[0], &shouldQuit);
                 break;
             case 4:
-     //           runFindPoles(deviceIds[0]);
+       //         runFindPoles(deviceIds[0]);
                 break;
             case 5:
                 runTwoDevicePositionControl(deviceIds[0], deviceIds[1], &shouldQuit);

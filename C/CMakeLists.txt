@@ -25,8 +25,8 @@ set(CSCRIPT_SRCS
 add_executable(main ${CSCRIPT_SRCS})
 
 # build the executable
-set(COMM_TEST_SRCS communication_tester.cpp)
-add_executable(communication_tester ${COMM_TEST_SRCS})
+#set(COMM_TEST_SRCS communication_tester.cpp)
+#add_executable(communication_tester ${COMM_TEST_SRCS})
 
 if(WIN32)
 	# only look for a freshly built plan stack library since we're already set up to compile this find_program
@@ -35,12 +35,12 @@ if(WIN32)
 
 	# link plan stack library to our application
 	target_link_libraries(main ${fx_plan_stack_LIBRARY})
-	target_link_libraries(communication_tester ${fx_plan_stack_LIBRARY})
+	#	target_link_libraries(communication_tester ${fx_plan_stack_LIBRARY})
 
 	# there are windows and linux specific libraries that also need to be linked in
 	target_link_libraries(main setupapi hid)
-	target_link_libraries(communication_tester setupapi hid)
-
+	#target_link_libraries(communication_tester setupapi hid)
+	
 else()
 	# only look for a freshly built plan stack library since we're already set up to compile this find_program
 	# should not be an issues to have a freshly compiled plan stack to prevent confusion
@@ -48,8 +48,6 @@ else()
 
 	# link plan stack library to our application
 	target_link_libraries(main ${fx_plan_stack_LIBRARY})
-	target_link_libraries(communication_tester ${fx_plan_stack_LIBRARY})
 
 	target_link_libraries(main pthread)
-	target_link_libraries(communication_tester pthread)
 endif()

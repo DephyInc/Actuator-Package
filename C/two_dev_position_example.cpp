@@ -19,8 +19,8 @@ void runTwoDevicePositionControl(int devId0, int devId1, bool* shouldQuit)
 	//
 	// Start streaming the data
 	//
-	errCode[0] = fxStartStreaming(devId0, true);
-	errCode[1] = fxStartStreaming(devId1, true);
+	errCode[0] = fxStartStreaming(devId0, 200, true);
+	errCode[1] = fxStartStreaming(devId1, 200, true);
 	if(errCode[0] != FxSuccess || errCode[1] != FxSuccess)
 	{
 		cout << "Streaming failed ..." << endl;
@@ -40,8 +40,8 @@ void runTwoDevicePositionControl(int devId0, int devId1, bool* shouldQuit)
 		return;
 	}
 
-	initialAngle[0] = readData[0]._execute._motor_data._motor_angle;
-	initialAngle[1] = readData[1]._execute._motor_data._motor_angle;
+	initialAngle[0] = readData[0].encoderAngle;
+	initialAngle[1] = readData[1].encoderAngle;
 
 	cout << "Initial angles are: " << initialAngle[0] << ", " << initialAngle[1] << endl;
 

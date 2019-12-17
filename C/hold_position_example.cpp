@@ -18,7 +18,7 @@ void runHoldPosition(int devId, bool *shouldQuit)
 	//
 	// Start streaming the data
 	//
-	if(fxStartStreaming( devId, true) != FxSuccess)
+	if(fxStartStreaming(devId, 200, true) != FxSuccess)
 	{
 		cout << "Streaming failed ..." << endl;
 		return;
@@ -39,7 +39,7 @@ void runHoldPosition(int devId, bool *shouldQuit)
 		return;
 	}
 	
-	initialAngle = readData._execute._motor_data._motor_angle;
+	initialAngle = readData.encoderAngle;
 
 	//
 	// Set the motor control

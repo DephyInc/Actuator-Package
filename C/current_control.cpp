@@ -16,7 +16,7 @@ void runCurrentControl(int devId, bool* shouldQuit)
 	ActPackState readData;
 	FxError errCode;
 
-	errCode = fxStartStreaming(devId, true);
+	errCode = fxStartStreaming(devId, 200, true);
 	if(errCode != FxSuccess)
 	{
 		cout << "Streaming Failed..." << endl;
@@ -78,7 +78,7 @@ void runCurrentControl(int devId, bool* shouldQuit)
 		exit(2);
 	}
 
-	lastAngle = readData._execute._motor_data._motor_angle;
+	lastAngle = readData.encoderAngle;
 	this_thread::sleep_for(200ms);
 
 	// Read "Current" encoder angle
@@ -91,7 +91,7 @@ void runCurrentControl(int devId, bool* shouldQuit)
 		exit(2);
 	}
 
-	currentAngle = readData._execute._motor_data._motor_angle;
+	currentAngle = readData.encoderAngle;
 	this_thread::sleep_for(200ms);
 
 	// Wait for motor to stop spinning
@@ -107,7 +107,7 @@ void runCurrentControl(int devId, bool* shouldQuit)
 			exit(2);
 		}
 	
-		currentAngle = readData._execute._motor_data._motor_angle;
+		currentAngle = readData.encoderAngle;
 
 	}
 

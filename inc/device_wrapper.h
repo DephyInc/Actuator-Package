@@ -2,7 +2,7 @@
 #define DEVICE_WRAPPER_H
 
 #include <stdbool.h>
-#include "ActPackState.h"
+#include <actpack_struct.h>
 
 #ifdef __cplusplus
 extern "C" 
@@ -29,6 +29,21 @@ typedef enum fxControlMode
 	FxNone
 
 } FxControlMode;
+
+typedef enum fxAppType
+{
+	FxInvalidApp = -1,
+	FxActPack = 0,
+	FxExo
+
+} FxAppType;
+
+typedef struct actPackState ActPackState;
+
+// Valid streaming frequencies 
+#define NUM_TIMER_FREQS 11
+
+static const int TIMER_FREQS_IN_HZ[NUM_TIMER_FREQS] = {1, 5, 10, 20, 33, 50, 100, 200, 300, 500, 1000};
 
 // Max size of array returned by fxNumDevices
 // Can be changed to suit your application
@@ -57,8 +72,9 @@ typedef enum fxControlMode
 /// 
 /// @note Device ID is used by the functions in this API to specify which FlexSEA 
 /// device to communicate with.
-int fxOpen(const char* portName, const unsigned int baudRate,
-		const unsigned int frequency, const unsigned int logLevel);
+int fxOpen(const char* portName, 
+		const unsigned int baudRate,
+		const unsigned int logLevel);
 
 // Is Open?
 bool fxIsOpen(const unsigned int deviceId);
@@ -106,7 +122,9 @@ void fxGetDeviceIds(int* const idArray, const unsigned int size);
 /// from the device.
 ///
 /// @returns Error codes defined at top of the header
-FxError fxStartStreaming(const unsigned int deviceId, const bool shouldLog);
+FxError fxStartStreaming(const unsigned int deviceId, 
+			const unsigned int frequency,
+			const bool shouldLog);
 
 /// \brief Stop streaming data from a FlexSEA device.
 /// 
@@ -115,15 +133,6 @@ FxError fxStartStreaming(const unsigned int deviceId, const bool shouldLog);
 /// @returns Error codes defined at top of the header
 FxError fxStopStreaming(const unsigned int deviceId);
 
-/// \brief Set the communication frequency with the FlexSEA device. This
-/// applies for streaming device data as well as sending commands to the
-/// device.
-///
-/// @param deviceId is the device ID
-///
-/// @param frequency is the desired frequency of communication
-FxError fxSetCommunicationFrequency(const unsigned int deviceId, const unsigned int frequency);
-
 /// \brief Read the most recent data from a streaming FlexSEA device stream.
 /// Must call fxStartStreaming before calling this.
 /// 
@@ -131,7 +140,7 @@ FxError fxSetCommunicationFrequency(const unsigned int deviceId, const unsigned 
 ///
 /// @param ActPackState contains the most recent data from the device
 ///
-/// @returns ENoReadData if there is no data to read.
+/// @returns ENotStreaming if device is not streaming when this is called.
 FxError fxReadDevice(const unsigned int deviceId, ActPackState* readData);
 
 /// \brief Sets the gains used by PID controllers on the FlexSEA device.
@@ -171,6 +180,13 @@ FxError fxSetGains(const unsigned int deviceId,
 ///
 /// @returns Error codes defined at top of the header
 FxError fxSendMotorCommand(const unsigned int deviceId, const FxControlMode controlMode, const int value);
+
+/// \brief Get the device application type
+/// @param deviceId is the device ID
+///
+/// @returns FxAppType defined at the top of the header
+
+//FxAppType fxGetAppType(const unsigned int deviceId);
 
 #ifdef __cplusplus
 } // extern "C"
