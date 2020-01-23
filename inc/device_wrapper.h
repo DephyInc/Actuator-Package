@@ -2,7 +2,7 @@
 #define DEVICE_WRAPPER_H
 
 #include <stdbool.h>
-#include <actpack_struct.h>
+#include "actpack_struct.h"
 
 #ifdef __cplusplus
 extern "C" 
@@ -38,15 +38,12 @@ typedef enum fxAppType
 
 } FxAppType;
 
-typedef struct actPackState ActPackState;
-
 // Valid streaming frequencies 
 #define NUM_TIMER_FREQS 11
 
 static const int TIMER_FREQS_IN_HZ[NUM_TIMER_FREQS] = {1, 5, 10, 20, 33, 50, 100, 200, 300, 500, 1000};
 
 // Max size of array returned by fxNumDevices
-// Can be changed to suit your application
 #define FX_MAX_DEVICES 10
 
 /// Device ID is a 16-bit integer used to refer to a specific FlexSEA device 
@@ -138,10 +135,48 @@ FxError fxStopStreaming(const unsigned int deviceId);
 /// 
 /// @param deviceId is the device ID of the device to read from.
 ///
-/// @param ActPackState contains the most recent data from the device
+/// @param readData contains the most recent data from the device
 ///
-/// @returns ENotStreaming if device is not streaming when this is called.
+/// @returns FxNotStreaming if device is not streaming when this is called.
 FxError fxReadDevice(const unsigned int deviceId, ActPackState* readData);
+
+/// \brief Set the maximum read data queue size of a device.
+/// 
+/// @param deviceId is the device ID of the device to get the 
+/// read data queue size from.
+///
+/// @param size is the size to set the read data queue size to.
+///
+/// @returns FxInvalidDevice if invalid device.
+///		FxInvalidParam if size is invalid
+FxError fxSetReadDataQueueSize(const unsigned int deviceId,
+				const unsigned int size);
+
+/// \brief Get the maximum read data queue size of a device.
+/// 
+/// @param deviceId is the device ID of the device to get the 
+/// read data queue size from.
+///
+/// @returns size of the read data queue, or -1 if invalid device.
+int fxGetReadDataQueueSize(const unsigned int deviceId);
+
+/// \brief Read all data from a streaming FlexSEA device stream.
+/// Must call fxStartStreaming before calling this.
+/// 
+/// @param deviceId is the device ID of the device to read from.
+///
+/// @param readData is an array of size n which contains read results
+///
+/// @param n is the size of the readData y. Will only fill up to 
+/// data read queue size. 
+///
+/// @returns The actual number of entries read. You will probably need
+/// to use this number.
+///
+/// @note Will only fill readData array up to read data queue size.
+int fxReadDeviceAll(const unsigned int deviceId, 
+			ActPackState* readData, 
+			const unsigned int n);
 
 /// \brief Sets the gains used by PID controllers on the FlexSEA device.
 ///
@@ -186,7 +221,18 @@ FxError fxSendMotorCommand(const unsigned int deviceId, const FxControlMode cont
 ///
 /// @returns FxAppType defined at the top of the header
 
-//FxAppType fxGetAppType(const unsigned int deviceId);
+FxAppType fxGetAppType(const unsigned int deviceId);
+
+/// DO NOT USE THIS FUNCTION UNLESS YOU KNOW WHAT YOU ARE DOING
+///
+/// \brief Find the motor poles
+/// @param deviceId is the device ID
+///
+/// @returns FxInvalidDevice if deviceId is invalid
+///          FxSuccess otherwise
+///
+/// @note DO NOT USE THIS FUNCTION UNLESS YOU KNOW WHAT YOU ARE DOING
+FxError fxFindPoles(const unsigned int deviceId);
 
 #ifdef __cplusplus
 } // extern "C"

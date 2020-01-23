@@ -23,6 +23,12 @@ global flexsea
  FxStreamFailed,
  FxNoReadData) = map(c_int, range(7))
 
+###################### App Type Enums #############################
+
+(FxInvalidApp,
+ FxActPack,
+ FxExo) = map(c_int, range(-1,2))
+
 ##################### Redefine ExoState Structure #################
 # See "ActPackState.h" for C definition
 
@@ -308,7 +314,23 @@ def fxSendMotorCommand(devId, controlType, value):
 	if (retCode == FxInvalidParam):
 		raise ValueError('fxSendMotorCommand: invalid controlType')	
 
+def fxGetAppType(devId):
+	"""
+	Get the device application type
 
+	Parameters:
+	devId (int): The device ID.
+
+	Returns:
+	App Type (int)
+
+	-1 if invalid
+	0 if ActPack
+	1 if Exo
+	"""
+	global flexsea
+
+	return flexsea.fxGetAppType(devId).value
 
 # Loads the library from the c lib
 def loadFlexsea():
@@ -381,6 +403,9 @@ def loadFlexsea():
 	flexsea.fxSetGains.restype = c_int
 
 	flexsea.fxSendMotorCommand.argtypes = [c_uint, c_int, c_int]
+	flexsea.fxSendMotorCommand.restype = c_int
+
+	flexsea.fxGetAppType.argtypes = [c_uint]
 	flexsea.fxSendMotorCommand.restype = c_int
 
 	return True

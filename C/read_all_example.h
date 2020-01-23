@@ -1,7 +1,7 @@
 #ifndef READ_ALL_EXAMPLE_H
 #define READ_ALL_EXAMPLE_H
 
-typedef struct actPackState ActPackState;
+struct ActPackState;
 
 void runReadAll(int devId, bool* shouldQuit);
 void displayState(ActPackState &exoState);

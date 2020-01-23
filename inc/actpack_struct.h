@@ -1,7 +1,7 @@
 #ifndef ACTPACK_STRUCT_H
 #define ACTPACK_STRUCT_H
 
-struct actPackState
+struct ActPackState
 {
 	int rigid;
 	int id;
