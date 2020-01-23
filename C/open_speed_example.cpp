@@ -11,7 +11,7 @@ using namespace std::literals::chrono_literals;
 
 void runOpenSpeed(int devId, bool *shouldQuit)
 {
-	if(fxStartStreaming(devId, true) != FxSuccess )
+	if(fxStartStreaming(devId, 200, true) != FxSuccess )
 	{
 		cout << "Streaming failed..." << endl;
 		return;
