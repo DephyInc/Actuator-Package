@@ -10,14 +10,14 @@ def fxReadOnly(port, baudRate, time = 6,time_step = 0.1):
 	
 	devId =	fxOpen(port, baudRate)
 	print(devId)
-	fxStartStreaming(devId, True)
+	fxStartStreaming(devId, frequency = 100, shouldLog = True)
     
 	for i in range(int(time/time_step)):
 		exoState = fxReadDevice(devId)
-		print('accelx: ', exoState._manage._imu._accelx, ', accely: ', exoState._manage._imu._accely, ' accelz: ', exoState._manage._imu._accelz)
-		print('gyrox: ', exoState._manage._imu._gyrox, ', gyroy: ', exoState._manage._imu._gyroy, ' gyroz: ', exoState._manage._imu._gyroz)
-		print('motor position: ', exoState._execute._motor_data._motor_angle)
-		print('battery current: ', exoState._regulate._battery._battery_current, ' , battery current: ', exoState._regulate._battery._battery_current, ' , battery temperature: ', exoState._regulate._battery._battery_temperature)
+		print('accelx: ', exoState.accelx, ', accely: ', exoState.accely, ' accelz: ', exoState.accelz)
+		print('gyrox: ', exoState.gyrox, ', gyroy: ', exoState.gyroy, ' gyroz: ', exoState.gyroz)
+		print('motor position: ', exoState.encoderAngle, ', motor velocity: ', exoState.encoderVelocity)
+		print('battery current: ', exoState.batteryCurrent, ' , battery voltage: ', exoState.batteryVoltage, ' , battery temperature: ', exoState.batteryTemp)
 		sys.stdout.flush()
 		sleep(time_step)
 		
