@@ -4,58 +4,42 @@ from time import sleep
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pardir)
 from fxUtil import *
-from .streamManager import Stream
 
-labels = ["State time", 											\
-"Accel X", "Accel Y", "Accel Z", "Gyro X", "Gyro Y", "Gyro Z", 		\
-"Motor angle", "Motor voltage", "Motor current",					\
-"Battery voltage", "Battery current"								\
-]
-
-varsToStream = [ 							\
-	FX_STATETIME, 							\
-	FX_ACCELX, FX_ACCELY, FX_ACCELZ, 		\
-	FX_GYROX,  FX_GYROY,  FX_GYROZ,			\
-	FX_ENC_ANG,								\
-	FX_MOT_VOLT, FX_MOT_CURR,				\
-	FX_BATT_VOLT, FX_BATT_CURR 				\
-]
+def printDevice(actPackState):
+	print('State time: ', actPackState.timestamp)
+	print('Accel X: ', actPackState.accelx, ', Accel Y: ', actPackState.accely, ' Accel Z: ', actPackState.accelz)
+	print('Gyro X: ', actPackState.gyrox, ', Gyro Y: ', actPackState.gyroy, ' Gyro Z: ', actPackState.gyroz)
+	print('Motor angle: ', actPackState.encoderAngle, ', Motor voltage: ', actPackState.motorVoltage)
 
 def fxPositionControl(port, baudRate, time = 5, time_step = 0.1,  resolution = 100):
+	
+	devId = fxOpen(port, baudRate, 0)
+	fxStartStreaming(devId, resolution, True)
+	sleep(0.1)
 
-	stream = Stream(port, baudRate, printingRate = 2, labels=labels, varsToStream = varsToStream)
-	result = True
-	initialData = stream()
-	stream.printData()
-	initialAngle = stream([FX_ENC_ANG])[0]
-	timeout = 100
-	timeoutCount = 0
-	while(initialAngle == None):
-		timeoutCount = timeoutCount + 1
-		if(timeoutCount > timeout):
-			print("Timed out waiting for valid encoder value...")
-			sys.exit(1)
-		else:
-			sleep(0.1)
-			initialAngle = stream([FX_ENC_ANG])[0]
+	actPackState = fxReadDevice(devId)
+	printDevice(actPackState)
+	initialAngle = actPackState.encoderAngle
 
-	setPosition(stream.devId, initialAngle)
-	setControlMode(stream.devId, CTRL_POSITION)
-	setPosition(stream.devId, initialAngle)
-	setGains(stream.devId, 50, 3, 0, 0)
+	fxSetGains(devId, 50, 3, 0, 0, 0)
+
+	fxSendMotorCommand(devId, FxPosition, initialAngle)
+
 	num_time_steps = int(time/time_step)
 	for i in range(num_time_steps):
 		sleep(time_step)
 		preamble = "Holding position: {}...".format(initialAngle)
-		stream()
-		stream.printData(message=preamble)
-		currentAngle = stream([FX_ENC_ANG])[0]
-		result ^= (abs(initialAngle - currentAngle) < resolution)
+		print(preamble)
 
-	setControlMode(stream.devId, CTRL_NONE)
+		actPackState = fxReadDevice(devId)
+		printDevice(actPackState)
+		currentAngle = actPackState.encoderAngle
+		
+		print("Measured delta is: ", currentAngle - initialAngle, flush=True)
 
-	del stream
-	return result
+	fxClose(devId)
+
+	return True
 
 if __name__ == '__main__':
 	baudRate = sys.argv[1]

@@ -17,13 +17,13 @@ B_Increments = 125
 
 def fxImpedanceControl(port, baudRate, expTime = 7, time_step = 0.02, delta = 7500, transition_time = 0.8, resolution = 500):
 
-	devId = fxOpen(port, baudRate, resolution, 0) 
-	fxStartStreaming(devId, True)
+	devId = fxOpen(port, baudRate, 0) 
+	fxStartStreaming(devId, resolution, True)
 	
 	result = True
 	
 	data = fxReadDevice(devId)
-	initialAngle = data._execute._motor_data._motor_angle
+	initialAngle = data.encoderAngle
 	
 	timeout = 100
 	timeoutCount = 0
@@ -55,7 +55,7 @@ def fxImpedanceControl(port, baudRate, expTime = 7, time_step = 0.02, delta = 75
 	B = -B_Increments # We do that to make sure we start at 0
 	for i in range(num_time_steps):
 		data = fxReadDevice(devId)
-		measuredPos = data._execute._motor_data._motor_angle
+		measuredPos = data.encoderAngle
 		if i % transition_steps == 0:
 			B = B + B_Increments	# Increments every cycle
 			fxSetGains(devId, kp, ki, 0, K, B)

@@ -57,8 +57,8 @@ def fxHighSpeedTest(port, baudRate, controllerType = Controller.position, signal
 	print(delay_time)
 
 	########### Open the device and start streaming ############
-	devId = fxOpen(port, baudRate, commandFreq, debugLoggingLevel) 
-	fxStartStreaming(devId, dataLog)
+	devId = fxOpen(port, baudRate, debugLoggingLevel) 
+	fxStartStreaming(devId, commandFreq, dataLog)
 	print('Connected to device with ID ',devId)
 
 	############# Main Code ############
@@ -68,7 +68,7 @@ def fxHighSpeedTest(port, baudRate, controllerType = Controller.position, signal
 		#Get initial position:
 		print('Reading initial position...')
 		data = fxReadDevice(devId)
-		initialPos = data._execute._motor_data._motor_angle
+		initialPos = data.encoderAngle
 		timeout = 100
 		timeoutCount = 0
 		while(initialPos == None):
@@ -80,7 +80,7 @@ def fxHighSpeedTest(port, baudRate, controllerType = Controller.position, signal
 			else:
 				sleep(delay_time)
 				data = fxReadDevice(devId)
-				initialPos = data._execute._motor_data._motor_angle
+				initialPos = data.encoderAngle
 	else:
 		initialPos = 0
 	
@@ -128,10 +128,10 @@ def fxHighSpeedTest(port, baudRate, controllerType = Controller.position, signal
 			data = fxReadDevice(devId)
 			if (controllerType == Controller.current):
 				fxSendMotorCommand(devId, FxCurrent, sample)
-				measurements.append(data._execute._motor_data._motor_current)
+				measurements.append(data.motorCurrent)
 			elif (controllerType == Controller.position):
 				fxSendMotorCommand(devId, FxPosition, sample - initialPos)
-				measurements.append(data._execute._motor_data._motor_angle)
+				measurements.append(data.encoderAngle)
 
 
 			times.append(time() - t0)
@@ -146,10 +146,10 @@ def fxHighSpeedTest(port, baudRate, controllerType = Controller.position, signal
 				# Read data from ActPack
 				data = fxReadDevice(devId)
 				if (controllerType == Controller.current):
-					measurements.append(data._execute._motor_data._motor_current)
+					measurements.append(data.motorCurrent)
 
 				elif (controllerType == Controller.position):
-					measurements.append(data._execute._motor_data._motor_angle)
+					measurements.append(data.encoderAngle)
 
 				times.append(time() - t0)
 				requests.append(sample)
