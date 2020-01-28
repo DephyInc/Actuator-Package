@@ -4,61 +4,56 @@ from time import sleep
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pardir)
 from fxUtil import *
-from .streamManager import Stream
+# from .streamManager import Stream
 
 labels = ["State time", 		\
 "Motor angle", "Motor current",	\
 "Battery voltage", "Battery current" \
 ]
 
-varsToStream = [ 							\
-	FX_STATETIME, 							\
-	FX_ENC_ANG,								\
-	FX_MOT_CURR,								\
-	FX_BATT_VOLT, FX_BATT_CURR \
-]
-
 def fxCurrentControl(port, baudRate, holdCurrent = [1000], time = 4, time_step = 0.1):
-	stream = Stream(port, baudRate, printingRate = 2,labels=labels, varsToStream = varsToStream)
+	devId = fxOpen(port, baudRate, 0)
+	fxStartStreaming(devId, 100, True)
 	result = True
 	print('Setting controller to current...')
-	setControlMode(stream.devId, CTRL_CURRENT)
-	setGains(stream.devId, 50, 32, 0, 0)
+	fxSetGains(devId, 50, 32, 0, 0, 0)
+	sleep(0.5)
 	prevCurrent = holdCurrent[0]
 	num_time_steps = int(time/time_step)
+
 	for current in holdCurrent:
 		for i in range(num_time_steps):
 			desCurrent = int((current-prevCurrent) * (i / float(num_time_steps)) + prevCurrent)
-			setMotorCurrent(stream.devId, desCurrent) # Start the current, holdCurrent is in mA
+			fxSendMotorCommand(devId, FxCurrent, desCurrent)
 			sleep(time_step)
-			preamble = "Holding Current: {} mA...".format(desCurrent)
-			stream()
-			stream.printData(message=preamble)
-			measuredCurrent = stream([FX_MOT_CURR])[0]
-			result ^= (abs(measuredCurrent - desCurrent) <= 0.2 * desCurrent) 
+			print('Holding Current: ', desCurrent, ' mA...')
+			actPack = fxReadDevice(devId)
+			print('Measured Current: ', actPack.motorCurrent, ' mA...')
+			print('Observed delta: ', (actPack.motorCurrent - desCurrent))
 		prevCurrent = current
 
 	print('Turning off current control...')
 	# ramp down first
 	n = 50
 	for i in range(0, n):
-		setMotorCurrent(stream.devId, prevCurrent * (n-i)/n)
+		fxSendMotorCommand(devId, FxCurrent, prevCurrent * (n-i)/n)
 		sleep(0.04)
 
 	# wait for motor to spin down
-
-	setMotorCurrent(stream.devId, 0)
-	lastAngle = stream([FX_ENC_ANG])[0]
+	fxSendMotorCommand(devId, FxCurrent, 0)
+	actPack = fxReadDevice(devId)
+	lastAngle = actPack.encoderAngle
 	sleep(0.2)
-	currentAngle = stream([FX_ENC_ANG])[0]
+	actPack = fxReadDevice(devId)
+	currentAngle = actPack.encoderAngle
+
 	while( abs(currentAngle - lastAngle) > 100):
 		lastAngle = currentAngle
 		sleep(0.2)
-		currentAngle = stream([FX_ENC_ANG])[0]
+		actPack = fxReadDevice(devId)
+		currentAngle = actPack.encoderAngle
 
-	setControlMode(stream.devId, CTRL_NONE)
-	del stream
-	return result
+	return True
 
 if __name__ == '__main__':
 	baudRate = sys.argv[1]
