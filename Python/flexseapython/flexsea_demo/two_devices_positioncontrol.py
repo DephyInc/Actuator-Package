@@ -3,75 +3,57 @@ from time import sleep
 
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pardir)
-from pyFlexsea import *
-from pyFlexsea_def import *
 from fxUtil import *
-from .streamManager import Stream
 
-labels = ["State time", 											\
-"Accel X", "Accel Y", "Accel Z", "Gyro X", "Gyro Y", "Gyro Z", 		\
-"Motor angle", "Motor voltage", "Motor current",					\
-"Battery voltage", "Battery current"								\
-]
+def printDevice(actPackState):
+	print('State time: ', actPackState.timestamp)
+	print('Accel X: ', actPackState.accelx, ', Accel Y: ', actPackState.accely, ' Accel Z: ', actPackState.accelz)
+	print('Gyro X: ', actPackState.gyrox, ', Gyro Y: ', actPackState.gyroy, ' Gyro Z: ', actPackState.gyroz)
+	print('Motor angle: ', actPackState.encoderAngle, ', Motor voltage: ', actPackState.motorVoltage, flush=True)
 
-varsToStream = [ 							\
-	FX_STATETIME, 							\
-	FX_ACCELX, FX_ACCELY, FX_ACCELZ, 		\
-	FX_GYROX,  FX_GYROY,  FX_GYROZ,			\
-	FX_ENC_ANG,								\
-	FX_MOT_VOLT, FX_MOT_CURR,				\
-	FX_BATT_VOLT, FX_BATT_CURR 				\
-]
+
 
 def fxTwoDevicePositionControl(port0, port1, baudRate):
 
-	dev0 = Stream(port0, baudRate, printingRate =2, labels=labels, varsToStream=varsToStream)
-	dev1 = Stream(port1, baudRate, printingRate =2, labels=labels, varsToStream=varsToStream)
+	devId0 = fxOpen(port0, baudRate, 0)
+	devId1 = fxOpen(port1, baudRate, 0)
 
-	# Concatenates angles of both stream together
-	initialAngles = dev0([FX_ENC_ANG]) + dev1([FX_ENC_ANG])
-	timeout = 10
-	timeoutCount = 0
+	fxStartStreaming(devId0, 200, True)
+	fxStartStreaming(devId1, 200, True)
 
-	while(None in initialAngles):
-		timeoutCount = timeoutCount + 1
-		if(timeoutCount > timeout):
-			raise Exception("Timed out trying to read data")
-		else:
-			sleep(0.5)
-			# Concatenates angles of both stream together
-			a = dev0([FX_ENC_ANG])
-			b = dev1([FX_ENC_ANG])
-			initialAngles = a + b
+	sleep(0.2)
 
-	# set position controller for both devices
-	for i, devId in enumerate( [dev0.devId, dev1.devId] ):
-		setPosition(devId, initialAngles[i])
-		setControlMode(devId, CTRL_POSITION)
-		setPosition(devId, initialAngles[i])
-		setGains(devId, 50, 3, 0, 0)
+	actPackState0 = fxReadDevice(devId0)
+	actPackState1 = fxReadDevice(devId1)
+
+	initialAngle0 = actPackState0.encoderAngle
+	initialAngle1 = actPackState1.encoderAngle
+
+	fxSetGains(devId0, 50, 3, 0, 0, 0)
+	fxSetGains(devId1, 50, 3, 0, 0, 0)
+	
+	fxSendMotorCommand(devId0, FxPosition, initialAngle0)
+	fxSendMotorCommand(devId1, FxPosition, initialAngle1)
 
 	try:
 		while(True):
 			sleep(0.2)
 			os.system('cls')
 			preamble = "Holding position, two devices: "
-			dev0()
-			dev1()
-			dev0.printData(message = preamble)
-			dev1.printData(clear_terminal = False)
+			print(preamble)
+	
+			actPackState0 = fxReadDevice(devId0)
+			actPackState1 = fxReadDevice(devId1)
+			
+			printDevice(actPackState0)
+			printDevice(actPackState1)
+
 	except:
 		pass
 
 	print('Turning off position control...')
-	setControlMode(dev0.devId, CTRL_NONE)
-	setControlMode(dev1.devId, CTRL_NONE)
-
-	# sleep so that the commmand makes it through before we stop streaming
-	sleep(0.2)
-	del followerStream
-	sleep(0.2)
-	del leadStream
+	fxClose(devId0)
+	fxClose(devId1)
 
 if __name__ == '__main__':
 	baudRate = sys.argv[1]
