@@ -4,12 +4,6 @@ from time import sleep
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pardir)
 from fxUtil import *
-# from .streamManager import Stream
-
-labels = ["State time", 		\
-"Motor angle", "Motor current",	\
-"Battery voltage", "Battery current" \
-]
 
 def fxCurrentControl(port, baudRate, holdCurrent = [1000], time = 4, time_step = 0.1):
 	devId = fxOpen(port, baudRate, 0)

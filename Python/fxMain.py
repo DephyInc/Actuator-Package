@@ -9,7 +9,7 @@ from flexseapython.fxUtil import *
 from flexseapython.flexsea_demo.readonly import fxReadOnly
 from flexseapython.flexsea_demo.opencontrol import fxOpenControl
 from flexseapython.flexsea_demo.currentcontrol import fxCurrentControl
-#from flexseapython.flexsea_demo.positioncontrol import fxPositionControl
+from flexseapython.flexsea_demo.positioncontrol import fxPositionControl
 #from flexseapython.flexsea_demo.high_speed_test import fxHighSpeedTest
 #from flexseapython.flexsea_demo.two_devices_positioncontrol import fxTwoDevicePositionControl
 #from flexseapython.flexsea_demo.impedancecontrol import fxImpedanceControl
@@ -45,7 +45,7 @@ experiments =  [									\
 		(fxReadOnly,		"Read Only"),			\
 		(fxOpenControl, "Open Control"),		\
 		(fxCurrentControl, "Current Control"),	\
-#		(fxPositionControl, "Position Control"),	\
+		(fxPositionControl, "Position Control"),	\
 #		(fxTwoPositionControl, "Two Positions Control"), \
 #		(fxImpedanceControl, "Impedance Control"), \
 #		(fxHighSpeedTest, "High Speed Test"),	\

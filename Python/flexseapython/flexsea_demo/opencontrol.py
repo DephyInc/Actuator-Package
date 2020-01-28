@@ -5,11 +5,6 @@ pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pardir)
 from fxUtil import *
 
-labels = ["State time", 											\
-"Accel X", "Accel Y", "Accel Z", "Gyro X", "Gyro Y", "Gyro Z", 		\
-"Motor angle", "Motor voltage"									\
-]
-
 def fxOpenControl(port, baudRate, time = 2, num_times = 2, time_resolution = 0.1, maxVoltage = 3000, sign = -1):
 	devId = fxOpen(port, baudRate, 0)
 	fxStartStreaming(devId, 100, True)
