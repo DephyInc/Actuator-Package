@@ -1,88 +1,68 @@
 import os, sys
 from time import sleep
 
+import traceback
+
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pardir)
-from pyFlexsea import *
-from pyFlexsea_def import *
 from fxUtil import *
-from .streamManager import Stream
 
-labels = ["State time", 				\
-	"Accel X",	"Accel Y",	"Accel Z",	\
-	"Gyro X", 	"Gyro Y", 	"Gyro Z",	\
-	"Motor angle", "Motor voltage", "Motor current",	\
-	"Battery voltage", "Battery current"				\
-]
+def printDevice(actPackState):
+	print('State time: ', actPackState.timestamp)
+	print('Accel X: ', actPackState.accelx, ', Accel Y: ', actPackState.accely, ' Accel Z: ', actPackState.accelz)
+	print('Gyro X: ', actPackState.gyrox, ', Gyro Y: ', actPackState.gyroy, ' Gyro Z: ', actPackState.gyroz)
+	print('Motor angle: ', actPackState.encoderAngle, ', Motor voltage: ', actPackState.motorVoltage, flush=True)
 
-varsToStream = [ 							\
-	FX_STATETIME, 							\
-	FX_ACCELX, FX_ACCELY, FX_ACCELZ, 		\
-	FX_GYROX,  FX_GYROY,  FX_GYROZ,			\
-	FX_ENC_ANG,								\
-	FX_MOT_VOLT, FX_MOT_CURR,				\
-	FX_BATT_VOLT, FX_BATT_CURR 				\
-]
 
 def fxLeaderFollower(leaderPort, followerPort, baudRate):
-	
-	leadStream = Stream(leaderPort, baudRate, printingRate =2, labels=labels, varsToStream=varsToStream)
-	followerStream = Stream(followerPort, baudRate, printingRate =2, labels=labels, varsToStream=varsToStream)
 
-	# Concatenates angles of both stream together
-	initialAngles = leadStream([FX_ENC_ANG]) + followerStream([FX_ENC_ANG])
-	timeout = 10
-	timeoutCount = 0
+	devId0 = fxOpen(leaderPort, baudRate, 0)
+	devId1 = fxOpen(followerPort, baudRate, 0)
 
-	while(None in initialAngles):
-		timeoutCount = timeoutCount + 1
-		if(timeoutCount > timeout):
-			raise Exception("Timed out trying to read data")
-		else:
-			sleep(0.5)
-			# Concatenates angles of both stream together
-			a = leadStream([FX_ENC_ANG])
-			b = followerStream([FX_ENC_ANG])
-			initialAngles = a + b
+	fxStartStreaming(devId0, 200, True)
+	fxStartStreaming(devId1, 200, True)
+
+	sleep(0.2)
+
+	actPackState0 = fxReadDevice(devId0)	
+	actPackState1 = fxReadDevice(devId1)
+
+	initialAngle0 = actPackState0.encoderAngle
+	initialAngle1 = actPackState1.encoderAngle
+
 
 	# set first device to current controller with 0 current (0 torque)
-	setControlMode(leadStream.devId, CTRL_CURRENT)
-	setGains(leadStream.devId, 100, 20, 0, 0)
-	setMotorCurrent(leadStream.devId, 0) # Start the current, holdCurrent is in mA 
+	fxSetGains(devId0, 100, 20, 0, 0, 0)
+	fxSendMotorCommand(devId0, FxCurrent, 0)
 
 	# set position controller for second device
-	setPosition(followerStream.devId, initialAngles[1])
-	setControlMode(followerStream.devId, CTRL_POSITION)
-	setPosition(followerStream.devId, initialAngles[1])
-	setGains(followerStream.devId, 50, 3, 0, 0)
+	fxSetGains(devId1, 50, 3, 0, 0, 0)
+	fxSendMotorCommand(devId1, FxPosition, initialAngle1)
 
 	count = 0
 	try:
 		while(True):
-			sleep(0.1)
-			angle0 = leadStream([FX_ENC_ANG])[0]
-			if(angle0 != None):
-				diff0 = angle0 - initialAngles[0]
-				setPosition(followerStream.devId, initialAngles[1] + diff0)
-			
-			preamble = "device {} following device {}".format(followerStream.devId, leadStream.devId)
-			followerStream()
-			leadStream()
-			followerStream.printData(message = preamble)
-			leadStream.printData(clear_terminal = False)
+			sleep(0.05)
 
-	except:
-		print("Unexpected error:", sys.exc_info()[0])
+			leaderData = fxReadDevice(devId0)
+			followerData = fxReadDevice(devId0)
+
+			angle0 = leaderData.encoderAngle
+			
+			diff = angle0 - initialAngle0
+			fxSendMotorCommand(devId1, FxPosition, initialAngle1 + diff)
+			
+			print("device {} following device {}".format(devId1, devId0))
+			
+			printDevice(followerData)
+			printDevice(leaderData)
+
+	except Exception as e:
+		print(traceback.format_exc())
 
 	print('Turning off position control...')
-	setControlMode(leadStream.devId, CTRL_NONE)
-	setControlMode(followerStream.devId, CTRL_NONE)
-
-	# sleep so that the commmand makes it through before we stop streaming
-	sleep(0.2)
-	del followerStream
-	sleep(0.2)
-	del leadStream
+	fxClose(devId0)
+	fxClose(devId1)
 
 if __name__ == '__main__':
 	baudRate = sys.argv[1]

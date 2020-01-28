@@ -13,7 +13,7 @@ from flexseapython.flexsea_demo.positioncontrol import fxPositionControl
 from flexseapython.flexsea_demo.high_speed_test import fxHighSpeedTest
 from flexseapython.flexsea_demo.two_devices_positioncontrol import fxTwoDevicePositionControl
 from flexseapython.flexsea_demo.impedancecontrol import fxImpedanceControl
-#from flexseapython.flexsea_demo.two_devices_leaderfollower import fxLeaderFollower
+from flexseapython.flexsea_demo.two_devices_leaderfollower import fxLeaderFollower
 #from flexseapython.flexsea_demo.twopositioncontrol import fxTwoPositionControl
 
 def fxRunFindPoles(port, baudRate):
@@ -51,7 +51,7 @@ experiments =  [									\
 		(fxRunFindPoles,	"Find Poles"),			\
 #		(fxTwoPositionControl, "Two Positions Control"), \
 		(fxTwoDevicePositionControl,	"Two Devices Position Control"),	 \
-#		(fxLeaderFollower,	"Two Devices Leader Follower Control"),
+		(fxLeaderFollower,	"Two Devices Leader Follower Control"),
 ]
 
 def selectExperiment():
