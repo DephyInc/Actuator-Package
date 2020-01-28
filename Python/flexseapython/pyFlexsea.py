@@ -350,10 +350,20 @@ def fxGetAppType(devId):
 
 def fxFindPoles(devId):
 	"""
-        TODO: Implement
+	DO NOT USE THIS FUNCTION UNLESS YOU KNOW WHAT YOU ARE DOING
+	Find the motor poles
+
+	Parameters:
+	devId (int): The device ID.
+
+	Returns:
+	FxInvalidDevice if deviceId is invalid
+	FxSuccess otherwise
+
 	DO NOT USE THIS FUNCTION UNLESS YOU KNOW WHAT YOU ARE DOING
 	"""
-	pass
+	if (flexsea.fxFindPoles(devId) == FxInvalidDevice):
+		raise ValueError('fxFindPoles: invalid device ID')
 
 # Loads the library from the c lib
 def loadFlexsea():

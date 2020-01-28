@@ -16,10 +16,10 @@ from flexseapython.flexsea_demo.currentcontrol import fxCurrentControl
 #from flexseapython.flexsea_demo.two_devices_leaderfollower import fxLeaderFollower
 #from flexseapython.flexsea_demo.twopositioncontrol import fxTwoPositionControl
 
-def fxFindPoles(port):
-	stream = Stream(port, baudRate, printingRate = 2, labels=[], varsToStream=[])
-	findPoles(stream.devId, 1)
-	del stream
+def fxRunFindPoles(port, baudRate):
+	devId = fxOpen(port, baudRate, 0)
+	if (fxFindPoles(devId) == FxInvalidDevice):
+		raise ValueError('fxFindPoles: invalid device ID')
 
 def main():
 	print('')
@@ -49,7 +49,7 @@ experiments =  [									\
 #		(fxTwoPositionControl, "Two Positions Control"), \
 #		(fxImpedanceControl, "Impedance Control"), \
 #		(fxHighSpeedTest, "High Speed Test"),	\
-#		(fxFindPoles,	"Find Poles"),			\
+		(fxRunFindPoles,	"Find Poles"),			\
 #		(fxUserRW, "User RW"), \
 #		(fxTwoDevicePositionControl,	"Two Devices Position Control"),	 \
 #		(fxLeaderFollower,	"Two Devices Leader Follower Control"),
