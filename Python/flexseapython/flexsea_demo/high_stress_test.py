@@ -46,11 +46,12 @@ def setPositionCtrl(devId0, devId1, secondDevice):
 # Baud Rate : baud rate of outgoing serial connection to ActPack
 # Command Freq: Desired frequency of issuing commands to controller, actual 
 #	command frequency will be slower due to OS overhead.
-
+# positionAmplitude: amplitude (in ticks), position controller
+# currentAmplitude: amplitude (in mA), current controller
+# positionFreq: frequency (Hz) of the sine wave, position controller
+# currentFreq: frequency (Hz) of the sine wave, current controller
 # Number of Loops: Number of times to send desired signal to controller
-
-
-def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000, positionAmplitude = 10000, currentAmplitude = 2000, positionFreq = 1, currentFreq = 5, numberOfLoops = 5):
+def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000, positionAmplitude = 10000, currentAmplitude = 1000, positionFreq = 1, currentFreq = 5, numberOfLoops = 5):
 
 	########### One vs two devices ############
 	secondDevice = False
@@ -159,7 +160,7 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000, positionAm
 		# Step 2: set current controller
 		# -------------------------------
 		print("Step 2: set current controller")
-		#setPositionCtrl(devId0, devId1, secondDevice)
+		setPositionCtrl(devId0, devId1, secondDevice)
 		
 		# Step 3: current setpoint
 		# --------------------------
@@ -175,17 +176,17 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000, positionAm
 				data1 = fxReadDevice(devId1)
 
 			# Position setpoint:
-			fxSendMotorCommand(devId0, FxPosition, sample + initialPos0)
+			fxSendMotorCommand(devId0, FxCurrent, sample)
 			currentMeasurements0.append(data0.motorCurrent)
 			positionMeasurements0.append(data0.encoderAngle - initialPos0)
 			if (secondDevice):
-				fxSendMotorCommand(devId1, FxPosition, sample + initialPos1)
+				fxSendMotorCommand(devId1, FxCurrent, sample)
 				currentMeasurements1.append(data1.motorCurrent)
 				positionMeasurements1.append(data1.encoderAngle - initialPos1)
 
 			times.append(time() - t0)
-			currentRequests.append(0)
-			positionRequests.append(sample)
+			currentRequests.append(sample)
+			positionRequests.append(0)
 			i = i + 1
 			
 		# We'll draw a line at the end of every period
