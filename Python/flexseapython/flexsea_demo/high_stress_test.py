@@ -36,6 +36,20 @@ def lineGenerator(amplitude, commandFreq):
 	line_vals = [ amplitude for i in range(num_samples) ]
 	return line_vals
 
+# Set the device(s) for current control
+def setCurrentCtrl(devId0, devId1, secondDevice):
+	print("Setting up current control demo")
+	fxSetGains(devId0, 300, 50, 0, 0, 0)
+	if (secondDevice):
+		fxSetGains(devId1, 300, 50, 0, 0, 0)
+
+# Set the device(s) for position control
+def setPositionCtrl(devId0, devId1, secondDevice):
+	print("Setting up position control demo")
+	fxSetGains(devId0, 300, 50, 0, 0, 0)
+	if (secondDevice):
+		fxSetGains(devId1, 300, 50, 0, 0, 0)
+
 # Port: port with outgoing serial connection to ActPack
 # Baud Rate : baud rate of outgoing serial connection to ActPack
 # Controller Type: Position controller or current controller
@@ -46,11 +60,11 @@ def lineGenerator(amplitude, commandFreq):
 #	if position controller, current in mA if current controller
 # Number of Loops: Number of times to send desired signal to controller
 # Signal Freq: Frequency of sine wave if using sine wave signal
-# Cycle Delay: Delay between signals sent to controller, use with sine wave only
 # Request Jitter: Add jitter amount to every other sample sent to controller
 # Jitter: Amount of jitter
-def fxHighStressTest(port0, baudRate, port1 = "", controllerType = Controller.position, signalType = signal.sine, commandFreq = 1000, signalAmplitude = 10000, numberOfLoops = 10, signalFreq = 5, cycleDelay = .1, requestJitter = True, jitter = 500):
+def fxHighStressTest(port0, baudRate, port1 = "", controllerType = Controller.position, signalType = signal.sine, commandFreq = 1000, signalAmplitude = 10000, numberOfLoops = 10, signalFreq = 5, requestJitter = True, jitter = 500):
 
+	########### One vs two devices ############
 	secondDevice = False
 	if (port1 != ""):
 		secondDevice = True
@@ -60,13 +74,14 @@ def fxHighStressTest(port0, baudRate, port1 = "", controllerType = Controller.po
 	else:
 		print("Running high stress test with one device")
 
+	########### Debug & Data Logging ############
 	debugLoggingLevel = 0 # 6 is least verbose, 0 is most verbose
 	dataLog = False # Data log logs device data
 
 	delay_time = float(1/(float(commandFreq)))
 	print(delay_time)
 
-	########### Open the device and start streaming ############
+	########### Open the device(s) and start streaming ############
 	devId0 = fxOpen(port0, baudRate, debugLoggingLevel) 
 	fxStartStreaming(devId0, commandFreq, dataLog)
 	print('Connected to device with ID ',devId0)
@@ -80,23 +95,19 @@ def fxHighStressTest(port0, baudRate, port1 = "", controllerType = Controller.po
 	############# Main Code ############
 	######## Make your changes here #########
 
-	if(controllerType == Controller.position):
-		#Get initial position:
-		print('Reading initial position...')
-		
-		# Give the device time to consume the startStreaming command and start streaming
-		sleep(0.1)
+	# Get initial position:
+	print('Reading initial position...')
+	
+	# Give the device time to consume the startStreaming command and start streaming
+	sleep(0.1)
 
-		data = fxReadDevice(devId0)
-		initialPos0 = data.encoderAngle
+	data = fxReadDevice(devId0)
+	initialPos0 = data.encoderAngle
 
-		initialPos1 = 0
-		if (secondDevice):
-			data = fxReadDevice(devId1)
-			initialPos1 = data.encoderAngle
-	else:
-		initialPos0 = 0
-		initialPos1 = 0
+	initialPos1 = 0
+	if (secondDevice):
+		data = fxReadDevice(devId1)
+		initialPos1 = data.encoderAngle
 	
 	# Generate a control profile
 	print('Command table:')
@@ -119,24 +130,16 @@ def fxHighStressTest(port0, baudRate, port1 = "", controllerType = Controller.po
 	i = 0
 	t0 = 0
 
-	# Prepare controller:
-	if (controllerType == Controller.current):
-		print("Setting up current control demo")
-		fxSetGains(devId0, 300, 50, 0, 0, 0)
-		if (secondDevice):
-			fxSetGains(devId1, 300, 50, 0, 0, 0)
-
-	elif (controllerType == Controller.position):
-		print("Setting up position control demo")
-		fxSetGains(devId0, 300, 50, 0, 0, 0)
-		if (secondDevice):
-			fxSetGains(devId1, 300, 50, 0, 0, 0)
-	else:
-		assert 0
-	
 	# Record start time of experiment
 	t0 = time()
 	for reps in range(0, numberOfLoops):
+		
+		# Step 0: set Position controller
+		# -------------------------------
+		setPositionCtrl(devId0, devId1, secondDevice)
+		
+		# Step 1: Position sine wave
+		# -------------------------------
 		for sample in samples:
 			if (i % 2 == 0 and requestJitter):
 				sample = sample + jitter
@@ -149,47 +152,16 @@ def fxHighStressTest(port0, baudRate, port1 = "", controllerType = Controller.po
 			if (secondDevice):
 				data1 = fxReadDevice(devId1)
 
-			if (controllerType == Controller.current):
-				fxSendMotorCommand(devId0, FxCurrent, sample)
-				measurements0.append(data0.motorCurrent)
-				if (secondDevice):
-					fxSendMotorCommand(devId1, FxCurrent, sample)
-					measurements1.append(data1.motorCurrent)
-
-			elif (controllerType == Controller.position):
-				fxSendMotorCommand(devId0, FxPosition, sample + initialPos0)
-				measurements0.append(data0.encoderAngle - initialPos0)
-				if (secondDevice):
-					fxSendMotorCommand(devId1, FxPosition, sample + initialPos1)
-					measurements1.append(data1.encoderAngle - initialPos1)
+			# Position setpoint:
+			fxSendMotorCommand(devId0, FxPosition, sample + initialPos0)
+			measurements0.append(data0.encoderAngle - initialPos0)
+			if (secondDevice):
+				fxSendMotorCommand(devId1, FxPosition, sample + initialPos1)
+				measurements1.append(data1.encoderAngle - initialPos1)
 
 			times.append(time() - t0)
 			requests.append(sample)
 			i = i + 1
-
-		# Delay between cycles (sine wave only)
-		if (signalType == signal.sine):
-			for j in range(int(cycleDelay/delay_time)):
-
-				sleep(delay_time)
-				# Read data from ActPack
-				data0 = fxReadDevice(devId0)
-				if (secondDevice):
-					data1 = fxReadDevice(devId1)
-
-				if (controllerType == Controller.current):
-					measurements0.append(data0.motorCurrent)
-					if (secondDevice):
-						measurements1.append(data1.motorCurrent)
-
-				elif (controllerType == Controller.position):
-					measurements0.append(data0.encoderAngle - initialPos0)
-					if (secondDevice):
-						measurements1.append(data1.encoderAngle - initialPos1)
-
-				times.append(time() - t0)
-				requests.append(sample)
-				i = i + 1
 
 		# We'll draw a line at the end of every period
 		cycleStopTimes.append(time() - t0)
