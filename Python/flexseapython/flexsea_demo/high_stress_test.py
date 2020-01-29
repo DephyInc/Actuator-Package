@@ -122,8 +122,9 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000, positionAm
 	t0 = time()
 	for reps in range(0, numberOfLoops):
 		
+		print("")
 		print("Rep #",reps,"out of",numberOfLoops)
-		print("------------")
+		print("-------------------")
 		
 		# Step 0: set position controller
 		# -------------------------------
@@ -132,7 +133,7 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000, positionAm
 		
 		# Step 1: position sine wave
 		# --------------------------
-		print("Step 1: position sine wave")
+		print("Step 1: track position sine wave")
 		for sample in positionSamples:
 
 			sleep(delay_time)
@@ -164,7 +165,7 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000, positionAm
 		
 		# Step 3: current setpoint
 		# --------------------------
-		print("Step 3: current line")
+		print("Step 3: track current sine wave")
 		for sample in currentSamples:
 
 			sleep(delay_time)
@@ -196,19 +197,26 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000, positionAm
 	fxClose(devId0)
 	fxClose(devId1)
 
+	######## Stats: #########
+	
+	print("")
+	print("Final Stats:")
+	print("------------")
+	actual_period = cycleStopTimes[0]
+	command_frequency = i / elapsed_time
+	print("Number of commands sent: " + str(i))
+	print("Total time (s): " + str(elapsed_time))
+	print("Requested command frequency: "+"{:.2f}".format(commandFreq))
+	print("Actual command frequency (Hz): "+"{:.2f}".format(command_frequency))
+	print("")
+	
 	######## End of Main Code #########
 
 	######## Plotting Code, you can edit this ##################
 
-	actual_period = cycleStopTimes[0]
-	actual_frequency = 1 / actual_period
-	command_frequency = i / elapsed_time
-	print("i: " + str(i) + ", elapsed_time: " + str(elapsed_time))
-
 	# Current Plot:
 	plt.figure(1)
-	title = "Motor Current (" + "{:.2f}".format(actual_frequency) + " Hz, " + \
-		str(currentAmplitude) + " mA amplitude " + " and " + "{:.2f}".format(command_frequency) + " Hz commands )"
+	title = "Motor Current"
 	plt.plot(times, currentRequests, color = 'b', label = 'desired current')
 	plt.plot(times, currentMeasurements0, color = 'r', label = 'measured current')
 	plt.xlabel("Time (s)")
@@ -223,8 +231,7 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000, positionAm
 
 	# Position Plot:
 	plt.figure(2)
-	title = "Motor Position (" + "{:.2f}".format(actual_frequency) + " Hz, " + \
-		str(positionAmplitude) + " ticks amplitude " + " and " + "{:.2f}".format(command_frequency) + " Hz commands)"
+	title = "Motor Position"
 	plt.plot(times, positionRequests, color = 'b', label = 'desired position')
 	plt.plot(times, positionMeasurements0, color = 'r', label = 'measured position')
 	plt.xlabel("Time (s)")
@@ -237,7 +244,9 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000, positionAm
 	for endpoints in cycleStopTimes:
 		plt.axvline(x=endpoints)
 
+	# #######
 	# *** ToDo: add plotting for 2nd device here ***
+	# #######
 	
 	plt.show()
 
