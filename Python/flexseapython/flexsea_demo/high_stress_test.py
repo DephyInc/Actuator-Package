@@ -67,7 +67,7 @@ def linearInterp(a, b, points):
 # positionFreq: frequency (Hz) of the sine wave, position controller
 # currentFreq: frequency (Hz) of the sine wave, current controller
 # Number of Loops: Number of times to send desired signal to controller
-def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000, positionAmplitude = 10000, currentAmplitude = 1000, positionFreq = 1, currentFreq = 5, numberOfLoops = 5):
+def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000, positionAmplitude = 10000, currentAmplitude = 2500, positionFreq = 1, currentFreq = 5, numberOfLoops = 5):
 
 	########### One vs two devices ############
 	secondDevice = False
@@ -160,7 +160,6 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000, positionAm
 		if( i ):
 			print("Step 1: go to initial position")
 			linSamples = linearInterp(data0.encoderAngle-initialPos0, 0, 100)
-			print("Actual position:", data0.encoderAngle)
 			#print(np.int64(linSamples))
 			for sample in linSamples:
 
