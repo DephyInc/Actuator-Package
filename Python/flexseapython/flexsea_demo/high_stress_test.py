@@ -42,6 +42,11 @@ def setPositionCtrl(devId0, devId1, secondDevice):
 	if (secondDevice):
 		fxSetGains(devId1, 300, 50, 0, 0, 0)
 
+# Interpolates between two positions (A to B)
+def linearInterp(a, b, points):
+	lin_array = np.linspace(a, b, points)
+	return lin_array
+
 # Port: port with outgoing serial connection to ActPack
 # Baud Rate : baud rate of outgoing serial connection to ActPack
 # Command Freq: Desired frequency of issuing commands to controller, actual 
@@ -131,9 +136,41 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000, positionAm
 		print("Step 0: set position controller")
 		setPositionCtrl(devId0, devId1, secondDevice)
 		
-		# Step 1: position sine wave
+		# Step 1: go to initial position
+		# -------------------------------
+		if( i ):
+			print("Step 1: go to initial position")
+			linSamples = linearInterp(data0.encoderAngle, initialPos0, 100)
+			#print(np.int64(linSamples))
+			for sample in linSamples:
+
+				sleep(delay_time)
+
+				# set controller to the next sample
+				# read ActPack data
+				data0 = fxReadDevice(devId0)
+				if (secondDevice):
+					data1 = fxReadDevice(devId1)
+
+				# Position setpoint:
+				fxSendMotorCommand(devId0, FxPosition, sample)
+				currentMeasurements0.append(data0.motorCurrent)
+				positionMeasurements0.append(data0.encoderAngle - initialPos0)
+				if (secondDevice):
+					fxSendMotorCommand(devId1, FxPosition, sample)
+					currentMeasurements1.append(data1.motorCurrent)
+					positionMeasurements1.append(data1.encoderAngle - initialPos1)
+
+				times.append(time() - t0)
+				currentRequests.append(0)
+				positionRequests.append(sample)
+				i = i + 1
+		else:
+			print("Step 1: skipped, first round")
+		
+		# Step 2: position sine wave
 		# --------------------------
-		print("Step 1: track position sine wave")
+		print("Step 2: track position sine wave")
 		for sample in positionSamples:
 
 			sleep(delay_time)
@@ -158,14 +195,14 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000, positionAm
 			positionRequests.append(sample)
 			i = i + 1
 
-		# Step 2: set current controller
+		# Step 3: set current controller
 		# -------------------------------
-		print("Step 2: set current controller")
+		print("Step 3: set current controller")
 		setPositionCtrl(devId0, devId1, secondDevice)
 		
-		# Step 3: current setpoint
+		# Step 4: current setpoint
 		# --------------------------
-		print("Step 3: track current sine wave")
+		print("Step 4: track current sine wave")
 		for sample in currentSamples:
 
 			sleep(delay_time)
