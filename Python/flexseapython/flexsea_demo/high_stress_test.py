@@ -66,8 +66,9 @@ def linearInterp(a, b, points):
 # currentAmplitude: amplitude (in mA), current controller
 # positionFreq: frequency (Hz) of the sine wave, position controller
 # currentFreq: frequency (Hz) of the sine wave, current controller
+# currentAsymmetricG: we use more current on the "way back" to come back closer to the staring point. Positive numbers only, 1-3 range.
 # Number of Loops: Number of times to send desired signal to controller
-def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000, positionAmplitude = 10000, currentAmplitude = 2500, positionFreq = 1, currentFreq = 5, numberOfLoops = 5):
+def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000, positionAmplitude = 10000, currentAmplitude = 2500, positionFreq = 1, currentFreq = 5, currentAsymmetricG = 1.25, numberOfLoops = 5):
 
 	########### One vs two devices ############
 	secondDevice = False
@@ -225,6 +226,14 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000, positionAm
 		for sample in currentSamples:
 
 			sleep(delay_time)
+			
+			#We use more current on the "way back" to come back closer to the staring point
+			if(sample <= 0):
+				#No change
+				compensatedSample = sample
+			else:
+				#Apply gain
+				compensatedSample = np.int64(currentAsymmetricG * sample)
 
 			# set controller to the next sample
 			# read ActPack data
@@ -233,16 +242,16 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000, positionAm
 				data1 = fxReadDevice(devId1)
 
 			# Position setpoint:
-			fxSendMotorCommand(devId0, FxCurrent, sample)
+			fxSendMotorCommand(devId0, FxCurrent, compensatedSample)
 			currentMeasurements0.append(data0.motorCurrent)
 			positionMeasurements0.append(data0.encoderAngle - initialPos0)
 			if (secondDevice):
-				fxSendMotorCommand(devId1, FxCurrent, sample)
+				fxSendMotorCommand(devId1, FxCurrent, compensatedSample)
 				currentMeasurements1.append(data1.motorCurrent)
 				positionMeasurements1.append(data1.encoderAngle - initialPos1)
 
 			times.append(time() - t0)
-			currentRequests.append(sample)
+			currentRequests.append(compensatedSample)
 			positionRequests.append(0)
 			i = i + 1
 			
