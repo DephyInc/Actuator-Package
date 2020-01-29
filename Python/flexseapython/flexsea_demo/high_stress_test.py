@@ -30,12 +30,6 @@ def sinGenerator(amplitude, frequency, commandFreq):
 	sin_vals = amplitude * np.sin(in_array)
 	return sin_vals
 
-# generate a line with specific amplitude
-def lineGenerator(amplitude, commandFreq):
-	num_samples = commandFreq
-	line_vals = [ amplitude for i in range(num_samples) ]
-	return line_vals
-
 # Set the device(s) for current control
 def setCurrentCtrl(devId0, devId1, secondDevice):
 	fxSetGains(devId0, 300, 50, 0, 0, 0)
@@ -50,17 +44,13 @@ def setPositionCtrl(devId0, devId1, secondDevice):
 
 # Port: port with outgoing serial connection to ActPack
 # Baud Rate : baud rate of outgoing serial connection to ActPack
-# Controller Type: Position controller or current controller
-# Signal Type: Sine wave or line
 # Command Freq: Desired frequency of issuing commands to controller, actual 
 #	command frequency will be slower due to OS overhead.
-# Signal Amplitude: Amplitude of signal to send to controller. Encoder position
-#	if position controller, current in mA if current controller
+
 # Number of Loops: Number of times to send desired signal to controller
-# Signal Freq: Frequency of sine wave if using sine wave signal
-# Request Jitter: Add jitter amount to every other sample sent to controller
-# Jitter: Amount of jitter
-def fxHighStressTest(port0, baudRate, port1 = "", controllerType = Controller.position, signalType = signal.sine, commandFreq = 1000, signalAmplitude = 10000, numberOfLoops = 5, signalFreq = 5, requestJitter = True, jitter = 500):
+
+
+def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000, positionAmplitude = 10000, currentAmplitude = 2000, positionFreq = 1, currentFreq = 5, numberOfLoops = 5):
 
 	########### One vs two devices ############
 	secondDevice = False
@@ -107,13 +97,13 @@ def fxHighStressTest(port0, baudRate, port1 = "", controllerType = Controller.po
 		data = fxReadDevice(devId1)
 		initialPos1 = data.encoderAngle
 	
-	# Generate a control profiles
-	print('Command table #1 - Sine:')
-	sineSamples = sinGenerator(signalAmplitude, signalFreq, commandFreq)
-	print(np.int64(sineSamples))
-	print('Command table #2 - Line:')
-	lineSamples = lineGenerator(signalAmplitude, commandFreq)
-	#print(np.int64(lineSamples))
+	# Generate control profiles
+	print('Command table #1 - Position Sine:')
+	positionSamples = sinGenerator(positionAmplitude, positionFreq, commandFreq)
+	print(np.int64(positionSamples))
+	print('Command table #2 - Current Sine:')
+	currentSamples = sinGenerator(currentAmplitude, currentFreq, commandFreq)
+	print(np.int64(currentSamples))
 	
 	# Initialize lists
 	currentRequests = []
@@ -142,9 +132,7 @@ def fxHighStressTest(port0, baudRate, port1 = "", controllerType = Controller.po
 		# Step 1: position sine wave
 		# --------------------------
 		print("Step 1: position sine wave")
-		for sample in sineSamples:
-			if (i % 2 == 0 and requestJitter):
-				sample = sample + jitter
+		for sample in positionSamples:
 
 			sleep(delay_time)
 
@@ -176,9 +164,7 @@ def fxHighStressTest(port0, baudRate, port1 = "", controllerType = Controller.po
 		# Step 3: current setpoint
 		# --------------------------
 		print("Step 3: current line")
-		for sample in lineSamples:
-			if (i % 2 == 0 and requestJitter):
-				sample = sample + jitter
+		for sample in currentSamples:
 
 			sleep(delay_time)
 
@@ -204,7 +190,7 @@ def fxHighStressTest(port0, baudRate, port1 = "", controllerType = Controller.po
 			
 		# We'll draw a line at the end of every period
 		cycleStopTimes.append(time() - t0)
-	elapsed_time = time() - t0
+		elapsed_time = time() - t0
 
 	fxClose(devId0)
 	fxClose(devId1)
@@ -221,7 +207,7 @@ def fxHighStressTest(port0, baudRate, port1 = "", controllerType = Controller.po
 	# Current Plot:
 	plt.figure(1)
 	title = "Motor Current (" + "{:.2f}".format(actual_frequency) + " Hz, " + \
-		str(signalAmplitude) + " mA amplitude " + " and " + "{:.2f}".format(command_frequency) + " Hz commands )"
+		str(currentAmplitude) + " mA amplitude " + " and " + "{:.2f}".format(command_frequency) + " Hz commands )"
 	plt.plot(times, currentRequests, color = 'b', label = 'desired current')
 	plt.plot(times, currentMeasurements0, color = 'r', label = 'measured current')
 	plt.xlabel("Time (s)")
@@ -237,7 +223,7 @@ def fxHighStressTest(port0, baudRate, port1 = "", controllerType = Controller.po
 	# Position Plot:
 	plt.figure(2)
 	title = "Motor Position (" + "{:.2f}".format(actual_frequency) + " Hz, " + \
-		str(signalAmplitude) + " ticks amplitude " + " and " + "{:.2f}".format(command_frequency) + " Hz commands)"
+		str(positionAmplitude) + " ticks amplitude " + " and " + "{:.2f}".format(command_frequency) + " Hz commands)"
 	plt.plot(times, positionRequests, color = 'b', label = 'desired position')
 	plt.plot(times, positionMeasurements0, color = 'r', label = 'measured position')
 	plt.xlabel("Time (s)")
@@ -250,39 +236,8 @@ def fxHighStressTest(port0, baudRate, port1 = "", controllerType = Controller.po
 	for endpoints in cycleStopTimes:
 		plt.axvline(x=endpoints)
 
-	# if (secondDevice):
-		# if (controllerType == Controller.current):
-			# plt.figure(2)
-			# title = "Current control with " + "{:.2f}".format(actual_frequency) + " Hz, " + \
-				# str(signalAmplitude) + " mA amplitude " + signalTypeStr + " and " + "{:.2f}".format(command_frequency) + " Hz commands"
-			# plt.plot(times, requests, color = 'b', label = 'desired current')
-			# plt.plot(times, measurements1, color = 'r', label = 'measured current')
-			# plt.xlabel("Time (s)")
-			# plt.ylabel("Motor current (mA)")
-			# plt.title(title)
-
-			# plt.legend(loc='upper right')
-
-			# # Draw a vertical line at the end of each cycle
-			# for endpoints in cycleStopTimes:
-				# plt.axvline(x=endpoints)
-
-		# elif (controllerType == Controller.position):
-			# plt.figure(2)
-			# title = "Position control with " + "{:.2f}".format(actual_frequency) + " Hz, " + \
-				# str(signalAmplitude) + " ticks amplitude " + signalTypeStr + " and " + "{:.2f}".format(command_frequency) + " Hz commands"
-			# plt.plot(times, requests, color = 'b', label = 'desired position')
-			# plt.plot(times, measurements1, color = 'r', label = 'measured position')
-			# plt.xlabel("Time (s)")
-			# plt.ylabel("Encoder position")
-			# plt.title(title)
-
-			# plt.legend(loc='upper right')
-
-			# # Draw a vertical line at the end of each cycle
-			# for endpoints in cycleStopTimes:
-				# plt.axvline(x=endpoints)
-
+	# *** ToDo: add plotting for 2nd device here ***
+	
 	plt.show()
 
 if __name__ == '__main__':
