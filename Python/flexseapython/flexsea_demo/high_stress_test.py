@@ -30,21 +30,32 @@ def sinGenerator(amplitude, frequency, commandFreq):
 	sin_vals = amplitude * np.sin(in_array)
 	return sin_vals
 
+# Generate a line with specific amplitude
+def lineGenerator(amplitude, length, commandFreq):
+	num_samples = np.int32(length * commandFreq)
+	line_vals = [ amplitude for i in range(num_samples) ]
+	return line_vals
+
 # Set the device(s) for current control
-def setCurrentCtrl(devId0, devId1, secondDevice):
+def setCurrentCtrl(devId0, devId1, secondDevice, current0, current1):
 	fxSetGains(devId0, 300, 50, 0, 0, 0)
+	fxSendMotorCommand(devId0, FxCurrent, current0)
 	if (secondDevice):
 		fxSetGains(devId1, 300, 50, 0, 0, 0)
+		fxSendMotorCommand(devId1, FxCurrent, current1)
 
 # Set the device(s) for position control
-def setPositionCtrl(devId0, devId1, secondDevice):
+def setPositionCtrl(devId0, devId1, secondDevice, position0, position1):
 	fxSetGains(devId0, 300, 50, 0, 0, 0)
+	fxSendMotorCommand(devId0, FxPosition, position0)
 	if (secondDevice):
 		fxSetGains(devId1, 300, 50, 0, 0, 0)
+		fxSendMotorCommand(devId1, FxPosition, position1)
 
 # Interpolates between two positions (A to B)
 def linearInterp(a, b, points):
 	lin_array = np.linspace(a, b, points)
+	#print("Lin interp from",a,"to",b)
 	return lin_array
 
 # Port: port with outgoing serial connection to ActPack
@@ -82,7 +93,7 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000, positionAm
 
 	devId1 = -1
 	if (secondDevice):
-		devId1 = fxOpen(port1, baudRate, debugLoggingLevel) 
+		devId1 = fxOpen(port1, baudRate, debugLoggingLevel)
 		fxStartStreaming(devId1, commandFreq, dataLog)
 		print('Connected to device with ID ',devId1)
 
@@ -97,11 +108,13 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000, positionAm
 
 	data = fxReadDevice(devId0)
 	initialPos0 = data.encoderAngle
+	print("Initial position 0:", initialPos0)
 
 	initialPos1 = 0
 	if (secondDevice):
 		data = fxReadDevice(devId1)
 		initialPos1 = data.encoderAngle
+		print("Initial position 1:", initialPos1)
 	
 	# Generate control profiles
 	print('Command table #1 - Position Sine:')
@@ -110,6 +123,9 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000, positionAm
 	print('Command table #2 - Current Sine:')
 	currentSamples = sinGenerator(currentAmplitude, currentFreq, commandFreq)
 	print(np.int64(currentSamples))
+	print('Command table #3 - Current Sine:')
+	currentSamplesLine = lineGenerator(0, 0.15, commandFreq)
+	#print(np.int64(currentSamplesLine))
 	
 	# Initialize lists
 	currentRequests = []
@@ -134,13 +150,17 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000, positionAm
 		# Step 0: set position controller
 		# -------------------------------
 		print("Step 0: set position controller")
-		setPositionCtrl(devId0, devId1, secondDevice)
+		if( i ):
+			setPositionCtrl(devId0, devId1, secondDevice, data0.encoderAngle, initialPos1) #ToDo: data1.encoderAngle
+		else:
+			setPositionCtrl(devId0, devId1, secondDevice, initialPos0, initialPos1)
 		
 		# Step 1: go to initial position
 		# -------------------------------
 		if( i ):
 			print("Step 1: go to initial position")
-			linSamples = linearInterp(data0.encoderAngle, initialPos0, 100)
+			linSamples = linearInterp(data0.encoderAngle-initialPos0, 0, 100)
+			print("Actual position:", data0.encoderAngle)
 			#print(np.int64(linSamples))
 			for sample in linSamples:
 
@@ -153,11 +173,11 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000, positionAm
 					data1 = fxReadDevice(devId1)
 
 				# Position setpoint:
-				fxSendMotorCommand(devId0, FxPosition, sample)
+				fxSendMotorCommand(devId0, FxPosition, sample + initialPos0)
 				currentMeasurements0.append(data0.motorCurrent)
 				positionMeasurements0.append(data0.encoderAngle - initialPos0)
 				if (secondDevice):
-					fxSendMotorCommand(devId1, FxPosition, sample)
+					fxSendMotorCommand(devId1, FxPosition, sample + initialPos1)
 					currentMeasurements1.append(data1.motorCurrent)
 					positionMeasurements1.append(data1.encoderAngle - initialPos1)
 
@@ -198,7 +218,7 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000, positionAm
 		# Step 3: set current controller
 		# -------------------------------
 		print("Step 3: set current controller")
-		setPositionCtrl(devId0, devId1, secondDevice)
+		setCurrentCtrl(devId0, devId1, secondDevice, 0, 0)
 		
 		# Step 4: current setpoint
 		# --------------------------
@@ -207,6 +227,33 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000, positionAm
 
 			sleep(delay_time)
 
+			# set controller to the next sample
+			# read ActPack data
+			data0 = fxReadDevice(devId0)
+			if (secondDevice):
+				data1 = fxReadDevice(devId1)
+
+			# Position setpoint:
+			fxSendMotorCommand(devId0, FxCurrent, sample)
+			currentMeasurements0.append(data0.motorCurrent)
+			positionMeasurements0.append(data0.encoderAngle - initialPos0)
+			if (secondDevice):
+				fxSendMotorCommand(devId1, FxCurrent, sample)
+				currentMeasurements1.append(data1.motorCurrent)
+				positionMeasurements1.append(data1.encoderAngle - initialPos1)
+
+			times.append(time() - t0)
+			currentRequests.append(sample)
+			positionRequests.append(0)
+			i = i + 1
+			
+		# Step 5: short pause at 0 current to allow a slow-down
+		# -----------------------------------------------------
+		print("Step 5: motor slow-down, zero current")
+		for sample in currentSamplesLine:
+		
+			sleep(delay_time)
+		
 			# set controller to the next sample
 			# read ActPack data
 			data0 = fxReadDevice(devId0)
