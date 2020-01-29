@@ -31,8 +31,18 @@ def main():
 
 	try:
 		expNumb = selectExperiment()
+		
+		if (expNumb == 5): # High speed test
+			numDevices = input('\nHow many devices to use for high speed test (1 or 2)?\n')
+			if (int(numDevices) == 1):
+				experiments[expNumb][0](ports[0],int(baudRate))
+			elif (int(numDevices) == 2):
+				experiments[expNumb][0](ports[0],int(baudRate),ports[1])
+			else:
+				print('Invalid number of devices to use for high speed test. Exiting...')
+				exit()
 
-		if(expNumb < len(experiments) - 1):
+		elif(expNumb < len(experiments) - 2):
 			experiments[expNumb][0](ports[0],int(baudRate))
 		else:
 			experiments[expNumb][0](ports[0],ports[1],int(baudRate))
