@@ -11,6 +11,7 @@ from flexseapython.flexsea_demo.opencontrol import fxOpenControl
 from flexseapython.flexsea_demo.currentcontrol import fxCurrentControl
 from flexseapython.flexsea_demo.positioncontrol import fxPositionControl
 from flexseapython.flexsea_demo.high_speed_test import fxHighSpeedTest
+from flexseapython.flexsea_demo.high_stress_test import fxHighStressTest
 from flexseapython.flexsea_demo.two_devices_positioncontrol import fxTwoDevicePositionControl
 from flexseapython.flexsea_demo.impedancecontrol import fxImpedanceControl
 from flexseapython.flexsea_demo.two_devices_leaderfollower import fxLeaderFollower
@@ -32,7 +33,7 @@ def main():
 	try:
 		expNumb = selectExperiment()
 		
-		if (expNumb == 5): # High speed test
+		if (expNumb == 5 or expNumb == 6): # High speed/stress tests
 			numDevices = input('\nHow many devices to use for high speed test (1 or 2)?\n')
 			if (int(numDevices) == 1):
 				experiments[expNumb][0](ports[0],int(baudRate))
@@ -57,6 +58,7 @@ experiments =  [									\
 		(fxPositionControl, "Position Control"),	\
 		(fxImpedanceControl, "Impedance Control"), \
 		(fxHighSpeedTest, "High Speed Test"),	\
+		(fxHighStressTest, "High Stress Test"),	\
 #		(fxUserRW, "User RW"), \
 		(fxRunFindPoles,	"Find Poles"),			\
 #		(fxTwoPositionControl, "Two Positions Control"), \
