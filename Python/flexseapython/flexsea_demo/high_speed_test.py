@@ -196,7 +196,8 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = Controller.pos
 	elapsed_time = time() - t0
 
 	fxClose(devId0)
-	fxClose(devId1)
+	if (secondDevice):
+		fxClose(devId1)
 
 	######## End of Main Code #########
 
