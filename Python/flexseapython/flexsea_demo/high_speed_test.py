@@ -49,7 +49,7 @@ def lineGenerator(amplitude, commandFreq):
 # Cycle Delay: Delay between signals sent to controller, use with sine wave only
 # Request Jitter: Add jitter amount to every other sample sent to controller
 # Jitter: Amount of jitter
-def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = Controller.position, signalType = signal.sine, commandFreq = 1000, signalAmplitude = 10000, numberOfLoops = 10, signalFreq = 5, cycleDelay = .1, requestJitter = False, jitter = 20):
+def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = Controller.current, signalType = signal.sine, commandFreq = 1000, signalAmplitude = 1000, numberOfLoops = 10, signalFreq = 5, cycleDelay = .1, requestJitter = False, jitter = 20):
 
 	secondDevice = False
 	if (port1 != ""):
@@ -60,7 +60,7 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = Controller.pos
 	else:
 		print("Running high speed test with one device")
 
-	debugLoggingLevel = 0 # 6 is least verbose, 0 is most verbose
+	debugLoggingLevel =6 # 6 is least verbose, 0 is most verbose
 	dataLog = False # Data log logs device data
 
 	delay_time = float(1/(float(commandFreq)))
@@ -116,6 +116,9 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = Controller.pos
 	measurements1 = []
 	times = []
 	cycleStopTimes = []
+	currentCommandTimes = []
+	streamCommandTimes = []
+
 	i = 0
 	t0 = 0
 
@@ -145,12 +148,16 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = Controller.pos
 
 			# set controller to the next sample
 			# read ActPack data
+			tReadTime0 = time()
 			data0 = fxReadDevice(devId0)
+			tReadTime1 = time()
 			if (secondDevice):
 				data1 = fxReadDevice(devId1)
 
 			if (controllerType == Controller.current):
+				tCommandTime0 = time()
 				fxSendMotorCommand(devId0, FxCurrent, sample)
+				tCommandTime1 = time()
 				measurements0.append(data0.motorCurrent)
 				if (secondDevice):
 					fxSendMotorCommand(devId1, FxCurrent, sample)
@@ -163,6 +170,8 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = Controller.pos
 					fxSendMotorCommand(devId1, FxPosition, sample + initialPos1)
 					measurements1.append(data1.encoderAngle - initialPos1)
 
+			streamCommandTimes.append(tReadTime1 - tReadTime0)
+			currentCommandTimes.append(tCommandTime1 - tCommandTime0)
 			times.append(time() - t0)
 			requests.append(sample)
 			i = i + 1
@@ -239,6 +248,15 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = Controller.pos
 		# Draw a vertical line at the end of each cycle
 		for endpoints in cycleStopTimes:
 			plt.axvline(x=endpoints)
+
+	plt.figure(2)
+	title = "Current and stream command times (aggregate)"
+	plt.title(title)
+	plt.plot(currentCommandTimes, color = 'b', label = 'Current Command Times')
+	plt.plot(streamCommandTimes, color = 'r', label = 'Stream Command Times')
+	plt.xlabel("Command sequence number")
+	plt.ylabel("Time (s)")
+	plt.legend(loc='upper right')
 
 	if (secondDevice):
 		if (controllerType == Controller.current):
