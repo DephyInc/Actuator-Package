@@ -204,9 +204,7 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = Controller.cur
 		cycleStopTimes.append(time() - t0)
 	elapsed_time = time() - t0
 
-	fxClose(devId0)
-	if (secondDevice):
-		fxClose(devId1)
+	fxCloseAll()
 
 	######## End of Main Code #########
 

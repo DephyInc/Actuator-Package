@@ -129,11 +129,7 @@ int main()
     //
     // Close all of the FlexSEA devices
     //
-    for(uint8_t i = 0; i < devicesOpened; ++i)
-    {
-	cout << "Closing device " << deviceIds[i] << endl;
-        fxClose(deviceIds[i]);
-    }
+    fxCloseAll();
 
     return 0;
 }

@@ -73,7 +73,11 @@ int fxOpen(const char* portName,
 		const unsigned int baudRate,
 		const unsigned int logLevel);
 
-// Is Open?
+/// \brief Check if the device with the given device ID is open.
+///
+/// @param deviceId is the ID of the device to check the open status of.
+/// 
+/// @returns true if open, false if not.
 bool fxIsOpen(const unsigned int deviceId);
 
 /// \brief Disconnect from a FlexSEA device with the given device ID.
@@ -82,9 +86,8 @@ bool fxIsOpen(const unsigned int deviceId);
 /// @returns Error codes defined at top of the header
 FxError fxClose(const unsigned int deviceId);
 
-// ------------------------------------------
-// Stream configuration and reading functions
-// ------------------------------------------
+/// \brief Disconnect from all FlexSEA devices.
+void fxCloseAll();
 
 /// \brief Get the device ID of all connected FlexSEA devices. The device ID is
 /// used by the functions in this API to specify which FlexSEA device to

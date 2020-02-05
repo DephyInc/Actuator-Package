@@ -104,6 +104,13 @@ def fxClose(devId):
 	if (retCode == FxInvalidDevice):
 		raise ValueError('fxClose: invalid device ID')
 
+def fxCloseAll():
+	"""
+	Disconnect from all FlexSEA devices
+	"""
+	global flexsea
+	flexsea.fxCloseAll()
+
 def fxGetDeviceIds():
 	"""
 	Get the device IDs of all connected FlexSEA devices. 
@@ -420,6 +427,9 @@ def loadFlexsea():
 	
 	flexsea.fxClose.argtypes = [c_uint]
 	flexsea.fxClose.restype = c_int
+
+	flexsea.fxCloseAll.argtypes = []
+	flexsea.fxCloseAll.resType = []
 
 	flexsea.fxGetDeviceIds.argtypes = [POINTER(c_int), c_uint]
 
