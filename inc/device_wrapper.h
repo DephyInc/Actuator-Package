@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include "actpack_struct.h"
+#include "netmaster_struct.h"
 
 #ifdef __cplusplus
 extern "C" 
@@ -34,9 +35,13 @@ typedef enum fxAppType
 {
 	FxInvalidApp = -1,
 	FxActPack = 0,
-	FxExo
+	FxExo,
+	FxNetMaster
 
 } FxAppType;
+
+struct ActPackState;
+struct NetMasterState;
 
 // Valid streaming frequencies 
 #define NUM_TIMER_FREQS 11
@@ -140,6 +145,17 @@ FxError fxStopStreaming(const unsigned int deviceId);
 /// @returns FxNotStreaming if device is not streaming when this is called.
 FxError fxReadDevice(const unsigned int deviceId, ActPackState* readData);
 
+/// \brief Read the most recent data from a streaming FlexSEA NetMaster device.
+/// Must call fxStartStreaming before calling this.
+/// 
+/// @param deviceId is the device ID of the device to read from.
+///
+/// @param readData contains the most recent data from the device
+///
+/// @returns FxNoReadData if there is no data to read.
+FxError fxReadNetMasterDevice(const unsigned int deviceId, NetMasterState* readData);
+
+
 /// \brief Set the maximum read data queue size of a device.
 /// 
 /// @param deviceId is the device ID of the device to get the 
@@ -176,6 +192,23 @@ int fxGetReadDataQueueSize(const unsigned int deviceId);
 /// @note Will only fill readData array up to read data queue size.
 int fxReadDeviceAll(const unsigned int deviceId, 
 			ActPackState* readData, 
+			const unsigned int n);
+
+/// \brief Read all exo data from a streaming FlexSEA NetMaster device.
+/// Must call fxStartStreaming before calling this.
+/// 
+/// @param deviceId is the device ID of the device to read from.
+///
+/// @param readData is an array of size n which contains read results
+///
+/// @param n is the size of the readData y
+///
+/// @returns The actual number of entries read. You will probably need
+/// to use this number.
+///
+/// @note Will only fill readData array up to read data queue size.
+int fxReadNetMasterDeviceAll(const unsigned int deviceId, 
+			NetMasterState* readData, 
 			const unsigned int n);
 
 /// \brief Sets the gains used by PID controllers on the FlexSEA device.
