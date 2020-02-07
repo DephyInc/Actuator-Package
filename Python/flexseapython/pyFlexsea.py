@@ -26,9 +26,10 @@ global flexsea
 
 (FxInvalidApp,
  FxActPack,
- FxExo) = map(c_int, range(-1,2))
+ FxExo,
+ FxNetMaster) = map(int, range(-1,3))
 
-##################### Redefine ExoState Structure #################
+##################### Redefine ActPackState Structure #################
 # See "actpack_struct.h" for C definition
 
 class ActPackState(Structure):
@@ -53,10 +54,29 @@ class ActPackState(Structure):
 			("deviceStatus"   , c_int),
 			("motorStatus"	  , c_int),
 			("batteryStatus"  , c_int),
-			("genVar[10]"	  , c_int),
+			("genVar"    , c_int * 10),
 			("ankleAngle"	  , c_int),
 			("ankleVelocity"  , c_int)]
 
+class NetNodeState(Structure):
+	_fields_ = [
+			("accelx"	  , c_int),
+			("accely"	  , c_int),
+			("accelz"	  , c_int),
+			("gyrox"	  , c_int),
+			("gyroy"	  , c_int),
+			("gyroz"	  , c_int),
+			("pressure"	  , c_int),
+			("status"	  , c_int)]
+
+class NetMasterState(Structure):
+	_fields_ = [
+			("netmaster"	  , c_int),
+			("id"		  , c_int),
+			("timestamp"	  , c_int),
+			("genvar"     , c_int * 4),
+			("status"	  , c_int),
+			("netNode", NetNodeState * 8)]
 
 ####################### Begin API ##################################
 
@@ -240,6 +260,82 @@ def fxReadDeviceAll(devId, dataQueueSize):
 		raise ValueError('fxGetReadDataQueueSize: Invalid device ID')
 	return itemsRead
 
+def fxReadNetMasterDevice(devId):
+	"""
+	Read the most recent data from a streaming FlexSEA NetMaster device stream.
+	IMPORTANT! Must call fxStartStreaming before calling this.
+
+	Parameters:
+	devId (int): The device ID of the device to read from.
+
+	Returns:
+	netMasterState (NetMasterState): Contains the most recent data from the device
+
+	Raises:
+	ValueError if invalid device ID
+	RuntimeError if no read data
+	"""
+	global flexsea
+
+	netMasterState = NetMasterState();
+	retCode = flexsea.fxReadNetMasterDevice(devId, byref(netMasterState))
+	
+	if (retCode == FxInvalidDevice):
+		raise ValueError('fxReadDevice: invalid device ID')
+	elif (retCode == FxNotStreaming):	
+		raise RuntimeError('fxReadDevice: no read data')
+
+	return netMasterState 
+
+def fxReadDeviceAll(devId, dataQueueSize):
+	"""
+	Read all data from a streaming FlexSEA device stream.
+	MUST call fxStartStreaming before calling this.
+	
+	Parameters:
+	devId: Device ID of the device to read from.
+   
+	dataQueueSize: Size of readData.
+
+	Raise:
+	ValueError if invalid device ID
+   
+	Return:
+	Actual number of entries read. You will probably need to use this number.
+	"""
+	global flexsea
+
+	actPackStateDataQueue = [ActPackState() for count in range(dataQueueSize)];
+
+	itemsRead = flexsea.fxReadDeviceAll(devId, byref(actPackStateDataQueue), dataQueueSize)
+	if (itemsRead == -1):
+		raise ValueError('fxReadDeviceAll: Invalid device ID')
+	return itemsRead
+
+def fxReadNetMasterDeviceAll(devId, dataQueueSize):
+	"""
+	Read all data from a streaming FlexSEA NetMaster device stream.
+	MUST call fxStartStreaming before calling this.
+	
+	Parameters:
+	devId: Device ID of the device to read from.
+   
+	dataQueueSize: Size of readData.
+
+	Raise:
+	ValueError if invalid device ID
+   
+	Return:
+	Actual number of entries read. You will probably need to use this number.
+	"""
+	global flexsea
+
+	netMasterStateDataQueue = [NetMasterState() for count in range(dataQueueSize)];
+
+	itemsRead = flexsea.fxReadNetMasterDeviceAll(devId, byref(netMasterStateDataQueue), dataQueueSize)
+	if (itemsRead == -1):
+		raise ValueError('fxReadNetMasterDeviceAll: Invalid device ID')
+	return itemsRead
 
 def fxSetReadDataQueueSize(devId, readDataQueueSize):
 	"""
@@ -350,6 +446,7 @@ def fxGetAppType(devId):
 	-1 if invalid
 	0 if ActPack
 	1 if Exo
+	2 if NetMaster
 	"""
 	global flexsea
 
@@ -444,6 +541,12 @@ def loadFlexsea():
 
 	flexsea.fxReadDeviceAll.argtypes = [c_uint, POINTER(ActPackState), c_uint]
 	flexsea.fxReadDeviceAll.restype = c_int
+
+	flexsea.fxReadNetMasterDevice.argtypes = [c_uint, POINTER(NetMasterState)]
+	flexsea.fxReadDevice.restype = c_int
+
+	flexsea.fxReadNetMasterDeviceAll.argtypes = [c_uint, POINTER(NetMasterState), c_uint]
+	flexsea.fxReadNetMasterDeviceAll.restype = c_int
 
 	flexsea.fxSetReadDataQueueSize.argtypes = [c_uint, c_uint]
 	flexsea.fxSetReadDataQueueSize.restype  = c_uint
