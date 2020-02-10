@@ -26,7 +26,7 @@ class signal(Enum):
 def sinGenerator(amplitude, frequency, commandFreq):
 	num_samples = commandFreq / frequency
 	print("number of samples is: ", num_samples)
-	in_array = np.linspace(-np.pi, np.pi, num_samples)
+	in_array = np.linspace(-np.pi, np.pi, int(num_samples))
 	sin_vals = amplitude * np.sin(in_array)
 	return sin_vals
 
