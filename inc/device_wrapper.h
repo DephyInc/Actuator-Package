@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include "actpack_struct.h"
 #include "netmaster_struct.h"
+#include "i2t_struct.h"
 
 #ifdef __cplusplus
 extern "C" 
@@ -50,6 +51,12 @@ static const int TIMER_FREQS_IN_HZ[NUM_TIMER_FREQS] = {1, 5, 10, 20, 33, 50, 100
 
 // Max size of array returned by fxNumDevices
 #define FX_MAX_DEVICES 10
+
+#define MIN_UVLO 15000
+#define MAX_UVLO 50000
+
+#define MIN_CURRENT_OFFSET -15
+#define MAX_CURRENT_OFFSET 15
 
 /// Device ID is a 16-bit integer used to refer to a specific FlexSEA device 
 ///
@@ -258,6 +265,115 @@ FxError fxSendMotorCommand(const unsigned int deviceId, const FxControlMode cont
 /// @returns FxAppType defined at the top of the header
 
 FxAppType fxGetAppType(const unsigned int deviceId);
+
+/// \brief Set the UVLO to the desired value.
+///
+/// @param deviceId is the device ID
+/// 
+/// @param mV is the desired UVLO in mV
+///
+/// @returns FxInvalidDevice if deviceId does not correspond an exo device.
+///          FxInvalidParam if mV exceeds MIN_UVLO or MAX_UVLO
+///          FxSuccess otherwise.
+///
+FxError fxSetUVLO(const unsigned int deviceId, const unsigned int mV);
+
+/// \brief Send a UVLO request to the specified device. The value is retrieved
+/// asyncronously and must be checked by polling fxGetLastReceivedUVLO.
+///
+/// @param deviceId is the device ID
+/// 
+/// @returns FxInvalidDevice if deviceId does not correspond an exo device.
+///          FxSuccess otherwise.
+///
+/// @note The UVLO value is retrieved asyncronously and must be checked by 
+/// polling fxGetLastReceivedUVLO.
+FxError fxRequestUVLO(const unsigned int deviceId);
+
+/// \brief Check the last UVLO value which was received from the device. This 
+/// UVLO value is updated asyncronously by making calls to fxRequestUVLO.
+///
+/// @param deviceId is the device ID
+/// 
+/// @returns The last received UVLO in mV. -1 if invalid device.
+///
+int fxGetLastReceivedUVLO(const unsigned int deviceId);
+
+/// \brief Set the current offset to the desired value.
+///
+/// @param deviceId is the device ID
+/// 
+/// @param offset is the current offset. NOT in Amps.
+///
+/// @returns FxInvalidDevice if deviceId does not correspond an exo device.
+///          FxInvalidParam if mV exceeds MIN_CURRENT_OFFSET or 
+///          	MAX_CURRENT_OFFSET.
+///          FxSuccess otherwise.
+///
+FxError fxSetCurrentOffset(const unsigned int deviceId, const int offset);
+
+/// \brief Send a current offset request to the specified device. The value is 
+/// retrieved asyncronously and must be checked by polling 
+/// fxGetLastReceivedCurrentOffset.
+///
+/// @param deviceId is the device ID
+/// 
+/// @returns FxInvalidDevice if deviceId does not correspond an exo device.
+///          FxSuccess otherwise.
+///
+/// @note The current offset is retrieved asyncronously and must be checked by 
+/// polling fxGetLastReceivedCurrentOffset.
+FxError fxRequestCurrentOffset(const unsigned int deviceId);
+
+/// \brief Check the last current offset which was received from the device. 
+/// This current offset is updated asyncronously by making calls to 
+/// fxRequestCurrentOffset.
+///
+/// @param deviceId is the device ID
+/// 
+/// @returns The current offset last received from the device. -1 if invalid 
+/// device but proper usage can also return -1.
+///
+/// @note Please try to ensure you have a valid device before making a call 
+/// to this function. 
+///
+int fxGetLastReceivedCurrentOffset(const unsigned int deviceId);
+
+/// \brief Set the i2t values to the desired values
+///
+/// @param deviceId is the device ID
+/// 
+/// @param i2tValsToWrite is the i2tVals struct containing the values to write
+///
+/// @returns FxInvalidDevice if deviceId does not correspond an exo device.
+///          FxSuccess otherwise.
+///
+FxError fxSetI2T(const unsigned int deviceId, const i2tVals i2tValsToWrite);
+
+/// \brief Send an i2t values request to the specified device. The value is 
+/// retrieved asyncronously and must be checked by polling 
+/// fxGetLastReceivedI2T.
+///
+/// @param deviceId is the device ID
+/// 
+/// @returns FxInvalidDevice if deviceId does not correspond an exo device.
+///          FxSuccess otherwise.
+///
+/// @note The i2t values are retrieved asyncronously and must be checked by 
+/// polling fxGetLastReceivedI2T
+///
+FxError fxRequestI2T(const unsigned int deviceId);
+
+/// \brief Check the last i2t values which were received from the device. 
+/// These i2t values are updated asyncronously by making calls to 
+/// fxRequestI2T.
+///
+/// @param deviceId is the device ID
+/// 
+/// @returns The i2t values last received from the device. Will return a
+/// default initialized i2tVals struct if deviceId is invalid.
+///
+i2tVals fxGetLastReceivedI2T(const unsigned int deviceId);
 
 /// DO NOT USE THIS FUNCTION UNLESS YOU KNOW WHAT YOU ARE DOING
 ///
