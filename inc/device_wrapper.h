@@ -111,10 +111,10 @@ void fxCloseAll();
 /// 
 /// @param size is the size of the idarray.
 ///
-/// @returns Nothing. idarray is updated with device handles.
+/// @returns number of connected FlexSEA devices
 ///
 /// @note idArray should have at least as many elements as FlexSEA devices used.
-void fxGetDeviceIds(int* const idArray, const unsigned int size);
+int fxGetDeviceIds(int* const idArray, const unsigned int size);
 
 /// \brief Start streaming data from a FlexSEA device.
 ///
