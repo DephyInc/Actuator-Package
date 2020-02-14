@@ -105,22 +105,29 @@ void fxCloseAll();
 /// used by the functions in this API to specify which FlexSEA device to
 /// communicate with.
 ///
-/// @param idArray On return each element of the array will contain either a 
-/// valid device ID or -1 (no device). This array should have at least as many 
-/// elements as FlexSEA devices used.
+/// @param idArray is an array to hold the returned device IDs. The return value
+/// of this function is the number of connected FlexSEA devices (numDevices). 
+/// On return each element of the array up till numDevices will contain a valid
+/// device ID.
 /// 
-/// @param size is the size of the idarray.
+/// @param size is the size of the idarray. Should be large enough to contain 
+/// device IDs for all devices you plan to use at once, or FX_MAX_DEVICES.
 ///
 /// @returns number of connected FlexSEA devices
 ///
 /// @note idArray should have at least as many elements as FlexSEA devices used.
 int fxGetDeviceIds(int* const idArray, const unsigned int size);
 
-/// \brief Start streaming data from a FlexSEA device.
+/// \brief Start streaming data from a FlexSEA device and optionally log the
+/// streamed data. The data logger can impact performance if you are sending 
+/// many commands in quick succession.
 ///
 /// @param deviceId is the device ID 
 /// 
 /// @param shouldLog If set true, the program logs all received data to a file.
+/// Enabling the data logging can impact performance if you are sending many
+/// commands in quick succession.
+/// 
 /// The name of the file is formed as follows:
 ///
 /// < FlexSEA model >_id< device ID >_< date and time >.csv
@@ -134,6 +141,9 @@ int fxGetDeviceIds(int* const idArray, const unsigned int size);
 /// from the device.
 ///
 /// @returns Error codes defined at top of the header
+///
+/// @note The data logger can impact performance if you are sending many 
+/// commands in quick succession.
 FxError fxStartStreaming(const unsigned int deviceId, 
 			const unsigned int frequency,
 			const bool shouldLog);
