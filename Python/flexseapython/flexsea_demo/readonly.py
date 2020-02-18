@@ -5,6 +5,12 @@ pardir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file_
 sys.path.append(pardir)
 from flexseapython.fxUtil import *
 
+def clear():
+	if os.name == 'nt':
+		os.system('cls')
+	else:
+		os.system('clear')
+
 def printActPack(devId):
 	exoState = fxReadDevice(devId)
 	print('accelx: ', exoState.accelx, ', accely: ', exoState.accely, ' accelz: ', exoState.accelz)
@@ -31,7 +37,13 @@ def printNetMaster(devId):
 	print('NetNode6 - gyrox: ', netMasterState.netNode[6].gyrox, ', gyroy: ', netMasterState.netNode[6].gyroy, ' gyroz: ', netMasterState.netNode[6].gyroz)
 	print('NetNode7 - accelx: ', netMasterState.netNode[7].accelx, ', accely: ', netMasterState.netNode[7].accely, ' accelz: ', netMasterState.netNode[7].accelz)
 	print('NetNode7 - gyrox: ', netMasterState.netNode[7].gyrox, ', gyroy: ', netMasterState.netNode[7].gyroy, ' gyroz: ', netMasterState.netNode[7].gyroz)
-	
+
+def printBMSState(devId):
+	bmsState = fxReadBMSDevice(devId)
+	for i in range(9):
+		print('cellVoltage[', i, ']: ', bmsState.cellVoltage[i])
+	for i in range(3):
+		print('temperature[', i, ']: ', bmsState.temperature[i])
 
 def fxReadOnly(port, baudRate, time = 6,time_step = 0.1):
 	print(port)
@@ -43,15 +55,20 @@ def fxReadOnly(port, baudRate, time = 6,time_step = 0.1):
 	appType = fxGetAppType(devId)
 
 	for i in range(int(time/time_step)):
+		clear()
 		if (appType == FxActPack):
 			printActPack(devId)
 		elif (appType == FxNetMaster):
 			printNetMaster(devId)
+		elif (appType == FxBMS):
+			printBMS(devId)
+		elif (appType == FxExo):
+			print('Exo not supported with public actpack software')
 		else:
 			raise RuntimeError('Unsupported application type: ', appType)
 			return False
-
 		sys.stdout.flush()
+
 		sleep(time_step)
 		
 	return True
