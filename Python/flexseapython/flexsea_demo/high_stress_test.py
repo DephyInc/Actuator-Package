@@ -40,6 +40,7 @@ def lineGenerator(amplitude, length, commandFreq):
 def setCurrentCtrl(devId0, devId1, secondDevice, current0, current1):
 	fxSetGains(devId0, 300, 50, 0, 0, 0)
 	fxSendMotorCommand(devId0, FxCurrent, current0)
+
 	if (secondDevice):
 		fxSetGains(devId1, 300, 50, 0, 0, 0)
 		fxSendMotorCommand(devId1, FxCurrent, current1)
@@ -48,6 +49,7 @@ def setCurrentCtrl(devId0, devId1, secondDevice, current0, current1):
 def setPositionCtrl(devId0, devId1, secondDevice, position0, position1):
 	fxSetGains(devId0, 300, 50, 0, 0, 0)
 	fxSendMotorCommand(devId0, FxPosition, position0)
+
 	if (secondDevice):
 		fxSetGains(devId1, 300, 50, 0, 0, 0)
 		fxSendMotorCommand(devId1, FxPosition, position1)
@@ -81,7 +83,7 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000, positionAm
 		print("Running high stress test with one device")
 
 	########### Debug & Data Logging ############
-	debugLoggingLevel = 0 # 6 is least verbose, 0 is most verbose
+	debugLoggingLevel = 6 # 6 is least verbose, 0 is most verbose
 	dataLog = False # Data log logs device data
 
 	delay_time = float(1/(float(commandFreq)))
@@ -152,6 +154,7 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000, positionAm
 		# -------------------------------
 		print("Step 0: set position controller")
 		if( i ):
+			sleep(delay_time)
 			setPositionCtrl(devId0, devId1, secondDevice, data0.encoderAngle, initialPos1) #ToDo: data1.encoderAngle
 		else:
 			setPositionCtrl(devId0, devId1, secondDevice, initialPos0, initialPos1)
