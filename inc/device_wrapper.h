@@ -37,13 +37,15 @@ typedef enum fxAppType
 	FxActPack = 0,
 	FxExo,
 	FxNetMaster,
-	FxBMS
+	FxBMS,
+	FxHabsolute
 
 } FxAppType;
 
 struct ActPackState;
 struct NetMasterState;
 struct BMSState;
+struct HabsoluteState;
 
 // Valid streaming frequencies 
 #define NUM_TIMER_FREQS 11
@@ -191,6 +193,17 @@ FxError fxReadNetMasterDevice(const unsigned int deviceId, NetMasterState* readD
 ///          FxInvalidDevice if deviceId is invalid or is not a BMS device.
 FxError fxReadBMSDevice(const unsigned int deviceId, BMSState* readData);
 
+/// \brief Read the most recent data from a streaming FlexSEA Habsolute device.
+/// Must call fxStartStreaming before calling this.
+/// 
+/// @param deviceId is the device ID of the device to read from.
+///
+/// @param readData contains the most recent data from the device
+///
+/// @returns FxNotStreaming if device is not streaming when this is called.
+///          FxInvalidDevice if deviceId is invalid or is not a BMS device.
+FxError fxReadHabsoluteDevice(const unsigned int deviceId, HabsoluteState* readData);
+
 /// \brief Set the maximum read data queue size of a device.
 /// 
 /// @param deviceId is the device ID of the device to get the 
@@ -263,6 +276,22 @@ int fxReadBMSDeviceAll(const unsigned int deviceId,
 			BMSState* readData, 
 			const unsigned int n);
 
+/// \brief Read all exo data from a streaming FlexSEA Habsolute device.
+/// Must call fxStartStreaming before calling this.
+/// 
+/// @param deviceId is the device ID of the device to read from.
+///
+/// @param readData is an array of size n which contains read results
+///
+/// @param n is the size of the readData y
+///
+/// @returns The actual number of entries read. You will probably need
+/// to use this number.
+///
+/// @note Will only fill readData array up to read data queue size.
+int fxReadHabsoluteDeviceAll(const unsigned int deviceId, 
+			HabsoluteState* readData, 
+			const unsigned int n);
 
 /// \brief Sets the gains used by PID controllers on the FlexSEA device.
 ///
