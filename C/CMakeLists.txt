@@ -43,7 +43,7 @@ if(WIN32)
 else()
 	# only look for a freshly built plan stack library since we're already set up to compile this find_program
 	# should not be an issues to have a freshly compiled plan stack to prevent confusion
-	find_library(fx_plan_stack_LIBRARY fx_plan_stack_static ${CMAKE_CURRENT_SOURCE_DIR}/../libs/linux)
+	find_library(fx_plan_stack_LIBRARY fx_plan_stack_static ${CMAKE_CURRENT_SOURCE_DIR}/../libs/raspberryPi)
 
 	# link plan stack library to our application
 	target_link_libraries(main ${fx_plan_stack_LIBRARY})

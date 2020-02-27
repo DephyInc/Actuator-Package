@@ -7,6 +7,18 @@ import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use('WebAgg')
 
+
+# Toggle profiling to identify any performance bottlenecks
+doProfile=False
+if (doProfile):
+	import cProfile
+	pr = cProfile.Profile()
+	# Surround problematic code with following 2 lines:
+	# pr.enable()
+	# pr.disable()
+	# Make following the last line in your code:
+	# pr.print_stats(sort='time')
+
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 print(pardir)
 sys.path.append(pardir)
@@ -49,7 +61,9 @@ def lineGenerator(amplitude, commandFreq):
 # Cycle Delay: Delay between signals sent to controller, use with sine wave only
 # Request Jitter: Add jitter amount to every other sample sent to controller
 # Jitter: Amount of jitter
-def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = Controller.current, signalType = signal.sine, commandFreq = 1000, signalAmplitude = 1000, numberOfLoops = 10, signalFreq = 5, cycleDelay = .1, requestJitter = False, jitter = 20):
+def fxHighSpeedTest(port0, baudRate, port1="", controllerType=Controller.current,
+	signalType=signal.sine, commandFreq=1000, signalAmplitude=1000, numberOfLoops=40,
+	signalFreq=5, cycleDelay=.1, requestJitter=False, jitter=20):
 
 	secondDevice = False
 	if (port1 != ""):
@@ -60,7 +74,8 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = Controller.cur
 	else:
 		print("Running high speed test with one device")
 
-	debugLoggingLevel =6 # 6 is least verbose, 0 is most verbose
+	########### Debug & Data Logging ############
+	debugLoggingLevel = 6 # 6 is least verbose, 0 is most verbose
 	dataLog = False # Data log logs device data
 
 	delay_time = float(1/(float(commandFreq)))
@@ -118,7 +133,6 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = Controller.cur
 	cycleStopTimes = []
 	currentCommandTimes = []
 	streamCommandTimes = []
-
 	i = 0
 	t0 = 0
 
@@ -135,7 +149,7 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = Controller.cur
 		if (secondDevice):
 			fxSetGains(devId1, 300, 50, 0, 0, 0)
 	else:
-		assert 0
+		assert 0, 'Invalid controllerType'
 	
 	# Record start time of experiment
 	t0 = time()
@@ -228,8 +242,8 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = Controller.cur
 		plt.legend(loc='upper right')
 
 		# Draw a vertical line at the end of each cycle
-		for endpoints in cycleStopTimes:
-			plt.axvline(x=endpoints)
+#		for endpoints in cycleStopTimes:
+#			plt.axvline(x=endpoints)
 
 	elif (controllerType == Controller.position):
 		plt.figure(1)
@@ -247,14 +261,56 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = Controller.cur
 		for endpoints in cycleStopTimes:
 			plt.axvline(x=endpoints)
 
+	###### begin command times plotting ########################################33
+
+	# Babar: Following 6 lines are legacy code. Remove eventually.
+	#plt.figure(2)
+	#title = "Current and stream command times (aggregate)"
+	#plt.title(title)
+	#plt.plot(currentCommandTimes,color='b', label='Current Command Times')
+	#plt.plot(streamCommandTimes, color='r', label='Stream Command Times')
+	#plt.legend(loc='upper right')
+
+
 	plt.figure(2)
-	title = "Current and stream command times (aggregate)"
-	plt.title(title)
-	plt.plot(currentCommandTimes, color = 'b', label = 'Current Command Times')
-	plt.plot(streamCommandTimes, color = 'r', label = 'Stream Command Times')
-	plt.xlabel("Command sequence number")
-	plt.ylabel("Time (s)")
+	# Convert command times into millisec
+	currentCommandTimes = [i * 1000 for i in currentCommandTimes]
+	#np.savetxt('JFD.txt', np.array(currentCommandTimes), fmt='%.10f')
+	plt.plot(currentCommandTimes, color='b', label='Current Command Times')
+	plt.title("Commands")
 	plt.legend(loc='upper right')
+	plt.xlabel("Time (ms)")
+	plt.ylabel("Command Time (ms)")
+
+	plt.figure(3)
+	plt.yscale('log')
+	plt.hist(currentCommandTimes, bins=100, label = 'Current Commands')
+	plt.yscale('log')
+	plt.title("Commands")
+	plt.legend(loc='upper right')
+	plt.xlabel("Time (ms)")
+	plt.ylabel("Occurrences")
+
+	plt.figure(4)
+	streamCommandTimes = [i * 1000 for i in streamCommandTimes]
+	# Convert command times into millisec
+	plt.plot(streamCommandTimes, color='b', label='Stream Command Times')
+	plt.title("Commands")
+	plt.legend(loc='upper right')
+	plt.xlabel("Time (ms)")
+	plt.ylabel("Command Time (ms)")
+
+	plt.figure(5)
+	plt.yscale('log')
+	plt.hist(streamCommandTimes, bins=100, label = 'Stream Commands')
+	plt.yscale('log')
+	plt.title("Commands")
+	plt.legend(loc='upper right')
+	plt.xlabel("Time (ms)")
+	plt.ylabel("Occurrences")
+
+
+	##### end command times plotting ########################################33
 
 	if (secondDevice):
 		if (controllerType == Controller.current):
