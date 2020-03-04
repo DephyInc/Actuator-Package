@@ -13,3 +13,6 @@ The latest instructions for working with the Actuatory Package and sample progra
 [General information about the Dephy Actuator Package](http://dephy.com/wiki/flexsea/doku.php?id=dephyactpack)
 
 [Information about the scripts](http://dephy.com/wiki/flexsea/doku.php?id=scripts)
+
+License: CC BY-NC-SA 4.0
+[![License: CC BY-NC-SA 4.0](https://licensebuttons.net/l/by-nc-sa/4.0/80x15.png)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
