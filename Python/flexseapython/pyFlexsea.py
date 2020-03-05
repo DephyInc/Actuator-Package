@@ -553,7 +553,7 @@ def loadFlexsea():
 	linux_distro = platform.linux_distribution()[0]
 	# check whether we are running on a 32 or 64 bit machine
 	architecture = platform.architecture()[0]
-	librarypath=""
+	librarypaths = []
 	print(platform)
 	if("win" in sysOS):
 		# load proper library based on host architecture
@@ -561,23 +561,24 @@ def loadFlexsea():
 			lpath_base = os.path.join(dir_path,'../../libs/win32')
 		else:
 			lpath_base = os.path.join(dir_path,'../../libs/win64')
-		librarypath = os.path.join(lpath_base,'libfx_plan_stack.dll')
-	elif("Ubuntu" in linux_distro):
-		lpath_base = os.path.join(dir_path,'../../libs/linux')
-		librarypath = os.path.join(lpath_base,'libfx_plan_stack.so')
+		librarypaths = [os.path.join(lpath_base,'libfx_plan_stack.dll')]
 	else:
-		# TODO: as of now we'll assume we're compiling for a raspberry Pi if it's not Ubuntu
-		# or windows but we'll likely want to make OS library versions clearer
-		lpath_base = os.path.join(dir_path,'../../libs/raspberryPi')
-		librarypath = os.path.join(lpath_base,'libfx_plan_stack.so')
+		# Try to load the full linux lib first (that's x86_64), if that
+		# fails, fall back to the raspberryPi lib.
+		librarypaths = [
+				os.path.join(dir_path,'../../libs/linux','libfx_plan_stack.so'),
+				os.path.join(dir_path,'../../libs/raspberryPi','libfx_plan_stack.so'),
+		]
 
-	try:
-		print("loading... " + librarypath)
-		flexsea = cdll.LoadLibrary(librarypath)
-	except OSError as arg:
-		print( "\n\nThere was a problem loading the library\n {0}\n".format(arg))
-	else:
-		loadSucceeded  = True
+	for librarypath in librarypaths:
+		try:
+			print("loading... " + librarypath)
+			flexsea = cdll.LoadLibrary(librarypath)
+		except OSError as arg:
+			print("\n\nThere was a problem loading the library\n {0}\n".format(arg))
+		else:
+			loadSucceeded = True
+			break
 
 	if(loadSucceeded  != True):
 		return False
