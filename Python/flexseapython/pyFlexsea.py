@@ -97,8 +97,8 @@ class BMSState(Structure):
 ####################### Begin API ##################################
 
 ### Device ID is an alphanumeric ID used to refer to a specific FlexSEA device.
-### Device ID is returned by fxOpen upon establishing a connection with a 
-### FlexSEA device, and is used by most of the functions in this library to 
+### Device ID is returned by fxOpen upon establishing a connection with a
+### FlexSEA device, and is used by most of the functions in this library to
 ### specify which device to run that function on.
 
 def fxOpen(port, baudRate, logLevel = 4):
@@ -112,7 +112,7 @@ def fxOpen(port, baudRate, logLevel = 4):
 
 	logLevel (int): is the logging level for this device. 0 is most verbose and
 	6 is the least verbose. Values greater than 6 are floored to 6.
-	
+
 	Raises:
 	IOError if we fail to open the device.
 	"""
@@ -128,10 +128,10 @@ def fxOpen(port, baudRate, logLevel = 4):
 def fxClose(devId):
 	"""
 	Disconnect from a FlexSEA device with the given device ID.
-	
+
 	Parameters:
 	devId (int): The ID of the device to close
-	
+
 	Raises:
 	ValueError if the device ID is invalid
 	"""
@@ -149,9 +149,9 @@ def fxCloseAll():
 
 def fxGetDeviceIds():
 	"""
-	Get the device IDs of all connected FlexSEA devices. 
-	
-	The device ID is used by the functions in this API to specify which 
+	Get the device IDs of all connected FlexSEA devices.
+
+	The device ID is used by the functions in this API to specify which
 	FlexSEA device to communicate with. The C library requires a fixed
 	array so we give a size of n = 10 but feel free to increase this.
 
@@ -172,7 +172,7 @@ def fxStartStreaming(devId, frequency, shouldLog):
 	Start streaming data from a FlexSEA device.
 
 	Parameters:
-	devId (int): The device ID 
+	devId (int): The device ID
 
 	frequency (int): The desired frequency of communication
 
@@ -187,10 +187,10 @@ def fxStartStreaming(devId, frequency, shouldLog):
 
 	rigid_id3904_Tue_Nov_13_11_03_50_2018.csv
 
-	The file is formatted as a CSV file. The first line of the file will be 
-	headers for all columns. Each line after that will contain the data read 
+	The file is formatted as a CSV file. The first line of the file will be
+	headers for all columns. Each line after that will contain the data read
 	from the device.
-	
+
 	Raises:
 	ValueError if the device ID is invalid
 	RuntimeError if the stream failed
@@ -212,10 +212,10 @@ def fxStopStreaming(devId):
 	Stop streaming data from a FlexSEA device.
 
 	Parameters:
-	devId (int): Is the device ID 
+	devId (int): Is the device ID
 	"""
 	global flexsea
- 
+
 	retCode = flexsea.fxStopStreaming(devId)
 	if (retCode == FxInvalidDevice):
 		raise ValueError('fxStopStreaming: invalid device ID')
@@ -242,28 +242,28 @@ def fxReadDevice(devId):
 
 	actPackState = ActPackState();
 	retCode = flexsea.fxReadDevice(devId, byref(actPackState))
-	
+
 	if (retCode == FxInvalidDevice):
 		raise ValueError('fxReadDevice: invalid device ID')
-	elif (retCode == FxNotStreaming):	
+	elif (retCode == FxNotStreaming):
 		raise RuntimeError('fxReadDevice: no read data')
 
-	return actPackState 
+	return actPackState
 
 
 def fxReadDeviceAll(devId, dataQueueSize):
 	"""
 	Read all data from a streaming FlexSEA device stream.
 	MUST call fxStartStreaming before calling this.
-	
+
 	Parameters:
 	devId: Device ID of the device to read from.
-   
+
 	dataQueueSize: Size of readData.
 
 	Raise:
 	ValueError if invalid device ID
-   
+
 	Return:
 	Actual number of entries read. You will probably need to use this number.
 	"""
@@ -295,13 +295,13 @@ def fxReadNetMasterDevice(devId):
 
 	netMasterState = NetMasterState();
 	retCode = flexsea.fxReadNetMasterDevice(devId, byref(netMasterState))
-	
+
 	if (retCode == FxInvalidDevice):
 		raise ValueError('fxReadDevice: invalid device ID')
-	elif (retCode == FxNotStreaming):	
+	elif (retCode == FxNotStreaming):
 		raise RuntimeError('fxReadDevice: no read data')
 
-	return netMasterState 
+	return netMasterState
 
 def fxReadBMSDevice(devId):
 	"""
@@ -322,27 +322,27 @@ def fxReadBMSDevice(devId):
 
 	bmsState = BMSState();
 	retCode = flexsea.fxReadBMSDevice(devId, byref(bmsState))
-	
+
 	if (retCode == FxInvalidDevice):
 		raise ValueError('fxReadDevice: invalid device ID')
-	elif (retCode == FxNotStreaming):	
+	elif (retCode == FxNotStreaming):
 		raise RuntimeError('fxReadDevice: no read data')
 
-	return bmsState 
+	return bmsState
 
 def fxReadDeviceAll(devId, dataQueueSize):
 	"""
 	Read all data from a streaming FlexSEA device stream.
 	MUST call fxStartStreaming before calling this.
-	
+
 	Parameters:
 	devId: Device ID of the device to read from.
-   
+
 	dataQueueSize: Size of readData.
 
 	Raise:
 	ValueError if invalid device ID
-   
+
 	Return:
 	Actual number of entries read. You will probably need to use this number.
 	"""
@@ -359,15 +359,15 @@ def fxReadNetMasterDeviceAll(devId, dataQueueSize):
 	"""
 	Read all data from a streaming FlexSEA NetMaster device stream.
 	MUST call fxStartStreaming before calling this.
-	
+
 	Parameters:
 	devId: Device ID of the device to read from.
-   
+
 	dataQueueSize: Size of readData.
 
 	Raise:
 	ValueError if invalid device ID
-   
+
 	Return:
 	Actual number of entries read. You will probably need to use this number.
 	"""
@@ -384,15 +384,15 @@ def fxReadBMSDeviceAll(devId, dataQueueSize):
 	"""
 	Read all data from a streaming FlexSEA BMS device stream.
 	MUST call fxStartStreaming before calling this.
-	
+
 	Parameters:
 	devId: Device ID of the device to read from.
-   
+
 	dataQueueSize: Size of readData.
 
 	Raise:
 	ValueError if invalid device ID
-   
+
 	Return:
 	Actual number of entries read. You will probably need to use this number.
 	"""
@@ -448,14 +448,14 @@ def fxGetReadDataQueueSize(devId):
 def fxSetGains(devId, kp, ki, kd, K, B):
 	"""
 	Sets the gains used by PID controllers on the FlexSEA device.
-	
+
 	Parameters:
 	devId (int): The device ID.
 
-	kp (int): Proportional gain 
+	kp (int): Proportional gain
 
 	ki (int): Integral gain
-	
+
 	kd (int): Differential gain
 
 	K (int): Stiffness (used in impedence control only)
@@ -467,26 +467,26 @@ def fxSetGains(devId, kp, ki, kd, K, B):
 	"""
 	global flexsea
 	retCode = flexsea.fxSetGains(devId, kp, ki, kd, K, B)
-		
+
 	if (retCode == FxInvalidDevice):
 		raise ValueError('fxSetGains: invalid device ID')
 
 def fxSendMotorCommand(devId, controlMode, value):
 	"""
 	Send a command to the device.
-	
+
 	Parameters:
 	devId (int): The device ID.
 
 	controlMode (c_int): The control mode we will use to send this command.
 	Possible values are: FxPosition, FxCurrent, FxVoltage, FxImpedence
 
-	value (int): The value to use for the controlMode. 
+	value (int): The value to use for the controlMode.
 	FxPosition - encoder value
 	FxCurrent - current in mA
 	FxVoltage - voltage in mV
 	FxImpedence - current in mA
-	
+
 	Raises:
 	ValueError if invalid device ID
 	ValueError if invalid controlType
@@ -498,9 +498,9 @@ def fxSendMotorCommand(devId, controlMode, value):
 	if (retCode == FxInvalidDevice):
 		raise ValueError('fxSendMotorCommand: invalid device ID')
 	if (retCode == FxFailure):
-		raise IOError('fxSendMotorCommand: command failed')	
+		raise IOError('fxSendMotorCommand: command failed')
 	if (retCode == FxInvalidParam):
-		raise ValueError('fxSendMotorCommand: invalid controlType')	
+		raise ValueError('fxSendMotorCommand: invalid controlType')
 
 def fxGetAppType(devId):
 	"""
@@ -583,14 +583,14 @@ def loadFlexsea():
 		return False
 
 	print("Loaded!")
-	
+
 	# set arg types
 	flexsea.fxOpen.argtypes = [c_char_p, c_uint, c_uint]
 	flexsea.fxOpen.restype = c_int
-	
+
 	flexsea.fxIsOpen.argtypes = [c_uint]
 	flexsea.fxIsOpen.restype = c_bool
-	
+
 	flexsea.fxClose.argtypes = [c_uint]
 	flexsea.fxClose.restype = c_int
 
@@ -601,7 +601,7 @@ def loadFlexsea():
 
 	flexsea.fxStartStreaming.argtypes = [c_uint, c_uint, c_bool]
 	flexsea.fxStartStreaming.restype = c_int
-	
+
 	flexsea.fxStopStreaming.argtypes = [c_uint]
 	flexsea.fxStopStreaming.restype = c_int
 

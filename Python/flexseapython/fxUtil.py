@@ -17,7 +17,7 @@ def loadPortsFromFile(filename):
 	loadSuccess = loadFlexsea()
 	if(not loadSuccess):
 		raise Exception('load FlexSEA failed')
-	
+
 	# We should avoid OS or using ROOT (if this fails put it back)
 	"""
 	isUnix = os.name != 'nt'
