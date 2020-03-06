@@ -637,6 +637,6 @@ def loadFlexsea():
 
 def list_to_int_arr(l):
 	c_arr = (c_int * len(l))(*l)
-	c_len = c_int(len(l))
+	c_len = c_uint(len(l))
 	return c_arr, c_len
 
