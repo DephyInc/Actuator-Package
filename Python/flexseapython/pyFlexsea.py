@@ -348,7 +348,7 @@ def fxReadDeviceAll(devId, dataQueueSize):
 	"""
 	global flexsea
 
-	actPackStateDataQueue = [ActPackState() for count in range(dataQueueSize)];
+	actPackStateDataQueue = [ActPackState() for count in range(dataQueueSize)]
 
 	itemsRead = flexsea.fxReadDeviceAll(devId, byref(actPackStateDataQueue), dataQueueSize)
 	if (itemsRead == -1):
@@ -398,7 +398,7 @@ def fxReadBMSDeviceAll(devId, dataQueueSize):
 	"""
 	global flexsea
 
-	bmsStateDataQueue = [BMSState() for count in range(dataQueueSize)];
+	bmsStateDataQueue = [BMSState() for count in range(dataQueueSize)]
 
 	itemsRead = flexsea.fxReadNetMasterDeviceAll(devId, byref(bmsStateDataQueue), dataQueueSize)
 	if (itemsRead == -1):
@@ -545,16 +545,21 @@ def loadFlexsea():
 	print('[pyFlexsea Module]\n')
 
 	loadSucceeded  = False
-	is_64bits = sys.maxsize > 2**32
+	# is_64bits = sys.maxsize > 2**32
+	if (sys.maxsize > 2**32):
+		print('You are using 64-bit Python.  This program requires 32-bit Python')
+		return False
 	sysOS = platform.system().lower()
 	dir_path = os.path.dirname(os.path.realpath(__file__))
+
 	# we currently support Ubuntu and Raspbian so need to make sure we are pulling
 	# in correct library depending on which version of linux
-	linux_distro = platform.linux_distribution()[0]
+	# linux_distro = platform.linux_distribution()[0]
+
+	print('>>> dir_path:', dir_path)
 	# check whether we are running on a 32 or 64 bit machine
 	architecture = platform.architecture()[0]
 	librarypaths = []
-	print(platform)
 	if("win" in sysOS):
 		# load proper library based on host architecture
 		if architecture == "32bit":
@@ -562,6 +567,9 @@ def loadFlexsea():
 		else:
 			lpath_base = os.path.join(dir_path,'../../libs/win64')
 		librarypaths = [os.path.join(lpath_base,'libfx_plan_stack.dll')]
+		# Python 3.8+ requires location of all DLLs AND their dependencies be explicitly
+		# stated. Provide location of DLLs that libfx_plan_stack.dll depends on
+		os.add_dll_directory(os.path.join(dir_path,'../'))
 	else:
 		# Try to load the full linux lib first (that's x86_64), if that
 		# fails, fall back to the raspberryPi lib.
