@@ -547,7 +547,7 @@ def loadFlexsea():
 	loadSucceeded  = False
 	# is_64bits = sys.maxsize > 2**32
 	if (sys.maxsize > 2**32):
-		print('You are using 64-bit Python.  This program requires 32-bit Python')
+		print('You are using 64-bit Python. This program requires 32-bit Python')
 		return False
 	sysOS = platform.system().lower()
 	dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -569,7 +569,8 @@ def loadFlexsea():
 		librarypaths = [os.path.join(lpath_base,'libfx_plan_stack.dll')]
 		# Python 3.8+ requires location of all DLLs AND their dependencies be explicitly
 		# stated. Provide location of DLLs that libfx_plan_stack.dll depends on
-		os.add_dll_directory(os.path.join(dir_path,'../'))
+		if sys.version_info.minor >= 8:
+			os.add_dll_directory(os.path.join(dir_path,'../'))
 	else:
 		# Try to load the full linux lib first (that's x86_64), if that
 		# fails, fall back to the raspberryPi lib.
