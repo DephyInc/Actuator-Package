@@ -45,7 +45,7 @@ class signal(Enum):
 
 # Generate a sine wave of a specific amplitude and frequency
 def sinGenerator(amplitude, frequency, commandFreq):
-	num_samples = commandFreq / frequency
+	num_samples = np.int32(commandFreq / frequency + 0.5)
 	in_array = np.linspace(-np.pi, np.pi, num_samples)
 	sin_vals = amplitude * np.sin(in_array)
 	return sin_vals
@@ -205,7 +205,7 @@ def sendAndTimeCmds(t0, devId0, devId1, device2: bool, initialPos0, initialPos1,
 def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 		positionAmplitude = 10000, currentAmplitude = 2500,
 		positionFreq = 1, currentFreq = 5, currentAsymmetricG = 1.25,
-		numberOfLoops = 720):
+		numberOfLoops = 5):
 	global times		# Elapsed time since strart of run
 	global currentRequests
 	global positionRequests
@@ -269,24 +269,29 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 	# Generate control profiles
 	print('Command table #1 - Position Sine:')
 	positionSamples = sinGenerator(positionAmplitude, positionFreq, commandFreq)
+	print("number of samples is: ", len(positionSamples))
 	print(np.int64(positionSamples))
+
 	print('Command table #2 - Current Sine:')
 	currentSamples = sinGenerator(currentAmplitude, currentFreq, commandFreq)
 	print("number of samples is: ", len(currentSamples))
 	print(np.int64(currentSamples))
+
 	print('Command table #3 - Current Sine:')
 	currentSamplesLine = lineGenerator(0, 0.15, commandFreq)
-	#print(np.int64(currentSamplesLine))
+	print("number of samples is: ", len(currentSamplesLine))
+	print(np.int64(currentSamplesLine))
 
 	# Initialize lists
 	# cycleStopTimes = []
 
 	try:
-		t0 = time()	# Record start time of experiment
+		t0 = time()		# Record start time of experiment
 		i = 0
+		loop_count = 0
 		for reps in range(0, numberOfLoops):
-
-			print("")
+			loop_count += 1
+			print('Loop:', loop_count, ' of: ', numberOfLoops, end='\r')
 			print("Rep #", reps+1,"out of",numberOfLoops)
 			print("-------------------")
 
@@ -509,25 +514,25 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 	print("Requested command frequency: "+"{:.2f}".format(commandFreq))
 	print("Actual command frequency (Hz): "+"{:.2f}".format(command_frequency))
 	print("")
-	print('currentSamplesLine: ',		len(currentSamplesLine))
-	print('size(times)',			len(times))
-	print('size(currentRequests): ',	len(currentRequests))
+
+	print('currentSamplesLine: ',			len(currentSamplesLine))
+	print('size(times)',					len(times))
+	print('size(currentRequests): ',		len(currentRequests))
 	print('size(currentMeasurements0): ',	len(currentMeasurements0))
-	print('size(setGainsTimes): ',		len(setGainsTimes))
-	print('')
+	print('size(setGainsTimes): ',			len(setGainsTimes))
 
-        ######## Summary stats about intividual arrays: #########
-	print('\n\ntimes: ',			stats.describe(times))
-	print('\n\ncurrentRequests: ',		stats.describe(currentRequests))
-	print('\n\ncurrentMeasurements0: ',	stats.describe(currentMeasurements0))
+	######## Summary stats about intividual arrays: #########
+	print('\ntimes: ',					stats.describe(times))
+	print('\ncurrentRequests: ',		stats.describe(currentRequests))
+	print('\ncurrentMeasurements0: ',	stats.describe(currentMeasurements0))
 	# print('\n\ncurrentMeasurements1: ',	stats.describe(currentMeasurements1))
-	print('\n\npositionRequests: ',		stats.describe(positionRequests))
-	print('\n\npositionMeasurements0: ',	stats.describe(positionMeasurements0))
+	print('\npositionRequests: ',		stats.describe(positionRequests))
+	print('\npositionMeasurements0: ',	stats.describe(positionMeasurements0))
 	# print('\n\npositionMeasurements1: ',	stats.describe(positionMeasurements1))
-	print('\n\nreadDeviceTimes: ',		stats.describe(readDeviceTimes))
-	print('\n\nsendMotorTimes: ',		stats.describe(sendMotorTimes))
-	print('\n\nseetGainsTimes: ',		stats.describe(setGainsTimes))
-
+	print('\nreadDeviceTimes: ',		stats.describe(readDeviceTimes))
+	print('\nsendMotorTimes: ',			stats.describe(sendMotorTimes))
+	print('\nsetGainsTimes: ',			stats.describe(setGainsTimes))
+	print('')
 
 	######## End of Main Code #########
 
@@ -639,7 +644,9 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 	# #######
 	# *** ToDo: add plotting for 2nd device here ***
 	# #######
-	
+
+	if (os.name == 'nt'):
+		print('\nIn Windows, press Ctrl+BREAK to exit.  Ctrl+C may not work.')
 	plt.show()
 
 if __name__ == '__main__':

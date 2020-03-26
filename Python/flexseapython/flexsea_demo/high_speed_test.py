@@ -3,24 +3,11 @@ from time import sleep, time, strftime
 from enum import Enum
 import numpy as np
 import matplotlib.pyplot as plt
-#Next two lines are used to plot in a browser:
 import matplotlib
 matplotlib.use('WebAgg')
 
-
-# Toggle profiling to identify any performance bottlenecks
-doProfile=False
-if (doProfile):
-	import cProfile
-	pr = cProfile.Profile()
-	# Surround problematic code with following 2 lines:
-	# pr.enable()
-	# pr.disable()
-	# Make following the last line in your code:
-	# pr.print_stats(sort='time')
-
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-print(pardir)
+print('pardir: ', pardir)
 sys.path.append(pardir)
 from fxUtil import *
 
@@ -64,7 +51,6 @@ def lineGenerator(amplitude, commandFreq):
 def fxHighSpeedTest(port0, baudRate, port1="", controllerType=Controller.current,
 	signalType=signal.sine, commandFreq=1000, signalAmplitude=1000, numberOfLoops=40,
 	signalFreq=5, cycleDelay=.1, requestJitter=False, jitter=20):
-
 	secondDevice = False
 	if (port1 != ""):
 		secondDevice = True
@@ -79,18 +65,18 @@ def fxHighSpeedTest(port0, baudRate, port1="", controllerType=Controller.current
 	dataLog = False # Data log logs device data
 
 	delay_time = float(1/(float(commandFreq)))
-	print(delay_time)
+	print('delay_time: ', delay_time)
 
 	########### Open the device and start streaming ############
-	devId0 = fxOpen(port0, baudRate, debugLoggingLevel) 
+	devId0 = fxOpen(port0, baudRate, debugLoggingLevel)
 	fxStartStreaming(devId0, commandFreq, dataLog)
-	print('Connected to device with ID ',devId0)
+	print('Connected to device with ID ', devId0)
 
 	devId1 = -1
 	if (secondDevice):
 		devId1 = fxOpen(port1, baudRate, debugLoggingLevel) 
 		fxStartStreaming(devId1, commandFreq, dataLog)
-		print('Connected to device with ID ',devId1)
+		print('Connected to device with ID ', devId1)
 
 	############# Main Code ############
 	######## Make your changes here #########
@@ -153,7 +139,10 @@ def fxHighSpeedTest(port0, baudRate, port1="", controllerType=Controller.current
 	
 	# Record start time of experiment
 	t0 = time()
+	loop_count = 0
 	for reps in range(0, numberOfLoops):
+		loop_count += 1
+		print('Loop:', loop_count, ' of:', numberOfLoops, end='\r')
 		for sample in samples:
 			if (i % 2 == 0 and requestJitter):
 				sample = sample + jitter
@@ -216,6 +205,7 @@ def fxHighSpeedTest(port0, baudRate, port1="", controllerType=Controller.current
 
 		# We'll draw a line at the end of every period
 		cycleStopTimes.append(time() - t0)
+	print('')
 	elapsed_time = time() - t0
 
 	fxCloseAll()
@@ -227,7 +217,7 @@ def fxHighSpeedTest(port0, baudRate, port1="", controllerType=Controller.current
 	actual_period = cycleStopTimes[0]
 	actual_frequency = 1 / actual_period
 	command_frequency = i / elapsed_time
-	print("i: " + str(i) + ", elapsed_time: " + str(elapsed_time))
+	print("i: ", i, ", elapsed_time: ", elapsed_time)
 
 	if (controllerType == Controller.current):
 		plt.figure(1)
@@ -242,8 +232,8 @@ def fxHighSpeedTest(port0, baudRate, port1="", controllerType=Controller.current
 		plt.legend(loc='upper right')
 
 		# Draw a vertical line at the end of each cycle
-#		for endpoints in cycleStopTimes:
-#			plt.axvline(x=endpoints)
+		# for endpoints in cycleStopTimes:
+		#	plt.axvline(x=endpoints)
 
 	elif (controllerType == Controller.position):
 		plt.figure(1)
@@ -345,8 +335,8 @@ def fxHighSpeedTest(port0, baudRate, port1="", controllerType=Controller.current
 			for endpoints in cycleStopTimes:
 				plt.axvline(x=endpoints)
 
-
-
+	if (os.name == 'nt'):
+		print('\nIn Windows, press Ctrl+BREAK to exit.  Ctrl+C may not work.')
 	plt.show()
 
 if __name__ == '__main__':

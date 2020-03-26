@@ -1,4 +1,8 @@
-import os, sys
+import os
+import sys
+if sys.platform == 'win32':		# For Python 3.8+ compatibility:
+	import asyncio
+	asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 thisdir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(thisdir)
 
