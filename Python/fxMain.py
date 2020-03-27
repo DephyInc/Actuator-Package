@@ -19,7 +19,7 @@ from flexseapython.flexsea_demo.high_stress_test import fxHighStressTest
 from flexseapython.flexsea_demo.two_devices_positioncontrol import fxTwoDevicePositionControl
 from flexseapython.flexsea_demo.impedancecontrol import fxImpedanceControl
 from flexseapython.flexsea_demo.two_devices_leaderfollower import fxLeaderFollower
-#from flexseapython.flexsea_demo.twopositioncontrol import fxTwoPositionControl
+from flexseapython.flexsea_demo.twopositioncontrol import fxTwoPositionControl
 
 def fxRunFindPoles(port, baudRate):
 	devId = fxOpen(port, baudRate, 0)
@@ -66,7 +66,7 @@ experiments =  [									\
 	(fxHighStressTest, "High Stress Test"),	\
 #	(fxUserRW, "User RW"), \
 	(fxRunFindPoles,	"Find Poles"),			\
-#	(fxTwoPositionControl, "Two Positions Control"), \
+	(fxTwoPositionControl, "Two Positions Control"), \
 	(fxTwoDevicePositionControl,	"Two Devices Position Control"),	 \
 	(fxLeaderFollower,	"Two Devices Leader Follower Control"),
 ]
