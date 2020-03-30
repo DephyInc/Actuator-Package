@@ -1,8 +1,11 @@
-import os, sys
+from signal import signal, SIGINT
+import os
+import sys
+# from sys import exit
+# import traceback
+
 thisdir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(thisdir)
-
-import traceback
 
 from flexseapython.pyFlexsea import *
 from flexseapython.fxUtil import *
@@ -17,12 +20,22 @@ from flexseapython.flexsea_demo.impedancecontrol import fxImpedanceControl
 from flexseapython.flexsea_demo.two_devices_leaderfollower import fxLeaderFollower
 #from flexseapython.flexsea_demo.twopositioncontrol import fxTwoPositionControl
 
+
+def handler(signal_received, frame):
+	# Handle any cleanup here
+	print('SIGINT or CTRL-C detected.  Exiting gracefully ...')
+	sys.exit(0)
+
+
 def fxRunFindPoles(port, baudRate):
 	devId = fxOpen(port, baudRate, 0)
 	if (fxFindPoles(devId) == FxInvalidDevice):
 		raise ValueError('fxFindPoles: invalid device ID')
 
+
 def main():
+	# Tell Python to run the handler() function when SIGINT is recieved
+	signal(SIGINT, handler)
 	print('')
 	scriptPath = os.path.dirname(os.path.abspath(__file__))
 	fpath = scriptPath + '/flexseapython/com.txt'
@@ -30,9 +43,10 @@ def main():
 	print('Loaded ports: ' + str(ports))
 	print('Using baud rate: ' + str(baudRate))
 
+	if ((expNumb := selectExperiment()) == -1):
+		print('Quitting ...')
+		sys.exit(0)
 	try:
-		expNumb = selectExperiment()
-		
 		if (expNumb == 5 or expNumb == 6): # High speed/stress tests
 			numDevices = input('\nHow many devices to use for high speed test (1 or 2)?\n')
 			if (int(numDevices) == 1):
@@ -72,7 +86,8 @@ def selectExperiment():
 	for i in range(0, len(experiments)):
 		expString = expString + '[' + str(i) + '] ' + str(experiments[i][1]) + '\n'
 
-	choice = input('\nChoose an experiment:\n' + expString )
+	if ((choice := input('\nChoose an experiment [q to quit]:\n' + expString )) == 'q'):
+		return -1
 	return int(choice)
 
 main()
