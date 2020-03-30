@@ -12,21 +12,20 @@ def clear():
 		os.system('clear')
 
 def printActPack(devId):
-	exoState = fxReadDevice(devId)
-	print('Gyro X          ', exoState.gyrox)
-	print('Gyro Y          ', exoState.gyroy)
-	print('Gyro Z          ', exoState.gyroz)
-	print('Accel X         ', exoState.accelx)
-	print('Accel Y         ', exoState.accely)
-	print('Accel Z         ', exoState.accelz)
-	print('Motor Angle     ', exoState.encoderAngle)
-	print('Motor Velocity  ', exoState.encoderVelocity)
-	print('Motor Current   ', exoState.motorCurrent)
-	print('Battery Current ', exoState.batteryCurrent)
-	print('Battery Voltage ', exoState.batteryVoltage)
-	print('Battery Temp    ', exoState.batteryTemp)
+	actPackState = fxReadDevice(devId)
+	print('Gyro X:          ', actPackState.gyrox)
+	print('Gyro Y:          ', actPackState.gyroy)
+	print('Gyro Z:          ', actPackState.gyroz)
+	print('Accel X:         ', actPackState.accelx)
+	print('Accel Y:         ', actPackState.accely)
+	print('Accel Z:         ', actPackState.accelz)
+	print('Motor Angle:     ', actPackState.encoderAngle)
+	print('Motor Velocity:  ', actPackState.encoderVelocity)
+	print('Motor Current:   ', actPackState.motorCurrent)
+	print('Battery Current: ', actPackState.batteryCurrent)
+	print('Battery Voltage: ', actPackState.batteryVoltage)
+	print('Battery Temp:    ', actPackState.batteryTemp)
 	print('')
-
 
 def printNetMaster(devId):
 	netMasterState = fxReadNetMasterDevice(devId)
@@ -54,7 +53,7 @@ def printBMSState(devId):
 	for i in range(3):
 		print('temperature[', i, ']: ', bmsState.temperature[i])
 
-def fxReadOnly(port, baudRate, time=6, time_step=0.1):
+def fxReadOnly(port, baudRate, time = 6, time_step = 0.1):
 	print(port)
 	devId =	fxOpen(port, baudRate)
 	print(devId)
