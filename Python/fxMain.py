@@ -1,8 +1,11 @@
 from signal import signal, SIGINT
 import os
 import sys
-# from sys import exit
-# import traceback
+import traceback
+
+if sys.platform == 'win32':		# For Python 3.8 compatibility:
+	import asyncio
+	asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 thisdir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(thisdir)
@@ -18,7 +21,7 @@ from flexseapython.flexsea_demo.high_stress_test import fxHighStressTest
 from flexseapython.flexsea_demo.two_devices_positioncontrol import fxTwoDevicePositionControl
 from flexseapython.flexsea_demo.impedancecontrol import fxImpedanceControl
 from flexseapython.flexsea_demo.two_devices_leaderfollower import fxLeaderFollower
-#from flexseapython.flexsea_demo.twopositioncontrol import fxTwoPositionControl
+from flexseapython.flexsea_demo.twopositioncontrol import fxTwoPositionControl
 
 
 def handler(signal_received, frame):
@@ -76,7 +79,7 @@ experiments =  [									\
 	(fxHighStressTest, "High Stress Test"),	\
 #	(fxUserRW, "User RW"), \
 	(fxRunFindPoles,	"Find Poles"),			\
-#	(fxTwoPositionControl, "Two Positions Control"), \
+	(fxTwoPositionControl, "Two Positions Control"), \
 	(fxTwoDevicePositionControl,	"Two Devices Position Control"),	 \
 	(fxLeaderFollower,	"Two Devices Leader Follower Control"),
 ]

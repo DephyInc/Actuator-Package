@@ -542,8 +542,6 @@ def fxFindPoles(devId):
 def loadFlexsea():
 	global flexsea
 	#Init code:
-	print('[pyFlexsea Module]\n')
-
 	loadSucceeded  = False
 	# is_64bits = sys.maxsize > 2**32
 	if (sys.maxsize > 2**32):
@@ -556,7 +554,6 @@ def loadFlexsea():
 	# in correct library depending on which version of linux
 	# linux_distro = platform.linux_distribution()[0]
 
-	print('>>> dir_path:', dir_path)
 	# check whether we are running on a 32 or 64 bit machine
 	architecture = platform.architecture()[0]
 	librarypaths = []
