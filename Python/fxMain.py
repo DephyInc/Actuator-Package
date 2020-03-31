@@ -46,7 +46,8 @@ def main():
 	print('Loaded ports: ' + str(ports))
 	print('Using baud rate: ' + str(baudRate))
 
-	if ((expNumb := selectExperiment()) == -1):
+	expNumb = selectExperiment()
+	if expNumb == -1:
 		print('Quitting ...')
 		sys.exit(0)
 	try:
@@ -89,7 +90,8 @@ def selectExperiment():
 	for i in range(0, len(experiments)):
 		expString = expString + '[' + str(i) + '] ' + str(experiments[i][1]) + '\n'
 
-	if ((choice := input('\nChoose an experiment [q to quit]:\n' + expString )) == 'q'):
+	choice = input('\nChoose an experiment [q to quit]:\n' + expString)
+	if choice == 'q':
 		return -1
 	return int(choice)
 
