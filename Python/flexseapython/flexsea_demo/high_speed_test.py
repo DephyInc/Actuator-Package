@@ -148,7 +148,6 @@ def fxHighSpeedTest(port0, baudRate, port1="", controllerType=Controller.current
 		loopCtr += 1
 		elapsed_time = time() - t0
 		print('Loop:', loopCtr, 'of', numberOfLoops, '- Elapsed time:', int(elapsed_time+0.5), 's', end='\r')
-		# print('i:', i, ', elapsed_time:', int(elapsed_time+0.5))
 		for sample in samples:
 			if (i % 2 == 0 and requestJitter):
 				sample = sample + jitter
@@ -220,7 +219,6 @@ def fxHighSpeedTest(port0, baudRate, port1="", controllerType=Controller.current
 
 	elapsed_time = time() - t0
 	print('Loop:', loopCtr, 'of', numberOfLoops, '- Elapsed time:', int(elapsed_time+0.5), 's')
-	# print('i:', i, ', elapsed_time:', int(elapsed_time+0.5))
 	actual_period = cycleStopTimes[0]
 	actual_frequency = 1 / actual_period
 	command_frequency = i / elapsed_time

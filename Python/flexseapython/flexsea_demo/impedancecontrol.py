@@ -15,7 +15,8 @@ K = 325
 B = 0
 B_Increments = 125
 
-def fxImpedanceControl(port, baudRate, expTime = 7, time_step = 0.02, delta = 7500, transition_time = 0.8, resolution = 500):
+def fxImpedanceControl(port, baudRate, expTime = 15, time_step = 0.02, delta = 7500,
+	transition_time = 0.8, resolution = 500):
 
 	devId = fxOpen(port, baudRate, 0) 
 	fxStartStreaming(devId, resolution, True)
@@ -64,14 +65,13 @@ def fxImpedanceControl(port, baudRate, expTime = 7, time_step = 0.02, delta = 75
 			currentPos = (currentPos + 1) % 2
 			fxSendMotorCommand(devId, FxImpedance, positions[currentPos])
 		sleep(time_step)
-		preamble = "Holding position: {}...".format(positions[currentPos])
-		print(preamble)	
+		print('Holding position:', positions[currentPos], end='\r')
 		# Plotting:
 		measurements.append(measuredPos)
 		times.append(time() - t0)
 		requests.append(positions[currentPos])
 
-	# Close device and do device cleanup
+	print('')
 	fxClose(devId)
 	
 	# Plot before we exit:
@@ -82,6 +82,8 @@ def fxImpedanceControl(port, baudRate, expTime = 7, time_step = 0.02, delta = 75
 	plt.ylabel("Encoder position")
 	plt.title(title)
 	plt.legend(loc='upper right')
+	if (os.name == 'nt'):
+		print('\nIn Windows, press Ctrl+BREAK to exit.  Ctrl+C may not work.')
 	plt.show()
 	
 	return result
