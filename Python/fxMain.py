@@ -26,7 +26,7 @@ from flexseapython.flexsea_demo.twopositioncontrol import fxTwoPositionControl
 
 def handler(signal_received, frame):
 	# Handle any cleanup here
-	print('SIGINT or CTRL-C detected.  Exiting gracefully ...')
+	print('SIGINT or CTRL-C detected\nExiting gracefully ...')
 	sys.exit(0)
 
 
@@ -68,7 +68,7 @@ def main():
 
 	except Exception as e:
 		print(traceback.format_exc())
-	print('Exiting fxMain()')
+	print('\nExiting fxMain()')
 
 experiments =  [									\
 	(fxReadOnly,		"Read Only"),			\

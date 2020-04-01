@@ -54,6 +54,7 @@ def fxImpedanceControl(port, baudRate, expTime = 20, time_step = 0.02, delta = 7
 	# Run demo
 	loop_ctr = 0
 	B = -B_Increments # We do that to make sure we start at 0
+	print('')
 	for i in range(num_time_steps):
 		loop_ctr += 1
 		data = fxReadDevice(devId)
@@ -85,7 +86,7 @@ def fxImpedanceControl(port, baudRate, expTime = 20, time_step = 0.02, delta = 7
 	plt.title(title)
 	plt.legend(loc='upper right')
 	if (os.name == 'nt'):
-		print('\nIn Windows, press Ctrl+BREAK to exit.  Ctrl+C may not work.')
+		print('\nIn Windows, press Ctrl+BREAK to exit.  Ctrl+C may not work...')
 	plt.show()
 	
 	return result

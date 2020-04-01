@@ -139,11 +139,11 @@ def fxHighSpeedTest(port0, baudRate, port1="", controllerType=Controller.current
 			fxSetGains(devId1, 300, 50, 0, 0, 0)
 	else:
 		assert 0, 'Invalid controllerType'
-	
+
 	# Record start time of experiment
 	i = 0
 	t0 = time()
-	loopCtr = 0
+	loop_count = 0
 	for reps in range(0, numberOfLoops):
 		loopCtr += 1
 		elapsed_time = time() - t0

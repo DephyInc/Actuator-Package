@@ -6,9 +6,22 @@ import os
 def clearTerminal():
 	isWin = os.name == 'nt'
 	if isWin:
-		os.system('cls') #Clear terminal (Win)
+		os.system('cls')	#Clear terminal (Win)
 	else:
-		os.system('clear') #Clear terminal (Unix)
+		os.system('clear')	#Clear terminal (Unix)
+
+
+def printDevice(actPackState):
+	print('State time       ', actPackState.timestamp)
+	print('Accel X          ', actPackState.accelx)
+	print('Accel Y          ', actPackState.accely)
+	print('Accel Z          ', actPackState.accelz)
+	print('Gyro X           ', actPackState.gyrox)
+	print('Gyro Y           ', actPackState.gyroy)
+	print('Gyro Z           ', actPackState.gyroz)
+	print('Motor angle      ', actPackState.encoderAngle)
+	print('Motor voltage    ', actPackState.motorVoltage)
+
 
 # By default takes just one device from your com.txt file
 # If two arguments are passed, one is the path of the COM.txt file
