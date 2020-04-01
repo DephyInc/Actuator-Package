@@ -26,34 +26,34 @@ def printDevice(actPackState):
 	print('Motor angle:   ', actPackState.encoderAngle)
 	print('Motor voltage: ', actPackState.motorVoltage)
 
-def fxTwoPositionControl(port, baudRate, expTime=10, time_step=0.1, delta=10000,
-		transition_time=1.5, resolution=100):
-	# open device
+def fxTwoPositionControl(port, baudRate, expTime = 10, time_step = 0.1, delta = 10000,
+		transition_time = 1.5, resolution = 100):
+	# Open device
 	devId = fxOpen(port, baudRate, 0)
-	fxStartStreaming(devId, resolution, shouldLog=False)
+	fxStartStreaming(devId, resolution, shouldLog = False)
 	sleep(0.1)
 
-	# setting initial angle and angle waypoints
+	# Setting initial angle and angle waypoints
 	actPackState = fxReadDevice(devId)
 	printDevice(actPackState)
 	initialAngle = actPackState.encoderAngle
 
-	# setting angle waypoints
+	# Setting angle waypoints
 	positions = [initialAngle, initialAngle + delta]
 	current_pos = 0
 	num_pos = 2
 
-	# setting loop duration and transition rate
+	# Setting loop duration and transition rate
 	num_time_steps = int(expTime/time_step)
 	transition_steps = int(transition_time/time_step)
 
-	# setting gains (devId, kp, ki, kd, K, B)
-	fxSetGains(devId, 50, 3, 0, 0, 0)
+	# Setting gains (devId, kp, ki, kd, K, B)
+	fxSetGains(devId, 150, 100, 0, 0, 0)
 
-	# setting position control at initial position
+	# Setting position control at initial position
 	fxSendMotorCommand(devId, FxPosition, initialAngle)
 
-	# matplotlib - initialize lists
+	# Matplotlib - initialize lists
 	requests = []
 	measurements = []
 	times = []
@@ -63,24 +63,24 @@ def fxTwoPositionControl(port, baudRate, expTime=10, time_step=0.1, delta=10000,
 	sleep(0.4)
 	t0 = time()
 
-	# start two position control
+	# Start two position control
 	for i in range(num_time_steps):
 		actPackState = fxReadDevice(devId)
 		printDevice(actPackState)
+		print('Holding position:', positions[current_pos], '\n')
 		measuredPos = actPackState.encoderAngle
 
 		if i % transition_steps == 0:
 			current_pos = (current_pos + 1) % num_pos
 			fxSendMotorCommand(devId, FxPosition, positions[current_pos])
 		sleep(time_step)
-		print('Holding position:', positions[current_pos], '\n')
 
-		# plotting
+		# Plotting
 		times.append(time() - t0)
 		requests.append(positions[current_pos])
 		measurements.append(measuredPos)
 
-	# close device and do device cleanup
+	# Close device and do device cleanup
 	close_check = fxClose(devId)
 
 	# Plot before exit:
@@ -92,7 +92,7 @@ def fxTwoPositionControl(port, baudRate, expTime=10, time_step=0.1, delta=10000,
 	plt.title(title)
 	plt.legend(loc='upper right')
 	if (os.name == 'nt'):
-		print('\nIn Windows, press Ctrl+BREAK to exit.  Ctrl+C may not work.')
+		print('\nIn Windows, press Ctrl+BREAK to exit. Ctrl+C may not work.')
 	plt.show()
 
 	return close_check
