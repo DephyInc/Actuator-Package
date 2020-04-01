@@ -18,18 +18,20 @@ B_Increments = 125
 def fxImpedanceControl(port, baudRate, expTime = 20, time_step = 0.02, delta = 7500,
 	transition_time = 0.8, resolution = 500):
 
-	devId = fxOpen(port, baudRate, logLevel=6) 
-	fxStartStreaming(devId, resolution, shouldLog=False)
+	# Open device
+	devId = fxOpen(port, baudRate, logLevel = 6)
+	fxStartStreaming(devId, resolution, shouldLog = False)
+	sleep(0.1)
 	
-	result = True
-	
+	# Read initial angle
 	data = fxReadDevice(devId)
 	initialAngle = data.encoderAngle
 	
+	result = True
 	timeout = 100
 	timeoutCount = 0
 	transition_steps = int(transition_time / time_step)
-			
+	
 	# Initialize lists - matplotlib
 	requests = []
 	measurements = []
@@ -37,6 +39,7 @@ def fxImpedanceControl(port, baudRate, expTime = 20, time_step = 0.02, delta = 7
 	i = 0
 	t0 = 0
 
+	# Setpoint = initial angle
 	fxSendMotorCommand(devId, FxImpedance, initialAngle)
 	# Set gains
 	global B
@@ -66,7 +69,7 @@ def fxImpedanceControl(port, baudRate, expTime = 20, time_step = 0.02, delta = 7
 			currentPos = (currentPos + 1) % 2
 			fxSendMotorCommand(devId, FxImpedance, positions[currentPos])
 		sleep(time_step)
-		print('Loop ', loop_ctr, ' of ', num_time_steps, '- Holding position:',
+		print('Loop', loop_ctr, 'of', num_time_steps, '| Holding position:',
 			 positions[currentPos], end='\r')
 		# Plotting:
 		measurements.append(measuredPos)
