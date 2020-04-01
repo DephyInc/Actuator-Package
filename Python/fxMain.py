@@ -23,18 +23,15 @@ from flexseapython.flexsea_demo.impedancecontrol import fxImpedanceControl
 from flexseapython.flexsea_demo.two_devices_leaderfollower import fxLeaderFollower
 from flexseapython.flexsea_demo.twopositioncontrol import fxTwoPositionControl
 
-
 def handler(signal_received, frame):
 	# Handle any cleanup here
-	print('SIGINT or CTRL-C detected.  Exiting gracefully ...')
+	print('SIGINT or CTRL-C detected. Exiting gracefully...')
 	sys.exit(0)
-
 
 def fxRunFindPoles(port, baudRate):
 	devId = fxOpen(port, baudRate, 0)
 	if (fxFindPoles(devId) == FxInvalidDevice):
 		raise ValueError('fxFindPoles: invalid device ID')
-
 
 def main():
 	# Tell Python to run the handler() function when SIGINT is recieved
@@ -71,18 +68,18 @@ def main():
 	print('Exiting fxMain()')
 
 experiments =  [									\
-	(fxReadOnly,		"Read Only"),			\
-	(fxOpenControl, "Open Control"),		\
-	(fxCurrentControl, "Current Control"),	\
-	(fxPositionControl, "Position Control"),	\
-	(fxImpedanceControl, "Impedance Control"), \
-	(fxHighSpeedTest, "High Speed Test"),	\
-	(fxHighStressTest, "High Stress Test"),	\
-#	(fxUserRW, "User RW"), \
-	(fxRunFindPoles,	"Find Poles"),			\
-	(fxTwoPositionControl, "Two Positions Control"), \
+	(fxReadOnly,					"Read Only"),			\
+	(fxOpenControl, 				"Open Control"),		\
+	(fxCurrentControl, 				"Current Control"),	\
+	(fxPositionControl,				"Position Control"),	\
+	(fxImpedanceControl, 			"Impedance Control"), \
+	(fxHighSpeedTest, 				"High Speed Test"),	\
+	(fxHighStressTest, 				"High Stress Test"),	\
+	#(fxUserRW, 					"User RW"), \
+	(fxRunFindPoles,				"Find Poles"),			\
+	(fxTwoPositionControl, 			"Two Positions Control"), \
 	(fxTwoDevicePositionControl,	"Two Devices Position Control"),	 \
-	(fxLeaderFollower,	"Two Devices Leader Follower Control"),
+	(fxLeaderFollower,				"Two Devices Leader Follower Control"),
 ]
 
 def selectExperiment():
