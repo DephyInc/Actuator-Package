@@ -7,6 +7,18 @@ import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use('WebAgg')
 
+
+# Toggle profiling to identify any performance bottlenecks
+doProfile=False
+if (doProfile):
+	import cProfile
+	pr = cProfile.Profile()
+	# Surround problematic code with following 2 lines:
+	# pr.enable()
+	# pr.disable()
+	# Make following the last line in your code:
+	# pr.print_stats(sort='time')
+
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 print(pardir)
 sys.path.append(pardir)
@@ -36,25 +48,23 @@ def lineGenerator(amplitude, commandFreq):
 	line_vals = [ amplitude for i in range(num_samples) ]
 	return line_vals
 
-
+# Port: port with outgoing serial connection to ActPack
+# Baud Rate : baud rate of outgoing serial connection to ActPack
+# Controller Type: Position controller or current controller
+# Signal Type: Sine wave or line
+# Command Freq: Desired frequency of issuing commands to controller, actual 
+#	command frequency will be slower due to OS overhead.
+# Signal Amplitude: Amplitude of signal to send to controller. Encoder position
+#	if position controller, current in mA if current controller
+# Number of Loops: Number of times to send desired signal to controller
+# Signal Freq: Frequency of sine wave if using sine wave signal
+# Cycle Delay: Delay between signals sent to controller, use with sine wave only
+# Request Jitter: Add jitter amount to every other sample sent to controller
+# Jitter: Amount of jitter
 def fxHighSpeedTest(port0, baudRate, port1="", controllerType=Controller.current,
-	signalType=signal.sine, commandFreq=1000, signalAmplitude=1000, numberOfLoops=30,
+	signalType=signal.sine, commandFreq=1000, signalAmplitude=1000, numberOfLoops=40,
 	signalFreq=5, cycleDelay=.1, requestJitter=False, jitter=20):
-	"""
-	port			Port with outgoing serial connection to ActPack
-	baudRate		Baud rate of outgoing serial connection to ActPack
-	controllerType	Position controller or current controller
-	signalType		Sine wave or line
-	commandFreq		Desired frequency of issuing commands to controller, actual 
-					command frequency will be slower due to OS overhead.
-	signalAmplitude	Amplitude of signal to send to controller. Encoder position
-					if position controller, current in mA if current controller
-	nmberOfLoops	Number of times to send desired signal to controller
-	signalFreq		Frequency of sine wave if using sine wave signal
-	cycleDelay		Delay between signals sent to controller, use with sine wave only
-	requestJitter	Add jitter amount to every other sample sent to controller
-	jitter			Amount of jitter
-	"""
+
 	secondDevice = False
 	if (port1 != ""):
 		secondDevice = True
@@ -69,7 +79,6 @@ def fxHighSpeedTest(port0, baudRate, port1="", controllerType=Controller.current
 	dataLog = False # Data log logs device data
 
 	delay_time = float(1/(float(commandFreq)))
-	print(delay_time)
 
 	########### Open the device and start streaming ############
 	devId0 = fxOpen(port0, baudRate, debugLoggingLevel) 
@@ -123,10 +132,12 @@ def fxHighSpeedTest(port0, baudRate, port1="", controllerType=Controller.current
 	cycleStopTimes = []
 	currentCommandTimes = []
 	streamCommandTimes = []
+	i = 0
+	t0 = 0
 
 	# Prepare controller:
 	if (controllerType == Controller.current):
-		print("Setting up current control demo. Low current, high frequency: motor shouldn't move.")
+		print("Setting up current control demo")
 		fxSetGains(devId0, 300, 50, 0, 0, 0)
 		if (secondDevice):
 			fxSetGains(devId1, 300, 50, 0, 0, 0)
@@ -140,13 +151,11 @@ def fxHighSpeedTest(port0, baudRate, port1="", controllerType=Controller.current
 		assert 0, 'Invalid controllerType'
 
 	# Record start time of experiment
-	i = 0
 	t0 = time()
-	loop_count = 0
+	loop_ctr=0
 	for reps in range(0, numberOfLoops):
-		loopCtr += 1
-		elapsed_time = time() - t0
-		print('Loop:', loopCtr, 'of', numberOfLoops, '- Elapsed time:', int(elapsed_time+0.5), 's', end='\r')
+		loop_ctr += 1
+		print('Loop:', loop_ctr, ' of:', numberOfLoops)
 		for sample in samples:
 			if (i % 2 == 0 and requestJitter):
 				sample = sample + jitter
@@ -209,6 +218,7 @@ def fxHighSpeedTest(port0, baudRate, port1="", controllerType=Controller.current
 
 		# We'll draw a line at the end of every period
 		cycleStopTimes.append(time() - t0)
+	elapsed_time = time() - t0
 
 	fxCloseAll()
 
@@ -216,11 +226,11 @@ def fxHighSpeedTest(port0, baudRate, port1="", controllerType=Controller.current
 
 	######## Plotting Code, you can edit this ##################
 
-	elapsed_time = time() - t0
-	print('Loop:', loopCtr, 'of', numberOfLoops, '- Elapsed time:', int(elapsed_time+0.5), 's')
 	actual_period = cycleStopTimes[0]
 	actual_frequency = 1 / actual_period
 	command_frequency = i / elapsed_time
+	# print("i: " + str(i) + ", elapsed_time: " + str(elapsed_time))
+	print('i:', i, ', elapsed_time, ', elapsed_time)
 
 	if (controllerType == Controller.current):
 		plt.figure(1)
@@ -235,8 +245,8 @@ def fxHighSpeedTest(port0, baudRate, port1="", controllerType=Controller.current
 		plt.legend(loc='upper right')
 
 		# Draw a vertical line at the end of each cycle
-#		for endpoints in cycleStopTimes:
-#			plt.axvline(x=endpoints)
+		# for endpoints in cycleStopTimes:
+		#	plt.axvline(x=endpoints)
 
 	elif (controllerType == Controller.position):
 		plt.figure(1)
@@ -256,13 +266,14 @@ def fxHighSpeedTest(port0, baudRate, port1="", controllerType=Controller.current
 
 	###### begin command times plotting ########################################33
 
-	# Babar: Following 6 lines are legacy code. Remove eventually.
+	# Following 6 lines are legacy code. Remove eventually.
 	#plt.figure(2)
 	#title = "Current and stream command times (aggregate)"
 	#plt.title(title)
 	#plt.plot(currentCommandTimes,color='b', label='Current Command Times')
 	#plt.plot(streamCommandTimes, color='r', label='Stream Command Times')
 	#plt.legend(loc='upper right')
+
 
 	plt.figure(2)
 	# Convert command times into millisec
@@ -301,6 +312,7 @@ def fxHighSpeedTest(port0, baudRate, port1="", controllerType=Controller.current
 	plt.xlabel("Time (ms)")
 	plt.ylabel("Occurrences")
 
+
 	##### end command times plotting ########################################33
 
 	if (secondDevice):
@@ -335,9 +347,7 @@ def fxHighSpeedTest(port0, baudRate, port1="", controllerType=Controller.current
 			# Draw a vertical line at the end of each cycle
 			for endpoints in cycleStopTimes:
 				plt.axvline(x=endpoints)
-
-	if (os.name == 'nt'):
-		print('\nIn Windows, press Ctrl+BREAK to exit.  Ctrl+C may not work.')
+	print('In Windows, press Ctrl + BREAK to exit')
 	plt.show()
 
 if __name__ == '__main__':
