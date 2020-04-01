@@ -5,12 +5,6 @@ pardir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file_
 sys.path.append(pardir)
 from flexseapython.fxUtil import *
 
-def clear():
-	if os.name == 'nt':
-		os.system('cls')
-	else:
-		os.system('clear')
-
 def printActPack(devId):
 	actPackState = fxReadDevice(devId)
 	print('Gyro X:          ', actPackState.gyrox)
@@ -61,7 +55,7 @@ def fxReadOnly(port, baudRate, time = 6, time_step = 0.1):
 	appType = fxGetAppType(devId)
 
 	for i in range(int(time/time_step)):
-		clear()
+		clearTerminal()
 		if (appType == FxActPack):
 			printActPack(devId)
 		elif (appType == FxNetMaster):

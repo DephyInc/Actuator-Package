@@ -8,14 +8,8 @@ from fxUtil import *
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pardir)
 
-def clear():
-	if os.name == 'nt':
-		os.system('cls')
-	else:
-		os.system('clear')
-
 def printDevice(actPackState):
-	clear()
+	clearTerminal()
 	print('State time:    ', actPackState.timestamp)
 	print('Accel X        ', actPackState.accelx)
 	print('Accel Y:       ', actPackState.accely)

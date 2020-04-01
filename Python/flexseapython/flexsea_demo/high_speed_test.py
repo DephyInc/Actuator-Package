@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use('WebAgg')
 
-
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 print(pardir)
 sys.path.append(pardir)
@@ -127,7 +126,7 @@ def fxHighSpeedTest(port0, baudRate, port1="", controllerType=Controller.current
 
 	# Prepare controller:
 	if (controllerType == Controller.current):
-		print("Setting up current control demo")
+		print("Setting up current control demo. Low current, high frequency: motor shouldn't move.")
 		fxSetGains(devId0, 300, 50, 0, 0, 0)
 		if (secondDevice):
 			fxSetGains(devId1, 300, 50, 0, 0, 0)

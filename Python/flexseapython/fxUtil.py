@@ -6,9 +6,9 @@ import os
 def clearTerminal():
 	isWin = os.name == 'nt'
 	if isWin:
-		os.system('cls') #Clear terminal (Win)
+		os.system('cls')	#Clear terminal (Win)
 	else:
-		os.system('clear') #Clear terminal (Unix)
+		os.system('clear')	#Clear terminal (Unix)
 
 # By default takes just one device from your com.txt file
 # If two arguments are passed, one is the path of the COM.txt file

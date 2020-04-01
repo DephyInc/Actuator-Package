@@ -20,6 +20,7 @@ def fxCurrentControl(port, baudRate, holdCurrent = [1000], time = 4, time_step =
 			desCurrent = int((current-prevCurrent) * (i / float(num_time_steps)) + prevCurrent)
 			fxSendMotorCommand(devId, FxCurrent, desCurrent)
 			sleep(time_step)
+			clearTerminal()
 			print('Holding Current: ', desCurrent, ' mA...')
 			actPack = fxReadDevice(devId)
 			print('Measured Current: ', actPack.motorCurrent, ' mA...')
@@ -27,13 +28,13 @@ def fxCurrentControl(port, baudRate, holdCurrent = [1000], time = 4, time_step =
 		prevCurrent = current
 
 	print('Turning off current control...')
-	# ramp down first
+	# Ramp down first
 	n = 50
 	for i in range(0, n):
 		fxSendMotorCommand(devId, FxCurrent, prevCurrent * (n-i)/n)
 		sleep(0.04)
 
-	# wait for motor to spin down
+	# Wait for motor to spin down
 	fxSendMotorCommand(devId, FxCurrent, 0)
 	actPack = fxReadDevice(devId)
 	lastAngle = actPack.encoderAngle
@@ -47,6 +48,7 @@ def fxCurrentControl(port, baudRate, holdCurrent = [1000], time = 4, time_step =
 		actPack = fxReadDevice(devId)
 		currentAngle = actPack.encoderAngle
 
+	fxClose(devId)
 	return True
 
 if __name__ == '__main__':
