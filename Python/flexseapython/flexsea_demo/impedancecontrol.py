@@ -15,11 +15,11 @@ K = 325
 B = 0
 B_Increments = 125
 
-def fxImpedanceControl(port, baudRate, expTime = 15, time_step = 0.02, delta = 7500,
+def fxImpedanceControl(port, baudRate, expTime = 20, time_step = 0.02, delta = 7500,
 	transition_time = 0.8, resolution = 500):
 
-	devId = fxOpen(port, baudRate, 0) 
-	fxStartStreaming(devId, resolution, True)
+	devId = fxOpen(port, baudRate, logLevel=6) 
+	fxStartStreaming(devId, resolution, shouldLog=False)
 	
 	result = True
 	
@@ -52,9 +52,10 @@ def fxImpedanceControl(port, baudRate, expTime = 15, time_step = 0.02, delta = 7
 	t0 = time()
 	
 	# Run demo
-	print(result)
+	loop_ctr = 0
 	B = -B_Increments # We do that to make sure we start at 0
 	for i in range(num_time_steps):
+		loop_ctr += 1
 		data = fxReadDevice(devId)
 		measuredPos = data.encoderAngle
 		if i % transition_steps == 0:
@@ -65,7 +66,8 @@ def fxImpedanceControl(port, baudRate, expTime = 15, time_step = 0.02, delta = 7
 			currentPos = (currentPos + 1) % 2
 			fxSendMotorCommand(devId, FxImpedance, positions[currentPos])
 		sleep(time_step)
-		print('Holding position:', positions[currentPos], end='\r')
+		print('Loop ', loop_ctr, ' of ', num_time_steps, '- Holding position:',
+			 positions[currentPos], end='\r')
 		# Plotting:
 		measurements.append(measuredPos)
 		times.append(time() - t0)
