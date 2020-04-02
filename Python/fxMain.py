@@ -24,17 +24,22 @@ from flexseapython.flexsea_demo.two_devices_leaderfollower import fxLeaderFollow
 from flexseapython.flexsea_demo.twopositioncontrol import fxTwoPositionControl
 
 def handler(signal_received, frame):
-	# Handle any cleanup here
-	print('SIGINT or CTRL-C detected')
-	print('Exiting gracefully ...')
-	sys.exit(0)
+	sys.exit('SIGINT or CTRL-C detected\nExiting gracefully ...')
 
 def fxRunFindPoles(port, baudRate):
 	devId = fxOpen(port, baudRate, 0)
 	if (fxFindPoles(devId) == FxInvalidDevice):
 		raise ValueError('fxFindPoles: invalid device ID')
 
-def main():
+def main(argv):
+	numDevices = 0
+	if len(argv) > 1:		# We have command-line arguments
+		numDevices_str = argv[1]
+		if numDevices_str.isdecimal():
+			numDevices = int(numDevices_str)
+		else:				# Invalid number of devices
+			sys.exit('\nUsage: python fxMain.py [number_of_devices]')
+
 	# Tell Python to run the handler() function when SIGINT is recieved
 	signal(SIGINT, handler)
 	print('')
@@ -46,18 +51,22 @@ def main():
 
 	expNumb = selectExperiment()
 	if expNumb == -1:
-		print('Quitting ...')
-		sys.exit(0)
+		sys.exit('Quitting')
 	try:
 		if (expNumb == 5 or expNumb == 6): # High speed/stress tests
-			numDevices = input('\nHow many devices to use for high speed test (1 or 2)?\n')
+			if numDevices < 1:		# User didn't specify this on command line
+				numDevices_str = input('\nNumber of devices?\t')
+				if numDevices_str.isdecimal():
+					numDevices = int(numDevices_str)
+				else:
+					error_msg = 'Invalid number of devices [' + numDevices_str + ']. Exiting...'
+					sys.exit(error_msg)
 			if (int(numDevices) == 1):
 				experiments[expNumb][0](ports[0],int(baudRate))
 			elif (int(numDevices) == 2):
 				experiments[expNumb][0](ports[0],int(baudRate),ports[1])
 			else:
-				print('Invalid number of devices to use for high speed test. Exiting...')
-				exit()
+				sys.exit('Not implemented: Handling >2 attached devices.')
 
 		elif(expNumb < len(experiments) - 2):
 			experiments[expNumb][0](ports[0],int(baudRate))
@@ -65,7 +74,7 @@ def main():
 			experiments[expNumb][0](ports[0],ports[1],int(baudRate))
 
 	except Exception as e:
-		print(traceback.format_exc())
+		print(traceback.format_exc(e))
 	print('\nExiting fxMain()')
 
 experiments =  [									\
@@ -93,4 +102,5 @@ def selectExperiment():
 		return -1
 	return int(choice)
 
-main()
+if __name__ == '__main__':
+	main(sys.argv)
