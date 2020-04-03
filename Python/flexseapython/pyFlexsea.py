@@ -101,7 +101,7 @@ class BMSState(Structure):
 ### FlexSEA device, and is used by most of the functions in this library to
 ### specify which device to run that function on.
 
-def fxOpen(port, baudRate, logLevel = 4):
+def fxOpen(port, baudRate, logLevel = 6):
 	"""
 	Establish a connection with a FlexSEA device.
 
@@ -167,7 +167,7 @@ def fxGetDeviceIds():
 	asList = asList[: asList.index(-1) ]
 	return asList
 
-def fxStartStreaming(devId, frequency, shouldLog):
+def fxStartStreaming(devId, frequency, shouldLog=False):
 	"""
 	Start streaming data from a FlexSEA device.
 

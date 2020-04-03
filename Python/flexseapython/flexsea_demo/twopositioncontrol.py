@@ -8,28 +8,16 @@ from fxUtil import *
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pardir)
 
-def printDevice(actPackState):
-	clearTerminal()
-	print('State time:    ', actPackState.timestamp)
-	print('Accel X        ', actPackState.accelx)
-	print('Accel Y:       ', actPackState.accely)
-	print('Accel Z:       ', actPackState.accelz)
-	print('Gyro X:        ', actPackState.gyrox)
-	print('Gyro Y:        ', actPackState.gyroy)
-	print('Gyro Z:        ', actPackState.gyroz)
-	print('Motor angle:   ', actPackState.encoderAngle)
-	print('Motor voltage: ', actPackState.motorVoltage)
 
-def fxTwoPositionControl(port, baudRate, expTime = 10, time_step = 0.1, delta = 10000,
-		transition_time = 1.5, resolution = 100):
+def fxTwoPositionControl(port, baudRate, expTime = 13, time_step = 0.1,
+		delta = 10000, transition_time = 1.5, resolution = 100):
 	# Open device
 	devId = fxOpen(port, baudRate, 0)
-	fxStartStreaming(devId, resolution, shouldLog = False)
+	fxStartStreaming(devId, resolution)
 	sleep(0.1)
 
 	# Setting initial angle and angle waypoints
 	actPackState = fxReadDevice(devId)
-	printDevice(actPackState)
 	initialAngle = actPackState.encoderAngle
 
 	# Setting angle waypoints
@@ -51,23 +39,21 @@ def fxTwoPositionControl(port, baudRate, expTime = 10, time_step = 0.1, delta = 
 	requests = []
 	measurements = []
 	times = []
+
 	i = 0
-	t0 = 0
-
-	sleep(0.4)
 	t0 = time()
-
 	# Start two position control
 	for i in range(num_time_steps):
+		sleep(time_step)
+		clearTerminal()
 		actPackState = fxReadDevice(devId)
 		printDevice(actPackState)
-		print('Holding position:', positions[current_pos], '\n')
+		print('Holding position  ', positions[current_pos])
 		measuredPos = actPackState.encoderAngle
 
 		if i % transition_steps == 0:
 			current_pos = (current_pos + 1) % num_pos
 			fxSendMotorCommand(devId, FxPosition, positions[current_pos])
-		sleep(time_step)
 
 		# Plotting
 		times.append(time() - t0)

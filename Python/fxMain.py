@@ -75,6 +75,7 @@ def main(argv):
 
 	except Exception as e:
 		print(traceback.format_exc(e))
+
 	print('\nExiting fxMain()')
 
 experiments =  [									\
@@ -85,7 +86,7 @@ experiments =  [									\
 	(fxImpedanceControl, 			"Impedance Control"), \
 	(fxHighSpeedTest, 				"High Speed Test"),	\
 	(fxHighStressTest, 				"High Stress Test"),	\
-	#(fxUserRW, 					"User RW"), \
+	# (fxUserRW, 					"User RW"), \
 	(fxRunFindPoles,				"Find Poles"),			\
 	(fxTwoPositionControl, 			"Two Positions Control"), \
 	(fxTwoDevicePositionControl,	"Two Devices Position Control"),	 \

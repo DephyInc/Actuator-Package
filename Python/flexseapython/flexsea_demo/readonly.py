@@ -5,21 +5,6 @@ pardir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file_
 sys.path.append(pardir)
 from flexseapython.fxUtil import *
 
-def printActPack(devId):
-	actPackState = fxReadDevice(devId)
-	print('Gyro X:          ', actPackState.gyrox)
-	print('Gyro Y:          ', actPackState.gyroy)
-	print('Gyro Z:          ', actPackState.gyroz)
-	print('Accel X:         ', actPackState.accelx)
-	print('Accel Y:         ', actPackState.accely)
-	print('Accel Z:         ', actPackState.accelz)
-	print('Motor Angle:     ', actPackState.encoderAngle)
-	print('Motor Velocity:  ', actPackState.encoderVelocity)
-	print('Motor Current:   ', actPackState.motorCurrent)
-	print('Battery Current: ', actPackState.batteryCurrent)
-	print('Battery Voltage: ', actPackState.batteryVoltage)
-	print('Battery Temp:    ', actPackState.batteryTemp)
-	print('')
 
 def printNetMaster(devId):
 	netMasterState = fxReadNetMasterDevice(devId)
@@ -40,6 +25,7 @@ def printNetMaster(devId):
 	print('NetNode7 - accelx: ', netMasterState.netNode[7].accelx, ', accely: ', netMasterState.netNode[7].accely, ' accelz: ', netMasterState.netNode[7].accelz)
 	print('NetNode7 - gyrox:  ', netMasterState.netNode[7].gyrox,  ', gyroy:  ', netMasterState.netNode[7].gyroy,  ' gyroz:  ', netMasterState.netNode[7].gyroz)
 
+
 def printBMSState(devId):
 	bmsState = fxReadBMSDevice(devId)
 	for i in range(9):
@@ -47,32 +33,30 @@ def printBMSState(devId):
 	for i in range(3):
 		print('temperature[', i, ']: ', bmsState.temperature[i])
 
-def fxReadOnly(port, baudRate, time = 6, time_step = 0.1):
-	print(port)
+
+def fxReadOnly(port, baudRate, time = 8, time_step = 0.1):
+	# print(port)
 	devId =	fxOpen(port, baudRate)
-	print(devId)
-	fxStartStreaming(devId, frequency = 100, shouldLog = True)
+	# print(devId)
+	fxStartStreaming(devId, frequency = 100)
 	appType = fxGetAppType(devId)
 
 	for i in range(int(time/time_step)):
+		sleep(time_step)
 		clearTerminal()
+		actPackState = fxReadDevice(devId)
 		if (appType == FxActPack):
-			printActPack(devId)
+			printDevice(actPackState)
 		elif (appType == FxNetMaster):
 			printNetMaster(devId)
 		elif (appType == FxBMS):
-			printBMS(devId)
+			printBMSState(devId)
 		elif (appType == FxExo):
 			print('Exo not supported with public actpack software')
 		else:
 			raise RuntimeError('Unsupported application type: ', appType)
 
-		# sys.stdout.flush()
-		sleep(time_step)
-
-	#Close device
 	fxClose(devId)
-
 	return True
 
 if __name__ == '__main__':

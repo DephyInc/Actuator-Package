@@ -5,21 +5,14 @@ pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pardir)
 from fxUtil import *
 
-def printDevice(actPackState):
-	print('State time: ', actPackState.timestamp)
-	print('Accel X: ', actPackState.accelx, ', Accel Y: ', actPackState.accely, ' Accel Z: ', actPackState.accelz)
-	print('Gyro X: ', actPackState.gyrox, ', Gyro Y: ', actPackState.gyroy, ' Gyro Z: ', actPackState.gyroz)
-	print('Motor angle: ', actPackState.encoderAngle, ', Motor voltage: ', actPackState.motorVoltage, flush=True)
-
-
 
 def fxTwoDevicePositionControl(port0, port1, baudRate):
 
 	devId0 = fxOpen(port0, baudRate, 0)
 	devId1 = fxOpen(port1, baudRate, 0)
 
-	fxStartStreaming(devId0, 200, True)
-	fxStartStreaming(devId1, 200, True)
+	fxStartStreaming(devId0, 200)
+	fxStartStreaming(devId1, 200)
 
 	sleep(0.2)
 
@@ -38,16 +31,14 @@ def fxTwoDevicePositionControl(port0, port1, baudRate):
 	try:
 		while(True):
 			sleep(0.2)
-			os.system('cls')
-			preamble = "Holding position, two devices: "
-			print(preamble)
+			clearTerminal()
+			print("Holding position, two devices: ")
 	
 			actPackState0 = fxReadDevice(devId0)
 			actPackState1 = fxReadDevice(devId1)
 			
 			printDevice(actPackState0)
 			printDevice(actPackState1)
-
 	except:
 		pass
 
