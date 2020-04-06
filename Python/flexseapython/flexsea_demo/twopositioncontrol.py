@@ -8,7 +8,6 @@ from fxUtil import *
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pardir)
 
-
 def fxTwoPositionControl(port, baudRate, expTime = 13, time_step = 0.1,
 		delta = 10000, transition_time = 1.5, resolution = 100):
 	# Open device
@@ -45,12 +44,14 @@ def fxTwoPositionControl(port, baudRate, expTime = 13, time_step = 0.1,
 	# Start two position control
 	for i in range(num_time_steps):
 		sleep(time_step)
-		clearTerminal()
 		actPackState = fxReadDevice(devId)
-		printDevice(actPackState)
-		print('Holding position  ', positions[current_pos])
+		clearTerminal()
 		measuredPos = actPackState.encoderAngle
-
+		print('Desired:              ', positions[current_pos])
+		print('Measured:             ', measuredPos)
+		print('Difference:           ', (measuredPos - positions[current_pos]), '\n')
+		printDevice(actPackState)
+		
 		if i % transition_steps == 0:
 			current_pos = (current_pos + 1) % num_pos
 			fxSendMotorCommand(devId, FxPosition, positions[current_pos])

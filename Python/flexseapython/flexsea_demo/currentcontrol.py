@@ -20,11 +20,12 @@ def fxCurrentControl(port, baudRate, holdCurrent = [1000], time = 6, time_step =
 			desCurrent = int((current-prevCurrent) * (i / float(num_time_steps)) + prevCurrent)
 			fxSendMotorCommand(devId, FxCurrent, desCurrent)
 			sleep(time_step)
-			clearTerminal()
-			print('Holding Current (mA):  ', desCurrent)
 			actPack = fxReadDevice(devId)
-			print('Measured Current (mA): ', actPack.motorCurrent)
-			print('Observed delta:        ', (actPack.motorCurrent - desCurrent))
+			clearTerminal()
+			print('Desired  (mA):        ', desCurrent)
+			print('Measured  (mA):       ', actPack.motorCurrent)
+			print('Difference (mA):      ', (actPack.motorCurrent - desCurrent), '\n')
+			printDevice(actPack)
 		prevCurrent = current
 
 	print('Turning off current control...')

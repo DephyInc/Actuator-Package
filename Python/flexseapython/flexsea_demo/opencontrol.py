@@ -18,24 +18,27 @@ def fxOpenControl(port, baudRate, time = 2, num_times = 5,
 	for time in range(num_times):
 		direction = direction * sign
 
+		#Ramp-up:
 		for i in range(numSteps):
 			sleep(time_resolution)
 			mV = direction * maxVoltage * (i*1.0 / numSteps)
 			fxSendMotorCommand(devId, FxVoltage, mV)
 			clearTerminal()
-			print(u"\u2191", 'Ramping up open controller...')
+			print('Ramping up motor voltage...\n')
 			data0 = fxReadDevice(devId)
 			printDevice(data0)
 
+		#Ramp-down:
 		for i in range(numSteps):
 			sleep(time_resolution)
 			mV = direction * maxVoltage * ((numSteps - i)*1.0 / numSteps)
 			fxSendMotorCommand(devId, FxVoltage, mV)
 			clearTerminal()
-			print(u"\u2193", 'Ramping down open controller...')
+			print('Ramping down motor voltage...\n')
 			data0 = fxReadDevice(devId)
 			printDevice(data0)
 
+	fxClose(devId)
 	return True
 
 if __name__ == '__main__':

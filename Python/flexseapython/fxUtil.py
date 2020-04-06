@@ -10,21 +10,19 @@ def clearTerminal():
 	else:
 		os.system('clear')	#Clear terminal (Unix)
 
-
 def printDevice(actPackState: ActPackState):
-	print('State time        ', actPackState.timestamp)
-	print('Accel X           ', actPackState.accelx)
-	print('Accel Y           ', actPackState.accely)
-	print('Accel Z           ', actPackState.accelz)
-	print('Gyro X            ', actPackState.gyrox)
-	print('Gyro Y            ', actPackState.gyroy)
-	print('Gyro Z            ', actPackState.gyroz)
-	print('Motor angle       ', actPackState.encoderAngle)
-	print('Motor voltage     ', actPackState.motorVoltage)
-	print('Battery Current mA', actPackState.batteryCurrent)
-	print('Battery Voltage V ', actPackState.batteryVoltage/1000)
-	print('Battery Temp C    ', actPackState.batteryTemp)
-
+	print('State time:           ', actPackState.timestamp)
+	print('Accel X:              ', actPackState.accelx)
+	print('Accel Y:              ', actPackState.accely)
+	print('Accel Z:              ', actPackState.accelz)
+	print('Gyro X:               ', actPackState.gyrox)
+	print('Gyro Y:               ', actPackState.gyroy)
+	print('Gyro Z:               ', actPackState.gyroz)
+	print('Motor angle:          ', actPackState.encoderAngle)
+	print('Motor voltage:        ', actPackState.motorVoltage)
+	print('Battery Current (mA): ', actPackState.batteryCurrent)
+	print('Battery Voltage (mV): ', actPackState.batteryVoltage)
+	print('Battery Temp (C):     ', actPackState.batteryTemp)
 
 # By default takes just one device from your com.txt file
 # If two arguments are passed, one is the path of the COM.txt file

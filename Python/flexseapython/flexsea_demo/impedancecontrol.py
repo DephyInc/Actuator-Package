@@ -42,7 +42,7 @@ def fxImpedanceControl(port, baudRate, expTime = 20, time_step = 0.02, delta = 7
 	# Setpoint = initial angle
 	fxSendMotorCommand(devId, FxImpedance, initialAngle)
 	# Set gains
-	global B
+	global B, K, kp, ki
 	fxSetGains(devId, kp, ki, 0, K, B)
 
 	# Select transition rate and positions
@@ -70,14 +70,18 @@ def fxImpedanceControl(port, baudRate, expTime = 20, time_step = 0.02, delta = 7
 			currentPos = (currentPos + 1) % 2
 			fxSendMotorCommand(devId, FxImpedance, positions[currentPos])
 		sleep(time_step)
-		print('Loop', loop_ctr, 'of', num_time_steps, '| Holding position:',
-			 positions[currentPos], end='\r')
+		#We downsample the display refresh:
+		if i % 10 == 0:
+			clearTerminal()
+			print('Loop', loop_ctr, 'of', num_time_steps)
+			print('Holding position:', positions[currentPos])
+			print('K =', K, 'B =', B, 'kp =', kp, 'ki =', ki, '\n')
+			printDevice(data)
 		# Plotting:
 		measurements.append(measuredPos)
 		times.append(time() - t0)
 		requests.append(positions[currentPos])
 
-	print('')
 	fxClose(devId)
 	
 	# Plot before we exit:
