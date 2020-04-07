@@ -78,18 +78,18 @@ def main(argv):
 
 	print('\nExiting fxMain()')
 
-experiments =  [									\
-	(fxReadOnly,					"Read Only"),			\
-	(fxOpenControl, 				"Open Control"),		\
-	(fxCurrentControl, 				"Current Control"),	\
-	(fxPositionControl,				"Position Control"),	\
-	(fxImpedanceControl, 			"Impedance Control"), \
-	(fxHighSpeedTest, 				"High Speed Test"),	\
-	(fxHighStressTest, 				"High Stress Test"),	\
-	# (fxUserRW, 					"User RW"), \
-	(fxRunFindPoles,				"Find Poles"),			\
-	(fxTwoPositionControl, 			"Two Positions Control"), \
-	(fxTwoDevicePositionControl,	"Two Devices Position Control"),	 \
+experiments = [																\
+	(fxReadOnly,					"Read Only"),							\
+	(fxOpenControl, 				"Open Control"),						\
+	(fxCurrentControl, 				"Current Control"),						\
+	(fxPositionControl,				"Position Control"),					\
+	(fxImpedanceControl, 			"Impedance Control"),					\
+	(fxHighSpeedTest, 				"High Speed Test"),						\
+	(fxHighStressTest, 				"High Stress Test"),					\
+	#(fxUserRW, 					"User RW"), 							\
+	(fxRunFindPoles,				"Find Poles"),							\
+	(fxTwoPositionControl, 			"Two Positions Control"),				\
+	(fxTwoDevicePositionControl,	"Two Devices Position Control"),		\
 	(fxLeaderFollower,				"Two Devices Leader Follower Control"),
 ]
 
