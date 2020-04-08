@@ -26,125 +26,112 @@ from flexseapython.flexsea_demo.twopositioncontrol import fxTwoPositionControl
 def handler(signal_received, frame):
 	sys.exit('\nCTRL-C or SIGINT detected\nExiting ...')
 
-
 def fxRunFindPoles(port, baudRate):
 	devId = fxOpen(port, baudRate, 0)
 	if (fxFindPoles(devId) == FxInvalidDevice):
 		raise ValueError('fxFindPoles: invalid device ID')
 
-
-experiments =  [
-	(fxReadOnly,					"Read Only"),
-	(fxOpenControl, 				"Open Control"),
-	(fxCurrentControl, 				"Current Control"),
-	(fxPositionControl,				"Position Control"),
-	(fxImpedanceControl, 			"Impedance Control"),
-	# (fxUserRW, 					"User RW"),
-	(fxRunFindPoles,				"Find Poles"),
-	(fxTwoPositionControl, 			"Two Positions Control"),
-	(fxHighSpeedTest, 				"High Speed Test"),
-	(fxHighStressTest, 				"High Stress Test"),
-	(fxTwoDevicePositionControl,	"Two Devices Position Control"),
-	(fxLeaderFollower,				"Two Devices Leader Follower Control"),
+#List of available experiments.
+#Format is: functionName, text string, max number of devices
+experiments = [
+	(fxReadOnly,					"Read Only",							1),
+	(fxOpenControl, 				"Open Control",							1),
+	(fxCurrentControl, 				"Current Control",						1),
+	(fxPositionControl,				"Position Control",						1),
+	(fxImpedanceControl, 			"Impedance Control",					1),
+	#(fxUserRW, 					"User RW",								1),
+	(fxRunFindPoles,				"Find Poles",							1),
+	(fxTwoPositionControl, 			"Two Positions Control",				1),
+	(fxHighSpeedTest, 				"High Speed Test",						2),
+	(fxHighStressTest, 				"High Stress Test",						2),
+	(fxTwoDevicePositionControl,	"Two Devices Position Control",			2),
+	(fxLeaderFollower,				"Two Devices Leader Follower Control",	2),
 ]
-IDX_MAX			  = len(experiments) - 1
-IDX_MAX_STR		  = str(IDX_MAX)
-IDX_MAX_1_DEV	  = IDX_MAX - 4		# Experiments [0 - 6] accept 1 device only
-IDX_MAX_1_DEV_STR = str(IDX_MAX_1_DEV)
 
+MAX_EXPERIMENT			= len(experiments) - 1
+MAX_EXPERIMENT_STR		= str(MAX_EXPERIMENT)
+MAX_DEVICES				= 2
 
+#Print list of available experiments
 def print_experiments():
-	""" Print list of available experiments """
-	for i in range(IDX_MAX+1):
+	for i in range(MAX_EXPERIMENT+1):
 		print('[' + str(i) + ']', experiments[i][1])
+	print('')
 
-
+#Some error occurred. Print help message and exit.
 def print_usage_exit(prog_name: str):
-	""" Some error occurred.  Print help message and exit. """
 	print('\nUsage:\tPython', prog_name, '[experiment_number (0 - ' + \
-			IDX_MAX_STR + ') connected_devices (1 - 2)]')
-	print('\t"connected_devices" ONLY required for experiment_number [' + str(IDX_MAX_1_DEV + 1)  + \
-			'- ' + IDX_MAX_STR + '].\n' + \
+			MAX_EXPERIMENT_STR + ') connected_devices (1 - 2)]')
+	print('\t"connected_devices" ONLY required for specific experiments\n' +
 			'\tOther experiments use [1] device by default.\n')
-	print_experiments()
 	sys.exit(0)
 
+#Obtain experiment number from argument list or by prompting user
+def get_exp_num(num_cl_args, argv):
+	exp_num = -1
+	if(num_cl_args > 0):
+		#Get it from the command line argument list
+		exp_num = argv[1]
+	else:
+		#Or prompt the user for it
+		if(exp_num := input('Choose experiment number [q to quit]: ')) == 'q':
+			sys.exit('Quitting ...')
+	#Make sure it's valid and in range:
+	if(not exp_num.isdecimal()):	#Filter out letters
+		sys.exit('Please choose an experiment between [0 - ' + str(MAX_EXPERIMENT) + ']')
+	exp_num = int(exp_num)			#Make sure is a int and not a string
+	if((exp_num < 0) or (exp_num > MAX_EXPERIMENT)):	#And make sure it's in range
+		sys.exit('Please choose an experiment between [0 - ' + str(MAX_EXPERIMENT) + ']')
 
-def parse_exp_num( argv):
-	""" Parse command line args to get the experiment number """
-	exp_num_str = argv[1]
-	if not exp_num_str.isdecimal():
-		print_usage_exit(argv[0])
-	exp_num = int(exp_num_str)
-	if exp_num < 0 or exp_num > IDX_MAX:
-		print('\nInvalid  exp_num:', exp_num)
-		print_usage_exit(argv[0])
 	return exp_num
 
+#Obtain number of devices from argument list or by prompting user
+def get_dev_num(num_cl_args, argv, exp_num):
+	dev_num = 1
+	
+	#We only bother if this experiment supports more than 1 device
+	if(experiments[exp_num][2] > 1):
+		print('Max number of devices for this experiment:', experiments[exp_num][2])
+	else:
+		#Nothing to do here, return default = 1
+		return dev_num
+	
+	#Code below is executed when this experiment supports more than # device	
+	if(num_cl_args > 1):
+		#Get it from the command line argument list
+		dev_num = argv[2]
+	else:
+		#Or prompt the user for it
+		if(dev_num := input('Enter connected devices [q to quit]: ')) == 'q':
+			sys.exit('Quitting ...')
+	
+	#Make sure it's valid and in range:
+	if(not dev_num.isdecimal()):	#Filter out letters
+		sys.exit('Please choose a valid number of devices.')
+	dev_num = int(dev_num)			#Make sure is a int and not a string
+	if((dev_num < 1) or (dev_num > experiments[exp_num][2])):	#And make sure it's in range
+		sys.exit('Please choose a valid number of devices.')
 
-def parse_num_dev(argv, exp_num: int):
-	""" Parse command line args to get count of connected devices """
-	if len(argv) != 3:					# Defensive programming
-		print_usage_exit(argv[0])
-	num_dev_str = argv[2]
-	if not num_dev_str.isdecimal():
-		print_usage_exit(argv[0])
-	num_dev = int(num_dev_str)
-	if num_dev < 1 or num_dev > 2:
-		print('\nInvalid num_dev:', num_dev)
-		print_usage_exit(argv[0])
-	elif num_dev == 2 and exp_num <= IDX_MAX_1_DEV:
-		print('\nExperiment [' + str(exp_num) + '] only accepts [1] connected device.')
-		print_usage_exit(argv[0])
-	return num_dev
-
-
-def get_exp_num():
-	""" Prompt user for the experiment number """
-	print_experiments()
-	if (exp_num := input('Choose experiment number\t[q to quit]:\t')) == 'q':
-		sys.exit('Quitting ...')
-	if not exp_num.isdecimal():
-		sys.exit('Please choose an experiment between [0 - ' + str(IDX_MAX) + ']')
-	exp_num = int(exp_num)
-	if exp_num < 0 or exp_num > IDX_MAX:
-		sys.exit('Please choose an experiment between [0 - ' + str(IDX_MAX) + ']')
-	return exp_num
-
-
-def get_num_dev(exp_num: int):
-	""" Prompt user for number of connected devices """
-	if (num_dev := input('Enter connected devices [1 - 2] [q to quit]:\t')) == 'q':
-		sys.exit('Quitting ...')
-	if not num_dev.isdecimal():
-		sys.exit('Please provide a number between [1 - 2]')
-	num_dev = int(num_dev)
-	if num_dev < 1 or num_dev > 2:
-		sys.exit('Please provide a number between [1 - 2]')
-	if num_dev == 2 and exp_num <= (IDX_MAX - 3):
-		print('Experiment [' + str(exp_num) + '] only accepts [1] connected device.')
-		print_usage_exit(argv[0])
-	return num_dev
-
+	return dev_num
 
 def main(argv):
 	signal(SIGINT, handler)				# Handle Ctrl-C or SIGINT
 
 	exp_num = -1
 	num_dev = 1
+	
+	print('\n>>> Actuator Package Python Demo Scripts <<<\n')
 
-	num_cl_args = len(argv) - 1			# Get count of command line arguments
-	if num_cl_args == 0:				# No command-line arguments
-		exp_num = get_exp_num()
-		if exp_num > IDX_MAX_1_DEV:		# 1 or 2 connected devices
-			num_dev = get_num_dev(exp_num)
-	elif num_cl_args  < 3:				# 1-2 command-line arguments provided
-		exp_num = parse_exp_num( argv)
-		if num_cl_args == 2:
-			num_dev = parse_num_dev(argv, exp_num)
-	else:								# Too many command line arguments provided
+	#Handles command line arguments and experiment setup
+	num_cl_args = len(argv) - 1	# Get count of command line arguments
+	if(num_cl_args < 3):
+		print_experiments()
+		exp_num = get_exp_num(num_cl_args, argv)
+		dev_num = get_dev_num(num_cl_args, argv, exp_num)
+	else:
 		print('\nToo many command line arguments provided.')
 		print_usage_exit(argv[0])
+	
 	print('Running Experiment [' + str(exp_num) + '] with [' + str(num_dev) + '] connected device(s)')
 
 	scriptPath = os.path.dirname(os.path.abspath(__file__))
@@ -154,20 +141,16 @@ def main(argv):
 	print('Using ports:\t', ports)
 	print('Using baud rate:', baudRate)
 
+	#Time to call the demo script:
 	try:
-		if exp_num > IDX_MAX_1_DEV:		# 1 or 2 connected devices
-			if num_dev == 1:
-				experiments[exp_num][0](baudRate, ports[0])
-			else:
-		 		experiments[exp_num][0](baudRate, ports[0], ports[1])
-		else:	# Only 1 connected device permitted. Note order of ports/baudRate is reversed
-		 	experiments[exp_num][0](ports[0], baudRate)
-
+		if(dev_num == 1):
+			experiments[exp_num][0](ports[0], baudRate)
+		elif(dev_num == 2):
+			experiments[exp_num][0](baudRate, ports[0], ports[1])
 	except Exception as e:
 		sys.exit(e)
 
 	print('\nExiting fxMain()')
-
 
 if __name__ == '__main__':
 	main(sys.argv)
