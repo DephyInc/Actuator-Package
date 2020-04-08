@@ -3,7 +3,6 @@ from time import sleep, time, strftime
 from enum import Enum
 import numpy as np
 import matplotlib.pyplot as plt
-#Next two lines are used to plot in a browser:
 import matplotlib
 matplotlib.use('WebAgg')
 
@@ -37,12 +36,12 @@ def lineGenerator(amplitude, commandFreq):
 	return line_vals
 
 
-def fxHighSpeedTest(port0, baudRate, port1="", controllerType=Controller.current,
+def fxHighSpeedTest(baudRate, port0, port1="", controllerType=Controller.current,
 	signalType=signal.sine, commandFreq=1000, signalAmplitude=1000, numberOfLoops=30,
 	signalFreq=5, cycleDelay=.1, requestJitter=False, jitter=20):
 	"""
-	port			Port with outgoing serial connection to ActPack
 	baudRate		Baud rate of outgoing serial connection to ActPack
+	port			Port with outgoing serial connection to ActPack
 	controllerType	Position controller or current controller
 	signalType		Sine wave or line
 	commandFreq		Desired frequency of issuing commands to controller, actual 
@@ -143,10 +142,10 @@ def fxHighSpeedTest(port0, baudRate, port1="", controllerType=Controller.current
 	i = 0
 	t0 = time()
 	loop_count = 0
-	for reps in range(0, numberOfLoops):
-		loopCtr += 1
+	for reps in range(numberOfLoops):
+		loop_count += 1
 		elapsed_time = time() - t0
-		print('Loop:', loopCtr, 'of', numberOfLoops, '- Elapsed time:', int(elapsed_time+0.5), 's', end='\r')
+		print('Loop:', loop_count, 'of', numberOfLoops, '- Elapsed time:', int(elapsed_time+0.5), 's', end='\r')
 		for sample in samples:
 			if (i % 2 == 0 and requestJitter):
 				sample = sample + jitter
@@ -217,7 +216,7 @@ def fxHighSpeedTest(port0, baudRate, port1="", controllerType=Controller.current
 	######## Plotting Code, you can edit this ##################
 
 	elapsed_time = time() - t0
-	print('Loop:', loopCtr, 'of', numberOfLoops, '- Elapsed time:', int(elapsed_time+0.5), 's')
+	print('Loop:', loop_count, 'of', numberOfLoops, '- Elapsed time:', int(elapsed_time+0.5), 's')
 	actual_period = cycleStopTimes[0]
 	actual_frequency = 1 / actual_period
 	command_frequency = i / elapsed_time
@@ -235,8 +234,8 @@ def fxHighSpeedTest(port0, baudRate, port1="", controllerType=Controller.current
 		plt.legend(loc='upper right')
 
 		# Draw a vertical line at the end of each cycle
-#		for endpoints in cycleStopTimes:
-#			plt.axvline(x=endpoints)
+		# for endpoints in cycleStopTimes:
+		# 	plt.axvline(x=endpoints)
 
 	elif (controllerType == Controller.position):
 		plt.figure(1)

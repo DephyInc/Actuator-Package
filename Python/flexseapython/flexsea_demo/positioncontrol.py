@@ -23,11 +23,11 @@ def fxPositionControl(port, baudRate, time = 8, time_step = 0.1,  resolution = 1
 	for i in range(num_time_steps):
 		sleep(time_step)
 		clearTerminal()
-		print('Holding position ', initialAngle, '...')
+		print('Holding position  ', initialAngle, '...')
 		actPackState = fxReadDevice(devId)
 		printDevice(actPackState)
 		currentAngle = actPackState.encoderAngle
-		print("Measured delta   ", currentAngle - initialAngle, flush=True)
+		print("Measured delta    ", currentAngle - initialAngle, flush=True)
 
 	fxClose(devId)
 

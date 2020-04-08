@@ -45,7 +45,8 @@ class signal(Enum):
 
 # Generate a sine wave of a specific amplitude and frequency
 def sinGenerator(amplitude, frequency, commandFreq):
-	num_samples = commandFreq / frequency
+	print('commandFreq:', commandFreq, ', frequency: ', frequency)
+	num_samples = int(round(commandFreq / frequency))
 	in_array = np.linspace(-np.pi, np.pi, num_samples)
 	sin_vals = amplitude * np.sin(in_array)
 	return sin_vals
@@ -202,10 +203,10 @@ def sendAndTimeCmds(t0, devId0, devId1, device2: bool, initialPos0, initialPos1,
 # currentAsymmetricG: we use more current on the "way back" to come back closer to the staring
 # point. Positive numbers only, 1-3 range.
 # Number of Loops: Number of times to send desired signal to controller
-def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
+def fxHighStressTest(baudRate, port0, port1 = "", commandFreq = 1000,
 		positionAmplitude = 10000, currentAmplitude = 2500,
 		positionFreq = 1, currentFreq = 5, currentAsymmetricG = 1.25,
-		numberOfLoops = 720):
+		numberOfLoops = 15):
 	global times		# Elapsed time since strart of run
 	global currentRequests
 	global positionRequests
