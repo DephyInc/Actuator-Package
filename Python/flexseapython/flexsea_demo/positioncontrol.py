@@ -29,7 +29,7 @@ def fxPositionControl(port, baudRate, time = 8, time_step = 0.1,  resolution = 1
 		print('Measured:             ', currentAngle)
 		print('Difference:           ', currentAngle - initialAngle, '\n', flush=True)
 		printDevice(actPackState)
-		
+
 	fxClose(devId)
 
 	return True

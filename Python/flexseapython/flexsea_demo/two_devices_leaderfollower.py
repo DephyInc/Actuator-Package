@@ -8,7 +8,7 @@ sys.path.append(pardir)
 from fxUtil import *
 
 
-def fxLeaderFollower(leaderPort, followerPort, baudRate):
+def fxLeaderFollower(baudRate, leaderPort, followerPort):
 
 	devId0 = fxOpen(leaderPort, baudRate, 0)
 	devId1 = fxOpen(followerPort, baudRate, 0)
