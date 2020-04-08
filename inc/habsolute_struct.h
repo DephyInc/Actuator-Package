@@ -68,6 +68,8 @@ struct HabsoluteState
 		deviceData[HABSOLUTE_ADC_3_POS ]=_deviceStateBuffer[HABSOLUTE_ADC_3_POS ];
 		adc_4=_deviceStateBuffer[HABSOLUTE_ADC_4_POS ];
 		deviceData[HABSOLUTE_ADC_4_POS ]=_deviceStateBuffer[HABSOLUTE_ADC_4_POS ];
+
+
 		adc_5=_deviceStateBuffer[HABSOLUTE_ADC_5_POS ];
 		deviceData[HABSOLUTE_ADC_5_POS ]=_deviceStateBuffer[HABSOLUTE_ADC_5_POS ];
 		adc_6=_deviceStateBuffer[HABSOLUTE_ADC_6_POS ];
