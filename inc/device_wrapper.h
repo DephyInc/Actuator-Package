@@ -101,6 +101,7 @@ bool fxIsOpen(const unsigned int deviceId);
 /// @returns Error codes defined at top of the header
 FxError fxClose(const unsigned int deviceId);
 
+
 /// \brief Disconnect from all FlexSEA devices.
 void fxCloseAll();
 

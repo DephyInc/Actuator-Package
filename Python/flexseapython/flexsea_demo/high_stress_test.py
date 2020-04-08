@@ -203,7 +203,7 @@ def sendAndTimeCmds(t0, devId0, devId1, device2: bool, initialPos0, initialPos1,
 def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 		positionAmplitude = 10000, currentAmplitude = 2500,
 		positionFreq = 1, currentFreq = 5, currentAsymmetricG = 1.25,
-		numberOfLoops = 20):
+		numberOfLoops = 5):
 	global times		# Elapsed time since strart of run
 	global currentRequests
 	global positionRequests
@@ -502,29 +502,29 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 	print("------------")
 	actual_period = cycleStopTimes[0]
 	command_frequency = i / elapsed_time
-	print("Number of commands sent: " + str(i))
-	print("Total time (s): " + str(elapsed_time))
-	print("Requested command frequency: "+"{:.2f}".format(commandFreq))
-	print("Actual command frequency (Hz): "+"{:.2f}".format(command_frequency))
+	print("Number of commands sent:" + str(i))
+	print("Total time (s):" + str(elapsed_time))
+	print("Requested command frequency:"+"{:.2f}".format(commandFreq))
+	print("Actual command frequency (Hz):"+"{:.2f}".format(command_frequency))
 	print("")
-	print('currentSamplesLine: ',		len(currentSamplesLine))
-	print('size(times)',			len(times))
-	print('size(currentRequests): ',	len(currentRequests))
-	print('size(currentMeasurements0): ',	len(currentMeasurements0))
-	print('size(setGainsTimes): ',		len(setGainsTimes))
+	print('currentSamplesLine:',		len(currentSamplesLine))
+	print('size(times):',			len(times))
+	print('size(currentRequests):',	len(currentRequests))
+	print('size(currentMeasurements0):',	len(currentMeasurements0))
+	print('size(setGainsTimes):',		len(setGainsTimes))
 	print('')
 
-	######## Summary stats about intividual arrays: #########
-	print('\n\ntimes: ',			stats.describe(times))
-	print('\n\ncurrentRequests: ',		stats.describe(currentRequests))
-	print('\n\ncurrentMeasurements0: ',	stats.describe(currentMeasurements0))
+	######## Summary stats about individual arrays: #########
+	#print('\n\ntimes: ',			stats.describe(times))
+	#print('\n\ncurrentRequests: ',		stats.describe(currentRequests))
+	#print('\n\ncurrentMeasurements0: ',	stats.describe(currentMeasurements0))
 	# print('\n\ncurrentMeasurements1: ',	stats.describe(currentMeasurements1))
-	print('\n\npositionRequests: ',		stats.describe(positionRequests))
-	print('\n\npositionMeasurements0: ',	stats.describe(positionMeasurements0))
+	#print('\n\npositionRequests: ',		stats.describe(positionRequests))
+	#print('\n\npositionMeasurements0: ',	stats.describe(positionMeasurements0))
 	# print('\n\npositionMeasurements1: ',	stats.describe(positionMeasurements1))
-	print('\n\nreadDeviceTimes: ',		stats.describe(readDeviceTimes))
-	print('\n\nsendMotorTimes: ',		stats.describe(sendMotorTimes))
-	print('\n\nseetGainsTimes: ',		stats.describe(setGainsTimes))
+	#print('\n\nreadDeviceTimes: ',		stats.describe(readDeviceTimes))
+	#print('\n\nsendMotorTimes: ',		stats.describe(sendMotorTimes))
+	#print('\n\nseetGainsTimes: ',		stats.describe(setGainsTimes))
 
 	######## End of Main Code #########
 
@@ -572,65 +572,65 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 	plt.title(title)
 	plt.legend(loc='upper right')
 
-	# Draw a vertical line at the end of each cycle
-	for endpoints in cycleStopTimes:
-		plt.axvline(x=endpoints)
+	# # Draw a vertical line at the end of each cycle
+	# for endpoints in cycleStopTimes:
+		# plt.axvline(x=endpoints)
 
-	plt.figure(3)
-	# Convert command times into millisec
-	sendMotorTimes = [i * 1000 for i in sendMotorTimes]
-	plt.plot(times, sendMotorTimes, color='b', label='Send Motor Times')
-	plt.xlabel("Time (ms)")
-	plt.ylabel("Command Time (ms)")
-	plt.title("Send Motor Times")
-	plt.legend(loc='upper right')
+	# plt.figure(3)
+	# # Convert command times into millisec
+	# sendMotorTimes = [i * 1000 for i in sendMotorTimes]
+	# plt.plot(times, sendMotorTimes, color='b', label='Send Motor Times')
+	# plt.xlabel("Time (ms)")
+	# plt.ylabel("Command Time (ms)")
+	# plt.title("Send Motor Times")
+	# plt.legend(loc='upper right')
 
-	plt.figure(4)
-	plt.yscale('log')
-	plt.hist(sendMotorTimes, bins=100, label = 'Send Motor Times')
-	plt.yscale('log')
-	plt.xlabel("Time (ms)")
-	plt.ylabel("Occurrences")
-	plt.title("Send Motor Commands")
-	plt.legend(loc='upper right')
+	# plt.figure(4)
+	# plt.yscale('log')
+	# plt.hist(sendMotorTimes, bins=100, label = 'Send Motor Times')
+	# plt.yscale('log')
+	# plt.xlabel("Time (ms)")
+	# plt.ylabel("Occurrences")
+	# plt.title("Send Motor Commands")
+	# plt.legend(loc='upper right')
 
-	plt.figure(5)
-	# Convert command times into millisec
-	readDeviceTimes = [i * 1000 for i in readDeviceTimes]
-	plt.plot(times, readDeviceTimes, color='b', label='Read Device Times')
-	plt.xlabel("Time (ms)")
-	plt.ylabel("Command Time (ms)")
-	plt.title("Read Device Commands")
-	plt.legend(loc='upper right')
+	# plt.figure(5)
+	# # Convert command times into millisec
+	# readDeviceTimes = [i * 1000 for i in readDeviceTimes]
+	# plt.plot(times, readDeviceTimes, color='b', label='Read Device Times')
+	# plt.xlabel("Time (ms)")
+	# plt.ylabel("Command Time (ms)")
+	# plt.title("Read Device Commands")
+	# plt.legend(loc='upper right')
 
-	plt.figure(6)
-	plt.yscale('log')
-	plt.hist(readDeviceTimes, bins=100, label = 'Read Device Times')
-	plt.yscale('log')
-	plt.xlabel("Time (ms)")
-	plt.ylabel("Occurrences")
-	plt.title("Read Device Commands")
-	plt.legend(loc='upper right')
+	# plt.figure(6)
+	# plt.yscale('log')
+	# plt.hist(readDeviceTimes, bins=100, label = 'Read Device Times')
+	# plt.yscale('log')
+	# plt.xlabel("Time (ms)")
+	# plt.ylabel("Occurrences")
+	# plt.title("Read Device Commands")
+	# plt.legend(loc='upper right')
 
-	plt.figure(7)
-	# Convert command times into millisec
-	setGainsTimes = [i * 1000 for i in setGainsTimes]
-	plt.plot(times, setGainsTimes, color='b', label='Set Gains Times')
-	plt.xlabel("Time (ms)")
-	plt.ylabel("Command Time (ms)")
-	plt.title("Set Gains Commands")
-	plt.legend(loc='upper right')
+	# plt.figure(7)
+	# # Convert command times into millisec
+	# setGainsTimes = [i * 1000 for i in setGainsTimes]
+	# plt.plot(times, setGainsTimes, color='b', label='Set Gains Times')
+	# plt.xlabel("Time (ms)")
+	# plt.ylabel("Command Time (ms)")
+	# plt.title("Set Gains Commands")
+	# plt.legend(loc='upper right')
 
-	plt.figure(8)
-	plt.yscale('log')
-	# Remove 0 values in histogram
-	setGainsTimes = [i for i in setGainsTimes if i > 0]
-	plt.hist(setGainsTimes, bins=100, label = 'Set Gains Times')
-	plt.yscale('log')
-	plt.xlabel("Time (ms)")
-	plt.ylabel("Occurrences")
-	plt.title("Set Gains Commands")
-	plt.legend(loc='upper right')
+	# plt.figure(8)
+	# plt.yscale('log')
+	# # Remove 0 values in histogram
+	# setGainsTimes = [i for i in setGainsTimes if i > 0]
+	# plt.hist(setGainsTimes, bins=100, label = 'Set Gains Times')
+	# plt.yscale('log')
+	# plt.xlabel("Time (ms)")
+	# plt.ylabel("Occurrences")
+	# plt.title("Set Gains Commands")
+	# plt.legend(loc='upper right')
 
 	# #######
 	# *** ToDo: add plotting for 2nd device here ***
