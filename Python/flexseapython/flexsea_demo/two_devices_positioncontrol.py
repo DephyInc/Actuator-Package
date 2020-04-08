@@ -6,7 +6,7 @@ sys.path.append(pardir)
 from fxUtil import *
 
 
-def fxTwoDevicePositionControl(baudRate, port0, port1):
+def fxTwoDevicePositionControl(port0, baudRate, port1):
 
 	devId0 = fxOpen(port0, baudRate, 0)
 	devId1 = fxOpen(port1, baudRate, 0)

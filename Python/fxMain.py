@@ -146,7 +146,7 @@ def main(argv):
 		if(dev_num == 1):
 			experiments[exp_num][0](ports[0], baudRate)
 		elif(dev_num == 2):
-			experiments[exp_num][0](baudRate, ports[0], ports[1])
+			experiments[exp_num][0](ports[0], baudRate, ports[1])
 	except Exception as e:
 		sys.exit(e)
 
