@@ -99,11 +99,14 @@ def fxImpedanceControl(port, baudRate, expTime = 20, time_step = 0.02, delta = 7
 	if (os.name == 'nt'):
 		print('\nIn Windows, press Ctrl+BREAK to exit.  Ctrl+C may not work...')
 	plt.show()
+	sleep(0.1)
 	
 	#Close device
+	print('End of script, fxClose()')
 	fxClose(devId)
 	
-	return result
+	#return result
+	return True
 
 if __name__ == '__main__':
 	baudRate = sys.argv[1]

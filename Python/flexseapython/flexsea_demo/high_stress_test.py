@@ -226,7 +226,7 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 		print("Running high stress test with one device")
 
 	########### Debug & Data Logging ############
-	debugLoggingLevel = 0 # 6 is least verbose, 0 is most verbose
+	debugLoggingLevel = 6 # 6 is least verbose, 0 is most verbose
 	dataLog = False # Data log logs device data
 
 	delay_time = float(1/(float(commandFreq)))
