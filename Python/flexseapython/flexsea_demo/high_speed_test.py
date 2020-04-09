@@ -208,7 +208,12 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = Controller.cur
 		# We'll draw a line at the end of every period
 		cycleStopTimes.append(time() - t0)
 
-	fxCloseAll()
+	#fxCloseAll()	#STACK-169
+	
+	#Disable the controller, send 0 PWM
+	fxSendMotorCommand(devId0, FxVoltage, 0)
+	fxSendMotorCommand(devId1, FxVoltage, 0)
+	sleep(0.1)
 
 	######## End of Main Code #########
 
@@ -337,6 +342,8 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = Controller.cur
 	if(os.name == 'nt'):
 		print('\nIn Windows, press Ctrl+BREAK to exit.  Ctrl+C may not work.')
 	plt.show()
+	
+	fxCloseAll()
 
 if __name__ == '__main__':
 	baudRate = sys.argv[1]

@@ -82,11 +82,11 @@ def fxImpedanceControl(port, baudRate, expTime = 20, time_step = 0.02, delta = 7
 		times.append(time() - t0)
 		requests.append(positions[currentPos])
 	
-	#Disable the impedance controller, send 0 PWM
+	#Disable the controller, send 0 PWM
 	fxSendMotorCommand(devId, FxVoltage, 0)
 	sleep(0.1)
 	
-	#fxClose(devId)	#Buggy, moved below plotting for now
+	#fxClose(devId)	#STACK-169
 	
 	# Plot before we exit:
 	title = "Impedance Control Demo"

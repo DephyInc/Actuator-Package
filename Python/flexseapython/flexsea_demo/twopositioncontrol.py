@@ -62,7 +62,11 @@ def fxTwoPositionControl(port, baudRate, expTime = 13, time_step = 0.1,
 		measurements.append(measuredPos)
 
 	# Close device and do device cleanup
-	close_check = fxClose(devId)
+	#close_check = fxClose(devId)	#STACK-169
+	
+	#Disable the controller, send 0 PWM
+	fxSendMotorCommand(devId, FxVoltage, 0)
+	sleep(0.1)
 
 	# Plot before exit:
 	title = "Two Position Control Demo"
@@ -75,6 +79,9 @@ def fxTwoPositionControl(port, baudRate, expTime = 13, time_step = 0.1,
 	if (os.name == 'nt'):
 		print('\nIn Windows, press Ctrl+BREAK to exit. Ctrl+C may not work.')
 	plt.show()
+	
+	# Close device and do device cleanup
+	close_check = fxClose(devId)
 
 	return close_check
 

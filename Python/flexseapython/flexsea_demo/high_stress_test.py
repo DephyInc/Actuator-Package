@@ -45,6 +45,7 @@ class signal(Enum):
 # Generate a sine wave of a specific amplitude and frequency
 def sinGenerator(amplitude, frequency, commandFreq):
 	num_samples = commandFreq / frequency
+	print(num_samples)
 	in_array = np.linspace(-np.pi, np.pi, int(num_samples))
 	sin_vals = amplitude * np.sin(in_array)
 	return sin_vals
@@ -225,7 +226,7 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 		print("Running high stress test with one device")
 
 	########### Debug & Data Logging ############
-	debugLoggingLevel = 6 # 6 is least verbose, 0 is most verbose
+	debugLoggingLevel = 0 # 6 is least verbose, 0 is most verbose
 	dataLog = False # Data log logs device data
 
 	delay_time = float(1/(float(commandFreq)))
@@ -265,16 +266,10 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 		print("Initial position 1:", initialPos1)
 
 	# Generate control profiles
-	print('Command table #1 - Position Sine:')
+	print('Genating 3x Command tables...')
 	positionSamples = sinGenerator(positionAmplitude, positionFreq, commandFreq)
-	print(np.int64(positionSamples))
-	print('Command table #2 - Current Sine:')
 	currentSamples = sinGenerator(currentAmplitude, currentFreq, commandFreq)
-	print("number of samples is: ", len(currentSamples))
-	print(np.int64(currentSamples))
-	print('Command table #3 - Current Sine:')
 	currentSamplesLine = lineGenerator(0, 0.15, commandFreq)
-	#print(np.int64(currentSamplesLine))
 
 	# Initialize lists
 	# cycleStopTimes = []
@@ -285,7 +280,7 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 		for reps in range(0, numberOfLoops):
 
 			print("")
-			print("Rep #", reps+1,"out of",numberOfLoops)
+			print("Rep #", reps + 1,"out of",numberOfLoops)
 			print("-------------------")
 
 			# Step 0: set position controller
@@ -493,8 +488,13 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 	except KeyboardInterrupt:
 		print ('Keypress detected. Exiting gracefully...')
 
-	fxClose(devId0)
-	fxClose(devId1)
+	#fxClose(devId0)	//STACK-169
+	#fxClose(devId1)
+	
+	#Disable the controller, send 0 PWM
+	fxSendMotorCommand(devId0, FxVoltage, 0)
+	fxSendMotorCommand(devId1, FxVoltage, 0)
+	sleep(0.1)
 
 	######## Stats: #########
 	print("")
@@ -531,24 +531,25 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 	######## Plotting Code, you can edit this ##################
 
 	###### Begin Create unique data filename and save desired and measured values
-	now = datetime.now().strftime("%Y-%m-%d_%H-%M")
-	data_fn = 'log/' + now + '_Current.csv'
-	print('Do create Current  data file ['+ data_fn + ']')
+	#now = datetime.now().strftime("%Y-%m-%d_%H-%M")
+	#data_fn = 'log/' + now + '_Current.csv'
+	#print('Do create Current  data file ['+ data_fn + ']')
 	# NON-PYTHONIC, but efficient write to file:
 	# with open(data_fn, 'w') as df:
 	# 	for i in range(len(currentRequests)):
 	# 		df.write(str(times[i]) + ',' + str(currentRequests[i]) + ','
 	# 			+ str(currentMeasurements0[i]) + '\n')
 
-	data_fn = 'log/' + now + '_Position.csv'
-	print('Do create Position data file ['+ data_fn + ']')
+	#data_fn = 'log/' + now + '_Position.csv'
+	#print('Do create Position data file ['+ data_fn + ']')
 	# with open(data_fn, 'w') as df:
 	# 	for i in range(len(positionRequests)):
 	# 		df.write(str(times[i]) + ',' + str(positionRequests[i]) + ','
 	# 			+ str(positionMeasurements0[i]) + '\n')
 	###### End Create unique data filename and save desired and measured values
-
+	
 	# Current Plot:
+	print('Preparing plot 1')
 	plt.figure(1)
 	title = "Motor Current"
 	plt.plot(times, currentRequests, color = 'b', label = 'desired current')
@@ -563,6 +564,7 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 		plt.axvline(x=endpoints)
 
 	# Position Plot:
+	print('Preparing plot 2')
 	plt.figure(2)
 	title = "Motor Position"
 	plt.plot(times, positionRequests, color = 'b', label = 'desired position')
@@ -636,7 +638,12 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 	# *** ToDo: add plotting for 2nd device here ***
 	# #######
 	
+	print('Showing plot')
 	plt.show()
+	sleep(0.1)
+	
+	print('End of script, fxCloseAll()')
+	fxCloseAll();
 
 if __name__ == '__main__':
 	baudRate = sys.argv[1]
