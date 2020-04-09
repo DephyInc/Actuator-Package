@@ -3,9 +3,11 @@ import os
 import sys
 import traceback
 
-if sys.platform == 'win32':		# Need for WebAgg server to work in Python 3.8
-	import asyncio
-	asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+if((sys.version_info[0] == 3) and (sys.version_info[1] == 8)):
+	print('Detected Python 3.8.')
+	if sys.platform == 'win32':		# Need for WebAgg server to work in Python 3.8
+		import asyncio
+		asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 thisdir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(thisdir)
@@ -74,7 +76,8 @@ def get_exp_num(num_cl_args, argv):
 		exp_num = argv[1]
 	else:
 		#Or prompt the user for it
-		if(exp_num := input('Choose experiment number [q to quit]: ')) == 'q':
+		exp_num = input('Choose experiment number [q to quit]: ')
+		if(exp_num == 'q'):
 			sys.exit('Quitting ...')
 	#Make sure it's valid and in range:
 	if(not exp_num.isdecimal()):	#Filter out letters
@@ -102,7 +105,8 @@ def get_dev_num(num_cl_args, argv, exp_num):
 		dev_num = argv[2]
 	else:
 		#Or prompt the user for it
-		if(dev_num := input('Enter connected devices [q to quit]: ')) == 'q':
+		dev_num = input('Enter connected devices [q to quit]: ')
+		if(dev_num == 'q'):
 			sys.exit('Quitting ...')
 	
 	#Make sure it's valid and in range:

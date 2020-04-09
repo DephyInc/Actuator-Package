@@ -84,7 +84,6 @@ def fxImpedanceControl(port, baudRate, expTime = 20, time_step = 0.02, delta = 7
 	
 	#Disable the controller, send 0 PWM
 	fxSendMotorCommand(devId, FxVoltage, 0)
-	sleep(0.1)
 	
 	#fxClose(devId)	#STACK-169
 	
@@ -99,7 +98,7 @@ def fxImpedanceControl(port, baudRate, expTime = 20, time_step = 0.02, delta = 7
 	if (os.name == 'nt'):
 		print('\nIn Windows, press Ctrl+BREAK to exit.  Ctrl+C may not work...')
 	plt.show()
-	sleep(0.1)
+	#sleep(0.1)
 	
 	#Close device
 	print('End of script, fxClose()')
