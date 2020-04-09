@@ -71,7 +71,7 @@ def fxImpedanceControl(port, baudRate, expTime = 20, time_step = 0.02, delta = 7
 			fxSendMotorCommand(devId, FxImpedance, positions[currentPos])
 		sleep(time_step)
 		#We downsample the display refresh:
-		if i % 10 == 0:
+		if(i % 10 == 0):
 			clearTerminal()
 			print('Loop', loop_ctr, 'of', num_time_steps)
 			print('Holding position:', positions[currentPos])
@@ -81,8 +81,12 @@ def fxImpedanceControl(port, baudRate, expTime = 20, time_step = 0.02, delta = 7
 		measurements.append(measuredPos)
 		times.append(time() - t0)
 		requests.append(positions[currentPos])
-
-	fxClose(devId)
+	
+	#Disable the impedance controller, send 0 PWM
+	fxSendMotorCommand(devId, FxVoltage, 0)
+	sleep(0.1)
+	
+	#fxClose(devId)	#Buggy, moved below plotting for now
 	
 	# Plot before we exit:
 	title = "Impedance Control Demo"
@@ -95,6 +99,9 @@ def fxImpedanceControl(port, baudRate, expTime = 20, time_step = 0.02, delta = 7
 	if (os.name == 'nt'):
 		print('\nIn Windows, press Ctrl+BREAK to exit.  Ctrl+C may not work...')
 	plt.show()
+	
+	#Close device
+	fxClose(devId)
 	
 	return result
 

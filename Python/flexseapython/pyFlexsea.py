@@ -479,7 +479,7 @@ def fxSendMotorCommand(devId, controlMode, value):
 	devId (int): The device ID.
 
 	controlMode (c_int): The control mode we will use to send this command.
-	Possible values are: FxPosition, FxCurrent, FxVoltage, FxImpedence
+	Possible values are: FxPosition, FxCurrent, FxVoltage, FxImpedance
 
 	value (int): The value to use for the controlMode.
 	FxPosition - encoder value
