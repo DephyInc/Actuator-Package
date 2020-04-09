@@ -45,7 +45,7 @@ def fxLeaderFollower(leaderPort, followerPort, baudRate):
 			sleep(0.05)
 
 			leaderData = fxReadDevice(devId0)
-			followerData = fxReadDevice(devId0)
+			followerData = fxReadDevice(devId1)
 
 			angle0 = leaderData.encoderAngle
 			
