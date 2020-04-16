@@ -3,107 +3,87 @@ from time import sleep, time, strftime
 import matplotlib
 import matplotlib.pyplot as plt
 matplotlib.use('WebAgg')
+from fxUtil import *
 
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pardir)
-from fxUtil import *
-from .streamManager import Stream
 
-# Control gain constants
-kp = 25
-ki = 2000
+def fxTwoPositionControl(port, baudRate, expTime = 13, time_step = 0.1,
+		delta = 10000, transition_time = 1.5, resolution = 100):
+	# Open device
+	devId = fxOpen(port, baudRate, 0)
+	fxStartStreaming(devId, resolution)
+	sleep(0.1)
 
-labels = ["State time", 											\
-"Accel X", "Accel Y", "Accel Z", "Gyro X", "Gyro Y", "Gyro Z", 		\
-"Motor angle", "Motor voltage", "Motor current",					\
-"Battery voltage", "Battery current"								\
-]
+	# Setting initial angle and angle waypoints
+	actPackState = fxReadDevice(devId)
+	initialAngle = actPackState.encoderAngle
 
-varsToStream = [ 							\
-	FX_STATETIME, 							\
-	FX_ACCELX, FX_ACCELY, FX_ACCELZ, 		\
-	FX_GYROX,  FX_GYROY,  FX_GYROZ,			\
-	FX_ENC_ANG,								\
-	FX_MOT_VOLT, FX_MOT_CURR,				\
-	FX_BATT_VOLT, FX_BATT_CURR 				\
-]
+	# Setting angle waypoints
+	positions = [initialAngle, initialAngle + delta]
+	current_pos = 0
+	num_pos = 2
 
-def fxTwoPositionControl(port, baudRate, expTime = 4, time_step = 0.02, delta = 10000, transition_time = 1, resolution = 500):
+	# Setting loop duration and transition rate
+	num_time_steps = int(expTime/time_step)
+	transition_steps = int(transition_time/time_step)
 
-	stream = Stream(port, baudRate, printingRate =2, labels=labels, varsToStream=varsToStream, updateFreq=500)
-	result = True
-	stream()
-	stream.printData()
-	initialAngle = stream([FX_ENC_ANG])[0]
-	timeout = 100
-	timeoutCount = 0
-	transition_steps = int(transition_time / time_step)
-	while(initialAngle == None):
-		timeoutCount = timeoutCount + 1
-		if(timeoutCount > timeout):
-			print("Timed out waiting for valid encoder value...")
-			sys.exit(1)
-		else:
-			sleep(time_step)
-			initialAngle = stream([FX_ENC_ANG])[0]
+	# Setting gains (devId, kp, ki, kd, K, B)
+	fxSetGains(devId, 150, 100, 0, 0, 0)
 
-	# Initialize lists - matplotlib
+	# Setting position control at initial position
+	fxSendMotorCommand(devId, FxPosition, initialAngle)
+
+	# Matplotlib - initialize lists
 	requests = []
 	measurements = []
 	times = []
-	i = 0
-	t0 = 0
-	
-	# Intial positions
-	setPosition(stream.devId, initialAngle)
-	setControlMode(stream.devId, CTRL_POSITION)
-	setPosition(stream.devId, initialAngle)
-	# Set gains
-	setGains(stream.devId, kp, ki, 0, 0)
 
-	# Select transition rate and positions
-	currentPos = 0
-	num_time_steps = int(expTime/time_step)
-	positions = [initialAngle,initialAngle + delta]
-	sleep(0.4)
-	
-	# Record start time of experiment
+	i = 0
 	t0 = time()
-	
-	# Run demo
-	print(result)
+	# Start two position control
 	for i in range(num_time_steps):
-		measuredPos = stream([FX_ENC_ANG])[0]
-		if i % transition_steps == 0:
-			delta = abs(positions[currentPos] - measuredPos)
-			result &= delta < resolution
-			currentPos = (currentPos + 1) % 2
-			setPosition(stream.devId, positions[currentPos])
 		sleep(time_step)
-		stream()
-		preamble = "Holding position: {}...".format(positions[currentPos])
-		stream.printData(message = preamble)
-		# Plotting:
-		measurements.append(measuredPos)
+		actPackState = fxReadDevice(devId)
+		clearTerminal()
+		measuredPos = actPackState.encoderAngle
+		print('Desired:              ', positions[current_pos])
+		print('Measured:             ', measuredPos)
+		print('Difference:           ', (measuredPos - positions[current_pos]), '\n')
+		printDevice(actPackState)
+		
+		if i % transition_steps == 0:
+			current_pos = (current_pos + 1) % num_pos
+			fxSendMotorCommand(devId, FxPosition, positions[current_pos])
+
+		# Plotting
 		times.append(time() - t0)
-		requests.append(positions[currentPos])
+		requests.append(positions[current_pos])
+		measurements.append(measuredPos)
+
+	# Close device and do device cleanup
+	#close_check = fxClose(devId)	#STACK-169
 	
-	# Disable controller:
-	setControlMode(stream.devId, CTRL_NONE)
+	#Disable the controller, send 0 PWM
+	fxSendMotorCommand(devId, FxVoltage, 0)
 	sleep(0.1)
-	
-	# Plot before we exit:
-	title = "Two Positions Control Demo"
+
+	# Plot before exit:
+	title = "Two Position Control Demo"
 	plt.plot(times, requests, color = 'b', label = 'Desired position')
 	plt.plot(times, measurements, color = 'r', label = 'Measured position')
 	plt.xlabel("Time (s)")
 	plt.ylabel("Encoder position")
 	plt.title(title)
 	plt.legend(loc='upper right')
+	if (os.name == 'nt'):
+		print('\nIn Windows, press Ctrl+BREAK to exit. Ctrl+C may not work.')
 	plt.show()
 	
-	del stream
-	return result
+	# Close device and do device cleanup
+	close_check = fxClose(devId)
+
+	return close_check
 
 if __name__ == '__main__':
 	baudRate = sys.argv[1]

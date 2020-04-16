@@ -17,21 +17,20 @@ sys.path.append(pardir)
 from fxUtil import *
 
 ######## These arrays are updated concurrently with every new timestamp ############
-times                = []
-currentRequests      = []
+times = []
+currentRequests = []
 currentMeasurements0 = []	# For devId0
 currentMeasurements1 = []	# For devId1
-positionRequests     = []
-positionMeasurements0= []	# For devId0
-positionMeasurements1= []	# For devId1
-readDeviceTimes      = []	# Timing data for fxReadDevice()
-sendMotorTimes       = []	# Timing data for fxSendMotorCommand
-setGainsTimes        = []	# Timing data for fxSetGains()
+positionRequests = []
+positionMeasurements0 = []	# For devId0
+positionMeasurements1 = []	# For devId1
+readDeviceTimes = []		# Timing data for fxReadDevice()
+sendMotorTimes = []			# Timing data for fxSendMotorCommand
+setGainsTimes = []			# Timing data for fxSetGains()
 #####################################################################
 cycleStopTimes = []		# Use to draw a line at end of every period
-data0=0				# Contains state of ActPack0 
-data1=0				# Contains state of ActPack1
-
+data0 = 0				# Contains state of ActPack0 
+data1 = 0				# Contains state of ActPack1
 
 # Controller type to send to controller
 class Controller(Enum):
@@ -46,7 +45,8 @@ class signal(Enum):
 # Generate a sine wave of a specific amplitude and frequency
 def sinGenerator(amplitude, frequency, commandFreq):
 	num_samples = commandFreq / frequency
-	in_array = np.linspace(-np.pi, np.pi, num_samples)
+	print(num_samples)
+	in_array = np.linspace(-np.pi, np.pi, int(num_samples))
 	sin_vals = amplitude * np.sin(in_array)
 	return sin_vals
 
@@ -82,7 +82,7 @@ def setPositionCtrl(t0, devId0, devId1, secondDevice, position0, position1):
 	tSendMotorTimes_end = time()
 	sendMotorTimes.append(tSendMotorTimes_end - tSendMotorTimes_beg)
 
-	if (secondDevice):
+	if(secondDevice):
 		fxSetGains(devId1, 300, 50, 0, 0, 0)
 		fxSendMotorCommand(devId1, FxPosition, position1)
 	
@@ -115,7 +115,7 @@ def setCurrentCtrl(t0, devId0, devId1, secondDevice, current0, current1):
 	tSendMotorTimes_end = time()
 	sendMotorTimes.append(tSendMotorTimes_end - tSendMotorTimes_beg)
 
-	if (secondDevice):
+	if(secondDevice):
 		fxSetGains(devId1, 300, 50, 0, 0, 0)
 		fxSendMotorCommand(devId1, FxCurrent, current1)
 
@@ -134,23 +134,23 @@ def setCurrentCtrl(t0, devId0, devId1, secondDevice, current0, current1):
 #	Allowed values:	FxPosition, FxVoltage, FxCurrent, FxImpedance
 def sendAndTimeCmds(t0, devId0, devId1, device2: bool, initialPos0, initialPos1,
 		current0, current1, motorCmd, position0, position1, posReq, setGains: bool):
-	global times			# Elapsed time from start of run
+	global times					# Elapsed time from start of run
 	global currentRequests
-	global currentMeasurements0	# For devId0
-	global currentMeasurements1	# For devId1
+	global currentMeasurements0		# For devId0
+	global currentMeasurements1		# For devId1
 	global positionRequests
 	global positionMeasurements0	# For devId0
 	global positionMeasurements1	# For devId1
-	global readDeviceTimes		# Timing data for fxReadDevice()
-	global sendMotorTimes		# Timing data for fxSendMotorCommand
-	global setGainsTimes		# Timing data for fxSetGains()
-	global data0			# Contains state of ActPack0 
-	global data1 			# Contains state of ActPack1
+	global readDeviceTimes			# Timing data for fxReadDevice()
+	global sendMotorTimes			# Timing data for fxSendMotorCommand
+	global setGainsTimes			# Timing data for fxSetGains()
+	global data0					# Contains state of ActPack0 
+	global data1 					# Contains state of ActPack1
 
 	tstart = time()
-	data0  = fxReadDevice(devId0)	# Get ActPackState
+	data0 = fxReadDevice(devId0)	# Get ActPackState
 	readDeviceTimes.append(time() - tstart)
-	if (device2):
+	if(device2):
 		data1 = fxReadDevice(devId1)
 
 	if setGains:
@@ -158,7 +158,7 @@ def sendAndTimeCmds(t0, devId0, devId1, device2: bool, initialPos0, initialPos1,
 		for i in range(2):
 			fxSetGains(devId0, 300, 50, 0, 0, 0)
 		setGainsTimes.append(time() - tstart)
-		if (device2):
+		if(device2):
 			fxSetGains(devId1, 300, 50, 0, 0, 0)
 	else:
 		setGainsTimes.append(0)
@@ -167,7 +167,7 @@ def sendAndTimeCmds(t0, devId0, devId1, device2: bool, initialPos0, initialPos1,
 		tstart = time()
 		fxSendMotorCommand(devId0, FxCurrent, current0)
 		sendMotorTimes.append(time() - tstart)
-		if (device2):
+		if(device2):
 			fxSendMotorCommand(devId1, FxCurrent, current1)
 			positionMeasurements1.append(data1.encoderAngle - initialPos1)
 		positionMeasurements0.append(data0.encoderAngle)
@@ -176,7 +176,7 @@ def sendAndTimeCmds(t0, devId0, devId1, device2: bool, initialPos0, initialPos1,
 		tstart = time()
 		fxSendMotorCommand(devId0, FxPosition, position0)
 		sendMotorTimes.append(time() - tstart)
-		if (device2):
+		if(device2):
 			fxSendMotorCommand(devId1, FxPosition, position1)
 			positionMeasurements1.append(data1.encoderAngle - initialPos1)
 		positionMeasurements0.append(data0.encoderAngle - initialPos0)
@@ -185,11 +185,10 @@ def sendAndTimeCmds(t0, devId0, devId1, device2: bool, initialPos0, initialPos1,
 
 	currentRequests.append(current0)
 	currentMeasurements0.append(data0.motorCurrent)
-	if (device2):
+	if(device2):
 		currentMeasurements1.append(data1.motorCurrent)
 	positionRequests.append(position0)
 	times.append(time() - t0)
-
 
 # Port: port with outgoing serial connection to ActPack
 # Baud Rate : baud rate of outgoing serial connection to ActPack
@@ -205,7 +204,7 @@ def sendAndTimeCmds(t0, devId0, devId1, device2: bool, initialPos0, initialPos1,
 def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 		positionAmplitude = 10000, currentAmplitude = 2500,
 		positionFreq = 1, currentFreq = 5, currentAsymmetricG = 1.25,
-		numberOfLoops = 720):
+		numberOfLoops = 5):
 	global times		# Elapsed time since strart of run
 	global currentRequests
 	global positionRequests
@@ -218,10 +217,10 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 
 	########### One vs two devices ############
 	secondDevice = False
-	if (port1 != ""):
+	if(port1 != ""):
 		secondDevice = True
 
-	if (secondDevice):
+	if(secondDevice):
 		print("Running high stress test with two devices")
 	else:
 		print("Running high stress test with one device")
@@ -239,7 +238,7 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 	print('Connected to device with Id:', devId0)
 
 	devId1 = -1
-	if (secondDevice):
+	if(secondDevice):
 		print('Port: ', port1)
 		print('BaudRate: ', baudRate)
 		print('debugLoggingLevel: ', debugLoggingLevel)
@@ -261,22 +260,16 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 	print("Initial position 0:", initialPos0)
 
 	initialPos1 = 0
-	if (secondDevice):
+	if(secondDevice):
 		data1 = fxReadDevice(devId1)
 		initialPos1 = data1.encoderAngle
 		print("Initial position 1:", initialPos1)
 
 	# Generate control profiles
-	print('Command table #1 - Position Sine:')
+	print('Genating 3x Command tables...')
 	positionSamples = sinGenerator(positionAmplitude, positionFreq, commandFreq)
-	print(np.int64(positionSamples))
-	print('Command table #2 - Current Sine:')
 	currentSamples = sinGenerator(currentAmplitude, currentFreq, commandFreq)
-	print("number of samples is: ", len(currentSamples))
-	print(np.int64(currentSamples))
-	print('Command table #3 - Current Sine:')
 	currentSamplesLine = lineGenerator(0, 0.15, commandFreq)
-	#print(np.int64(currentSamplesLine))
 
 	# Initialize lists
 	# cycleStopTimes = []
@@ -287,7 +280,7 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 		for reps in range(0, numberOfLoops):
 
 			print("")
-			print("Rep #", reps+1,"out of",numberOfLoops)
+			print("Rep #", reps + 1,"out of",numberOfLoops)
 			print("-------------------")
 
 			# Step 0: set position controller
@@ -295,7 +288,7 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 			print("Step 0: set position controller")
 
 			sleep(delay_time)	# Important in loop 2+
-			if (i):	# Second or later iterations in loop
+			if(i):	# Second or later iterations in loop
 				# setPositionCtrl(  devId0, devId1, secondDevice, data0.encoderAngle, initialPos1)
 				sendAndTimeCmds(t0, devId0, devId1, secondDevice, initialPos0, initialPos1,
 					current0=0, current1=0, motorCmd=FxPosition,
@@ -310,7 +303,7 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 
 			# Step 1: go to initial position
 			# -------------------------------
-			if (i):	# Second or later iterations in loop
+			if(i):	# Second or later iterations in loop
 				print("Step 1: go to initial position")
 				linSamples = linearInterp(data0.encoderAngle-initialPos0, 0, 100)
 				#print(np.int64(linSamples))
@@ -329,7 +322,7 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 					data0  = fxReadDevice(devId0)
 					tstop  = time()
 					readDeviceTimes.append(tstop - tstart)
-					if (secondDevice):
+					if(secondDevice):
 						data1 = fxReadDevice(devId1)
 
 					# Position setpoint:
@@ -340,7 +333,7 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 
 					currentMeasurements0.append(data0.motorCurrent)
 					positionMeasurements0.append(data0.encoderAngle - initialPos0)
-					if (secondDevice):
+					if(secondDevice):
 						fxSendMotorCommand(devId1, FxPosition, sample + initialPos1)
 						currentMeasurements1.append(data1.motorCurrent)
 						positionMeasurements1.append(data1.encoderAngle-initialPos1)
@@ -372,7 +365,7 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 				data0 = fxReadDevice(devId0)
 				tstop = time()
 				readDeviceTimes.append(tstop - tstart)
-				if (secondDevice):
+				if(secondDevice):
 					data1 = fxReadDevice(devId1)
 
 				# Position setpoint:
@@ -383,7 +376,7 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 
 				currentMeasurements0.append(data0.motorCurrent)
 				positionMeasurements0.append(data0.encoderAngle - initialPos0)
-				if (secondDevice):
+				if(secondDevice):
 					fxSendMotorCommand(devId1, FxPosition, sample + initialPos1)
 					currentMeasurements1.append(data1.motorCurrent)
 					positionMeasurements1.append(data1.encoderAngle - initialPos1)
@@ -427,7 +420,7 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 				data0 = fxReadDevice(devId0)
 				tstop = time()
 				readDeviceTimes.append(tstop - tstart)
-				if (secondDevice):
+				if(secondDevice):
 					data1 = fxReadDevice(devId1)
 
 				# Position setpoint:
@@ -438,7 +431,7 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 
 				currentMeasurements0.append(data0.motorCurrent)
 				positionMeasurements0.append(data0.encoderAngle - initialPos0)
-				if (secondDevice):
+				if(secondDevice):
 					fxSendMotorCommand(devId1, FxCurrent, compensatedSample)
 					currentMeasurements1.append(data1.motorCurrent)
 					positionMeasurements1.append(data1.encoderAngle - initialPos1)
@@ -467,7 +460,7 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 				data0 = fxReadDevice(devId0)
 				tstop = time()
 				readDeviceTimes.append(tstop - tstart)
-				if (secondDevice):
+				if(secondDevice):
 					data1 = fxReadDevice(devId1)
 
 				# Position setpoint:
@@ -478,7 +471,7 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 
 				currentMeasurements0.append(data0.motorCurrent)
 				positionMeasurements0.append(data0.encoderAngle - initialPos0)
-				if (secondDevice):
+				if(secondDevice):
 					fxSendMotorCommand(devId1, FxCurrent, sample)
 					currentMeasurements1.append(data1.motorCurrent)
 					positionMeasurements1.append(data1.encoderAngle - initialPos1)
@@ -493,10 +486,15 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 			cycleStopTimes.append(time() - t0)
 			elapsed_time = time() - t0
 	except KeyboardInterrupt:
-		print ('Keypress detected.  Exiting gracefully ...')
+		print ('Keypress detected. Exiting gracefully...')
 
-	fxClose(devId0)
-	fxClose(devId1)
+	#fxClose(devId0)	//STACK-169
+	#fxClose(devId1)
+	
+	#Disable the controller, send 0 PWM
+	fxSendMotorCommand(devId0, FxVoltage, 0)
+	fxSendMotorCommand(devId1, FxVoltage, 0)
+	sleep(0.1)
 
 	######## Stats: #########
 	print("")
@@ -504,54 +502,54 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 	print("------------")
 	actual_period = cycleStopTimes[0]
 	command_frequency = i / elapsed_time
-	print("Number of commands sent: " + str(i))
-	print("Total time (s): " + str(elapsed_time))
-	print("Requested command frequency: "+"{:.2f}".format(commandFreq))
-	print("Actual command frequency (Hz): "+"{:.2f}".format(command_frequency))
+	print("Number of commands sent:" + str(i))
+	print("Total time (s):" + str(elapsed_time))
+	print("Requested command frequency:"+"{:.2f}".format(commandFreq))
+	print("Actual command frequency (Hz):"+"{:.2f}".format(command_frequency))
 	print("")
-	print('currentSamplesLine: ',		len(currentSamplesLine))
-	print('size(times)',			len(times))
-	print('size(currentRequests): ',	len(currentRequests))
-	print('size(currentMeasurements0): ',	len(currentMeasurements0))
-	print('size(setGainsTimes): ',		len(setGainsTimes))
+	print('currentSamplesLine:',		len(currentSamplesLine))
+	print('size(times):',			len(times))
+	print('size(currentRequests):',	len(currentRequests))
+	print('size(currentMeasurements0):',	len(currentMeasurements0))
+	print('size(setGainsTimes):',		len(setGainsTimes))
 	print('')
 
-        ######## Summary stats about intividual arrays: #########
-	print('\n\ntimes: ',			stats.describe(times))
-	print('\n\ncurrentRequests: ',		stats.describe(currentRequests))
-	print('\n\ncurrentMeasurements0: ',	stats.describe(currentMeasurements0))
+	######## Summary stats about individual arrays: #########
+	#print('\n\ntimes: ',			stats.describe(times))
+	#print('\n\ncurrentRequests: ',		stats.describe(currentRequests))
+	#print('\n\ncurrentMeasurements0: ',	stats.describe(currentMeasurements0))
 	# print('\n\ncurrentMeasurements1: ',	stats.describe(currentMeasurements1))
-	print('\n\npositionRequests: ',		stats.describe(positionRequests))
-	print('\n\npositionMeasurements0: ',	stats.describe(positionMeasurements0))
+	#print('\n\npositionRequests: ',		stats.describe(positionRequests))
+	#print('\n\npositionMeasurements0: ',	stats.describe(positionMeasurements0))
 	# print('\n\npositionMeasurements1: ',	stats.describe(positionMeasurements1))
-	print('\n\nreadDeviceTimes: ',		stats.describe(readDeviceTimes))
-	print('\n\nsendMotorTimes: ',		stats.describe(sendMotorTimes))
-	print('\n\nseetGainsTimes: ',		stats.describe(setGainsTimes))
-
+	#print('\n\nreadDeviceTimes: ',		stats.describe(readDeviceTimes))
+	#print('\n\nsendMotorTimes: ',		stats.describe(sendMotorTimes))
+	#print('\n\nseetGainsTimes: ',		stats.describe(setGainsTimes))
 
 	######## End of Main Code #########
 
 	######## Plotting Code, you can edit this ##################
 
 	###### Begin Create unique data filename and save desired and measured values
-	now = datetime.now().strftime("%Y-%m-%d_%H-%M")
-	data_fn = 'log/' + now + '_Current.csv'
-	print('Do create Current  data file ['+ data_fn + ']')
+	#now = datetime.now().strftime("%Y-%m-%d_%H-%M")
+	#data_fn = 'log/' + now + '_Current.csv'
+	#print('Do create Current  data file ['+ data_fn + ']')
 	# NON-PYTHONIC, but efficient write to file:
 	# with open(data_fn, 'w') as df:
 	# 	for i in range(len(currentRequests)):
 	# 		df.write(str(times[i]) + ',' + str(currentRequests[i]) + ','
 	# 			+ str(currentMeasurements0[i]) + '\n')
 
-	data_fn = 'log/' + now + '_Position.csv'
-	print('Do create Position data file ['+ data_fn + ']')
+	#data_fn = 'log/' + now + '_Position.csv'
+	#print('Do create Position data file ['+ data_fn + ']')
 	# with open(data_fn, 'w') as df:
 	# 	for i in range(len(positionRequests)):
 	# 		df.write(str(times[i]) + ',' + str(positionRequests[i]) + ','
 	# 			+ str(positionMeasurements0[i]) + '\n')
 	###### End Create unique data filename and save desired and measured values
-
+	
 	# Current Plot:
+	print('Preparing plot 1')
 	plt.figure(1)
 	title = "Motor Current"
 	plt.plot(times, currentRequests, color = 'b', label = 'desired current')
@@ -566,6 +564,7 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 		plt.axvline(x=endpoints)
 
 	# Position Plot:
+	print('Preparing plot 2')
 	plt.figure(2)
 	title = "Motor Position"
 	plt.plot(times, positionRequests, color = 'b', label = 'desired position')
@@ -575,72 +574,76 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 	plt.title(title)
 	plt.legend(loc='upper right')
 
-	# Draw a vertical line at the end of each cycle
-	for endpoints in cycleStopTimes:
-		plt.axvline(x=endpoints)
+	# # Draw a vertical line at the end of each cycle
+	# for endpoints in cycleStopTimes:
+		# plt.axvline(x=endpoints)
 
-	plt.figure(3)
-	# Convert command times into millisec
-	sendMotorTimes = [i * 1000 for i in sendMotorTimes]
-	plt.plot(times, sendMotorTimes, color='b', label='Send Motor Times')
-	plt.xlabel("Time (ms)")
-	plt.ylabel("Command Time (ms)")
-	plt.title("Send Motor Times")
-	plt.legend(loc='upper right')
+	# plt.figure(3)
+	# # Convert command times into millisec
+	# sendMotorTimes = [i * 1000 for i in sendMotorTimes]
+	# plt.plot(times, sendMotorTimes, color='b', label='Send Motor Times')
+	# plt.xlabel("Time (ms)")
+	# plt.ylabel("Command Time (ms)")
+	# plt.title("Send Motor Times")
+	# plt.legend(loc='upper right')
 
-	plt.figure(4)
-	plt.yscale('log')
-	plt.hist(sendMotorTimes, bins=100, label = 'Send Motor Times')
-	plt.yscale('log')
-	plt.xlabel("Time (ms)")
-	plt.ylabel("Occurrences")
-	plt.title("Send Motor Commands")
-	plt.legend(loc='upper right')
+	# plt.figure(4)
+	# plt.yscale('log')
+	# plt.hist(sendMotorTimes, bins=100, label = 'Send Motor Times')
+	# plt.yscale('log')
+	# plt.xlabel("Time (ms)")
+	# plt.ylabel("Occurrences")
+	# plt.title("Send Motor Commands")
+	# plt.legend(loc='upper right')
 
-	plt.figure(5)
-	# Convert command times into millisec
-	readDeviceTimes = [i * 1000 for i in readDeviceTimes]
-	plt.plot(times, readDeviceTimes, color='b', label='Read Device Times')
-	plt.xlabel("Time (ms)")
-	plt.ylabel("Command Time (ms)")
-	plt.title("Read Device Commands")
-	plt.legend(loc='upper right')
+	# plt.figure(5)
+	# # Convert command times into millisec
+	# readDeviceTimes = [i * 1000 for i in readDeviceTimes]
+	# plt.plot(times, readDeviceTimes, color='b', label='Read Device Times')
+	# plt.xlabel("Time (ms)")
+	# plt.ylabel("Command Time (ms)")
+	# plt.title("Read Device Commands")
+	# plt.legend(loc='upper right')
 
-	plt.figure(6)
-	plt.yscale('log')
-	plt.hist(readDeviceTimes, bins=100, label = 'Read Device Times')
-	plt.yscale('log')
-	plt.xlabel("Time (ms)")
-	plt.ylabel("Occurrences")
-	plt.title("Read Device Commands")
-	plt.legend(loc='upper right')
+	# plt.figure(6)
+	# plt.yscale('log')
+	# plt.hist(readDeviceTimes, bins=100, label = 'Read Device Times')
+	# plt.yscale('log')
+	# plt.xlabel("Time (ms)")
+	# plt.ylabel("Occurrences")
+	# plt.title("Read Device Commands")
+	# plt.legend(loc='upper right')
 
-	plt.figure(7)
-	# Convert command times into millisec
-	setGainsTimes = [i * 1000 for i in setGainsTimes]
-	plt.plot(times, setGainsTimes, color='b', label='Set Gains Times')
-	plt.xlabel("Time (ms)")
-	plt.ylabel("Command Time (ms)")
-	plt.title("Set Gains Commands")
-	plt.legend(loc='upper right')
+	# plt.figure(7)
+	# # Convert command times into millisec
+	# setGainsTimes = [i * 1000 for i in setGainsTimes]
+	# plt.plot(times, setGainsTimes, color='b', label='Set Gains Times')
+	# plt.xlabel("Time (ms)")
+	# plt.ylabel("Command Time (ms)")
+	# plt.title("Set Gains Commands")
+	# plt.legend(loc='upper right')
 
-	plt.figure(8)
-	plt.yscale('log')
-	# Remove 0 values in histogram
-	setGainsTimes = [i for i in setGainsTimes if i > 0]
-	plt.hist(setGainsTimes, bins=100, label = 'Set Gains Times')
-	plt.yscale('log')
-	plt.xlabel("Time (ms)")
-	plt.ylabel("Occurrences")
-	plt.title("Set Gains Commands")
-	plt.legend(loc='upper right')
-
+	# plt.figure(8)
+	# plt.yscale('log')
+	# # Remove 0 values in histogram
+	# setGainsTimes = [i for i in setGainsTimes if i > 0]
+	# plt.hist(setGainsTimes, bins=100, label = 'Set Gains Times')
+	# plt.yscale('log')
+	# plt.xlabel("Time (ms)")
+	# plt.ylabel("Occurrences")
+	# plt.title("Set Gains Commands")
+	# plt.legend(loc='upper right')
 
 	# #######
 	# *** ToDo: add plotting for 2nd device here ***
 	# #######
 	
+	print('Showing plot')
 	plt.show()
+	sleep(0.1)
+	
+	print('End of script, fxCloseAll()')
+	fxCloseAll();
 
 if __name__ == '__main__':
 	baudRate = sys.argv[1]
@@ -649,4 +652,3 @@ if __name__ == '__main__':
 		fxHighStressTest(ports, baudRate)
 	except Exception as e:
 		print("broke: " + str(e))
-

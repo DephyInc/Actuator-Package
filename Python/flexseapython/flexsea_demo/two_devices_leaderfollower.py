@@ -7,14 +7,8 @@ pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pardir)
 from fxUtil import *
 
-def printDevice(actPackState):
-	print('State time: ', actPackState.timestamp)
-	print('Accel X: ', actPackState.accelx, ', Accel Y: ', actPackState.accely, ' Accel Z: ', actPackState.accelz)
-	print('Gyro X: ', actPackState.gyrox, ', Gyro Y: ', actPackState.gyroy, ' Gyro Z: ', actPackState.gyroz)
-	print('Motor angle: ', actPackState.encoderAngle, ', Motor voltage: ', actPackState.motorVoltage, flush=True)
 
-
-def fxLeaderFollower(leaderPort, followerPort, baudRate):
+def fxLeaderFollower(leaderPort, baudRate, followerPort):
 
 	devId0 = fxOpen(leaderPort, baudRate, 0)
 	devId1 = fxOpen(followerPort, baudRate, 0)
@@ -43,20 +37,16 @@ def fxLeaderFollower(leaderPort, followerPort, baudRate):
 	try:
 		while(True):
 			sleep(0.05)
-
-			leaderData = fxReadDevice(devId0)
-			followerData = fxReadDevice(devId0)
-
+			clearTerminal()
+			leaderData   = fxReadDevice(devId0)
+			followerData = fxReadDevice(devId1)
 			angle0 = leaderData.encoderAngle
-			
 			diff = angle0 - initialAngle0
 			fxSendMotorCommand(devId1, FxPosition, initialAngle1 + diff)
-			
-			print("device {} following device {}".format(devId1, devId0))
-			
+			# print("device {} following device {}".format(devId1, devId0))
+			print('Device', devId1, ' following device',  devId0)
 			printDevice(followerData)
 			printDevice(leaderData)
-
 	except Exception as e:
 		print(traceback.format_exc())
 

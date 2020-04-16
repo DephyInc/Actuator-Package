@@ -101,7 +101,7 @@ class BMSState(Structure):
 ### FlexSEA device, and is used by most of the functions in this library to
 ### specify which device to run that function on.
 
-def fxOpen(port, baudRate, logLevel = 4):
+def fxOpen(port, baudRate, logLevel = 6):
 	"""
 	Establish a connection with a FlexSEA device.
 
@@ -167,7 +167,7 @@ def fxGetDeviceIds():
 	asList = asList[: asList.index(-1) ]
 	return asList
 
-def fxStartStreaming(devId, frequency, shouldLog):
+def fxStartStreaming(devId, frequency, shouldLog=False):
 	"""
 	Start streaming data from a FlexSEA device.
 
@@ -479,7 +479,7 @@ def fxSendMotorCommand(devId, controlMode, value):
 	devId (int): The device ID.
 
 	controlMode (c_int): The control mode we will use to send this command.
-	Possible values are: FxPosition, FxCurrent, FxVoltage, FxImpedence
+	Possible values are: FxPosition, FxCurrent, FxVoltage, FxImpedance
 
 	value (int): The value to use for the controlMode.
 	FxPosition - encoder value
@@ -542,8 +542,6 @@ def fxFindPoles(devId):
 def loadFlexsea():
 	global flexsea
 	#Init code:
-	print('[pyFlexsea Module]\n')
-
 	loadSucceeded  = False
 	# is_64bits = sys.maxsize > 2**32
 	if (sys.maxsize > 2**32):
@@ -556,7 +554,6 @@ def loadFlexsea():
 	# in correct library depending on which version of linux
 	# linux_distro = platform.linux_distribution()[0]
 
-	print('>>> dir_path:', dir_path)
 	# check whether we are running on a 32 or 64 bit machine
 	architecture = platform.architecture()[0]
 	librarypaths = []

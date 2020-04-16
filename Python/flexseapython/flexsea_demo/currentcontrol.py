@@ -5,9 +5,9 @@ pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pardir)
 from fxUtil import *
 
-def fxCurrentControl(port, baudRate, holdCurrent = [1000], time = 4, time_step = 0.1):
-	devId = fxOpen(port, baudRate, 0)
-	fxStartStreaming(devId, 100, True)
+def fxCurrentControl(port, baudRate, holdCurrent = [1000], time = 6, time_step = 0.1):
+	devId = fxOpen(port, baudRate, logLevel = 6)
+	fxStartStreaming(devId, 100, shouldLog = False)
 	result = True
 	print('Setting controller to current...')
 	fxSetGains(devId, 50, 32, 0, 0, 0)
@@ -20,20 +20,22 @@ def fxCurrentControl(port, baudRate, holdCurrent = [1000], time = 4, time_step =
 			desCurrent = int((current-prevCurrent) * (i / float(num_time_steps)) + prevCurrent)
 			fxSendMotorCommand(devId, FxCurrent, desCurrent)
 			sleep(time_step)
-			print('Holding Current: ', desCurrent, ' mA...')
 			actPack = fxReadDevice(devId)
-			print('Measured Current: ', actPack.motorCurrent, ' mA...')
-			print('Observed delta: ', (actPack.motorCurrent - desCurrent))
+			clearTerminal()
+			print('Desired  (mA):        ', desCurrent)
+			print('Measured  (mA):       ', actPack.motorCurrent)
+			print('Difference (mA):      ', (actPack.motorCurrent - desCurrent), '\n')
+			printDevice(actPack)
 		prevCurrent = current
 
 	print('Turning off current control...')
-	# ramp down first
+	# Ramp down first
 	n = 50
-	for i in range(0, n):
+	for i in range(n):
 		fxSendMotorCommand(devId, FxCurrent, prevCurrent * (n-i)/n)
 		sleep(0.04)
 
-	# wait for motor to spin down
+	# Wait for motor to spin down
 	fxSendMotorCommand(devId, FxCurrent, 0)
 	actPack = fxReadDevice(devId)
 	lastAngle = actPack.encoderAngle
@@ -47,6 +49,7 @@ def fxCurrentControl(port, baudRate, holdCurrent = [1000], time = 4, time_step =
 		actPack = fxReadDevice(devId)
 		currentAngle = actPack.encoderAngle
 
+	fxClose(devId)
 	return True
 
 if __name__ == '__main__':
