@@ -377,6 +377,7 @@ class Device:
 	jitter: int = 0
 	devId: int = 0
 
+# Dummy function used for development.  Replace with actual funtion down the road.
 def fxOpen(port: str, baudRate: int, debugLoggingLevel: int) -> int:
 	fxOpen.counter += 1
 	print('Connected to   device with Id:', fxOpen.counter)
