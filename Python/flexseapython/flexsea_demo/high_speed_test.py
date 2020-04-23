@@ -1,15 +1,22 @@
+
+# New implementation of fxHighSpeedTest() uses annotation and dataclass
+from __future__ import annotations
+from typing import List
+from dataclasses import dataclass
+# ==========================================
+
 import os, sys, math
 from time import sleep, time, strftime
-from enum import Enum
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
-matplotlib.use('WebAgg')
+from enum import Enum
+# matplotlib.use('WebAgg')
 
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 print(pardir)
 sys.path.append(pardir)
-from fxUtil import *
+# from fxUtil import *
 
 # Controller type to send to controller
 class Controller(Enum):
@@ -35,7 +42,7 @@ def lineGenerator(amplitude, commandFreq):
 	line_vals = [ amplitude for i in range(num_samples) ]
 	return line_vals
 
-def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = Controller.current,
+def fxHighSpeedTest2(port0, baudRate, port1 = "", controllerType = Controller.current,
 	signalType = signal.sine, commandFreq = 1000, signalAmplitude = 1000, numberOfLoops = 30,
 	signalFreq = 5, cycleDelay = 0.1, requestJitter = False, jitter = 20):
 	"""
@@ -209,7 +216,7 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = Controller.cur
 		cycleStopTimes.append(time() - t0)
 
 	#fxCloseAll()	#STACK-169
-	
+
 	#Disable the controller, send 0 PWM
 	fxSendMotorCommand(devId0, FxVoltage, 0)
 	fxSendMotorCommand(devId1, FxVoltage, 0)
@@ -218,6 +225,11 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = Controller.cur
 	######## End of Main Code #########
 
 	######## Plotting Code, you can edit this ##################
+
+	try:			# Try to specify "WebAgg" as the backend for rendering and GUI integration.
+		matplotlib.use('WebAgg')
+	except ImportError:
+		sys.exit('high_speed_test.py: use("WebAgg") unsuccessful:' + ImportError)
 
 	elapsed_time = time() - t0
 	print('Loop:', loopCtr, 'of', numberOfLoops, '- Elapsed time:', int(elapsed_time+0.5), 's')
@@ -259,7 +271,7 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = Controller.cur
 
 	###### begin command times plotting ########################################33
 
-	# Babar: Following 6 lines are legacy code. Remove eventually.
+	# Following 6 lines are legacy code. Remove eventually.
 	#plt.figure(2)
 	#title = "Current and stream command times (aggregate)"
 	#plt.title(title)
@@ -340,12 +352,84 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = Controller.cur
 				plt.axvline(x=endpoints)
 
 	if(os.name == 'nt'):
-		print('\nIn Windows, press Ctrl+BREAK to exit.  Ctrl+C may not work.')
+		print('\nIn Windows, press Ctrl-BREAK to exit.  Ctrl-C may not work.')
 	plt.show()
 	
 	fxCloseAll()
 
+
+####################################################################################################
+##### New Implementation #####
+####################################################################################################
+
+@dataclass
+class Device:
+	port: str = ''
+	baudRate: int = 0
+	controllerType: Controller = Controller.position
+	signalType: signal = signal.sine
+	commandFreq:int = 0
+	signalAmplitude: int = 0
+	numberOfLoops: int = 0
+	signalFreq: int = 0
+	cycleDelay: float = 0.0
+	requestJitter: bool = False
+	jitter: int = 0
+	devId: int = 0
+
+def fxOpen(port: str, baudRate: int, debugLoggingLevel: int) -> int:
+	fxOpen.counter += 1
+	print('Connected to   device with Id:', fxOpen.counter)
+	return fxOpen.counter
+fxOpen.counter = 0
+
+def fxStartStreaming(devId: int, commandFreq: int, dataLog: int) -> None:
+	print('Streaming from device with Id:', devId)
+
+# port				Port with outgoing serial connection to ActPack
+# baudRate			Baud rate of outgoing serial connection to ActPack
+# controllerType	Position controller or current controller
+# signalType		Sine wave or line
+# commandFreq		Desired frequency of issuing commands to controller, actual 
+# 					command frequency will be slower due to OS overhead.
+# signalAmplitude	Amplitude of signal to send to controller. Encoder position
+# 					if position controller, current in mA if current controller
+# numberOfLoops		Number of times to send desired signal to controller
+# signalFreq		Frequency of sine wave if using sine wave signal
+# cycleDelay		Delay between signals sent to controller, use with sine wave only
+# requestJitter		Add jitter amount to every other sample sent to controller
+# jitter			Amount of jitter
+def fxHighSpeedTest(ports: List[str], baudRate: int, controllerType = Controller.current,
+		signalType = signal.sine, commandFreq = 1000, signalAmplitude = 1000, numberOfLoops = 30,
+		signalFreq = 5, cycleDelay = 0.1, requestJitter = False, jitter = 20, devId = 0) -> None:
+	num_devices: int = len(ports)
+	print('Running high speed test with', num_devices, 'devices.')
+	devices: List[Device] = []
+	for i in range(num_devices):
+		dev1 = Device(ports[i], baudRate, controllerType, signalType, commandFreq, signalAmplitude,
+				numberOfLoops, signalFreq, cycleDelay, requestJitter, jitter)
+		devices.append(dev1)
+	# for dev in devices:
+	# 	print(dev)
+
+	########### Debug & Data Logging ############
+	debugLoggingLevel = 6			# 6 is least verbose, 0 is most verbose
+	dataLog = False					# Data log logs device data
+
+	delay_time = 1 / commandFreq	# Default: 1 ms
+	print('delay time:', delay_time)
+
+	########### Open device(s) and start streaming ############
+	for d in devices:
+		d.devId = fxOpen(d.port, d.baudRate, debugLoggingLevel) 
+		fxStartStreaming(d.devId, d.commandFreq, dataLog)
+
 if __name__ == '__main__':
+	ports = ['COM1', 'COM3', 'COM4', 'COM9']
+	baudRate = 22345
+	fxHighSpeedTest(ports, baudRate)
+	sys.exit(0)
+
 	baudRate = sys.argv[1]
 	ports = sys.argv[2:3]
 	try:
