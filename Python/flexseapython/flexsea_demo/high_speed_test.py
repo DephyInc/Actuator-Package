@@ -376,14 +376,16 @@ class Device:
 	requestJitter: bool = False
 	jitter: int = 0
 	devId: int = 0
+	initialPos: int = 0
 
-# Dummy function used for development.  Replace with actual funtion down the road.
+# Dummy function used for development.  Replace with actual function down the road.
 def fxOpen(port: str, baudRate: int, debugLoggingLevel: int) -> int:
 	fxOpen.counter += 1
 	print('Connected to   device with Id:', fxOpen.counter)
 	return fxOpen.counter
 fxOpen.counter = 0
 
+# Dummy function used for development.  Replace with actual function down the road.
 def fxStartStreaming(devId: int, commandFreq: int, dataLog: int) -> None:
 	print('Streaming from device with Id:', devId)
 
@@ -407,17 +409,15 @@ def fxHighSpeedTest(ports: List[str], baudRate: int, controllerType = Controller
 	print('Running high speed test with', num_devices, 'devices.')
 	devices: List[Device] = []
 	for i in range(num_devices):
-		dev1 = Device(ports[i], baudRate, controllerType, signalType, commandFreq, signalAmplitude,
+		dev = Device(ports[i], baudRate, controllerType, signalType, commandFreq, signalAmplitude,
 				numberOfLoops, signalFreq, cycleDelay, requestJitter, jitter)
-		devices.append(dev1)
-	# for dev in devices:
-	# 	print(dev)
+		devices.append(dev)
 
 	########### Debug & Data Logging ############
 	debugLoggingLevel = 6			# 6 is least verbose, 0 is most verbose
 	dataLog = False					# Data log logs device data
 
-	delay_time = 1 / commandFreq	# Default: 1 ms
+	delay_time = 1 / commandFreq	# Default: 1 / 1000 == 1 ms
 	print('delay time:', delay_time)
 
 	########### Open device(s) and start streaming ############
@@ -425,7 +425,11 @@ def fxHighSpeedTest(ports: List[str], baudRate: int, controllerType = Controller
 		d.devId = fxOpen(d.port, d.baudRate, debugLoggingLevel) 
 		fxStartStreaming(d.devId, d.commandFreq, dataLog)
 
+	############# Main Code ############
+
+
 if __name__ == '__main__':
+	# Dummy code block for development.  Remove when done.
 	ports = ['COM1', 'COM3', 'COM4', 'COM9']
 	baudRate = 22345
 	fxHighSpeedTest(ports, baudRate)
