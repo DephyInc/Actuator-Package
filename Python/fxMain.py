@@ -6,6 +6,7 @@ import traceback
 if((sys.version_info[0] == 3) and (sys.version_info[1] == 8)):
 	print('Detected Python 3.8.')
 	if sys.platform == 'win32':		# Need for WebAgg server to work in Python 3.8
+		print('Detected win32')
 		import asyncio
 		asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
