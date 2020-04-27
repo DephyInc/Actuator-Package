@@ -1,9 +1,4 @@
-
-# New implementation of fxHighSpeedTest() uses annotation and dataclass
 from __future__ import annotations
-from typing import List
-from dataclasses import dataclass
-# ==========================================
 
 import os, sys, math
 from time import sleep, time, strftime
@@ -12,6 +7,14 @@ import matplotlib.pyplot as plt
 import matplotlib
 from enum import Enum
 # matplotlib.use('WebAgg')
+
+# ==========================================
+# New implementation of fxHighSpeedTest() uses annotation and dataclass
+from typing import Any, List
+from dataclasses import dataclass
+sys.path.append("C:\\00\\00-Dephy\\DSEP-63_3+dev\\Actuator-Package\\Python\\flexseapython")
+import fxUtil
+# ==========================================
 
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 print(pardir)
@@ -43,8 +46,8 @@ def lineGenerator(amplitude, commandFreq):
 	return line_vals
 
 def fxHighSpeedTest2(port0, baudRate, port1 = "", controllerType = Controller.current,
-	signalType = signal.sine, commandFreq = 1000, signalAmplitude = 1000, numberOfLoops = 30,
-	signalFreq = 5, cycleDelay = 0.1, requestJitter = False, jitter = 20):
+		signalType = signal.sine, commandFreq = 1000, signalAmplitude = 1000, numberOfLoops = 30,
+		signalFreq = 5, cycleDelay = 0.1, requestJitter = False, jitter = 20):
 	"""
 	baudRate		Baud rate of outgoing serial connection to ActPack
 	port			Port with outgoing serial connection to ActPack
@@ -377,6 +380,7 @@ class Device:
 	jitter: int = 0
 	devId: int = 0
 	initialPos: int = 0
+	data: fxUtil.ActPackState = fxUtil.ActPackState()
 
 # Dummy function used for development.  Replace with actual function down the road.
 def fxOpen(port: str, baudRate: int, debugLoggingLevel: int) -> int:
@@ -386,8 +390,8 @@ def fxOpen(port: str, baudRate: int, debugLoggingLevel: int) -> int:
 fxOpen.counter = 0
 
 # Dummy function used for development.  Replace with actual function down the road.
-def fxStartStreaming(devId: int, commandFreq: int, dataLog: int) -> None:
-	print('Streaming from device with Id:', devId)
+# def fxStartStreaming(devId: int, commandFreq: int, dataLog: int) -> None:
+# 	print('Streaming from device with Id:', devId)
 
 # port				Port with outgoing serial connection to ActPack
 # baudRate			Baud rate of outgoing serial connection to ActPack
@@ -410,7 +414,7 @@ def fxHighSpeedTest(ports: List[str], baudRate: int, controllerType = Controller
 	devices: List[Device] = []
 	for i in range(num_devices):
 		dev = Device(ports[i], baudRate, controllerType, signalType, commandFreq, signalAmplitude,
-				numberOfLoops, signalFreq, cycleDelay, requestJitter, jitter)
+		numberOfLoops, signalFreq, cycleDelay, requestJitter, jitter)
 		devices.append(dev)
 
 	########### Debug & Data Logging ############
@@ -422,11 +426,18 @@ def fxHighSpeedTest(ports: List[str], baudRate: int, controllerType = Controller
 
 	########### Open device(s) and start streaming ############
 	for d in devices:
-		d.devId = fxOpen(d.port, d.baudRate, debugLoggingLevel) 
-		fxStartStreaming(d.devId, d.commandFreq, dataLog)
+		d.devId = fxOpen(d.port, d.baudRate, debugLoggingLevel)
+		# Device might need 100 ms(?) pause to process following command:
+		fxUtil.fxStartStreaming(d.devId, d.commandFreq, dataLog)
 
 	############# Main Code ############
-
+	if controllerType == Controller.position:
+		print('Reading initial position of connected devices ...')
+		# Give the device time to consume the startStreaming command and start streaming
+		sleep(0.1)
+		for d in devices:
+			d.data = fxUtil.fxReadDevice(d.devId)
+	print('Everything went well!!!')
 
 if __name__ == '__main__':
 	# Dummy code block for development.  Remove when done.
