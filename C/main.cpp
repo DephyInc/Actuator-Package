@@ -101,22 +101,22 @@ int main()
                 runReadAll(deviceIds[0], &shouldQuit);
                 break;
             case 1:
-                runOpenSpeed(deviceIds[0], &shouldQuit);
+                //runOpenSpeed(deviceIds[0], &shouldQuit);
                 break;
             case 2:
-                runCurrentControl(deviceIds[0], &shouldQuit);
+                //runCurrentControl(deviceIds[0], &shouldQuit);
                 break;
             case 3:
-                runHoldPosition(deviceIds[0], &shouldQuit);
+                //runHoldPosition(deviceIds[0], &shouldQuit);
                 break;
             case 4:
        //         runFindPoles(deviceIds[0]);
                 break;
             case 5:
-                runTwoDevicePositionControl(deviceIds[0], deviceIds[1], &shouldQuit);
+                //runTwoDevicePositionControl(deviceIds[0], deviceIds[1], &shouldQuit);
                 break;
             case 6:
-                runLeaderFollower(deviceIds[0], deviceIds[1], &shouldQuit);
+                //runLeaderFollower(deviceIds[0], deviceIds[1], &shouldQuit);
                 break;
             default:
                 break;

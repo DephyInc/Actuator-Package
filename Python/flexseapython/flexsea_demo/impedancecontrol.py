@@ -2,6 +2,9 @@ import os, sys
 from time import sleep, time, strftime
 import matplotlib
 import matplotlib.pyplot as plt
+
+from flexseapython.fxUtil import clearTerminal
+
 matplotlib.use('WebAgg')
 
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -81,7 +84,7 @@ def fxImpedanceControl(port, baudRate, expTime = 20, time_step = 0.02, delta = 7
 		measurements.append(measuredPos)
 		times.append(time() - t0)
 		requests.append(positions[currentPos])
-	
+
 	#Disable the controller, send 0 PWM
 	fxSendMotorCommand(devId, FxVoltage, 0)
 	

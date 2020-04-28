@@ -12,12 +12,12 @@ include_directories(
 set(CSCRIPT_SRCS
 	main.cpp
 	read_all_example.cpp
-	open_speed_example.cpp
-	current_control.cpp
-	hold_position_example.cpp
+	#open_speed_example.cpp
+	#current_control.cpp
+	#hold_position_example.cpp
 	#findpolesexample.cpp
-	two_dev_position_example.cpp
-	leaderfollower.cpp
+	#two_dev_position_example.cpp
+	#leaderfollower.cpp
 	utils.h
 )
 
