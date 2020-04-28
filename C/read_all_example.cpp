@@ -11,42 +11,80 @@ using namespace std::literals::chrono_literals;
 
 void displayState(ActPackState& state)
 {
-	cout << "Device time: " << state.timestamp << endl;
-	cout << "imu: " << state.accelx << ", " << state.accely << ", " << state.accelz << endl;
+/*	cout << "Device time: \t" << state.state_time << endl;
+	cout << "imu: " << state.accelx << ", \t" << state.accely << ", " << state.accelz << endl;
 	cout << state.gyrox << ", " << state.gyroy << ", " << state.gyroz << endl;
-	cout << "motor: " << state.encoderAngle << " angle, " << \
-		state.motorCurrent << " mA, " <<\
-		state.motorVoltage << " mV" << endl;
-	cout <<"battery: " << state.batteryVoltage << " mV, " << \
-		state.batteryCurrent << " mA, " << \
-		state.batteryTemp << " C" << endl << endl; 
+	cout << "motor: " << state.mot_ang << " angle, \t" << \
+		state.mot_cur << " mA, " <<\
+		state.mot_volt << " mV" << endl;
+	cout <<"battery: " << state.batt_volt << " mV, " << \
+		state.batt_curr << " mA, " << \
+		state.temperature << " C" << endl << endl;*/
+
+    //get the Log labels
+    char labels[ACTPACK_STRUCT_DEVICE_FIELD_COUNT][ACTPACK_LABEL_MAX_CHAR_LENGTH];
+    ActPackGetLabels(labels);
+
+    //display everything starting from the state time.  We don't need the id...
+    for(int index=ACTPACK_STATE_TIME_POS;index<ACTPACK_STRUCT_DEVICE_FIELD_COUNT;index++)
+    {
+        //let's put 3 items per line with tabs between them
+
+        if(index%3==0 || index==0)
+        {
+            cout <<"\n"<<labels[index] << ":" <<state.deviceData[index];
+        } else//all the others get a tab
+        {
+            if(strnlen(labels[index-1], ACTPACK_LABEL_MAX_CHAR_LENGTH)<12)
+            {
+                cout<<"\t";
+            }
+            cout<<"\t"<<labels[index] << ":" <<state.deviceData[index];
+        }
+        if(index%4==0)
+        {
+            cout<<"\n";
+        }
+
+    }
+    cout<<"\n\n\n";
+
 }
 
 void init_actPackState(ActPackState* state)
 {
 	state->rigid = 0;
 	state->id = 0;
-	state->timestamp = 0;
+	state->state_time = 0;
 	state->accelx = 0;
 	state->accely = 0;
 	state->accelz = 0;
 	state->gyrox = 0;
 	state->gyroy = 0;
 	state->gyroz = 0;
-	state->encoderAngle = 0;
-	state->encoderVelocity = 0;
-	state->encoderAccel = 0;
-	state->motorCurrent = 0;
-	state->motorVoltage = 0;
-	state->batteryVoltage = 0;
-	state->batteryCurrent = 0;
-	state->batteryTemp = 0;
-	state->deviceStatus = 0;
-	state->motorStatus = 0;
-	state->batteryStatus = 0;
-	state->genVar[10] = {0};
-	state->ankleAngle = 0;
-	state->ankleVelocity = 0;
+	state->mot_ang = 0;
+	state->mot_vel = 0;
+	state->mot_acc = 0;
+	state->mot_cur = 0;
+	state->mot_volt = 0;
+	state->batt_volt = 0;
+	state->batt_curr= 0;
+	state->temperature = 0;
+	state->status_mn = 0;
+	state->status_ex = 0;
+	state->status_re = 0;
+	state->genvar_0=0;
+    state->genvar_1=0;
+    state->genvar_2=0;
+    state->genvar_3=0;
+    state->genvar_4=0;
+    state->genvar_5=0;
+    state->genvar_6=0;
+    state->genvar_7=0;
+    state->genvar_8=0;
+    state->genvar_9=0;
+	state->ank_ang = 0;
+	state->ank_vel = 0;
 }
 
 void runReadAll(int devId, bool *shouldQuit)
