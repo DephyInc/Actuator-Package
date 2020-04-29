@@ -131,7 +131,7 @@ int main()
     // Close all of the FlexSEA devices
     //
     fxCloseAll();
-
+    cout << "Exiting..." << endl;
     return 0;
 }
 
@@ -139,12 +139,12 @@ void printMenu(void)
 {
     cout << "What demo would you like to try?" << endl << endl;
     cout << "[0] Read-Only: no actuator, sensors only." << endl;
-    cout << "[1] Open-Speed: PWM will ramp up, then down, then up..." << endl;
-    cout << "[2] Current Control" << endl;
-    cout << "[3] Position Control" << endl;
-    cout << "[4] Find Poles" << endl;
-    cout << "[5] Two device Position Control" << endl;
-    cout << "[6] Two Device Leader-Follower" << endl;
+    //cout << "[1] Open-Speed: PWM will ramp up, then down, then up..." << endl;
+    //cout << "[2] Current Control" << endl;
+    //cout << "[3] Position Control" << endl;
+    //cout << "[4] Find Poles" << endl;
+    //cout << "[5] Two device Position Control" << endl;
+    //cout << "[6] Two Device Leader-Follower" << endl;
     cout << "[q] Quit program." << endl << endl;
     //ToDo: expand that list
 }

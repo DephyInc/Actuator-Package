@@ -38,7 +38,7 @@ void displayState(ActPackState& state)
         if(index%3==0 || index==0)
         {
             cout <<"\n"<<dataString;
-        } else//all the others get a tab or 2 depending on length
+        } else//all the others get a tab or 2 depending on length. Make it pretty.
         {
             char prevDataString[ACTPACK_LABEL_MAX_CHAR_LENGTH+15];
             strcpy(prevDataString,"");
@@ -63,38 +63,13 @@ void displayState(ActPackState& state)
 
 void init_actPackState(ActPackState* state)
 {
-	state->rigid = 0;
-	state->id = 0;
-	state->state_time = 0;
-	state->accelx = 0;
-	state->accely = 0;
-	state->accelz = 0;
-	state->gyrox = 0;
-	state->gyroy = 0;
-	state->gyroz = 0;
-	state->mot_ang = 0;
-	state->mot_vel = 0;
-	state->mot_acc = 0;
-	state->mot_cur = 0;
-	state->mot_volt = 0;
-	state->batt_volt = 0;
-	state->batt_curr= 0;
-	state->temperature = 0;
-	state->status_mn = 0;
-	state->status_ex = 0;
-	state->status_re = 0;
-	state->genvar_0=0;
-    state->genvar_1=0;
-    state->genvar_2=0;
-    state->genvar_3=0;
-    state->genvar_4=0;
-    state->genvar_5=0;
-    state->genvar_6=0;
-    state->genvar_7=0;
-    state->genvar_8=0;
-    state->genvar_9=0;
-	state->ank_ang = 0;
-	state->ank_vel = 0;
+    //make a temp buffer of all zeros to load
+    uint32_t tempDeviceStateBuffer[ACTPACK_STRUCT_DEVICE_FIELD_COUNT];
+    memset(tempDeviceStateBuffer,0,sizeof(uint32_t)*ACTPACK_STRUCT_DEVICE_FIELD_COUNT);
+
+    //set struct with the data from the zero buffer
+    ActPackSetData(state,tempDeviceStateBuffer,0);
+
 }
 
 void runReadAll(int devId, bool *shouldQuit)
