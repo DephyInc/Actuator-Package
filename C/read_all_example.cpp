@@ -29,21 +29,31 @@ void displayState(ActPackState& state)
     for(int index=ACTPACK_STATE_TIME_POS;index<ACTPACK_STRUCT_DEVICE_FIELD_COUNT;index++)
     {
         //let's put 3 items per line with tabs between them
+        char dataString[ACTPACK_LABEL_MAX_CHAR_LENGTH+15];
+        strcpy(dataString,"");
 
+        sprintf(dataString,"%s:%i",labels[index],state.deviceData[index]);
+
+        //this puts 3 items per row
         if(index%3==0 || index==0)
         {
-            cout <<"\n"<<labels[index] << ":" <<state.deviceData[index];
-        } else//all the others get a tab
+            cout <<"\n"<<dataString;
+        } else//all the others get a tab or 2 depending on length
         {
-            if(strnlen(labels[index-1], ACTPACK_LABEL_MAX_CHAR_LENGTH)<12)
+            char prevDataString[ACTPACK_LABEL_MAX_CHAR_LENGTH+15];
+            strcpy(prevDataString,"");
+
+            //let's check how long the previous string was. if it was short, we need an extra tab
+            sprintf(prevDataString,"%s:%i",labels[index-1],state.deviceData[index-1]);
+            if(strnlen(prevDataString, ACTPACK_LABEL_MAX_CHAR_LENGTH+10)<15)
             {
                 cout<<"\t";
             }
-            cout<<"\t"<<labels[index] << ":" <<state.deviceData[index];
+            cout<<"\t"<<dataString;
         }
-        if(index%4==0)
+        if(index%6==0)
         {
-            cout<<"\n";
+            //cout<<"\n";
         }
 
     }

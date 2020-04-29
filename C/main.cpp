@@ -38,9 +38,10 @@ bool        shouldQuit = false;
 
 void my_handler(int s)
 {
-            (void)s;
-           cout << "Caught CTRL-C, exiting...\n";
+           (void)s;
+           cout << "Caught CTRL-C, exiting........\n";
            shouldQuit = true;
+           this_thread::sleep_for(100ms);
 }
 
 int main()
