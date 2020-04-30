@@ -1,17 +1,20 @@
 from signal import signal, SIGINT
 import os
 import sys
-import traceback
+# import traceback
 
 if((sys.version_info[0] == 3) and (sys.version_info[1] == 8)):
-	print('Detected Python 3.8.')
+	print('Detected Python 3.8')
 	if sys.platform == 'win32':		# Need for WebAgg server to work in Python 3.8
 		print('Detected win32')
 		import asyncio
 		asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
+# Following code seems redundant, since Python adds CWD: Current Working
+# Directory to os.path by default
 thisdir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(thisdir)
+print('os.path:', sys.path)
 
 from flexseapython.pyFlexsea import *
 from flexseapython.fxUtil import *
@@ -26,8 +29,9 @@ from flexseapython.flexsea_demo.impedancecontrol import fxImpedanceControl
 from flexseapython.flexsea_demo.two_devices_leaderfollower import fxLeaderFollower
 from flexseapython.flexsea_demo.twopositioncontrol import fxTwoPositionControl
 
-def handler(signal_received, frame):
-	sys.exit('\nCTRL-C or SIGINT detected\nExiting ...')
+# def sig_handler(signal_received, frame):
+def sig_handler(frame, signal_received):
+	return sys.exit('\nCTRL-C or SIGINT detected\nExiting ...')
 
 def fxRunFindPoles(port, baudRate):
 	devId = fxOpen(port, baudRate, 0)
@@ -93,14 +97,14 @@ def get_exp_num(num_cl_args, argv):
 def get_dev_num(num_cl_args, argv, exp_num):
 	dev_num = 1
 	
-	#We only bother if this experiment supports more than 1 device
+	#We only bother if this experiment supportList more than 1 device
 	if(experiments[exp_num][2] > 1):
 		print('Max number of devices for this experiment:', experiments[exp_num][2])
 	else:
 		#Nothing to do here, return default = 1
 		return dev_num
 	
-	#Code below is executed when this experiment supports more than # device	
+	#Code below is executed when this experiment supportList more than # device	
 	if(num_cl_args > 1):
 		#Get it from the command line argument list
 		dev_num = argv[2]
@@ -120,7 +124,7 @@ def get_dev_num(num_cl_args, argv, exp_num):
 	return dev_num
 
 def main(argv):
-	signal(SIGINT, handler)				# Handle Ctrl-C or SIGINT
+	signal(SIGINT, sig_handler)				# Handle Ctrl-C or SIGINT
 	
 	exp_num = -1
 	num_dev = 1
@@ -141,21 +145,21 @@ def main(argv):
 	
 	scriptPath = os.path.dirname(os.path.abspath(__file__))
 	fpath = scriptPath + '/flexseapython/com.txt'
-	ports, baudRate = loadPortsFromFile(fpath)
+	portList, baudRate = loadPortsFromFile(fpath)
 	baudRate = int(baudRate)
-	print('Using ports:\t', ports)
+	print('Using portList:\t', portList)
 	print('Using baud rate:', baudRate)
 	
 	#Time to call the demo script:
 	try:
 		if(dev_num == 1):
-			experiments[exp_num][0](ports[0], baudRate)
+			experiments[exp_num][0](portList[0], baudRate)
 		elif(dev_num == 2):
-			experiments[exp_num][0](ports[0], baudRate, ports[1])
+			experiments[exp_num][0](portList[0], baudRate, portList)
 	except Exception as e:
 		sys.exit(e)
 
-	print('\nExiting fxMain()')
+	print('Exiting main() normally ...')
 
 if __name__ == '__main__':
 	main(sys.argv)
