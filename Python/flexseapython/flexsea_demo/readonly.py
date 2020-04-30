@@ -36,9 +36,11 @@ def printBMSState(devId):
 
 def fxReadOnly(port, baudRate, time = 8, time_step = 0.1):
 	# print(port)
-	devId =	fxOpen(port, baudRate)
+	debugLoggingLevel = 0	# 6 is least verbose, 0 is most verbose
+	dataLog = True 		# False measn no logs will be saved
+	devId =	fxOpen(port, baudRate, debugLoggingLevel)
 	# print(devId)
-	fxStartStreaming(devId, frequency = 100)
+	fxStartStreaming(devId, frequency = 100, shouldLog = dataLog)
 	appType = fxGetAppType(devId)
 
 	for i in range(int(time/time_step)):
