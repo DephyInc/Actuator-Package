@@ -14,7 +14,7 @@ import numpy as np
 
 # from fxUtil import *
 from flexseapython.pyFlexsea import fxReadDevice, ActPackState, fxOpen, fxStartStreaming, \
-	fxSetGains, fxSendMotorCommand, FxCurrent, FxPosition
+	fxSetGains, fxSendMotorCommand, FxCurrent, FxPosition, fxCloseAll, FxVoltage
 
 
 # pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -64,17 +64,17 @@ def fxHighSpeedTest2(port0, baudRate, port1="", controllerType=Controller.curren
 	jitter			Amount of jitter
 	"""
 	secondDevice = False
-	if (port1 != ""):
+	if(port1 != ""):
 		secondDevice = True
 
-	if (secondDevice):
+	if(secondDevice):
 		print("Running high speed test with two devices")
 	else:
 		print("Running high speed test with one device")
 
 	########### Debug & Data Logging ############
-	debugLoggingLevel = 6  # 6 is least verbose, 0 is most verbose
-	dataLog = False  # Data log logs device data
+	debugLoggingLevel = 6	# 6 is least verbose, 0 is most verbose
+	dataLog = False			# Data log logs device data
 
 	delay_time = float(1 / (float(commandFreq)))
 	print(delay_time)
@@ -384,11 +384,10 @@ class Device:
 	devId: int = 0
 	initialPos: int = 0
 	data: ActPackState = None
-	streamCommandTimes	: List[float] = field(default_factory=list)
-	currentCommandTimes	: List[float] = field(default_factory=list)
-	measurements		: List[float] = field(default_factory=list)
-	times				: List[float] = field(default_factory=list)
-	requests			: List[float] = field(default_factory=list)
+	measurements: List[float] = field(default_factory=list)
+
+def plot_device_data():
+	print('\nEverything went well!!!')
 
 # port				Port with outgoing serial connection to ActPack
 # baudRate			Baud rate of outgoing serial connection to ActPack
@@ -405,7 +404,16 @@ class Device:
 # jitter			Amount of jitter
 def fxHighSpeedTest(port0: str, baudRate: int, portList: List = '', controllerType=Controller.current,
 					signalType=signal.sine, commandFreq=1000, signalAmplitude=1000, numberOfLoops=30,
-					signalFreq=5, cycleDelay=0.1, requestJitter=False, jitter=20, devId=0) -> None:
+					signalFreq=5, cycleDelay=0.1, requestJitter=False, jitter=20, devId=0) -> int:
+
+	# *********** Initialize lists ***********
+	currentCommandTimes	: List[float] = []
+	cycleStopTimes		: List[float] = []		# To draw a line at the end of every period
+	requests			: List[float] = []
+	streamCommandTimes	: List[float] = []
+	times				: List[float] = []
+
+	# Initialize one data class/connected device
 	num_devices: int = len(portList)
 	print('Running high speed test with', num_devices, 'device(s).')
 	devices: List[Device] = []
@@ -414,21 +422,22 @@ def fxHighSpeedTest(port0: str, baudRate: int, portList: List = '', controllerTy
 					numberOfLoops, signalFreq, cycleDelay, requestJitter, jitter)
 		devices.append(dev)
 
-	########### Debug & Data Logging ############
-	debugLoggingLevel = 6  # 6 is least verbose, 0 is most verbose
-	dataLog = False  # Data log logs device data
+	# *********** Debug & Data Logging ***********
+	debugLoggingLevel = 6			# 6 is least verbose, 0 is most verbose
+	dataLog = False					# Data log logs device data
 
-	delay_time = 1 / commandFreq  # Default: 1 / 1000 == 1 ms
+	delay_time = 1 / commandFreq	# Default: 1 / 1000 == 1 ms
 	print('delay_time:', delay_time)
 
-	########### Open device(s) and start streaming ############
+	# *********** Open device(s) and start streaming  ***********
 	for d in devices:
 		d.devId = fxOpen(d.port, d.baudRate, debugLoggingLevel)
-		# Device might need 100 ms(?) pause to process following command:
+		# Does device need 100 ms pause to process following command?
 		fxStartStreaming(d.devId, d.commandFreq, dataLog)
 		print('Connected to device with ID:', d.devId)
 
-	############# Main Code ############
+	# ********************** Main Code **********************
+
 	if controllerType == Controller.position:
 		print('Reading initial position of connected devices ...')
 		# Give the device time to consume the startStreaming command and start streaming
@@ -436,13 +445,13 @@ def fxHighSpeedTest(port0: str, baudRate: int, portList: List = '', controllerTy
 		for d in devices:
 			d.data = fxReadDevice(d.devId)
 			d.initialPos = d.data.endocerAngle
-	# else: 	# controllerType == Controller.current
-	# 	pass		No action required
+	else:		# controllerType == Controller.current
+		pass	# No action required
 
 	# Generate a control profile
 	print('Command table:')
 	signalTypeStr: str = None
-	samples: List = None
+	samples: List[float] = None
 	if signalType == signal.sine:
 		signalTypeStr = "sine wave"
 		samples = sinGenerator(signalAmplitude, signalFreq, commandFreq)
@@ -451,56 +460,78 @@ def fxHighSpeedTest(port0: str, baudRate: int, portList: List = '', controllerTy
 		samples = lineGenerator(signalAmplitude, commandFreq)
 	print(np.int64(samples))
 
-	# Prepare controller.  Use the same code whether:
+	# Prepare controller.  Use the exact same code whether:
 	# controllerType == Controller.current OR controllerType == Controller.position
+	if controllerType == Controller.current:
+		print('Setting-up current control demo')
+	else:
+		print('Setting-up position control demo')
 	for d in devices:
 		fxSetGains(d.devId, 300, 50, 0, 0, 0)
 
-	######## Main loop ########
-	ii: int = 0
+	# *********** Main loop ***********
 	t0: float = time()
-	for loop in range(numberOfLoops):
+	ii: int = 0
+	loopCtr: int = 0
+	for _ in range(numberOfLoops):
+		loopCtr += 1
 		elapsed_time = round((time() - t0), 1)
-		print('Loop', (loop + 1), 'of', numberOfLoops, '/ Elapsed time', elapsed_time, 's',end='\r')
+		print('Loop', loopCtr, 'of', numberOfLoops, '/ Elapsed time', elapsed_time, 's',end='\r')
 		for sample in samples:
 			if (ii % 2 == 0) and requestJitter:
 				sample += jitter
 			sleep(delay_time)
+
 			# set controller to the next sample
-			# read ActPack data
-			for d in devices:
-				t_read0: float = time()
+			t1_start: float = time()
+			for d in devices:			# read ActPack data
 				d.data = fxReadDevice(d.devId)
-				t_read1: float = time()
-				d.streamCommandTimes.append(t_read1 - t_read0)
+			streamCommandTimes.append(time() - t1_start)
 
 			if controllerType == Controller.current:
+				t1_start = time()
 				for d in devices:
-					t_cmd0: float = time()
 					fxSendMotorCommand(d.devId, FxCurrent, sample)
-					t_cmd1: float = time()
-					d.currentCommandTimes.append(t_cmd1 - t_cmd0)
 					d.measurements.append(d.data.motorCurrent)
-			else:		# controllerType == Controller.position
+				currentCommandTimes.append(time() - t1_start)
+			else:						# controllerType == Controller.position
 				for d in devices:
-					t_cmd0: float = time()
 					fxSendMotorCommand(d.devId, FxPosition, sample + d.initialPos)
-					t_cmd1: float = time()
-					d.currentCommandTimes.append(0)
 					d.measurements.append(d.data.encoderAngle - d.initialPos)
+				currentCommandTimes.append(0.0)
 
-			elapsed_time = time() - t0
-			for d in devices:
-				d.times.append(elapsed_time)
-				d.requests.append(sample)
+			times.append(time() - t0)
+			requests.append(sample)
 			ii += 1
 
+		# JFD: Should this code be indented +1 so it executes once/sample?
 		# Delay between cycles (sine wave only)
 		if signalType == signal.sine:
-			pass
+			for _ in range(int(cycleDelay/delay_time)):		# Default: .1/.001 = 100
+				sleep(delay_time)
 
-	print('\nEverything went well!!!')
+				for d in devices:			# Read ActPack data
+					d.data = fxReadDevice(d.devId)
 
+				if controllerType == Controller.current:
+					for d in devices:
+						d.measurements.append(d.data.motorCurrent)
+				else:						# controllerType == Controller.position
+					for d in devices:
+						d.measurements.append(d.data.encoderAngle - d.initialPos)
+				times.append(time() - t0)
+				requests.append(sample)		# JFD: Logical error: Use before set
+				ii += 1
+
+		cycleStopTimes.append(time() - t0)		# To draw a line at the end of every period
+		# fxCloseAll()							#STACK-169
+		# Disable the controller, send 0 PWM
+		for d in devices:
+			fxSendMotorCommand(d.devId, FxVoltage, 0)
+		sleep(0.1)
+		plot_device_data()
+		fxCloseAll()
+		return 0
 
 if __name__ == '__main__':
 	baud_rate = int(sys.argv[1])
