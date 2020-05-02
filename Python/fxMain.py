@@ -29,7 +29,6 @@ from flexseapython.flexsea_demo.impedancecontrol import fxImpedanceControl
 from flexseapython.flexsea_demo.two_devices_leaderfollower import fxLeaderFollower
 from flexseapython.flexsea_demo.twopositioncontrol import fxTwoPositionControl
 
-# def sig_handler(signal_received, frame):
 def sig_handler(frame, signal_received):
 	return sys.exit('\nCTRL-C or SIGINT detected\nExiting ...')
 
@@ -97,14 +96,14 @@ def get_exp_num(num_cl_args, argv):
 def get_dev_num(num_cl_args, argv, exp_num):
 	dev_num = 1
 	
-	#We only bother if this experiment supportList more than 1 device
+	#We only bother if this experiment supports more than 1 device
 	if(experiments[exp_num][2] > 1):
 		print('Max number of devices for this experiment:', experiments[exp_num][2])
 	else:
 		#Nothing to do here, return default = 1
 		return dev_num
-	
-	#Code below is executed when this experiment supportList more than # device	
+
+	#Code below is executed when this experiment supports more than # device
 	if(num_cl_args > 1):
 		#Get it from the command line argument list
 		dev_num = argv[2]
