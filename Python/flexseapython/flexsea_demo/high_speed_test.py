@@ -404,6 +404,7 @@ def plot_device_data(devices: List[Device], t0: float, loopCtr: int, numberOfLoo
 	actual_frequency = 1 / actual_period
 	command_frequency = cmd_total / elapsed_time
 
+	plt_ctr: int = 1
 	if (controllerType == Controller.current):
 		plt.figure(1)
 		title = "Current control with " + "{:.2f}".format(actual_frequency) + " Hz, " + \
@@ -440,7 +441,7 @@ def plot_device_data(devices: List[Device], t0: float, loopCtr: int, numberOfLoo
 
 	###### begin command times plotting ########################################33
 
-	# Following 6 lines are legacy code. Remove eventually.
+	# Delete eventually: Following 6 lines are legacy code.
 	# plt.figure(2)
 	# title = "Current and stream command times (aggregate)"
 	# plt.title(title)
@@ -448,6 +449,7 @@ def plot_device_data(devices: List[Device], t0: float, loopCtr: int, numberOfLoo
 	# plt.plot(streamCommandTimes, color='r', label='Stream Command Times')
 	# plt.legend(loc='upper right')
 
+	plt_ctr += 1
 	plt.figure(2)
 	# Convert command times into millisec
 	currentCommandTimes = [i * 1000 for i in currentCommandTimes]
@@ -458,6 +460,7 @@ def plot_device_data(devices: List[Device], t0: float, loopCtr: int, numberOfLoo
 	plt.xlabel("Time (ms)")
 	plt.ylabel("Command Time (ms)")
 
+	plt_ctr += 1
 	plt.figure(3)
 	plt.yscale('log')
 	plt.hist(currentCommandTimes, bins=100, label='Current Commands')
@@ -467,6 +470,7 @@ def plot_device_data(devices: List[Device], t0: float, loopCtr: int, numberOfLoo
 	plt.xlabel("Time (ms)")
 	plt.ylabel("Occurrences")
 
+	plt_ctr += 1
 	plt.figure(4)
 	streamCommandTimes = [i * 1000 for i in streamCommandTimes]
 	# Convert command times into milliseconds
@@ -476,6 +480,7 @@ def plot_device_data(devices: List[Device], t0: float, loopCtr: int, numberOfLoo
 	plt.xlabel("Time (ms)")
 	plt.ylabel("Command Time (ms)")
 
+	plt_ctr += 1
 	plt.figure(5)
 	plt.yscale('log')
 	plt.hist(streamCommandTimes, bins=100, label='Stream Commands')
