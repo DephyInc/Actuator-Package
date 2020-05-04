@@ -370,6 +370,7 @@ def fxHighSpeedTest2(port0, baudRate, port1="", controllerType=Controller.curren
 
 @dataclass
 class Device:
+	""" Hold device state in one place """
 	port: str = ''
 	baudRate: int = 0
 	controllerType: Controller = Controller.position
@@ -386,8 +387,145 @@ class Device:
 	data: ActPackState = None
 	measurements: List[float] = field(default_factory=list)
 
-def plot_device_data():
-	print('\nEverything went well!!!')
+# Plot device data
+def plot_device_data(devices: List[Device], t0: float, loopCtr: int, numberOfLoops: int,
+		cmd_total: int, controllerType: Controller, signalAmplitude: int, signalType: str,
+		currentCommandTimes: List[float], cycleStopTimes: List[float],
+		requests: List[float], streamCommandTimes: List[float], times: List[float]) -> int:
+	""" Plotting Code, you can edit this """
+
+	# Specify "WebAgg" as the backend for rendering and GUI integration.
+	# On show(), it will start a tornado server with an interactive figure.
+	matplotlib.use('WebAgg')
+
+	elapsed_time = time() - t0
+	print('Loop:', loopCtr, 'of', numberOfLoops, '- Elapsed time:', int(elapsed_time + 0.5), 's')
+	actual_period = cycleStopTimes[0]
+	actual_frequency = 1 / actual_period
+	command_frequency = cmd_total / elapsed_time
+
+	if (controllerType == Controller.current):
+		plt.figure(1)
+		title = "Current control with " + "{:.2f}".format(actual_frequency) + " Hz, " + \
+				str(signalAmplitude) + " mA amplitude " + signalType + " and " + "{:.2f}".format(
+			command_frequency) + " Hz commands"
+		plt.plot(times, requests, color='b', label='desired current')
+		plt.plot(times, measurements0, color='r', label='measured current')
+		plt.xlabel("Time (s)")
+		plt.ylabel("Motor current (mA)")
+		plt.title(title)
+
+		plt.legend(loc='upper right')
+
+	# Draw a vertical line at the end of each cycle
+	# for endpoints in cycleStopTimes:
+	# 	plt.axvline(x=endpoints)
+
+	elif (controllerType == Controller.position):
+		plt.figure(1)
+		title = "Position control with " + "{:.2f}".format(actual_frequency) + " Hz, " + \
+				str(signalAmplitude) + " ticks amplitude " + signalType + " and " + "{:.2f}".format(
+			command_frequency) + " Hz commands"
+		plt.plot(times, requests, color='b', label='desired position')
+		plt.plot(times, measurements0, color='r', label='measured position')
+		plt.xlabel("Time (s)")
+		plt.ylabel("Encoder position")
+		plt.title(title)
+
+		plt.legend(loc='upper right')
+
+		# Draw a vertical line at the end of each cycle
+		for endpoints in cycleStopTimes:
+			plt.axvline(x=endpoints)
+
+	###### begin command times plotting ########################################33
+
+	# Following 6 lines are legacy code. Remove eventually.
+	# plt.figure(2)
+	# title = "Current and stream command times (aggregate)"
+	# plt.title(title)
+	# plt.plot(currentCommandTimes,color='b', label='Current Command Times')
+	# plt.plot(streamCommandTimes, color='r', label='Stream Command Times')
+	# plt.legend(loc='upper right')
+
+	plt.figure(2)
+	# Convert command times into millisec
+	currentCommandTimes = [i * 1000 for i in currentCommandTimes]
+	# np.savetxt('JFD.txt', np.array(currentCommandTimes), fmt='%.10f')
+	plt.plot(currentCommandTimes, color='b', label='Current Command Times')
+	plt.title("Commands")
+	plt.legend(loc='upper right')
+	plt.xlabel("Time (ms)")
+	plt.ylabel("Command Time (ms)")
+
+	plt.figure(3)
+	plt.yscale('log')
+	plt.hist(currentCommandTimes, bins=100, label='Current Commands')
+	plt.yscale('log')
+	plt.title("Commands")
+	plt.legend(loc='upper right')
+	plt.xlabel("Time (ms)")
+	plt.ylabel("Occurrences")
+
+	plt.figure(4)
+	streamCommandTimes = [i * 1000 for i in streamCommandTimes]
+	# Convert command times into milliseconds
+	plt.plot(streamCommandTimes, color='b', label='Stream Command Times')
+	plt.title("Commands")
+	plt.legend(loc='upper right')
+	plt.xlabel("Time (ms)")
+	plt.ylabel("Command Time (ms)")
+
+	plt.figure(5)
+	plt.yscale('log')
+	plt.hist(streamCommandTimes, bins=100, label='Stream Commands')
+	plt.yscale('log')
+	plt.title("Commands")
+	plt.legend(loc='upper right')
+	plt.xlabel("Time (ms)")
+	plt.ylabel("Occurrences")
+
+	##### End command times plotting ########################################33
+
+	if (secondDevice):
+		if (controllerType == Controller.current):
+			plt.figure(2)
+			title = "Current control with " + "{:.2f}".format(actual_frequency) + " Hz, " + \
+					str(signalAmplitude) + " mA amplitude " + signalTypeStr + " and " + "{:.2f}".format(
+				command_frequency) + " Hz commands"
+			plt.plot(times, requests, color='b', label='desired current')
+			plt.plot(times, measurements1, color='r', label='measured current')
+			plt.xlabel("Time (s)")
+			plt.ylabel("Motor current (mA)")
+			plt.title(title)
+
+			plt.legend(loc='upper right')
+
+			# Draw a vertical line at the end of each cycle
+			for endpoints in cycleStopTimes:
+				plt.axvline(x=endpoints)
+
+		elif (controllerType == Controller.position):
+			plt.figure(2)
+			title = "Position control with " + "{:.2f}".format(actual_frequency) + " Hz, " + \
+					str(signalAmplitude) + " ticks amplitude " + signalTypeStr + " and " + "{:.2f}".format(
+				command_frequency) + " Hz commands"
+			plt.plot(times, requests, color='b', label='desired position')
+			plt.plot(times, measurements1, color='r', label='measured position')
+			plt.xlabel("Time (s)")
+			plt.ylabel("Encoder position")
+			plt.title(title)
+
+			plt.legend(loc='upper right')
+
+			# Draw a vertical line at the end of each cycle
+			for endpoints in cycleStopTimes:
+				plt.axvline(x=endpoints)
+
+	if os.name == 'nt':
+		print('\nIn Windows, press Ctrl-BREAK to exit.  Ctrl-C may not work.')
+	plt.show()
+	return 0
 
 # port				Port with outgoing serial connection to ActPack
 # baudRate			Baud rate of outgoing serial connection to ActPack
@@ -403,7 +541,7 @@ def plot_device_data():
 # requestJitter		Add jitter amount to every other sample sent to controller
 # jitter			Amount of jitter
 def fxHighSpeedTest(port0: str, baudRate: int, portList: List = '', controllerType=Controller.current,
-					signalType=signal.sine, commandFreq=1000, signalAmplitude=1000, numberOfLoops=30,
+					signalType=signal.sine, commandFreq=1000, signalAmplitude=1000, numberOfLoops=10,
 					signalFreq=5, cycleDelay=0.1, requestJitter=False, jitter=20, devId=0) -> int:
 
 	# *********** Initialize lists ***********
@@ -450,13 +588,13 @@ def fxHighSpeedTest(port0: str, baudRate: int, portList: List = '', controllerTy
 
 	# Generate a control profile
 	print('Command table:')
-	signalTypeStr: str = None
+	signalType: str = None
 	samples: List[float] = None
 	if signalType == signal.sine:
-		signalTypeStr = "sine wave"
+		signalType = "sine wave"
 		samples = sinGenerator(signalAmplitude, signalFreq, commandFreq)
 	else:			# signalType == signal.line
-		signalTypeStr = "line"
+		signalType = "line"
 		samples = lineGenerator(signalAmplitude, commandFreq)
 	print(np.int64(samples))
 
@@ -471,14 +609,15 @@ def fxHighSpeedTest(port0: str, baudRate: int, portList: List = '', controllerTy
 
 	# *********** Main loop ***********
 	t0: float = time()
-	ii: int = 0
+	cmd_total: int = 0
 	loopCtr: int = 0
+	# JFD: Following loop takes about 5s/loop on Windows 10, about 2s on RPi4
 	for _ in range(numberOfLoops):
 		loopCtr += 1
 		elapsed_time = round((time() - t0), 1)
 		print('Loop', loopCtr, 'of', numberOfLoops, '/ Elapsed time', elapsed_time, 's',end='\r')
 		for sample in samples:
-			if (ii % 2 == 0) and requestJitter:
+			if (cmd_total % 2 == 0) and requestJitter:
 				sample += jitter
 			sleep(delay_time)
 
@@ -502,11 +641,12 @@ def fxHighSpeedTest(port0: str, baudRate: int, portList: List = '', controllerTy
 
 			times.append(time() - t0)
 			requests.append(sample)
-			ii += 1
+			cmd_total += 1
 
 		# JFD: Should this code be indented +1 so it executes once/sample?
 		# Delay between cycles (sine wave only)
 		if signalType == signal.sine:
+			# Following takes approx 2s on Windows 10 PC
 			for _ in range(int(cycleDelay/delay_time)):		# Default: .1/.001 = 100
 				sleep(delay_time)
 
@@ -521,17 +661,20 @@ def fxHighSpeedTest(port0: str, baudRate: int, portList: List = '', controllerTy
 						d.measurements.append(d.data.encoderAngle - d.initialPos)
 				times.append(time() - t0)
 				requests.append(sample)		# JFD: Logical error: Use before set
-				ii += 1
+				cmd_total += 1
 
-		cycleStopTimes.append(time() - t0)		# To draw a line at the end of every period
-		# fxCloseAll()							#STACK-169
-		# Disable the controller, send 0 PWM
-		for d in devices:
-			fxSendMotorCommand(d.devId, FxVoltage, 0)
-		sleep(0.1)
-		plot_device_data()
-		fxCloseAll()
-		return 0
+		cycleStopTimes.append(time() - t0)	# To draw a line at the end of every period
+
+	# fxCloseAll()						#STACK-169
+
+	# Disable the controller, send 0 PWM
+	for d in devices:
+		fxSendMotorCommand(d.devId, FxVoltage, 0)
+	sleep(0.1)
+	plot_device_data(devices, t0, loopCtr, numberOfLoops, cmd_total, controllerType, signalAmplitude,
+			signalType, currentCommandTimes, cycleStopTimes, requests, streamCommandTimes,times)
+	fxCloseAll()
+	return 0
 
 if __name__ == '__main__':
 	baud_rate = int(sys.argv[1])
