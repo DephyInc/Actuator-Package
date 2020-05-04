@@ -112,7 +112,7 @@ def get_dev_num(num_cl_args, argv, exp_num):
 		dev_num = input('Enter connected devices [q to quit]: ')
 		if(dev_num == 'q'):
 			sys.exit('Quitting ...')
-	
+
 	#Make sure it's valid and in range:
 	if(not dev_num.isdecimal()):	#Filter out letters
 		sys.exit('Please choose a valid number of devices.')
@@ -125,8 +125,8 @@ def get_dev_num(num_cl_args, argv, exp_num):
 def main(argv):
 	signal(SIGINT, sig_handler)				# Handle Ctrl-C or SIGINT
 	
-	exp_num = -1
-	num_dev = 1
+	exp_num: int = -1
+	num_dev: int = 1
 	
 	print('\n>>> Actuator Package Python Demo Scripts <<<\n')
 	
@@ -135,7 +135,7 @@ def main(argv):
 	if(num_cl_args < 3):
 		print_experiments()
 		exp_num = get_exp_num(num_cl_args, argv)
-		dev_num = get_dev_num(num_cl_args, argv, exp_num)
+		num_dev = get_dev_num(num_cl_args, argv, exp_num)
 	else:
 		print('\nToo many command line arguments provided.')
 		print_usage_exit(argv[0])
@@ -151,9 +151,10 @@ def main(argv):
 	
 	#Time to call the demo script:
 	try:
-		if(dev_num == 1):
+		if(num_dev == 1):
 			experiments[exp_num][0](portList[0], baudRate)
-		elif(dev_num == 2):
+		elif(num_dev == 2):
+			#experiments[exp_num][0](portList[0], baudRate, portList[1])
 			experiments[exp_num][0](portList[0], baudRate, portList)
 	except Exception as e:
 		sys.exit(e)
