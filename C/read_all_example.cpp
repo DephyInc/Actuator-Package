@@ -6,20 +6,14 @@
 #include "utils.h"
 #include "device_wrapper.h"
 
+#define TIME_STEP 0.1
+#define TIME 8
+
 using namespace std;
 using namespace std::literals::chrono_literals;
 
 void displayState(ActPackState& state)
 {
-/*	cout << "Device time: \t" << state.state_time << endl;
-	cout << "imu: " << state.accelx << ", \t" << state.accely << ", " << state.accelz << endl;
-	cout << state.gyrox << ", " << state.gyroy << ", " << state.gyroz << endl;
-	cout << "motor: " << state.mot_ang << " angle, \t" << \
-		state.mot_cur << " mA, " <<\
-		state.mot_volt << " mV" << endl;
-	cout <<"battery: " << state.batt_volt << " mV, " << \
-		state.batt_curr << " mA, " << \
-		state.temperature << " C" << endl << endl;*/
 
     //get the Log labels
     char labels[ACTPACK_STRUCT_DEVICE_FIELD_COUNT][ACTPACK_LABEL_MAX_CHAR_LENGTH];
@@ -32,10 +26,20 @@ void displayState(ActPackState& state)
         char dataString[ACTPACK_LABEL_MAX_CHAR_LENGTH+15];
         strcpy(dataString,"");
 
-        sprintf(dataString,"%s:%i",labels[index],state.deviceData[index]);
+        if(strnlen(labels[index],ACTPACK_LABEL_MAX_CHAR_LENGTH)<=8)
+        {
+            sprintf(dataString,"%s:\t\t\t%i\n",labels[index],state.deviceData[index]);
+        }else if((strnlen(labels[index],ACTPACK_LABEL_MAX_CHAR_LENGTH)<=12))
+        {
+            sprintf(dataString,"%s:\t\t%i\n",labels[index],state.deviceData[index]);
+        } else
+        {
+            sprintf(dataString,"%s:\t%i\n",labels[index],state.deviceData[index]);
+        }
+        cout<<dataString;
 
         //this puts 3 items per row
-        if(index%3==0 || index==0)
+/*        if(index%3==0 || index==0)
         {
             cout <<"\n"<<dataString;
         } else//all the others get a tab or 2 depending on length. Make it pretty.
@@ -54,10 +58,10 @@ void displayState(ActPackState& state)
         if(index%6==0)
         {
             //cout<<"\n";
-        }
+        }*/
 
     }
-    cout<<"\n\n\n";
+    cout<<"\n\n";
 
 }
 
@@ -89,9 +93,9 @@ void runReadAll(int devId, bool *shouldQuit)
     //
     ActPackState exoState;
     init_actPackState(&exoState);
-    while(!(*shouldQuit))
+    //while(!(*shouldQuit))
     {
-	this_thread::sleep_for(10ms);
+	this_thread::sleep_for(TIME_STEP*100);
         clearScreen();
 	fxReadDevice(devId, &exoState);
 	
