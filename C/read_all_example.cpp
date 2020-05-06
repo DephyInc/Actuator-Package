@@ -6,7 +6,7 @@
 #include "utils.h"
 #include "device_wrapper.h"
 
-#define TIME_STEP 0.1
+#define TIME_STEP .1 //in seconds
 #define TIME 8
 
 using namespace std;
@@ -18,20 +18,20 @@ void displayState(ActPackState& state)
     //get the Log labels
     char labels[ACTPACK_STRUCT_DEVICE_FIELD_COUNT][ACTPACK_LABEL_MAX_CHAR_LENGTH];
     ActPackGetLabels(labels);
-
+    char dataString[ACTPACK_LABEL_MAX_CHAR_LENGTH+15];
     //display everything starting from the state time.  We don't need the id...
     for(int index=ACTPACK_STATE_TIME_POS;index<ACTPACK_STRUCT_DEVICE_FIELD_COUNT;index++)
     {
         //let's put 3 items per line with tabs between them
-        char dataString[ACTPACK_LABEL_MAX_CHAR_LENGTH+15];
+
         strcpy(dataString,"");
 
-        if(strnlen(labels[index],ACTPACK_LABEL_MAX_CHAR_LENGTH)<=8)
-        {
-            sprintf(dataString,"%s:\t\t\t%i\n",labels[index],state.deviceData[index]);
-        }else if((strnlen(labels[index],ACTPACK_LABEL_MAX_CHAR_LENGTH)<=12))
+        if(strnlen(labels[index],ACTPACK_LABEL_MAX_CHAR_LENGTH)<=6)
         {
             sprintf(dataString,"%s:\t\t%i\n",labels[index],state.deviceData[index]);
+        }else if((strnlen(labels[index],ACTPACK_LABEL_MAX_CHAR_LENGTH)<=12))
+        {
+            sprintf(dataString,"%s:\t%i\n",labels[index],state.deviceData[index]);
         } else
         {
             sprintf(dataString,"%s:\t%i\n",labels[index],state.deviceData[index]);
@@ -94,8 +94,11 @@ void runReadAll(int devId, bool *shouldQuit)
     ActPackState exoState;
     init_actPackState(&exoState);
     //while(!(*shouldQuit))
+    int reps=TIME/TIME_STEP;
+    for(int index=0;index<reps ;index++)
     {
-	this_thread::sleep_for(TIME_STEP*100);
+
+	this_thread::sleep_for(100ms);
         clearScreen();
 	fxReadDevice(devId, &exoState);
 	
