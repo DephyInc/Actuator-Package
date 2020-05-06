@@ -15,7 +15,7 @@
 #endif
 #include "hold_position_example.h"
 #include "open_speed_example.h"
-#include "read_all_example.h"
+#include "readOnly.h"
 #include "current_control.h"
 //#include "findpolesexample.h"
 #include "two_dev_position_example.h"

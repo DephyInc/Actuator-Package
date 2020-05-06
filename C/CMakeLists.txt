@@ -11,7 +11,7 @@ include_directories(
 
 set(CSCRIPT_SRCS
 	main.cpp
-	read_all_example.cpp
+	readOnly.cpp
 	#open_speed_example.cpp
 	#current_control.cpp
 	#hold_position_example.cpp

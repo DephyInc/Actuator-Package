@@ -1,9 +1,9 @@
-#ifndef READ_ALL_EXAMPLE_H
-#define READ_ALL_EXAMPLE_H
+#ifndef READONLY_H
+#define READONLY_H
 
 struct ActPackState;
 
 void runReadAll(int devId, bool* shouldQuit);
 void displayState(ActPackState &exoState);
 
-#endif // READ_ALL_EXAMPLE_H
+#endif // READONLY_H
