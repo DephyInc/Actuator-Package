@@ -18,12 +18,11 @@ void displayState(ActPackState& state)
     //get the Log labels
     char labels[ACTPACK_STRUCT_DEVICE_FIELD_COUNT][ACTPACK_LABEL_MAX_CHAR_LENGTH];
     ActPackGetLabels(labels);
-    char dataString[ACTPACK_LABEL_MAX_CHAR_LENGTH+15];
+    char dataString[ACTPACK_LABEL_MAX_CHAR_LENGTH+15];//the label plus the colon and data being displayed
+
     //display everything starting from the state time.  We don't need the id...
     for(int index=ACTPACK_STATE_TIME_POS;index<ACTPACK_STRUCT_DEVICE_FIELD_COUNT;index++)
     {
-        //let's put 3 items per line with tabs between them
-
         strcpy(dataString,"");
 
         if(strnlen(labels[index],ACTPACK_LABEL_MAX_CHAR_LENGTH)<=6)
@@ -37,29 +36,6 @@ void displayState(ActPackState& state)
             sprintf(dataString,"%s:\t%i\n",labels[index],state.deviceData[index]);
         }
         cout<<dataString;
-
-        //this puts 3 items per row
-/*        if(index%3==0 || index==0)
-        {
-            cout <<"\n"<<dataString;
-        } else//all the others get a tab or 2 depending on length. Make it pretty.
-        {
-            char prevDataString[ACTPACK_LABEL_MAX_CHAR_LENGTH+15];
-            strcpy(prevDataString,"");
-
-            //let's check how long the previous string was. if it was short, we need an extra tab
-            sprintf(prevDataString,"%s:%i",labels[index-1],state.deviceData[index-1]);
-            if(strnlen(prevDataString, ACTPACK_LABEL_MAX_CHAR_LENGTH+10)<15)
-            {
-                cout<<"\t";
-            }
-            cout<<"\t"<<dataString;
-        }
-        if(index%6==0)
-        {
-            //cout<<"\n";
-        }*/
-
     }
     cout<<"\n\n";
 
