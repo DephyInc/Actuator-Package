@@ -542,21 +542,12 @@ def fxFindPoles(devId):
 def loadFlexsea():
 	global flexsea
 	#Init code:
-	print('[pyFlexsea Module]\n')
+	print('Loading pyFlexsea native module')
 
 	loadSucceeded  = False
-	# is_64bits = sys.maxsize > 2**32
-	if (sys.maxsize > 2**32):
-		print('You are using 64-bit Python. This program requires 32-bit Python')
-		return False
 	sysOS = platform.system().lower()
 	dir_path = os.path.dirname(os.path.realpath(__file__))
 
-	# we currently support Ubuntu and Raspbian so need to make sure we are pulling
-	# in correct library depending on which version of linux
-	# linux_distro = platform.linux_distribution()[0]
-
-	print('>>> dir_path:', dir_path)
 	# check whether we are running on a 32 or 64 bit machine
 	architecture = platform.architecture()[0]
 	librarypaths = []
@@ -577,22 +568,25 @@ def loadFlexsea():
 		librarypaths = [
 				os.path.join(dir_path,'../../libs/linux','libfx_plan_stack.so'),
 				os.path.join(dir_path,'../../libs/raspberryPi','libfx_plan_stack.so'),
+				os.path.join(dir_path,'../../libs/raspberryPi64','libfx_plan_stack.so'),
 		]
 
+	loadingLogMessages = []
 	for librarypath in librarypaths:
 		try:
-			print("loading... " + librarypath)
+			loadingLogMessages.append("loading... " + librarypath)
 			flexsea = cdll.LoadLibrary(librarypath)
 		except OSError as arg:
-			print("\n\nThere was a problem loading the library\n {0}\n".format(arg))
+			loadingLogMessages.append("\n\nThere was a problem loading the library\n {0}\n".format(arg))
 		else:
 			loadSucceeded = True
 			break
 
 	if(loadSucceeded  != True):
+		print("\n".join(loadingLogMessages))
 		return False
 
-	print("Loaded!")
+	print("Loaded " + os.path.realpath(librarypath) + "!")
 
 	# set arg types
 	flexsea.fxOpen.argtypes = [c_char_p, c_uint, c_uint]
