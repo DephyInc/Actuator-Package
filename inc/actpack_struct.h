@@ -29,8 +29,7 @@ extern "C"
 #endif
 
 struct ActPackState 
- { 
-
+ {
 	int rigid;
 	int id;
 	int state_time;
