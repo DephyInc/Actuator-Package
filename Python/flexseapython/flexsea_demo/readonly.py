@@ -46,15 +46,18 @@ def fxReadOnly(port, baudRate, time = 8, time_step = 0.1):
 	for i in range(int(time/time_step)):
 		sleep(time_step)
 		clearTerminal()
-		actPackState = fxReadDevice(devId)
 		if (appType == FxActPack):
-			printDevice(actPackState)
+			myData = fxReadDevice(devId)
+			printDevice(myData)
 		elif (appType == FxNetMaster):
+			fxReadNetMasterDevice(devId)
 			printNetMaster(devId)
 		elif (appType == FxBMS):
+			fxReadBMSDevice(devId)
 			printBMSState(devId)
 		elif (appType == FxExo):
-			print('Exo not supported with public actpack software')
+			myData = fxReadExoDevice(devId)
+			printExo(myData)
 		else:
 			raise RuntimeError('Unsupported application type: ', appType)
 

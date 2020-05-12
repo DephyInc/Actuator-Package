@@ -23,6 +23,9 @@ def printDevice(actPackState: ActPackState):
 	print('Battery Current (mA): ', actPackState.batteryCurrent)
 	print('Battery Voltage (mV): ', actPackState.batteryVoltage)
 	print('Battery Temp (C):     ', actPackState.batteryTemp)
+	
+def printExo(exoState: ExoState):
+	printDevice(exoState.actpack)
 
 # By default takes just one device from your com.txt file
 # If two arguments are passed, one is the path of the COM.txt file

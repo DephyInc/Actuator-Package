@@ -93,6 +93,32 @@ class BMSState(Structure):
 			("temperature"	  , c_int * 4),
 			("genvar", c_int * 4)]
 
+class ExoState(Structure):
+	_fields_ = [
+			("actpack", ActPackState),
+			("rigid"	  , c_int),
+			("id"		  , c_int),
+			("timestamp"	  , c_int),
+			("accelx"	  , c_int),
+			("accely"	  , c_int),
+			("accelz"	  , c_int),
+			("gyrox"	  , c_int),
+			("gyroy"	  , c_int),
+			("gyroz"	  , c_int),
+			("encoderAngle"   , c_int),
+			("encoderVelocity", c_int),
+			("encoderAccel"   , c_int),
+			("motorCurrent"   , c_int),
+			("motorVoltage"   , c_int),
+			("batteryVoltage" , c_int),
+			("batteryCurrent" , c_int),
+			("batteryTemp" 	  , c_int),
+			("deviceStatus"   , c_int),
+			("motorStatus"	  , c_int),
+			("batteryStatus"  , c_int),
+			("genVar"    , c_int * 10),
+			("ankleAngle"	  , c_int),
+			("ankleVelocity"  , c_int)]
 
 ####################### Begin API ##################################
 
@@ -250,6 +276,32 @@ def fxReadDevice(devId):
 
 	return actPackState
 
+def fxReadExoDevice(devId):
+	"""
+	Read the most recent data from a streaming FlexSEA device stream.
+	IMPORTANT! Must call fxStartStreaming before calling this.
+
+	Parameters:
+	devId (int): The device ID of the device to read from.
+
+	Returns:
+	exoState (ExoState): Contains the most recent data from the device
+
+	Raises:
+	ValueError if invalid device ID
+	RuntimeError if no read data
+	"""
+	global flexsea
+
+	exoState = ExoState();
+	retCode = flexsea.fxReadExoDevice(devId, byref(exoState))
+
+	if (retCode == FxInvalidDevice):
+		raise ValueError('fxReadDevice: invalid device ID')
+	elif (retCode == FxNotStreaming):
+		raise RuntimeError('fxReadDevice: no read data')
+
+	return exoState
 
 def fxReadDeviceAll(devId, dataQueueSize):
 	"""
