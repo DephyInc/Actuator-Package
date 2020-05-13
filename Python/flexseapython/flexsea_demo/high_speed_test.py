@@ -5,7 +5,7 @@ from enum import Enum
 import os
 import sys
 from time import sleep, time
-from typing import List
+from typing import Final, List
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -33,9 +33,9 @@ class signal(Enum):
 
 # Generate a sine wave of a specific amplitude and frequency
 def sinGenerator(amplitude, frequency, commandFreq):
-	num_samples = commandFreq / frequency
+	num_samples = int(round(commandFreq / frequency, 0))		# Default: 1000/5=200
 	print("number of samples is: ", num_samples)
-	in_array = np.linspace(-np.pi, np.pi, int(num_samples))
+	in_array = np.linspace(-np.pi, np.pi, num_samples)
 	sin_vals = amplitude * np.sin(in_array)
 	return sin_vals
 
@@ -45,7 +45,7 @@ def lineGenerator(amplitude, commandFreq):
 	line_vals = [amplitude for i in range(num_samples)]
 	return line_vals
 
-# JFD: Dead code: Remove eventually.
+# JFD: Dead code: fxHighSpeedTest2(): Remove eventually.
 def fxHighSpeedTest2(port0, baudRate, port1="", controllerType=Controller.current,
 					 signalType=signal.sine, commandFreq=1000, signalAmplitude=1000, numberOfLoops=30,
 					 signalFreq=5, cycleDelay=0.1, requestJitter=False, jitter=20):
@@ -370,7 +370,7 @@ def fxHighSpeedTest2(port0, baudRate, port1="", controllerType=Controller.curren
 
 @dataclass
 class Device:
-	""" Hold device state in one place """
+	""" Holds device state/measurements in one place """
 	port: str = ''
 	baudRate: int = 0
 	controllerType: Controller = Controller.position
@@ -407,15 +407,18 @@ def plot_device_data(devices: List[Device], t0: float, loopCtr: int, numberOfLoo
 	plt_ctr: int = 1
 	for d in devices:
 		plt.figure(plt_ctr)
-		if (controllerType == Controller.current):
-			title = 'Current control with', round(actual_frequency, 2), 'Hz, Amplitude',\
-					signalAmplitude, 'mA,', signal_desc, 'and', command_frequency, 'Hz commands'
+		title: str = ''
+		if controllerType == Controller.current:
+			title = 'Curr ctrl: ' + str(round(actual_frequency, 2)) + ' Hz, Amp ' +\
+					str(signalAmplitude) + ' mA,' + signal_desc + 'and' + \
+					str(round(command_frequency, 1)) + 'Hz cmd'
 			plt.plot(times, requests,       color='b', label='desired current')
 			plt.plot(times, d.measurements, color='r', label='measured current')
 			plt.ylabel("Motor current (mA)")
 		else:
-			title = 'Position control with', round(actual_frequency, 2), 'Hz, Ticks Amplitude',\
-					signalAmplitude, 'mA,', signal_desc, 'and', command_frequency, 'Hz commands'
+			title = 'Posn ctrl: ' + str(round(actual_frequency, 2)) + \
+					'Hz, Ticks Amp' + str(signalAmplitude) + ' mA,' + signal_desc + 'and' + \
+					str(round(command_frequency, 1)) + 'Hz cmd'
 			plt.plot(times, requests,       color='b', label='desired position')
 			plt.plot(times, d.measurements, color='r', label='measured position')
 			plt.ylabel("Motor current (mA)")
@@ -429,7 +432,7 @@ def plot_device_data(devices: List[Device], t0: float, loopCtr: int, numberOfLoo
 
 	plt.figure(plt_ctr)
 	plt.title("Current Command Times")
-	# Convert command times into millisec
+	# Convert command times from sec to millisec
 	currentCommandTimes = [i * 1000 for i in currentCommandTimes]
 	plt.plot(currentCommandTimes, color='b', label='Current Command Times')
 	plt.xlabel("Time (ms)")
@@ -438,7 +441,7 @@ def plot_device_data(devices: List[Device], t0: float, loopCtr: int, numberOfLoo
 	plt_ctr += 1
 	plt.figure(plt_ctr)
 	plt.title("Current Command Times Histogram")
-	plt.hist(currentCommandTimes, bins=100, label='Current Commands')
+	plt.hist(currentCommandTimes, bins=100,  label='Current Commands')
 	plt.plot(currentCommandTimes, color='b', label='Current Command Times')
 	plt.yscale('log')
 	plt.xlabel("Time (ms)")
@@ -447,7 +450,7 @@ def plot_device_data(devices: List[Device], t0: float, loopCtr: int, numberOfLoo
 	plt_ctr += 1
 	plt.figure(plt_ctr)
 	plt.title("Commands")
-	streamCommandTimes = [i * 1000 for i in streamCommandTimes]		# Convert to ms
+	streamCommandTimes = [i * 1000 for i in streamCommandTimes]		# Convert from sec to ms
 	plt.plot(streamCommandTimes, color='b', label='Stream Command Times')
 	plt.xlabel("Time (ms)")
 	plt.ylabel("Command Time (ms)")
@@ -478,13 +481,14 @@ def plot_device_data(devices: List[Device], t0: float, loopCtr: int, numberOfLoo
 # cycleDelay		Delay between signals sent to controller, use with sine wave only
 # requestJitter		Add jitter amount to every other sample sent to controller
 # jitter			Amount of jitter
-def fxHighSpeedTest(port0: str, baudRate: int, portList: List[str]=[], controllerType=Controller.current,
-					signalType=signal.sine, commandFreq=1000, signalAmplitude=1000, numberOfLoops=30,
-					signalFreq=5, cycleDelay=0.1, requestJitter=False, jitter=20) -> int:
+def fxHighSpeedTest(port0: str, baudRate: int, portList: List[str]=[],
+		controllerType=Controller.current, signalType=signal.sine, commandFreq=1000,
+		signalAmplitude=1000, numberOfLoops=15, signalFreq=5, cycleDelay=0.1, requestJitter=False,
+		jitter=20) -> int:
 
 	# *********** Initialize lists ***********
 	currentCommandTimes: List[float] = []
-	cycleStopTimes:		 List[float] = []		# To draw a line at the end of every period
+	cycleStopTimes:		 List[float] = []		# Used to draw a line at the end of every period
 	requests:			 List[float] = []
 	streamCommandTimes:	 List[float] = []
 	times:				 List[float] = []
@@ -493,6 +497,7 @@ def fxHighSpeedTest(port0: str, baudRate: int, portList: List[str]=[], controlle
 		portList.append(port0)
 	num_devices: int = len(portList)
 	print('Running high speed test with', num_devices, 'device(s).')
+
 	# Initialize one data class/connected device
 	devices: List[Device] = []
 	for i in range(num_devices):
@@ -500,37 +505,35 @@ def fxHighSpeedTest(port0: str, baudRate: int, portList: List[str]=[], controlle
 					numberOfLoops, signalFreq, cycleDelay, requestJitter, jitter)
 		devices.append(dev)
 
-	# *********** Debug & Data Logging ***********
-	debugLoggingLevel = 6			# 6 is least verbose, 0 is most verbose
-	dataLog = False					# Data log logs device data
-
-	delay_time = 1 / commandFreq	# Default: 1 / 1000 == 0.001s
-	print('delay_time:', delay_time)
+	delay_time = 1 / commandFreq	# Default: 1 / 1000 == 0.001s == 1ms
+	print('delay_time:', delay_time, 'sec')
 
 	# *********** Open device(s) and start streaming  ***********
+	debugLoggingLevel = 6			# 6 is least verbose, 0 is most verbose
+	dataLog = False					# Turn-off device data logging to file
 	for d in devices:
 		d.devId = fxOpen(d.port, d.baudRate, debugLoggingLevel)
-		# Does device need 100 ms pause to process following command?
 		fxStartStreaming(d.devId, d.commandFreq, dataLog)
 		print('Connected to device with ID:', d.devId)
 
-	# ********************** Main Code **********************
+	# ********************************** Main Code **********************************
 
+	# Give the device time to consume the startStreaming command and start streaming
+	sleep(0.1)
 	if controllerType == Controller.position:
 		print('Reading initial position of connected devices ...')
-		# Give the device time to consume the startStreaming command and start streaming
-		sleep(0.1)
 		for d in devices:
 			d.data = fxReadDevice(d.devId)
 			d.initialPos = d.data.endocerAngle
-	else:		# controllerType == Controller.current.  Current default
+	else:		# Default: controllerType==Controller.current
 		pass	# No action required
 
 	# Generate a control profile
 	print('Command table:')
-	signal_desc: str = None
-	if signalType == signal.sine:		# Current default
-		signal_desc = "sine wave"
+	signal_desc: str = ''
+	if signalType == signal.sine:		# Default
+		signal_desc = "sine"
+		# Generate a sine wave with signalAmplitude: min==-1000, max==1000
 		samples = sinGenerator(signalAmplitude, signalFreq, commandFreq)
 	else:			# signalType == signal.line
 		signal_desc = "line"
@@ -538,17 +541,17 @@ def fxHighSpeedTest(port0: str, baudRate: int, portList: List[str]=[], controlle
 	print('Signal type:', signal_desc)
 	print(np.int64(samples))
 
-	# Prepare controller.  Use the exact same code whether:
-	# controllerType == Controller.current OR controllerType == Controller.position
 	if controllerType == Controller.current:
 		print('Setting-up current control demo')
 	else:
 		print('Setting-up position control demo')
+	# JFD: Prepare controller.  Use the exact same code for either control type
 	for d in devices:
 		fxSetGains(d.devId, 300, 50, 0, 0, 0)
 
 	# *********** Main loop ***********
 	t0: float = time()
+	lag_time: Final = 0.1
 	cmd_total: int = 0
 	loopCtr: int = 0
 	# JFD: Following loop takes about 5s/loop on Windows 10, about 2s on RPi4
@@ -556,21 +559,24 @@ def fxHighSpeedTest(port0: str, baudRate: int, portList: List[str]=[], controlle
 		loopCtr += 1
 		elapsed_time = round((time() - t0), 1)
 		print('Loop', loopCtr, 'of', numberOfLoops, '/ Elapsed time', elapsed_time, 's',end='\r')
-		for sample in samples:
+		for sample in samples:			# Default len(samples)==200
 			if (cmd_total % 2 == 0) and requestJitter:
 				sample += jitter
 			sleep(delay_time)
 
 			# set controller to the next sample
+			# JFD: API also has function: fxReadDeviceAll(devId, dataQueueSize).  Function defined
+			# TWICE, but code seems to be identical
 			t1_start: float = time()
 			for d in devices:			# read ActPack data
 				d.data = fxReadDevice(d.devId)
 			streamCommandTimes.append(time() - t1_start)
 
-			if controllerType == Controller.current:
+			if controllerType == Controller.current:	# Default
 				t1_start = time()
 				for d in devices:
 					fxSendMotorCommand(d.devId, FxCurrent, sample)
+					# sleep(lag_time)	# JFD: Experimental. Produces drastic change in device behavior
 					d.measurements.append(d.data.motorCurrent)
 				currentCommandTimes.append(time() - t1_start)
 			else:						# controllerType == Controller.position
@@ -583,10 +589,10 @@ def fxHighSpeedTest(port0: str, baudRate: int, portList: List[str]=[], controlle
 			requests.append(sample)
 			cmd_total += 1
 
-		# JFD: Should this code be indented +1 so it executes once/sample?
+		# JFD: Should this code be indented +1 so it executes once/sample instead of once/loop?
+		# Currently, "sample" might be used before set.
 		# Delay between cycles (sine wave only)
-		if signalType == signal.sine:
-			# Following takes approx 2s on Windows 10 PC
+		if signalType == signal.sine:		# Default
 			for _ in range(int(cycleDelay/delay_time)):		# Default: .1/.001 = 100
 				sleep(delay_time)
 
@@ -606,7 +612,6 @@ def fxHighSpeedTest(port0: str, baudRate: int, portList: List[str]=[], controlle
 		cycleStopTimes.append(time() - t0)	# To draw a line at the end of every period
 
 	# fxCloseAll()							# STACK-169
-
 	# Disable the controller, send 0 PWM
 	for d in devices:
 		fxSendMotorCommand(d.devId, FxVoltage, 0)
