@@ -93,9 +93,8 @@ class BMSState(Structure):
 			("temperature"	  , c_int * 4),
 			("genvar", c_int * 4)]
 
-	class ExoState(Structure):
+class ExoState(Structure):
 		_fields_ = [
-			("actpack", ActPackState),
 			("rigid"	, c_int),
 			("id"		  , c_int),
 			("timestamp"	  , c_int),
