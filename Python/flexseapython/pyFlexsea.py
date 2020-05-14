@@ -255,6 +255,32 @@ def fxReadDevice(devId):
 
 	return actPackState
 
+def fxReadExoDevice(devId):
+	"""
+	Read the most recent data from a streaming FlexSEA device stream.
+	IMPORTANT! Must call fxStartStreaming before calling this.
+
+	Parameters:
+	devId (int): The device ID of the device to read from.
+
+	Returns:
+	exoState (ExoState): Contains the most recent data from the device
+
+	Raises:
+	ValueError if invalid device ID
+	RuntimeError if no read data
+	"""
+	global flexsea
+
+	exoState = ExoState();
+	retCode = flexsea.fxReadExoDevice(devId, byref(exoState))
+
+	if (retCode == FxInvalidDevice):
+		raise ValueError('fxReadDevice: invalid device ID')
+	elif (retCode == FxNotStreaming):
+		raise RuntimeError('fxReadDevice: no read data')
+
+	return exoState
 
 def fxReadDeviceAll(devId, dataQueueSize):
 	"""

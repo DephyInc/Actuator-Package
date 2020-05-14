@@ -25,7 +25,18 @@ def printDevice(actPackState: ActPackState):
 	print('Battery Temp (C):     ', actPackState.batteryTemp)
 	
 def printExo(exoState: ExoState):
-	printDevice(exoState.actpack)
+	print('State time:           ', exoState.timestamp)
+	print('Accel X:              ', exoState.accelx)
+	print('Accel Y:              ', exoState.accely)
+	print('Accel Z:              ', exoState.accelz)
+	print('Gyro X:               ', exoState.gyrox)
+	print('Gyro Y:               ', exoState.gyroy)
+	print('Gyro Z:               ', exoState.gyroz)
+	print('Motor angle:          ', exoState.encoderAngle)
+	print('Motor voltage:        ', exoState.motorVoltage)
+	print('Battery Current (mA): ', exoState.batteryCurrent)
+	print('Battery Voltage (mV): ', exoState.batteryVoltage)
+	print('Battery Temp (C):     ', exoState.batteryTemp)
 
 # By default takes just one device from your com.txt file
 # If two arguments are passed, one is the path of the COM.txt file
