@@ -1,9 +1,9 @@
 import os, sys
 from time import sleep
+from flexseapython.fxUtil import *
 
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pardir)
-from fxUtil import *
 
 def fxPositionControl(port, baudRate, time = 8, time_step = 0.1,  resolution = 100):
 

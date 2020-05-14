@@ -2,14 +2,12 @@ import os, sys
 from time import sleep, time, strftime
 import matplotlib
 import matplotlib.pyplot as plt
-
-from flexseapython.fxUtil import clearTerminal
+from flexseapython.fxUtil import *
 
 matplotlib.use('WebAgg')
 
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pardir)
-from fxUtil import *
 
 # Control gain constants
 kp = 100

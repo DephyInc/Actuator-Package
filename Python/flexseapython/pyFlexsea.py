@@ -537,7 +537,7 @@ def fxSendMotorCommand(devId, controlMode, value):
 	FxPosition - encoder value
 	FxCurrent - current in mA
 	FxVoltage - voltage in mV
-	FxImpedence - current in mA
+	FxImpedance - current in mA
 
 	Raises:
 	ValueError if invalid device ID

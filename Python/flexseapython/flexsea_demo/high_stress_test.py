@@ -10,11 +10,11 @@ import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use('WebAgg')
 from scipy import stats
+from flexseapython.fxUtil import *
 
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 print(pardir)
 sys.path.append(pardir)
-from fxUtil import *
 
 ######## These arrays are updated concurrently with every new timestamp ############
 times = []

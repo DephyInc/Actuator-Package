@@ -1,10 +1,9 @@
 import os, sys
 from time import sleep
+from flexseapython.fxUtil import *
 
 pardir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(pardir)
-from flexseapython.fxUtil import *
-
 
 def printNetMaster(devId):
 	netMasterState = fxReadNetMasterDevice(devId)
@@ -25,14 +24,12 @@ def printNetMaster(devId):
 	print('NetNode7 - accelx: ', netMasterState.netNode[7].accelx, ', accely: ', netMasterState.netNode[7].accely, ' accelz: ', netMasterState.netNode[7].accelz)
 	print('NetNode7 - gyrox:  ', netMasterState.netNode[7].gyrox,  ', gyroy:  ', netMasterState.netNode[7].gyroy,  ' gyroz:  ', netMasterState.netNode[7].gyroz)
 
-
 def printBMSState(devId):
 	bmsState = fxReadBMSDevice(devId)
 	for i in range(9):
 		print('cellVoltage[', i, ']: ', bmsState.cellVoltage[i])
 	for i in range(3):
 		print('temperature[', i, ']: ', bmsState.temperature[i])
-
 
 def fxReadOnly(port, baudRate, time = 8, time_step = 0.1):
 	# print(port)
