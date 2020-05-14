@@ -11,7 +11,11 @@ global flexsea
 (FxPosition,
  FxVoltage,
  FxCurrent,
- FxImpedance) = map(c_int, range(4))
+ FxImpedance,
+ FxNone,
+ FxCustom,
+ FxMeasRes,
+ FxStalk) = map(c_int, range(8))
 
 ###################### Error Code Enums ##########################
 

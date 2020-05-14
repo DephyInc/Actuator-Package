@@ -27,7 +27,10 @@ typedef enum fxControlMode
 	FxVoltage,
 	FxCurrent,
 	FxImpedance,
-	FxNone
+	FxNone,
+	FxCustom,
+	FxMeasRes,
+	FxStalk
 
 } FxControlMode;
 
