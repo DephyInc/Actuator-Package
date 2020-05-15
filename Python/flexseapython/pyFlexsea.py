@@ -94,9 +94,8 @@ class BMSState(Structure):
 			("genvar", c_int * 4)]
 
 class ExoState(Structure):
-	_fields_ = [
-			("actpack", ActPackState),
-			("rigid"	  , c_int),
+		_fields_ = [
+			("rigid"	, c_int),
 			("id"		  , c_int),
 			("timestamp"	  , c_int),
 			("accelx"	  , c_int),
@@ -120,6 +119,7 @@ class ExoState(Structure):
 			("ankleAngle"	  , c_int),
 			("ankleVelocity"  , c_int)]
 
+
 ####################### Begin API ##################################
 
 ### Device ID is an alphanumeric ID used to refer to a specific FlexSEA device.
@@ -127,18 +127,14 @@ class ExoState(Structure):
 ### FlexSEA device, and is used by most of the functions in this library to
 ### specify which device to run that function on.
 
-def fxOpen(port, baudRate, logLevel = 6):
+def fxOpen(port, baudRate, logLevel = 4):
 	"""
 	Establish a connection with a FlexSEA device.
-
 	Parameters:
 	portName (string): The name of the serial port to open (e.g. "COM3")
-
 	baudRate (int): The baud rate used i.e. 115200, 230400, etc.
-
 	logLevel (int): is the logging level for this device. 0 is most verbose and
 	6 is the least verbose. Values greater than 6 are floored to 6.
-
 	Raises:
 	IOError if we fail to open the device.
 	"""
@@ -154,10 +150,8 @@ def fxOpen(port, baudRate, logLevel = 6):
 def fxClose(devId):
 	"""
 	Disconnect from a FlexSEA device with the given device ID.
-
 	Parameters:
 	devId (int): The ID of the device to close
-
 	Raises:
 	ValueError if the device ID is invalid
 	"""
@@ -176,11 +170,9 @@ def fxCloseAll():
 def fxGetDeviceIds():
 	"""
 	Get the device IDs of all connected FlexSEA devices.
-
 	The device ID is used by the functions in this API to specify which
 	FlexSEA device to communicate with. The C library requires a fixed
 	array so we give a size of n = 10 but feel free to increase this.
-
 	Returns:
 	A list containing either valid device IDs or -1 (invalid device).
 	"""
@@ -193,30 +185,21 @@ def fxGetDeviceIds():
 	asList = asList[: asList.index(-1) ]
 	return asList
 
-def fxStartStreaming(devId, frequency, shouldLog=False):
+def fxStartStreaming(devId, frequency, shouldLog):
 	"""
 	Start streaming data from a FlexSEA device.
-
 	Parameters:
 	devId (int): The device ID
-
 	frequency (int): The desired frequency of communication
-
 	shouldLog (bool): If set true, the program logs all received data to
 	a file.
-
 	The name of the file is formed as follows:
-
 	< FlexSEA model >_id< device ID >_< date and time >.csv
-
 	for example:
-
 	rigid_id3904_Tue_Nov_13_11_03_50_2018.csv
-
 	The file is formatted as a CSV file. The first line of the file will be
 	headers for all columns. Each line after that will contain the data read
 	from the device.
-
 	Raises:
 	ValueError if the device ID is invalid
 	RuntimeError if the stream failed
@@ -236,7 +219,6 @@ def fxStartStreaming(devId, frequency, shouldLog=False):
 def fxStopStreaming(devId):
 	"""
 	Stop streaming data from a FlexSEA device.
-
 	Parameters:
 	devId (int): Is the device ID
 	"""
@@ -253,13 +235,10 @@ def fxReadDevice(devId):
 	"""
 	Read the most recent data from a streaming FlexSEA device stream.
 	IMPORTANT! Must call fxStartStreaming before calling this.
-
 	Parameters:
 	devId (int): The device ID of the device to read from.
-
 	Returns:
 	exoState (ExoState): Contains the most recent data from the device
-
 	Raises:
 	ValueError if invalid device ID
 	RuntimeError if no read data
@@ -307,15 +286,11 @@ def fxReadDeviceAll(devId, dataQueueSize):
 	"""
 	Read all data from a streaming FlexSEA device stream.
 	MUST call fxStartStreaming before calling this.
-
 	Parameters:
 	devId: Device ID of the device to read from.
-
 	dataQueueSize: Size of readData.
-
 	Raise:
 	ValueError if invalid device ID
-
 	Return:
 	Actual number of entries read. You will probably need to use this number.
 	"""
@@ -332,13 +307,10 @@ def fxReadNetMasterDevice(devId):
 	"""
 	Read the most recent data from a streaming FlexSEA NetMaster device stream.
 	IMPORTANT! Must call fxStartStreaming before calling this.
-
 	Parameters:
 	devId (int): The device ID of the device to read from.
-
 	Returns:
 	netMasterState (NetMasterState): Contains the most recent data from the device
-
 	Raises:
 	ValueError if invalid device ID
 	RuntimeError if no read data
@@ -359,13 +331,10 @@ def fxReadBMSDevice(devId):
 	"""
 	Read the most recent data from a streaming FlexSEA BMS device stream.
 	IMPORTANT! Must call fxStartStreaming before calling this.
-
 	Parameters:
 	devId (int): The device ID of the device to read from.
-
 	Returns:
 	bmsState (BMSState): Contains the most recent data from the device
-
 	Raises:
 	ValueError if invalid device ID
 	RuntimeError if no read data
@@ -386,15 +355,11 @@ def fxReadDeviceAll(devId, dataQueueSize):
 	"""
 	Read all data from a streaming FlexSEA device stream.
 	MUST call fxStartStreaming before calling this.
-
 	Parameters:
 	devId: Device ID of the device to read from.
-
 	dataQueueSize: Size of readData.
-
 	Raise:
 	ValueError if invalid device ID
-
 	Return:
 	Actual number of entries read. You will probably need to use this number.
 	"""
@@ -411,15 +376,11 @@ def fxReadNetMasterDeviceAll(devId, dataQueueSize):
 	"""
 	Read all data from a streaming FlexSEA NetMaster device stream.
 	MUST call fxStartStreaming before calling this.
-
 	Parameters:
 	devId: Device ID of the device to read from.
-
 	dataQueueSize: Size of readData.
-
 	Raise:
 	ValueError if invalid device ID
-
 	Return:
 	Actual number of entries read. You will probably need to use this number.
 	"""
@@ -436,15 +397,11 @@ def fxReadBMSDeviceAll(devId, dataQueueSize):
 	"""
 	Read all data from a streaming FlexSEA BMS device stream.
 	MUST call fxStartStreaming before calling this.
-
 	Parameters:
 	devId: Device ID of the device to read from.
-
 	dataQueueSize: Size of readData.
-
 	Raise:
 	ValueError if invalid device ID
-
 	Return:
 	Actual number of entries read. You will probably need to use this number.
 	"""
@@ -461,12 +418,9 @@ def fxReadBMSDeviceAll(devId, dataQueueSize):
 def fxSetReadDataQueueSize(devId, readDataQueueSize):
 	"""
 	Set the maximum read data queue size of a device.
-
 	Parameters:
 	devId (int): The device ID: ID of the device to get the read data queue size from.
-
 	readDataQueueSize: Size to set the read data queue size to.
-
 	Raises:
 	fxInvalidDevice if invalid device.
 	fxInvalidParam if size is invalid
@@ -482,10 +436,8 @@ def fxSetReadDataQueueSize(devId, readDataQueueSize):
 def fxGetReadDataQueueSize(devId):
 	"""
 	Get the maximum read data queue size of a device.
-
 	Parameters:
 	devId (int): The device ID: ID of the device to get the read data queue size from.
-
 	Returns:
 	Maximum read data queue size of a device.  -1 if invalid device ID.
 	"""
@@ -500,20 +452,13 @@ def fxGetReadDataQueueSize(devId):
 def fxSetGains(devId, kp, ki, kd, K, B):
 	"""
 	Sets the gains used by PID controllers on the FlexSEA device.
-
 	Parameters:
 	devId (int): The device ID.
-
 	kp (int): Proportional gain
-
 	ki (int): Integral gain
-
 	kd (int): Differential gain
-
 	K (int): Stiffness (used in impedence control only)
-
 	B (int): Damping (used in impedance control only)
-
 	Raises:
 	ValueError if the device ID is invalid
 	"""
@@ -526,19 +471,15 @@ def fxSetGains(devId, kp, ki, kd, K, B):
 def fxSendMotorCommand(devId, controlMode, value):
 	"""
 	Send a command to the device.
-
 	Parameters:
 	devId (int): The device ID.
-
 	controlMode (c_int): The control mode we will use to send this command.
-	Possible values are: FxPosition, FxCurrent, FxVoltage, FxImpedance
-
+	Possible values are: FxPosition, FxCurrent, FxVoltage, FxImpedence
 	value (int): The value to use for the controlMode.
 	FxPosition - encoder value
 	FxCurrent - current in mA
 	FxVoltage - voltage in mV
 	FxImpedence - current in mA
-
 	Raises:
 	ValueError if invalid device ID
 	ValueError if invalid controlType
@@ -557,13 +498,10 @@ def fxSendMotorCommand(devId, controlMode, value):
 def fxGetAppType(devId):
 	"""
 	Get the device application type
-
 	Parameters:
 	devId (int): The device ID.
-
 	Returns:
 	App Type (int)
-
 	-1 if invalid
 	0 if ActPack
 	1 if Exo
@@ -577,14 +515,11 @@ def fxFindPoles(devId):
 	"""
 	DO NOT USE THIS FUNCTION UNLESS YOU KNOW WHAT YOU ARE DOING
 	Find the motor poles
-
 	Parameters:
 	devId (int): The device ID.
-
 	Returns:
 	FxInvalidDevice if deviceId is invalid
 	FxSuccess otherwise
-
 	DO NOT USE THIS FUNCTION UNLESS YOU KNOW WHAT YOU ARE DOING
 	"""
 	if (flexsea.fxFindPoles(devId) == FxInvalidDevice):
@@ -594,17 +529,11 @@ def fxFindPoles(devId):
 def loadFlexsea():
 	global flexsea
 	#Init code:
+	print('Loading pyFlexsea native module')
+
 	loadSucceeded  = False
-	# is_64bits = sys.maxsize > 2**32
-	if (sys.maxsize > 2**32):
-		print('You are using 64-bit Python. This program requires 32-bit Python')
-		return False
 	sysOS = platform.system().lower()
 	dir_path = os.path.dirname(os.path.realpath(__file__))
-
-	# we currently support Ubuntu and Raspbian so need to make sure we are pulling
-	# in correct library depending on which version of linux
-	# linux_distro = platform.linux_distribution()[0]
 
 	# check whether we are running on a 32 or 64 bit machine
 	architecture = platform.architecture()[0]
@@ -626,22 +555,25 @@ def loadFlexsea():
 		librarypaths = [
 				os.path.join(dir_path,'../../libs/linux','libfx_plan_stack.so'),
 				os.path.join(dir_path,'../../libs/raspberryPi','libfx_plan_stack.so'),
+				os.path.join(dir_path,'../../libs/raspberryPi64','libfx_plan_stack.so'),
 		]
 
+	loadingLogMessages = []
 	for librarypath in librarypaths:
 		try:
-			print("loading... " + librarypath)
+			loadingLogMessages.append("loading... " + librarypath)
 			flexsea = cdll.LoadLibrary(librarypath)
 		except OSError as arg:
-			print("\n\nThere was a problem loading the library\n {0}\n".format(arg))
+			loadingLogMessages.append("\n\nThere was a problem loading the library\n {0}\n".format(arg))
 		else:
 			loadSucceeded = True
 			break
 
 	if(loadSucceeded  != True):
+		print("\n".join(loadingLogMessages))
 		return False
 
-	print("Loaded!")
+	print("Loaded " + os.path.realpath(librarypath) + "!")
 
 	# set arg types
 	flexsea.fxOpen.argtypes = [c_char_p, c_uint, c_uint]
@@ -697,4 +629,3 @@ def list_to_int_arr(l):
 	c_arr = (c_int * len(l))(*l)
 	c_len = c_uint(len(l))
 	return c_arr, c_len
-
