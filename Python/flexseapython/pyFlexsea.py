@@ -557,14 +557,17 @@ def loadFlexsea():
 				os.path.join(dir_path,'../../libs/raspberryPi','libfx_plan_stack.so'),
 				os.path.join(dir_path,'../../libs/raspberryPi64','libfx_plan_stack.so'),
 		]
-
+	loadedPath=""
 	loadingLogMessages = []
 	for librarypath in librarypaths:
 		try:
 			loadingLogMessages.append("loading... " + librarypath)
+			#print("loading... " + librarypath)
 			flexsea = cdll.LoadLibrary(librarypath)
+			loadedPath=librarypath;
 		except OSError as arg:
 			loadingLogMessages.append("\n\nThere was a problem loading the library\n {0}\n".format(arg))
+			#print("\n\nThere was a problem loading the library\n {0}\n".format(arg))
 		else:
 			loadSucceeded = True
 			break
@@ -573,7 +576,8 @@ def loadFlexsea():
 		print("\n".join(loadingLogMessages))
 		return False
 
-	print("Loaded " + os.path.realpath(librarypath) + "!")
+	#print("Loaded " + os.path.realpath(librarypath) + "!")
+	print('loaded!')
 
 	# set arg types
 	flexsea.fxOpen.argtypes = [c_char_p, c_uint, c_uint]
