@@ -56,7 +56,9 @@ class ActPackState(Structure):
 			("batteryStatus"  , c_int),
 			("genVar"    , c_int * 10),
 			("ankleAngle"	  , c_int),
-			("ankleVelocity"  , c_int)]
+			("ankleVelocity"  , c_int),
+			("SystemTime"	  , c_long,
+			("DataArray" , c_int * 33)]
 
 class NetNodeState(Structure):
 	_fields_ = [
