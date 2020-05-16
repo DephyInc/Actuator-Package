@@ -69,57 +69,66 @@ class NetNodeState(Structure):
 			("gyroy"	  , c_int),
 			("gyroz"	  , c_int),
 			("pressure"	  , c_int),
-			("status"	  , c_int)]
+			("status"	  , c_int),
+			("SystemTime"	, c_long),
+			("dataArray" , c_int * 9)]
 
 class NetMasterState(Structure):
 	_fields_ = [
-			("netmaster"	  , c_int),
-			("id"		  , c_int),
-			("timestamp"	  , c_int),
-			("genvar"     , c_int * 4),
-			("status"	  , c_int),
-			("netNode", NetNodeState * 8)]
+			("netmaster"	, c_int),
+			("id"		  	, c_int),
+			("timestamp"  	, c_int),
+			("genvar"     	, c_int * 4),
+			("status"	  	, c_int),
+			("netNode"		, NetNodeState * 8)
+			("SystemTime"	, c_long),
+			("dataArray" 	, c_int * 73)
+
 
 class BMSState(Structure):
 	_fields_ = [
-			("bms" 		  , c_int),
-			("id"		  , c_int),
-			("timestamp"	  , c_int),
-			("cellVoltage"     , c_int * 9),
-			("status"	  , c_int),
-			("current"	  , c_int),
-			("timer"	  , c_int),
-			("balancing"	  , c_int),
-			("stackVoltage"	  , c_int),
-			("packImbalance"  , c_int),
-			("temperature"	  , c_int * 4),
-			("genvar", c_int * 4)]
+			("bms" 		  		, c_int),
+			("id"		  		, c_int),
+			("timestamp"	  	, c_int),
+			("cellVoltage"     	, c_int * 9),
+			("status"	  		, c_int),
+			("current"	  		, c_int),
+			("timer"	  		, c_int),
+			("balancing"		, c_int),
+			("stackVoltage"		, c_int),
+			("packImbalance"	, c_int),
+			("temperature"		, c_int * 4),
+			("genvar"			, c_int * 4)
+			("SystemTime"		, c_long),
+			("dataArray" 		, c_int * 26)]
 
 class ExoState(Structure):
 		_fields_ = [
-			("rigid"	, c_int),
-			("id"		  , c_int),
-			("timestamp"	  , c_int),
-			("accelx"	  , c_int),
-			("accely"	  , c_int),
-			("accelz"	  , c_int),
-			("gyrox"	  , c_int),
-			("gyroy"	  , c_int),
-			("gyroz"	  , c_int),
-			("encoderAngle"   , c_int),
-			("encoderVelocity", c_int),
-			("encoderAccel"   , c_int),
-			("motorCurrent"   , c_int),
-			("motorVoltage"   , c_int),
-			("batteryVoltage" , c_int),
-			("batteryCurrent" , c_int),
-			("batteryTemp" 	  , c_int),
-			("deviceStatus"   , c_int),
-			("motorStatus"	  , c_int),
-			("batteryStatus"  , c_int),
-			("genVar"    , c_int * 10),
-			("ankleAngle"	  , c_int),
-			("ankleVelocity"  , c_int)]
+			("rigid"			, c_int),
+			("id"		  		, c_int),
+			("timestamp"	  	, c_int),
+			("accelx"	  		, c_int),
+			("accely"	  		, c_int),
+			("accelz"	  		, c_int),
+			("gyrox"	  		, c_int),
+			("gyroy"	  		, c_int),
+			("gyroz"	  		, c_int),
+			("encoderAngle"   	, c_int),
+			("encoderVelocity"	, c_int),
+			("encoderAccel"   	, c_int),
+			("motorCurrent"   	, c_int),
+			("motorVoltage"   	, c_int),
+			("batteryVoltage" 	, c_int),
+			("batteryCurrent" 	, c_int),
+			("batteryTemp" 	  	, c_int),
+			("deviceStatus"   	, c_int),
+			("motorStatus"	  	, c_int),
+			("batteryStatus"  	, c_int),
+			("genVar"    		, c_int * 10),
+			("ankleAngle"	  	, c_int),
+			("ankleVelocity"  	, c_int)
+			("SystemTime"		, c_long),
+			("dataArray" 		, c_int * 54)]
 
 
 ####################### Begin API ##################################
