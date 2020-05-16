@@ -82,7 +82,7 @@ class NetMasterState(Structure):
 			("status"	  	, c_int),
 			("netNode"		, NetNodeState * 8),
 			("SystemTime"	, c_long),
-			("dataArray" 	, c_int * 73)
+			("dataArray" 	, c_int * 73)]
 
 
 class BMSState(Structure):
