@@ -80,7 +80,7 @@ class NetMasterState(Structure):
 			("timestamp"  	, c_int),
 			("genvar"     	, c_int * 4),
 			("status"	  	, c_int),
-			("netNode"		, NetNodeState * 8)
+			("netNode"		, NetNodeState * 8),
 			("SystemTime"	, c_long),
 			("dataArray" 	, c_int * 73)
 
@@ -98,7 +98,7 @@ class BMSState(Structure):
 			("stackVoltage"		, c_int),
 			("packImbalance"	, c_int),
 			("temperature"		, c_int * 4),
-			("genvar"			, c_int * 4)
+			("genvar"			, c_int * 4),
 			("SystemTime"		, c_long),
 			("dataArray" 		, c_int * 26)]
 
@@ -126,7 +126,7 @@ class ExoState(Structure):
 			("batteryStatus"  	, c_int),
 			("genVar"    		, c_int * 10),
 			("ankleAngle"	  	, c_int),
-			("ankleVelocity"  	, c_int)
+			("ankleVelocity"  	, c_int),
 			("SystemTime"		, c_long),
 			("dataArray" 		, c_int * 54)]
 
