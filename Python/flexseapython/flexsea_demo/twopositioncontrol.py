@@ -12,7 +12,7 @@ def fxTwoPositionControl(port, baudRate, expTime = 13, time_step = 0.1,
 		delta = 10000, transition_time = 1.5, resolution = 100):
 	# Open device
 	devId = fxOpen(port, baudRate, 0)
-	fxStartStreaming(devId, resolution)
+	fxStartStreaming(devId, resolution, shouldLog=True)
 	sleep(0.1)
 
 	# Setting initial angle and angle waypoints
