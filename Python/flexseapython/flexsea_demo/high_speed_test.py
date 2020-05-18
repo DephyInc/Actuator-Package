@@ -4,12 +4,12 @@ from enum import Enum
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
+from flexseapython.fxUtil import *
 matplotlib.use('WebAgg')
 
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 print(pardir)
 sys.path.append(pardir)
-from fxUtil import *
 
 # Controller type to send to controller
 class Controller(Enum):

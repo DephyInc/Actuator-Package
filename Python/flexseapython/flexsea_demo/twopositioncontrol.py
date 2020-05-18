@@ -3,7 +3,7 @@ from time import sleep, time, strftime
 import matplotlib
 import matplotlib.pyplot as plt
 matplotlib.use('WebAgg')
-from fxUtil import *
+from flexseapython.fxUtil import *
 
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pardir)

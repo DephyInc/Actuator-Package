@@ -1,9 +1,9 @@
 import os, sys
 from time import sleep
+from flexseapython.fxUtil import *
 
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pardir)
-from fxUtil import *
 
 def fxCurrentControl(port, baudRate, holdCurrent = [1000], time = 6, time_step = 0.1):
 	devId = fxOpen(port, baudRate, logLevel = 6)

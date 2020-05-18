@@ -1,12 +1,10 @@
 import os, sys
 from time import sleep
-
+from flexseapython.fxUtil import *
 import traceback
 
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pardir)
-from fxUtil import *
-
 
 def fxLeaderFollower(leaderPort, baudRate, followerPort):
 

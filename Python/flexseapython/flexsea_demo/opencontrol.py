@@ -1,9 +1,9 @@
 import os, sys
 from time import sleep
+from flexseapython.fxUtil import *
 
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pardir)
-from fxUtil import *
 
 def fxOpenControl(port, baudRate, time = 2, num_times = 5,
 		time_resolution = 0.1, maxVoltage = 3000, sign = -1):
