@@ -14,7 +14,6 @@ if((sys.version_info[0] == 3) and (sys.version_info[1] == 8)):
 # Directory to os.path by default
 thisdir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(thisdir)
-print('os.path:', sys.path)
 
 from flexseapython.pyFlexsea import *
 from flexseapython.fxUtil import *
@@ -48,7 +47,7 @@ experiments = [
 	#(fxUserRW, 					"User RW",								1),
 	(fxRunFindPoles,				"Find Poles",							1),
 	(fxTwoPositionControl, 			"Two Positions Control",				1),
-	(fxHighSpeedTest, 				"High Speed Test",						2),
+	(fxHighSpeedTest, 				"High Speed Test",						4),
 	(fxHighStressTest, 				"High Stress Test",						2),
 	(fxTwoDevicePositionControl,	"Two Devices Position Control",			2),
 	(fxLeaderFollower,				"Two Devices Leader Follower Control",	2),
@@ -56,7 +55,6 @@ experiments = [
 
 MAX_EXPERIMENT			= len(experiments) - 1
 MAX_EXPERIMENT_STR		= str(MAX_EXPERIMENT)
-MAX_DEVICES				= 2
 
 #Print list of available experiments
 def print_experiments():
@@ -67,7 +65,7 @@ def print_experiments():
 #Some error occurred. Print help message and exit.
 def print_usage_exit(prog_name: str):
 	print('\nUsage:\tPython', prog_name, '[experiment_number (0 - ' + \
-			MAX_EXPERIMENT_STR + ') connected_devices (1 - 2)]')
+			MAX_EXPERIMENT_STR + ') connected_devices (1 - N)]')
 	print('\t"connected_devices" ONLY required for specific experiments\n' +
 			'\tOther experiments use [1] device by default.\n')
 	sys.exit(0)
@@ -123,10 +121,10 @@ def get_dev_num(num_cl_args, argv, exp_num):
 	return dev_num
 
 def main(argv):
-	signal(SIGINT, sig_handler)				# Handle Ctrl-C or SIGINT
+	signal(SIGINT, sig_handler)	# Handle Ctrl-C or SIGINT
 	
 	exp_num: int = -1
-	num_dev: int = 1
+	dev_num: int = 1
 	
 	print('\n>>> Actuator Package Python Demo Scripts <<<\n')
 	
@@ -135,12 +133,12 @@ def main(argv):
 	if(num_cl_args < 3):
 		print_experiments()
 		exp_num = get_exp_num(num_cl_args, argv)
-		num_dev = get_dev_num(num_cl_args, argv, exp_num)
+		dev_num = get_dev_num(num_cl_args, argv, exp_num)
 	else:
 		print('\nToo many command line arguments provided.')
 		print_usage_exit(argv[0])
 	
-	print('Running Experiment [' + str(exp_num) + '] with [' + str(num_dev) + '] connected device(s)')
+	print('Running Experiment [' + str(exp_num) + '] with [' + str(dev_num) + '] connected device(s)')
 	
 	scriptPath = os.path.dirname(os.path.abspath(__file__))
 	fpath = scriptPath + '/flexseapython/com.txt'
@@ -151,15 +149,15 @@ def main(argv):
 	
 	#Time to call the demo script:
 	try:
-		if(num_dev == 1):
+		if(dev_num == 1):
 			experiments[exp_num][0](portList[0], baudRate)
-		elif(num_dev == 2):
+		elif(dev_num == 2):
 			#experiments[exp_num][0](portList[0], baudRate, portList[1])
 			experiments[exp_num][0](portList[0], baudRate, portList)
 	except Exception as e:
 		sys.exit(e)
 
-	print('Exiting main() normally ...')
+	print('\nExiting fxMain() normally...')
 
 if __name__ == '__main__':
 	main(sys.argv)
