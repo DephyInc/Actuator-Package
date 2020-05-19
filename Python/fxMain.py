@@ -138,7 +138,7 @@ def main(argv):
 		print('\nToo many command line arguments provided.')
 		print_usage_exit(argv[0])
 	
-	print('Running Experiment [' + str(exp_num) + '] with [' + str(dev_num) + '] connected device(s)')
+	print('\nRunning Experiment [' + str(exp_num) + '] with [' + str(dev_num) + '] connected device(s)')
 	
 	scriptPath = os.path.dirname(os.path.abspath(__file__))
 	fpath = scriptPath + '/flexseapython/com.txt'
@@ -152,12 +152,11 @@ def main(argv):
 		if(dev_num == 1):
 			experiments[exp_num][0](portList[0], baudRate)
 		elif(dev_num == 2):
-			#experiments[exp_num][0](portList[0], baudRate, portList[1])
-			experiments[exp_num][0](portList[0], baudRate, portList)
+			experiments[exp_num][0](portList[0], baudRate, portList[1])
 	except Exception as e:
 		sys.exit(e)
 
-	print('\nExiting fxMain() normally...')
+	print('\nExiting fxMain() normally...\n')
 
 if __name__ == '__main__':
 	main(sys.argv)

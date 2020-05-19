@@ -7,13 +7,16 @@ sys.path.append(pardir)
 
 def fxTwoDevicePositionControl(port0, baudRate, port1):
 
+	expTime = 8
+	time_step = 0.1
+
 	devId0 = fxOpen(port0, baudRate, 0)
 	devId1 = fxOpen(port1, baudRate, 0)
 
-	fxStartStreaming(devId0, 200)
-	fxStartStreaming(devId1, 200)
-
-	sleep(0.2)
+	fxStartStreaming(devId0, 200, shouldLog = False)
+	sleep(0.1)
+	fxStartStreaming(devId1, 200, shouldLog = False)
+	sleep(0.1)
 
 	actPackState0 = fxReadDevice(devId0)
 	actPackState1 = fxReadDevice(devId1)
@@ -27,21 +30,29 @@ def fxTwoDevicePositionControl(port0, baudRate, port1):
 	fxSendMotorCommand(devId0, FxPosition, initialAngle0)
 	fxSendMotorCommand(devId1, FxPosition, initialAngle1)
 
-	try:
-		while(True):
-			sleep(0.2)
-			clearTerminal()
-			print("Holding position, two devices: ")
-	
-			actPackState0 = fxReadDevice(devId0)
-			actPackState1 = fxReadDevice(devId1)
-			
-			printDevice(actPackState0)
-			printDevice(actPackState1)
-	except:
-		pass
+	num_time_steps = int(expTime/time_step)
+	for i in range(num_time_steps):
+		sleep(time_step)
+		clearTerminal()
 
-	print('Turning off position control...')
+		actPackState0 = fxReadDevice(devId0)
+		actPackState1 = fxReadDevice(devId1)
+		currentAngle0 = actPackState0.encoderAngle
+		currentAngle1 = actPackState1.encoderAngle
+
+		print('Device 0:\n---------\n')
+		print('Desired:              ', initialAngle0)
+		print('Measured:             ', currentAngle0)
+		print('Difference:           ', currentAngle0 - initialAngle0, '\n')
+		printDevice(actPackState0)
+
+		print('\nDevice 1:\n---------\n')
+		print('Desired:              ', initialAngle1)
+		print('Measured:             ', currentAngle1)
+		print('Difference:           ', currentAngle1 - initialAngle1, '\n', flush=True)
+		printDevice(actPackState1)
+
+	print('\nTurning off position control...')
 	fxClose(devId0)
 	fxClose(devId1)
 

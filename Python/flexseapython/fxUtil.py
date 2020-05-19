@@ -44,20 +44,12 @@ def printExo(exoState: ExoState):
 def loadPortsFromFile(filename):
 	loadSuccess = loadFlexsea()
 	if(not loadSuccess):
-		raise Exception('load FlexSEA failed')
+		raise Exception('Could not load FlexSEA libraries.')
 
-	# We should avoid OS or using ROOT (if this fails put it back)
-	"""
-	isUnix = os.name != 'nt'
-	if(isUnix and os.geteuid() != 0):
-		sys.exit('\nRoot privileges needed for running this script') # why??
-	"""
-
-	portList = []
-	baudRate = []
 	# this now looks for the baud rate in the first line of com.txt and the com
 	# ports on all following lines. Copy com_template.txt to com.txt and fill
 	# in the correct baud rate and serial ports for your device
+	portList = []
 	try:
 		with open(filename, 'r') as f:
 			lines = f.readlines()
