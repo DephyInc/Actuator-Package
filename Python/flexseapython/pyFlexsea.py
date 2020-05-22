@@ -291,32 +291,6 @@ def fxReadDevice(devId):
 
 	return actPackState
 
-def fxReadExoDevice(devId):
-	"""
-	Read the most recent data from a streaming FlexSEA device stream.
-	IMPORTANT! Must call fxStartStreaming before calling this.
-
-	Parameters:
-	devId (int): The device ID of the device to read from.
-
-	Returns:
-	exoState (ExoState): Contains the most recent data from the device
-
-	Raises:
-	ValueError if invalid device ID
-	RuntimeError if no read data
-	"""
-	global flexsea
-
-	exoState = ExoState();
-	retCode = flexsea.fxReadExoDevice(devId, byref(exoState))
-
-	if (retCode == FxInvalidDevice):
-		raise ValueError('fxReadDevice: invalid device ID')
-	elif (retCode == FxNotStreaming):
-		raise RuntimeError('fxReadDevice: no read data')
-
-	return exoState
 
 def fxReadDeviceAll(devId, dataQueueSize):
 	"""
@@ -397,7 +371,30 @@ def fxReadBMSDevice(devId):
 
 	return bmsState
 
+def fxReadDeviceAll(devId, dataQueueSize):
+	"""
+	Read all data from a streaming FlexSEA device stream.
+	MUST call fxStartStreaming before calling this.
 
+	Parameters:
+	devId: Device ID of the device to read from.
+
+	dataQueueSize: Size of readData.
+
+	Raise:
+	ValueError if invalid device ID
+
+	Return:
+	Actual number of entries read. You will probably need to use this number.
+	"""
+	global flexsea
+
+	actPackStateDataQueue = [ActPackState() for count in range(dataQueueSize)]
+
+	itemsRead = flexsea.fxReadDeviceAll(devId, byref(actPackStateDataQueue), dataQueueSize)
+	if (itemsRead == -1):
+		raise ValueError('fxReadDeviceAll: Invalid device ID')
+	return itemsRead
 
 def fxReadNetMasterDeviceAll(devId, dataQueueSize):
 	"""
@@ -524,6 +521,7 @@ def fxSendMotorCommand(devId, controlMode, value):
 
 	controlMode (c_int): The control mode we will use to send this command.
 	Possible values are: FxPosition, FxCurrent, FxVoltage, FxImpedence
+
 	value (int): The value to use for the controlMode.
 	FxPosition - encoder value
 	FxCurrent - current in mA
@@ -538,7 +536,6 @@ def fxSendMotorCommand(devId, controlMode, value):
 
 	retCode = flexsea.fxSendMotorCommand(devId, controlMode, c_int(int(value)))
 
-	#ToDo: those comparisons do not work - see DSEP-92
 	if (retCode == FxInvalidDevice):
 		raise ValueError('fxSendMotorCommand: invalid device ID')
 	if (retCode == FxFailure):
@@ -594,7 +591,6 @@ def loadFlexsea():
 	dir_path = os.path.dirname(os.path.realpath(__file__))
 
 
-
 	# check whether we are running on a 32 or 64 bit machine
 	architecture = platform.architecture()[0]
 	librarypaths = []
@@ -622,12 +618,9 @@ def loadFlexsea():
 	for librarypath in librarypaths:
 		try:
 			loadingLogMessages.append("loading... " + librarypath)
-			#print("loading... " + librarypath)
 			flexsea = cdll.LoadLibrary(librarypath)
-			loadedPath=librarypath;
 		except OSError as arg:
 			loadingLogMessages.append("\n\nThere was a problem loading the library\n {0}\n".format(arg))
-			#print("\n\nThere was a problem loading the library\n {0}\n".format(arg))
 		else:
 			loadSucceeded = True
 			break
