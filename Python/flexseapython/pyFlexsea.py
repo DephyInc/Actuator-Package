@@ -62,7 +62,8 @@ class ActPackState(Structure):
 			("ankleAngle"	  , c_int),
 			("ankleVelocity"  , c_int),
 			("SystemTime"	  , c_long),
-			("dataArray" , c_int * 33)]
+			#("dataArray" , c_int * 33)]
+			("dataArray", c_long * 33)]
 
 class NetNodeState(Structure):
 	_fields_ = [
