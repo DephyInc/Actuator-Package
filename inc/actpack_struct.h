@@ -65,7 +65,7 @@ struct ActPackState
 	int ank_vel;
 	//the system time
 	clock_t systemTime;
-    int64_t deviceData[ACTPACK_STRUCT_DEVICE_FIELD_COUNT];
+	uint32_t deviceData[ACTPACK_STRUCT_DEVICE_FIELD_COUNT];
 };
 
 /// \brief Assigns the data in the buffer to the correct struct parameters

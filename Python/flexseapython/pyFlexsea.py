@@ -62,8 +62,8 @@ class ActPackState(Structure):
 			("ankleAngle"	  , c_int),
 			("ankleVelocity"  , c_int),
 			("SystemTime"	  , c_long),
-			#("dataArray" , c_int * 33)]
-			("dataArray", c_long * 33)]
+			("dataArray" , c_int * 33)]
+			#("dataArray", c_long * 33)]
 
 class NetNodeState(Structure):
 	_fields_ = [
@@ -85,7 +85,7 @@ class NetMasterState(Structure):
 			("timestamp"  	, c_int),
 			("genvar"     	, c_int * 4),
 			("status"	  	, c_int),
-			("netNode"		, NetNodeState * 8),
+			("netNode"		, c_int * 8),
 			("SystemTime"	, c_long),
 			("dataArray" 	, c_int * 73)]
 
