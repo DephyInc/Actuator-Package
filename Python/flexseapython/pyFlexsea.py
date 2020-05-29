@@ -37,6 +37,7 @@ global flexsea
 # See "actpack_struct.h" for C definition
 
 class ActPackState(Structure):
+	_pack_ = 1
 	_fields_ = [
 			("rigid"	  , c_int),
 			("id"		  , c_int),
@@ -66,6 +67,7 @@ class ActPackState(Structure):
 			#("dataArray", c_long * 33)]
 
 class NetNodeState(Structure):
+	_pack_ = 1
 	_fields_ = [
 			("accelx"	  , c_int),
 			("accely"	  , c_int),
@@ -79,6 +81,7 @@ class NetNodeState(Structure):
 			("dataArray" , c_int * 9)]
 
 class NetMasterState(Structure):
+	_pack_ = 1
 	_fields_ = [
 			("netmaster"	, c_int),
 			("id"		  	, c_int),
@@ -91,6 +94,7 @@ class NetMasterState(Structure):
 
 
 class BMSState(Structure):
+	_pack_ = 1
 	_fields_ = [
 			("bms" 		  		, c_int),
 			("id"		  		, c_int),
@@ -108,6 +112,7 @@ class BMSState(Structure):
 			("dataArray" 		, c_int * 26)]
 
 class ExoState(Structure):
+		_pack_ = 1
 		_fields_ = [
 			("rigid"							, c_int),
 			("id"		  						, c_int),
