@@ -24,7 +24,7 @@ class signal(Enum):
 # Generate a sine wave of a specific amplitude and frequency
 def sinGenerator(amplitude, frequency, commandFreq):
 	num_samples = commandFreq / frequency
-	print("number of samples is: ", num_samples)
+	print("number of samples is: ", int(num_samples))
 	in_array = np.linspace(-np.pi, np.pi, int(num_samples))
 	sin_vals = amplitude * np.sin(in_array)
 	return sin_vals
@@ -124,7 +124,7 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = Controller.cur
 
 	# Prepare controller:
 	if(controllerType == Controller.current):
-		print("Setting up current control demo. Low current, high frequency: motor shouldn't move much if at all.")
+		print("Setting up current control demo. Low current, high frequency")
 		fxSetGains(devId0, 300, 50, 0, 0, 0)
 		if(secondDevice):
 			fxSetGains(devId1, 300, 50, 0, 0, 0)
