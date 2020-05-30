@@ -53,9 +53,23 @@ def loadPortsFromFile(filename):
 	try:
 		with open(filename, 'r') as f:
 			lines = f.readlines()
-			baudRate = lines[0].strip()
-			for line in lines[1:]:
-				portList.append(line.strip())
+			gotBaudRate=False
+
+			for lineNum in lines:
+				#check if it's a comment
+				notAComment=not("#" in lineNum)
+				notABlankLine= len(lineNum.strip())>0
+
+				#if it's not a comment check it.  if not, we don't care.
+				if(notAComment and notABlankLine):
+					if(gotBaudRate):
+						portList.append(lineNum.strip())
+					else:
+						baudRate = int(lineNum.strip())
+						gotBaudRate = True;
+			#baudRate = lines[0].strip()
+			#for line in lines[1:]:
+				#portList.append(line.strip())
 	except IOError:
 		print("\n\nNo com.txt found in the flexseapython directory..."\
 				"\nPlease copy the com_template.txt found there to a file named com.txt"\
