@@ -55,6 +55,8 @@ experiments = [
 
 MAX_EXPERIMENT			= len(experiments) - 1
 MAX_EXPERIMENT_STR		= str(MAX_EXPERIMENT)
+IDX_TWO_DEV_POS_CTRL	= 9
+IDX_LDR_FLWR			= 10
 
 #Print list of available experiments
 def print_experiments():
@@ -117,7 +119,9 @@ def get_dev_num(num_cl_args, argv, exp_num):
 	dev_num = int(dev_num)			#Make sure is a int and not a string
 	if((dev_num < 1) or (dev_num > experiments[exp_num][2])):	#And make sure it's in range
 		sys.exit('Please choose a valid number of devices.')
-
+	if (exp_num == IDX_TWO_DEV_POS_CTRL) or (exp_num == IDX_LDR_FLWR):
+		if dev_num != 2:
+			sys.exit('This experiment requires exactly 2 connected devices.')
 	return dev_num
 
 def main(argv):
