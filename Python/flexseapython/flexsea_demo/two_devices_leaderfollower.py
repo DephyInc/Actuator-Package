@@ -32,7 +32,7 @@ def fxLeaderFollower(leaderPort, baudRate, followerPort):
 	fxSendMotorCommand(devId1, FxPosition, initialAngle1)
 
 	count = 0
-	loopCount=1000
+	loopCount=200
 	try:
 		#while(True):
 		for i in range(loopCount):
