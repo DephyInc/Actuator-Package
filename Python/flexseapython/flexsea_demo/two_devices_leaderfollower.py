@@ -32,8 +32,10 @@ def fxLeaderFollower(leaderPort, baudRate, followerPort):
 	fxSendMotorCommand(devId1, FxPosition, initialAngle1)
 
 	count = 0
+	loopCount=1000
 	try:
-		while(True):
+		#while(True):
+		for i in range(loopCount)
 			sleep(0.05)
 			clearTerminal()
 			leaderData   = fxReadDevice(devId0)
@@ -42,6 +44,7 @@ def fxLeaderFollower(leaderPort, baudRate, followerPort):
 			diff = angle0 - initialAngle0
 			fxSendMotorCommand(devId1, FxPosition, initialAngle1 + diff)
 			# print("device {} following device {}".format(devId1, devId0))
+			print('loop ',i,' of ',loopCount,'\n')
 			print('Device', devId1, ' following device',  devId0)
 			printDevice(followerData)
 			printDevice(leaderData)
