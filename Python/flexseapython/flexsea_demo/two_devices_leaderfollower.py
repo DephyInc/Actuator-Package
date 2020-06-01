@@ -35,7 +35,7 @@ def fxLeaderFollower(leaderPort, baudRate, followerPort):
 	loopCount=1000
 	try:
 		#while(True):
-		for i in range(loopCount)
+		for i in range(loopCount):
 			sleep(0.05)
 			clearTerminal()
 			leaderData   = fxReadDevice(devId0)
