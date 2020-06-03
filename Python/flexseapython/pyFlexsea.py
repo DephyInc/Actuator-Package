@@ -62,7 +62,7 @@ class ActPackState(Structure):
 			("genVar"    , c_int * 10),
 			("ankleAngle"	  , c_int),
 			("ankleVelocity"  , c_int),
-			("SystemTime"	  , c_long),
+			("SystemTime"	  , c_int),
 			("dataArray" , c_int * 33)]
 			#("dataArray", c_long * 33)]
 
@@ -77,7 +77,7 @@ class NetNodeState(Structure):
 			("gyroz"	  , c_int),
 			("pressure"	  , c_int),
 			("status"	  , c_int),
-			("SystemTime"	, c_long),
+			("SystemTime"	, c_int),
 			("dataArray" , c_int * 9)]
 
 class NetMasterState(Structure):
@@ -89,7 +89,7 @@ class NetMasterState(Structure):
 			("genvar"     	, c_int * 4),
 			("status"	  	, c_int),
 			("netNode"		, c_int * 8),
-			("SystemTime"	, c_long),
+			("SystemTime"	, c_int),
 			("dataArray" 	, c_int * 73)]
 
 
@@ -108,7 +108,7 @@ class BMSState(Structure):
 			("packImbalance"	, c_int),
 			("temperature"		, c_int * 4),
 			("genvar"			, c_int * 4),
-			("SystemTime"		, c_long),
+			("SystemTime"		, c_int),
 			("dataArray" 		, c_int * 26)]
 
 class ExoState(Structure):
@@ -158,7 +158,7 @@ class ExoState(Structure):
 			("bi_training_status"				, c_int),
 			("bi_need_steps"					, c_int),
 			("bi_step_count"					, c_int),
-			("SystemTime"						, c_long),
+			("SystemTime"						, c_int),
 			("dataArray" 						, c_int * 54)]
 
 
