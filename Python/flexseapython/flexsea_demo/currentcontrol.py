@@ -17,7 +17,7 @@ def fxCurrentControl(port, baudRate, holdCurrent = [1000], time = 6, time_step =
 
 	for current in holdCurrent:
 		for i in range(num_time_steps):
-			desCurrent = int((current-prevCurrent) * (i / float(num_time_steps)) + prevCurrent)
+			desCurrent = int((current - prevCurrent) * (i / float(num_time_steps)) + prevCurrent)
 			fxSendMotorCommand(devId, FxCurrent, desCurrent)
 			sleep(time_step)
 			actPack = fxReadDevice(devId)
@@ -32,22 +32,18 @@ def fxCurrentControl(port, baudRate, holdCurrent = [1000], time = 6, time_step =
 	# Ramp down first
 	n = 50
 	for i in range(n):
-		fxSendMotorCommand(devId, FxCurrent, prevCurrent * (n-i)/n)
-		sleep(0.04)
-
-	# Wait for motor to spin down
-	fxSendMotorCommand(devId, FxCurrent, 0)
-	actPack = fxReadDevice(devId)
-	lastAngle = actPack.encoderAngle
-	sleep(0.2)
-	actPack = fxReadDevice(devId)
-	currentAngle = actPack.encoderAngle
-
-	while( abs(currentAngle - lastAngle) > 100):
-		lastAngle = currentAngle
-		sleep(0.2)
+		desCurrent = prevCurrent * (n-i)/n
+		fxSendMotorCommand(devId, FxCurrent, desCurrent)
 		actPack = fxReadDevice(devId)
-		currentAngle = actPack.encoderAngle
+		clearTerminal()
+		print('Desired  (mA):        ', desCurrent)
+		print('Measured  (mA):       ', actPack.motorCurrent)
+		print('Difference (mA):      ', (actPack.motorCurrent - desCurrent), '\n')
+		printDevice(actPack)
+		sleep(time_step)
+
+	fxSendMotorCommand(devId, FxNone, 0)
+	sleep(0.5)
 
 	fxClose(devId)
 	return True
