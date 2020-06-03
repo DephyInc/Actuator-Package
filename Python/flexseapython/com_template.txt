@@ -1,2 +1,17 @@
-230400
-COM3
+# ***************** com.txt *****************
+# Typical values in this file.  May or may not work on your device:
+# ******** Windows ********
+# first line is baud rate. Replace with your baud rate.
+# 230400
+# COM3
+# COM4
+# ******** Ubuntu ********
+#first line is baud rate
+# 230400
+# /dev/ttyS3
+# /dev/ttyS4
+# ******** Raspberry Pi4 ********
+#first line is baud rate
+# 230400
+# /dev/ttyACM0
+# /dev/ttyACM1
