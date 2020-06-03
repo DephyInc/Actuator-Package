@@ -1,20 +1,14 @@
 import os, sys
 from time import sleep
+from flexseapython.fxUtil import *
 
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pardir)
-from fxUtil import *
 
-def printDevice(actPackState):
-	print('State time: ', actPackState.timestamp)
-	print('Accel X: ', actPackState.accelx, ', Accel Y: ', actPackState.accely, ' Accel Z: ', actPackState.accelz)
-	print('Gyro X: ', actPackState.gyrox, ', Gyro Y: ', actPackState.gyroy, ' Gyro Z: ', actPackState.gyroz)
-	print('Motor angle: ', actPackState.encoderAngle, ', Motor voltage: ', actPackState.motorVoltage)
+def fxPositionControl(port, baudRate, time = 8, time_step = 0.1,  resolution = 100):
 
-def fxPositionControl(port, baudRate, time = 5, time_step = 0.1,  resolution = 100):
-	
-	devId = fxOpen(port, baudRate, 0)
-	fxStartStreaming(devId, resolution, True)
+	devId = fxOpen(port, baudRate, logLevel = 6)
+	fxStartStreaming(devId, resolution, shouldLog = False)
 	sleep(0.1)
 
 	actPackState = fxReadDevice(devId)
@@ -25,18 +19,21 @@ def fxPositionControl(port, baudRate, time = 5, time_step = 0.1,  resolution = 1
 
 	fxSendMotorCommand(devId, FxPosition, initialAngle)
 
-	num_time_steps = int(time/time_step)
+	num_time_steps = int(time / time_step)
 	for i in range(num_time_steps):
 		sleep(time_step)
-		preamble = "Holding position: {}...".format(initialAngle)
-		print(preamble)
-
+		clearTerminal()
 		actPackState = fxReadDevice(devId)
-		printDevice(actPackState)
 		currentAngle = actPackState.encoderAngle
-		
-		print("Measured delta is: ", currentAngle - initialAngle, flush=True)
+		print('Desired:              ', initialAngle)
+		print('Measured:             ', currentAngle)
+		print('Difference:           ', currentAngle - initialAngle, '\n', flush=True)
+		printDevice(actPackState)
+		printLoopCount(i, num_time_steps)
 
+	# When we exit we want the motor to be off
+	fxSendMotorCommand(devId, FxNone, 0)
+	sleep(0.5)
 	fxClose(devId)
 
 	return True

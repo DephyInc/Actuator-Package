@@ -1,20 +1,12 @@
 import os, sys
 from time import sleep
-
+from flexseapython.fxUtil import *
 import traceback
 
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pardir)
-from fxUtil import *
 
-def printDevice(actPackState):
-	print('State time: ', actPackState.timestamp)
-	print('Accel X: ', actPackState.accelx, ', Accel Y: ', actPackState.accely, ' Accel Z: ', actPackState.accelz)
-	print('Gyro X: ', actPackState.gyrox, ', Gyro Y: ', actPackState.gyroy, ' Gyro Z: ', actPackState.gyroz)
-	print('Motor angle: ', actPackState.encoderAngle, ', Motor voltage: ', actPackState.motorVoltage, flush=True)
-
-
-def fxLeaderFollower(leaderPort, followerPort, baudRate):
+def fxLeaderFollower(leaderPort, baudRate, followerPort):
 
 	devId0 = fxOpen(leaderPort, baudRate, 0)
 	devId1 = fxOpen(followerPort, baudRate, 0)
@@ -24,12 +16,11 @@ def fxLeaderFollower(leaderPort, followerPort, baudRate):
 
 	sleep(0.2)
 
-	actPackState0 = fxReadDevice(devId0)	
+	actPackState0 = fxReadDevice(devId0)
 	actPackState1 = fxReadDevice(devId1)
 
 	initialAngle0 = actPackState0.encoderAngle
 	initialAngle1 = actPackState1.encoderAngle
-
 
 	# set first device to current controller with 0 current (0 torque)
 	fxSetGains(devId0, 100, 20, 0, 0, 0)
@@ -40,27 +31,31 @@ def fxLeaderFollower(leaderPort, followerPort, baudRate):
 	fxSendMotorCommand(devId1, FxPosition, initialAngle1)
 
 	count = 0
+	loopCount = 200
 	try:
-		while(True):
+		for i in range(loopCount):
 			sleep(0.05)
-
-			leaderData = fxReadDevice(devId0)
-			followerData = fxReadDevice(devId0)
-
+			clearTerminal()
+			leaderData   = fxReadDevice(devId0)
+			followerData = fxReadDevice(devId1)
 			angle0 = leaderData.encoderAngle
-			
 			diff = angle0 - initialAngle0
 			fxSendMotorCommand(devId1, FxPosition, initialAngle1 + diff)
-			
-			print("device {} following device {}".format(devId1, devId0))
-			
+			print('Device', devId1, 'following device',  devId0, '\n')
 			printDevice(followerData)
+			print('')	# Empty line
 			printDevice(leaderData)
+			printLoopCount(i, loopCount)
 
 	except Exception as e:
 		print(traceback.format_exc())
 
 	print('Turning off position control...')
+	fxSetGains(devId0, 0, 0, 0, 0, 0)
+	fxSetGains(devId1, 0, 0, 0, 0, 0)
+	fxSendMotorCommand(devId1, FxNone, 0)
+	fxSendMotorCommand(devId0, FxNone, 0)
+	sleep(0.5)
 	fxClose(devId0)
 	fxClose(devId1)
 

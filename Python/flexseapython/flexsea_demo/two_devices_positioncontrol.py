@@ -1,27 +1,22 @@
 import os, sys
 from time import sleep
+from flexseapython.fxUtil import *
 
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pardir)
-from fxUtil import *
 
-def printDevice(actPackState):
-	print('State time: ', actPackState.timestamp)
-	print('Accel X: ', actPackState.accelx, ', Accel Y: ', actPackState.accely, ' Accel Z: ', actPackState.accelz)
-	print('Gyro X: ', actPackState.gyrox, ', Gyro Y: ', actPackState.gyroy, ' Gyro Z: ', actPackState.gyroz)
-	print('Motor angle: ', actPackState.encoderAngle, ', Motor voltage: ', actPackState.motorVoltage, flush=True)
+def fxTwoDevicePositionControl(port0, baudRate, port1):
 
-
-
-def fxTwoDevicePositionControl(port0, port1, baudRate):
+	expTime = 8
+	time_step = 0.1
 
 	devId0 = fxOpen(port0, baudRate, 0)
 	devId1 = fxOpen(port1, baudRate, 0)
 
-	fxStartStreaming(devId0, 200, True)
-	fxStartStreaming(devId1, 200, True)
-
-	sleep(0.2)
+	fxStartStreaming(devId0, 200, shouldLog = False)
+	sleep(0.1)
+	fxStartStreaming(devId1, 200, shouldLog = False)
+	sleep(0.1)
 
 	actPackState0 = fxReadDevice(devId0)
 	actPackState1 = fxReadDevice(devId1)
@@ -35,23 +30,36 @@ def fxTwoDevicePositionControl(port0, port1, baudRate):
 	fxSendMotorCommand(devId0, FxPosition, initialAngle0)
 	fxSendMotorCommand(devId1, FxPosition, initialAngle1)
 
-	try:
-		while(True):
-			sleep(0.2)
-			os.system('cls')
-			preamble = "Holding position, two devices: "
-			print(preamble)
-	
-			actPackState0 = fxReadDevice(devId0)
-			actPackState1 = fxReadDevice(devId1)
-			
-			printDevice(actPackState0)
-			printDevice(actPackState1)
+	num_time_steps = int(expTime/time_step)
+	for i in range(num_time_steps):
+		sleep(time_step)
+		clearTerminal()
 
-	except:
-		pass
+		actPackState0 = fxReadDevice(devId0)
+		actPackState1 = fxReadDevice(devId1)
+		currentAngle0 = actPackState0.encoderAngle
+		currentAngle1 = actPackState1.encoderAngle
+
+		print('Device 0:\n---------\n')
+		print('Desired:              ', initialAngle0)
+		print('Measured:             ', currentAngle0)
+		print('Difference:           ', currentAngle0 - initialAngle0, '\n')
+		printDevice(actPackState0)
+
+		print('\nDevice 1:\n---------\n')
+		print('Desired:              ', initialAngle1)
+		print('Measured:             ', currentAngle1)
+		print('Difference:           ', currentAngle1 - initialAngle1, '\n', flush=True)
+		printDevice(actPackState1)
+
+		printLoopCount(i, num_time_steps)
 
 	print('Turning off position control...')
+	fxSetGains(devId0, 0, 0, 0, 0, 0)
+	fxSetGains(devId1, 0, 0, 0, 0, 0)
+	fxSendMotorCommand(devId1, FxNone, 0)
+	fxSendMotorCommand(devId0, FxNone, 0)
+	sleep(0.5)
 	fxClose(devId0)
 	fxClose(devId1)
 

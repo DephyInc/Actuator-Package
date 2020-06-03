@@ -15,7 +15,7 @@
 #endif
 #include "hold_position_example.h"
 #include "open_speed_example.h"
-#include "read_all_example.h"
+#include "readOnly.h"
 #include "current_control.h"
 //#include "findpolesexample.h"
 #include "two_dev_position_example.h"
@@ -38,9 +38,10 @@ bool        shouldQuit = false;
 
 void my_handler(int s)
 {
-            (void)s;
-           cout << "Caught CTRL-C, exiting...\n";
+           (void)s;
+           cout << "Caught CTRL-C, exiting........\n";
            shouldQuit = true;
+           this_thread::sleep_for(100ms);
 }
 
 int main()
@@ -101,22 +102,22 @@ int main()
                 runReadAll(deviceIds[0], &shouldQuit);
                 break;
             case 1:
-                runOpenSpeed(deviceIds[0], &shouldQuit);
+                //runOpenSpeed(deviceIds[0], &shouldQuit);
                 break;
             case 2:
-                runCurrentControl(deviceIds[0], &shouldQuit);
+                //runCurrentControl(deviceIds[0], &shouldQuit);
                 break;
             case 3:
-                runHoldPosition(deviceIds[0], &shouldQuit);
+                //runHoldPosition(deviceIds[0], &shouldQuit);
                 break;
             case 4:
        //         runFindPoles(deviceIds[0]);
                 break;
             case 5:
-                runTwoDevicePositionControl(deviceIds[0], deviceIds[1], &shouldQuit);
+                //runTwoDevicePositionControl(deviceIds[0], deviceIds[1], &shouldQuit);
                 break;
             case 6:
-                runLeaderFollower(deviceIds[0], deviceIds[1], &shouldQuit);
+                //runLeaderFollower(deviceIds[0], deviceIds[1], &shouldQuit);
                 break;
             default:
                 break;
@@ -130,7 +131,7 @@ int main()
     // Close all of the FlexSEA devices
     //
     fxCloseAll();
-
+    cout << "Exiting..." << endl;
     return 0;
 }
 
@@ -138,12 +139,12 @@ void printMenu(void)
 {
     cout << "What demo would you like to try?" << endl << endl;
     cout << "[0] Read-Only: no actuator, sensors only." << endl;
-    cout << "[1] Open-Speed: PWM will ramp up, then down, then up..." << endl;
-    cout << "[2] Current Control" << endl;
-    cout << "[3] Position Control" << endl;
-    cout << "[4] Find Poles" << endl;
-    cout << "[5] Two device Position Control" << endl;
-    cout << "[6] Two Device Leader-Follower" << endl;
+    //cout << "[1] Open-Speed: PWM will ramp up, then down, then up..." << endl;
+    //cout << "[2] Current Control" << endl;
+    //cout << "[3] Position Control" << endl;
+    //cout << "[4] Find Poles" << endl;
+    //cout << "[5] Two device Position Control" << endl;
+    //cout << "[6] Two Device Leader-Follower" << endl;
     cout << "[q] Quit program." << endl << endl;
     //ToDo: expand that list
 }

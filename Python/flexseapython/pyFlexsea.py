@@ -11,7 +11,11 @@ global flexsea
 (FxPosition,
  FxVoltage,
  FxCurrent,
- FxImpedance) = map(c_int, range(4))
+ FxImpedance,
+ FxNone,
+ FxCustom,
+ FxMeasRes,
+ FxStalk) = map(c_int, range(8))
 
 ###################### Error Code Enums ##########################
 
@@ -33,6 +37,7 @@ global flexsea
 # See "actpack_struct.h" for C definition
 
 class ActPackState(Structure):
+	_pack_ = 1
 	_fields_ = [
 			("rigid"	  , c_int),
 			("id"		  , c_int),
@@ -56,9 +61,12 @@ class ActPackState(Structure):
 			("batteryStatus"  , c_int),
 			("genVar"    , c_int * 10),
 			("ankleAngle"	  , c_int),
-			("ankleVelocity"  , c_int)]
+			("ankleVelocity"  , c_int),
+			("SystemTime"	  , c_int),
+			("dataArray" , c_int * 33)]
 
 class NetNodeState(Structure):
+	_pack_ = 1
 	_fields_ = [
 			("accelx"	  , c_int),
 			("accely"	  , c_int),
@@ -67,31 +75,87 @@ class NetNodeState(Structure):
 			("gyroy"	  , c_int),
 			("gyroz"	  , c_int),
 			("pressure"	  , c_int),
-			("status"	  , c_int)]
+			("dataArray" , c_int * 7)]
 
 class NetMasterState(Structure):
+	_pack_ = 1
 	_fields_ = [
-			("netmaster"	  , c_int),
-			("id"		  , c_int),
-			("timestamp"	  , c_int),
-			("genvar"     , c_int * 4),
-			("status"	  , c_int),
-			("netNode", NetNodeState * 8)]
+			("netmaster"	, c_int),
+			("id"		  	, c_int),
+			("timestamp"  	, c_int),
+			("genVar"     	, c_int * 4),
+			("status"	  	, c_int),
+			("netNode"		, NetNodeState * 8),
+			("SystemTime"	, c_int),
+			("dataArray" 	, c_int * 65)]
 
 class BMSState(Structure):
+	_pack_ = 1
 	_fields_ = [
-			("bms" 		  , c_int),
-			("id"		  , c_int),
-			("timestamp"	  , c_int),
-			("cellVoltage"     , c_int * 9),
-			("status"	  , c_int),
-			("current"	  , c_int),
-			("timer"	  , c_int),
-			("balancing"	  , c_int),
-			("stackVoltage"	  , c_int),
-			("packImbalance"  , c_int),
-			("temperature"	  , c_int * 4),
-			("genvar", c_int * 4)]
+			("bms" 		  		, c_int),
+			("id"		  		, c_int),
+			("timestamp"	  	, c_int),
+			("cellVoltage"     	, c_int * 9),
+			("status"	  		, c_int),
+			("current"	  		, c_int),
+			("timer"	  		, c_int),
+			("balancing"		, c_int),
+			("stackVoltage"		, c_int),
+			("packImbalance"	, c_int),
+			("temperature"		, c_int * 4),
+			("genvar"			, c_int * 4),
+			("SystemTime"		, c_int),
+			("dataArray" 		, c_int * 26)]
+
+class ExoState(Structure):
+		_pack_ = 1
+		_fields_ = [
+			("rigid"							, c_int),
+			("id"		  						, c_int),
+			("timestamp"	  					, c_int),
+			("accelx"	  						, c_int),
+			("accely"	  						, c_int),
+			("accelz"	  						, c_int),
+			("gyrox"	  						, c_int),
+			("gyroy"	  						, c_int),
+			("gyroz"	  						, c_int),
+			("encoderAngle"   					, c_int),
+			("encoderVelocity"					, c_int),
+			("encoderAccel"   					, c_int),
+			("motorCurrent"   					, c_int),
+			("motorVoltage"   					, c_int),
+			("batteryVoltage" 					, c_int),
+			("batteryCurrent" 					, c_int),
+			("batteryTemp" 	  					, c_int),
+			("deviceStatus"   					, c_int),
+			("motorStatus"	  					, c_int),
+			("batteryStatus"  					, c_int),
+			("genVar"    						, c_int * 10),
+			("ankleAngle"	  					, c_int),
+			("ankleVelocity"  					, c_int),
+			("ank_from_mot"						, c_int),
+			("ank_torque"						, c_int),
+			("step_energy"						, c_int),
+			("walking_state"					, c_int),
+			("gait_state"						, c_int),
+			("shk_ang_deg"						, c_int),
+			("bilateral_active"					, c_int),
+			("dge_state"						, c_int),
+			("mot_from_ank_ang"					, c_int),
+			("step_count"						, c_int),
+			("training_data_current_status" 	, c_int),
+			("need_to_add_steps"				, c_int),
+			("training_progress"				, c_int),
+			("substatedpeb42"					, c_int),
+			("bi_state"							, c_int),
+			("bi_substate"						, c_int),
+			("bi_power"							, c_int),
+			("bi_training_progress"				, c_int),
+			("bi_training_status"				, c_int),
+			("bi_need_steps"					, c_int),
+			("bi_step_count"					, c_int),
+			("SystemTime"						, c_int),
+			("dataArray" 						, c_int * 54)]
 
 
 ####################### Begin API ##################################
@@ -250,6 +314,32 @@ def fxReadDevice(devId):
 
 	return actPackState
 
+def fxReadExoDevice(devId):
+	"""
+	Read the most recent data from a streaming FlexSEA device stream.
+	IMPORTANT! Must call fxStartStreaming before calling this.
+
+	Parameters:
+	devId (int): The device ID of the device to read from.
+
+	Returns:
+	exoState (ExoState): Contains the most recent data from the device
+
+	Raises:
+	ValueError if invalid device ID
+	RuntimeError if no read data
+	"""
+	global flexsea
+
+	exoState = ExoState();
+	retCode = flexsea.fxReadExoDevice(devId, byref(exoState))
+
+	if (retCode == FxInvalidDevice):
+		raise ValueError('fxReadDevice: invalid device ID')
+	elif (retCode == FxNotStreaming):
+		raise RuntimeError('fxReadDevice: no read data')
+
+	return exoState
 
 def fxReadDeviceAll(devId, dataQueueSize):
 	"""
@@ -329,31 +419,6 @@ def fxReadBMSDevice(devId):
 		raise RuntimeError('fxReadDevice: no read data')
 
 	return bmsState
-
-def fxReadDeviceAll(devId, dataQueueSize):
-	"""
-	Read all data from a streaming FlexSEA device stream.
-	MUST call fxStartStreaming before calling this.
-
-	Parameters:
-	devId: Device ID of the device to read from.
-
-	dataQueueSize: Size of readData.
-
-	Raise:
-	ValueError if invalid device ID
-
-	Return:
-	Actual number of entries read. You will probably need to use this number.
-	"""
-	global flexsea
-
-	actPackStateDataQueue = [ActPackState() for count in range(dataQueueSize)]
-
-	itemsRead = flexsea.fxReadDeviceAll(devId, byref(actPackStateDataQueue), dataQueueSize)
-	if (itemsRead == -1):
-		raise ValueError('fxReadDeviceAll: Invalid device ID')
-	return itemsRead
 
 def fxReadNetMasterDeviceAll(devId, dataQueueSize):
 	"""
@@ -545,8 +610,10 @@ def loadFlexsea():
 	print('Loading pyFlexsea native module')
 
 	loadSucceeded  = False
+
 	sysOS = platform.system().lower()
 	dir_path = os.path.dirname(os.path.realpath(__file__))
+
 
 	# check whether we are running on a 32 or 64 bit machine
 	architecture = platform.architecture()[0]
@@ -570,7 +637,7 @@ def loadFlexsea():
 				os.path.join(dir_path,'../../libs/raspberryPi','libfx_plan_stack.so'),
 				os.path.join(dir_path,'../../libs/raspberryPi64','libfx_plan_stack.so'),
 		]
-
+	loadedPath=""
 	loadingLogMessages = []
 	for librarypath in librarypaths:
 		try:
@@ -586,7 +653,8 @@ def loadFlexsea():
 		print("\n".join(loadingLogMessages))
 		return False
 
-	print("Loaded " + os.path.realpath(librarypath) + "!")
+	#print("Loaded " + os.path.realpath(librarypath) + "!")
+	print('loaded!')
 
 	# set arg types
 	flexsea.fxOpen.argtypes = [c_char_p, c_uint, c_uint]
