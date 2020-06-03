@@ -29,15 +29,12 @@ def fxImpedanceControl(port, baudRate, expTime = 20, time_step = 0.02, delta = 7
 	initialAngle = data.encoderAngle
 	
 	result = True
-	timeout = 100
-	timeoutCount = 0
 	transition_steps = int(transition_time / time_step)
 	
 	# Initialize lists - matplotlib
 	requests = []
 	measurements = []
 	times = []
-	i = 0
 	t0 = 0
 
 	# Setpoint = initial angle
@@ -85,9 +82,7 @@ def fxImpedanceControl(port, baudRate, expTime = 20, time_step = 0.02, delta = 7
 
 	#Disable the controller, send 0 PWM
 	fxSendMotorCommand(devId, FxVoltage, 0)
-	
-	#fxClose(devId)	#STACK-169
-	
+
 	# Plot before we exit:
 	title = "Impedance Control Demo"
 	plt.plot(times, requests, color = 'b', label = 'Desired position')
@@ -96,23 +91,21 @@ def fxImpedanceControl(port, baudRate, expTime = 20, time_step = 0.02, delta = 7
 	plt.ylabel("Encoder position")
 	plt.title(title)
 	plt.legend(loc='upper right')
-	if (os.name == 'nt'):
-		print('\nIn Windows, press Ctrl+BREAK to exit.  Ctrl+C may not work...')
+	if(os.name == 'nt'):
+		print('\nIn Windows, press Ctrl+BREAK to exit. Ctrl+C may not work...')
 	plt.show()
-	#sleep(0.1)
-	
+
 	#Close device
 	print('End of script, fxClose()')
 	fxClose(devId)
-	
-	#return result
+
 	return True
 
 if __name__ == '__main__':
 	baudRate = sys.argv[1]
 	ports = sys.argv[2:3]
 	try:
-		fxPositionControl(ports, baudRate)
+		fxImpedanceControl(ports, baudRate)
 	except Exception as e:
 		print("broke: " + str(e))
 		pass

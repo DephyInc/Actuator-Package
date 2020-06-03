@@ -14,15 +14,13 @@ def fxOpenControl(port, baudRate, time = 2, num_times = 5,
 	fxSendMotorCommand(devId, FxVoltage, 0)
 	sleep(0.5)
 	numSteps = int((time/2)/time_resolution)
-	direction = 1
 
 	for time in range(num_times):
-		direction = direction * sign
 
 		#Ramp-up:
 		for i in range(numSteps):
 			sleep(time_resolution)
-			mV = direction * maxVoltage * (i*1.0 / numSteps)
+			mV = sign * maxVoltage * (i*1.0 / numSteps)
 			fxSendMotorCommand(devId, FxVoltage, mV)
 			clearTerminal()
 			print('Ramping up motor voltage...\n')
@@ -36,7 +34,7 @@ def fxOpenControl(port, baudRate, time = 2, num_times = 5,
 		#Ramp-down:
 		for i in range(numSteps):
 			sleep(time_resolution)
-			mV = direction * maxVoltage * ((numSteps - i)*1.0 / numSteps)
+			mV = sign * maxVoltage * ((numSteps - i)*1.0 / numSteps)
 			fxSendMotorCommand(devId, FxVoltage, mV)
 			clearTerminal()
 			print('Ramping down motor voltage...\n')

@@ -29,7 +29,7 @@ def fxPositionControl(port, baudRate, time = 8, time_step = 0.1,  resolution = 1
 		print('Measured:             ', currentAngle)
 		print('Difference:           ', currentAngle - initialAngle, '\n', flush=True)
 		printDevice(actPackState)
-		print('\nStep', i + 1, 'of', num_time_steps)
+		printLoopCount(i, num_time_steps)
 
 	# When we exit we want the motor to be off
 	fxSendMotorCommand(devId, FxNone, 0)

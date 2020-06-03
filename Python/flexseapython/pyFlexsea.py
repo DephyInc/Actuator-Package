@@ -64,7 +64,6 @@ class ActPackState(Structure):
 			("ankleVelocity"  , c_int),
 			("SystemTime"	  , c_int),
 			("dataArray" , c_int * 33)]
-			#("dataArray", c_long * 33)]
 
 class NetNodeState(Structure):
 	_pack_ = 1
@@ -76,9 +75,7 @@ class NetNodeState(Structure):
 			("gyroy"	  , c_int),
 			("gyroz"	  , c_int),
 			("pressure"	  , c_int),
-			("status"	  , c_int),
-			("SystemTime"	, c_int),
-			("dataArray" , c_int * 9)]
+			("dataArray" , c_int * 7)]
 
 class NetMasterState(Structure):
 	_pack_ = 1
@@ -86,12 +83,11 @@ class NetMasterState(Structure):
 			("netmaster"	, c_int),
 			("id"		  	, c_int),
 			("timestamp"  	, c_int),
-			("genvar"     	, c_int * 4),
+			("genVar"     	, c_int * 4),
 			("status"	  	, c_int),
-			("netNode"		, c_int * 8),
+			("netNode"		, NetNodeState * 8),
 			("SystemTime"	, c_int),
-			("dataArray" 	, c_int * 73)]
-
+			("dataArray" 	, c_int * 65)]
 
 class BMSState(Structure):
 	_pack_ = 1
