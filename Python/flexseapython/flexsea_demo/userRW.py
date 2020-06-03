@@ -3,8 +3,7 @@ from builtins import input
 
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pardir)
-from fxUtil import *
-from .streamManager import Stream
+from flexseapython.fxUtil import *
 
 labels = ["genVar[0]", "genVar[1]", "genVar[2]", \
 		"genVar[3]", "genVar[4]", "genVar[5]", \

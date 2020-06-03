@@ -1,2 +1,25 @@
-230400
-COM3
+# ***************** com.txt *****************
+#
+# Typical values shown in this file. May or may not work on your device.
+# Bare minimum: two lines. Rest is optional.
+# 1) First line without comments is baud rate (ex.: 230400)
+# 2) Second line is the first port
+# 3) List additional ports as needed.
+#
+# ******** Windows Example: ********
+#
+# 230400
+# COM3
+# COM4
+#
+# ******** Ubuntu ********
+#
+# 230400
+# /dev/ttyS3 #(could also be /dev/ttyACM0)
+# /dev/ttyS4
+#
+# ******** Raspberry Pi4 ********
+#
+# 230400
+# /dev/ttyACM0
+# /dev/ttyACM1
