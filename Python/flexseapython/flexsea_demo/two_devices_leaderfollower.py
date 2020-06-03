@@ -50,13 +50,12 @@ def fxLeaderFollower(leaderPort, baudRate, followerPort):
 	except Exception as e:
 		print(traceback.format_exc())
 
+	print('Turning off position control...')
 	fxSetGains(devId0, 0, 0, 0, 0, 0)
 	fxSetGains(devId1, 0, 0, 0, 0, 0)
-
-	fxSendMotorCommand(devId1, FxNone, initialAngle1)
-	fxSendMotorCommand(devId0, FxNone, initialAngle1)
-
-	print('Turning off position control...')
+	fxSendMotorCommand(devId1, FxNone, 0)
+	fxSendMotorCommand(devId0, FxNone, 0)
+	sleep(0.5)
 	fxClose(devId0)
 	fxClose(devId1)
 

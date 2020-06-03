@@ -54,7 +54,12 @@ def fxTwoDevicePositionControl(port0, baudRate, port1):
 
 		printLoopCount(i, num_time_steps)
 
-	print('\nTurning off position control...')
+	print('Turning off position control...')
+	fxSetGains(devId0, 0, 0, 0, 0, 0)
+	fxSetGains(devId1, 0, 0, 0, 0, 0)
+	fxSendMotorCommand(devId1, FxNone, 0)
+	fxSendMotorCommand(devId0, FxNone, 0)
+	sleep(0.5)
 	fxClose(devId0)
 	fxClose(devId1)
 
