@@ -16,12 +16,11 @@ def fxLeaderFollower(leaderPort, baudRate, followerPort):
 
 	sleep(0.2)
 
-	actPackState0 = fxReadDevice(devId0)	
+	actPackState0 = fxReadDevice(devId0)
 	actPackState1 = fxReadDevice(devId1)
 
 	initialAngle0 = actPackState0.encoderAngle
 	initialAngle1 = actPackState1.encoderAngle
-
 
 	# set first device to current controller with 0 current (0 torque)
 	fxSetGains(devId0, 100, 20, 0, 0, 0)
@@ -32,9 +31,8 @@ def fxLeaderFollower(leaderPort, baudRate, followerPort):
 	fxSendMotorCommand(devId1, FxPosition, initialAngle1)
 
 	count = 0
-	loopCount=200
+	loopCount = 200
 	try:
-		#while(True):
 		for i in range(loopCount):
 			sleep(0.05)
 			clearTerminal()
@@ -43,11 +41,12 @@ def fxLeaderFollower(leaderPort, baudRate, followerPort):
 			angle0 = leaderData.encoderAngle
 			diff = angle0 - initialAngle0
 			fxSendMotorCommand(devId1, FxPosition, initialAngle1 + diff)
-			# print("device {} following device {}".format(devId1, devId0))
-			print('\nloop ',i,'of ',loopCount,'\n')
-			print('Device', devId1, ' following device',  devId0)
+			print('Device', devId1, 'following device',  devId0, '\n')
 			printDevice(followerData)
+			print('')	# Empty line
 			printDevice(leaderData)
+			printLoopCount(i, loopCount)
+
 	except Exception as e:
 		print(traceback.format_exc())
 

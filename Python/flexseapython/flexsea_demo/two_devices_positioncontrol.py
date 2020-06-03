@@ -52,6 +52,8 @@ def fxTwoDevicePositionControl(port0, baudRate, port1):
 		print('Difference:           ', currentAngle1 - initialAngle1, '\n', flush=True)
 		printDevice(actPackState1)
 
+		printLoopCount(i, num_time_steps)
+
 	print('\nTurning off position control...')
 	fxClose(devId0)
 	fxClose(devId1)

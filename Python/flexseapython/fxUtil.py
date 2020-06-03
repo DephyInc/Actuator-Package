@@ -65,7 +65,6 @@ def printNetMaster(netMasterState: NetMasterState):
 	print('NetNode7 - accelx: ', netMasterState.netNode[7].accelx, ', accely: ', netMasterState.netNode[7].accely, ' accelz: ', netMasterState.netNode[7].accelz)
 	print('NetNode7 - gyrox:  ', netMasterState.netNode[7].gyrox,  ', gyroy:  ', netMasterState.netNode[7].gyroy,  ' gyroz:  ', netMasterState.netNode[7].gyroz)
 
-
 # Most scripts will print a loop count:
 def printLoopCount(i, total):
 	print('\nLoop', i + 1, 'of', total)
