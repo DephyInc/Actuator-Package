@@ -34,7 +34,7 @@ def printBMSState(devId):
 def fxReadOnly(port, baudRate, time = 8, time_step = 0.1):
 	# print(port)
 	debugLoggingLevel = 0	# 6 is least verbose, 0 is most verbose
-	dataLog = True 		# False measn no logs will be saved
+	dataLog = True 			# False means no logs will be saved
 	devId =	fxOpen(port, baudRate, debugLoggingLevel)
 	# print(devId)
 	fxStartStreaming(devId, frequency = 100, shouldLog = dataLog)
@@ -57,7 +57,7 @@ def fxReadOnly(port, baudRate, time = 8, time_step = 0.1):
 
 	totalLoopCount=int(time/time_step);
 	for i in range(totalLoopCount):
-		print('\n\nRead', i+1, 'of', totalLoopCount)
+		print('\nRead', i+1, 'of', totalLoopCount)
 		sleep(time_step)
 		clearTerminal()
 		if (appType == FxActPack):

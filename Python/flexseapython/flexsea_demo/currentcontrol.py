@@ -42,6 +42,7 @@ def fxCurrentControl(port, baudRate, holdCurrent = [1000], time = 6, time_step =
 		printDevice(actPack)
 		sleep(time_step)
 
+	# When we exit we want the motor to be off
 	fxSendMotorCommand(devId, FxNone, 0)
 	sleep(0.5)
 
