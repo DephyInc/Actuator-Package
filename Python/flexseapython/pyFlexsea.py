@@ -85,7 +85,7 @@ class NetMasterState(Structure):
 			("timestamp"  	, c_int),
 			("genVar"     	, c_int * 4),
 			("status"	  	, c_int),
-			("netNode"		, NetNodeState * 8),
+			("netNode"		, c_int * 7 * 8), #there are 7 c_ints in NetNodeState and there are 8 NetNodes
 			("SystemTime"	, c_int),
 			("dataArray" 	, c_int * 65)]
 
