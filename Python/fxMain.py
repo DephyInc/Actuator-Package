@@ -1,7 +1,6 @@
 from signal import signal, SIGINT
 import os
 import sys
-# import traceback
 
 if((sys.version_info[0] == 3) and (sys.version_info[1] == 8)):
 	print('Detected Python 3.8')
