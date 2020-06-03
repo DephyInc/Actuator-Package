@@ -144,7 +144,7 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = Controller.cur
 	for reps in range(0, numberOfLoops):
 		loopCtr += 1
 		elapsed_time = time() - t0
-		print('Loop:', loopCtr, 'of', numberOfLoops, '- Elapsed time:', int(elapsed_time+0.5), 's', end='\r')
+		print('Loop:', loopCtr, 'of ', numberOfLoops, '- Elapsed time:', int(elapsed_time+0.5), 's', end='\r')
 		for sample in samples:
 			if(i % 2 == 0 and requestJitter):
 				sample = sample + jitter

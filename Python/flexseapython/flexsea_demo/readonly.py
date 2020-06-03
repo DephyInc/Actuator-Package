@@ -39,7 +39,7 @@ def fxReadOnly(port, baudRate, time = 8, time_step = 0.1):
 	# print(devId)
 	fxStartStreaming(devId, frequency = 100, shouldLog = dataLog)
 	appType = fxGetAppType(devId)
-	
+
 	if (appType == FxActPack):
 		print('\nYour device is an ActPack \n')
 		input("Press Enter to continue...")
@@ -58,7 +58,7 @@ def fxReadOnly(port, baudRate, time = 8, time_step = 0.1):
 
 	totalLoopCount=int(time/time_step);
 	for i in range(totalLoopCount):
-		print('\n\nRead',i+1,' of ',totalLoopCount)
+		print('\n\nRead ',i+1,' of ',totalLoopCount)
 		sleep(time_step)
 		clearTerminal()
 		if (appType == FxActPack):
