@@ -2,13 +2,18 @@ from flexseapython.pyFlexsea import *
 from time import sleep
 import os
 
-#Clears the terminal - use before printing new values
+# Clears the terminal - use before printing new values
 def clearTerminal():
 	isWin = os.name == 'nt'
 	if isWin:
 		os.system('cls')	#Clear terminal (Win)
 	else:
 		os.system('clear')	#Clear terminal (Unix)
+
+# Prints plot exit message
+def printPlotExit():
+	if (os.name == 'nt'):
+		print('\nIn Windows, press Ctrl+BREAK to exit. Ctrl+C may not work.')
 
 def printDevice(actPackState: ActPackState):
 	print('[ Printing Actpack ]\n')

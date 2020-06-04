@@ -38,47 +38,33 @@ def plotSetpointVsDesired(devId, fig, controllerType, signalFrequency, signalAmp
 	return fig
 
 # Multiple figures: command and stream times in linear and occurrence log
-def plotExpStats(devId, fig, currentCommandTimes, streamCommandTimes):
+# Supports two types at once
+def plotExpStats(devId, fig, writeCommandTimes, readCommandTimes):
+	fig = plotExpStatsOneType(devId, fig, writeCommandTimes, "Write")
+	fig = plotExpStatsOneType(devId, fig, readCommandTimes, "Read")
+	return fig
+
+# Two figures: command and stream times in linear and occurrence log
+def plotExpStatsOneType(devId, fig, actionTimes, title):
+
 	# Figure: command time vs time, linear scale
 	plt.figure(fig)
 	fig += 1
+	actionTimes = [i * 1000 for i in actionTimes]
 	# Convert command times into ms
-	currentCommandTimes = [i * 1000 for i in currentCommandTimes]
-	plt.plot(currentCommandTimes, color='b', label='Current Command Times')
-	plt.title("Command Time vs Time" + ' (ID:' + str(devId) + ')')
+	plt.plot(actionTimes, color='b', label='Times')
+	plt.title(title + " Time vs Time" ' (ID:' + str(devId) + ')')
 	plt.legend(loc='upper right')
 	plt.xlabel("Time (ms)")
 	plt.ylabel("Command Time (ms)")
 
-	# Figure: command time occurrences, log
+	# Figure: time occurrences, log
 	plt.figure(fig)
 	fig += 1
 	plt.yscale('log')
-	plt.hist(currentCommandTimes, bins=100, label = 'Current Commands')
+	plt.hist(actionTimes, bins=100, label = 'Setpoints')
 	plt.yscale('log')
-	plt.title("Command time occurrence (log)" + ' (ID:' + str(devId) + ')')
-	plt.legend(loc='upper right')
-	plt.xlabel("Time (ms)")
-	plt.ylabel("Occurrences")
-
-	# Figure: stream time vs time, linear scale
-	plt.figure(fig)
-	fig += 1
-	streamCommandTimes = [i * 1000 for i in streamCommandTimes]
-	# Convert command times into ms
-	plt.plot(streamCommandTimes, color='b', label='Stream Command Times')
-	plt.title("Stream Time vs Time" + ' (ID:' + str(devId) + ')')
-	plt.legend(loc='upper right')
-	plt.xlabel("Time (ms)")
-	plt.ylabel("Command Time (ms)")
-
-	# Figure: stream time occurrences, log
-	plt.figure(fig)
-	fig += 1
-	plt.yscale('log')
-	plt.hist(streamCommandTimes, bins=100, label = 'Stream Commands')
-	plt.yscale('log')
-	plt.title("Stream time occurrence (log)" + ' (ID:' + str(devId) + ')')
+	plt.title(title + " Time Occurrence" + ' (ID:' + str(devId) + ')')
 	plt.legend(loc='upper right')
 	plt.xlabel("Time (ms)")
 	plt.ylabel("Occurrences")
