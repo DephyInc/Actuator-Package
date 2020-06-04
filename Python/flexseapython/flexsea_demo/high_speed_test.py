@@ -74,13 +74,13 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
 	# Open the device and start streaming
 	devId0 = fxOpen(port0, baudRate, debugLoggingLevel) 
 	fxStartStreaming(devId0, commandFreq, dataLog)
-	print('Connected to device 0 with ID ', devId0)
+	print('Connected to device 0 with ID', devId0)
 
 	devId1 = -1
 	if(secondDevice):
 		devId1 = fxOpen(port1, baudRate, debugLoggingLevel) 
 		fxStartStreaming(devId1, commandFreq, dataLog)
-		print('Connected to device 1 with ID ', devId1)
+		print('Connected to device 1 with ID', devId1)
 
 	# Get initial position:
 	if(controllerType == hssPosition):#Controller.position):
@@ -236,54 +236,6 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
 	plt.show()
 	
 	fxCloseAll()
-
-# Multiple figures: command and stream times in linear and occurrence log
-def plotExpStats(devId, fig, currentCommandTimes, streamCommandTimes):
-	# Figure: command time vs time, linear scale
-	plt.figure(fig)
-	fig += 1
-	# Convert command times into ms
-	currentCommandTimes = [i * 1000 for i in currentCommandTimes]
-	plt.plot(currentCommandTimes, color='b', label='Current Command Times')
-	plt.title("Command Time vs Time" + ' (ID:' + str(devId) + ')')
-	plt.legend(loc='upper right')
-	plt.xlabel("Time (ms)")
-	plt.ylabel("Command Time (ms)")
-
-	# Figure: command time occurrences, log
-	plt.figure(fig)
-	fig += 1
-	plt.yscale('log')
-	plt.hist(currentCommandTimes, bins=100, label = 'Current Commands')
-	plt.yscale('log')
-	plt.title("Command time occurrence (log)" + ' (ID:' + str(devId) + ')')
-	plt.legend(loc='upper right')
-	plt.xlabel("Time (ms)")
-	plt.ylabel("Occurrences")
-
-	# Figure: stream time vs time, linear scale
-	plt.figure(fig)
-	fig += 1
-	streamCommandTimes = [i * 1000 for i in streamCommandTimes]
-	# Convert command times into ms
-	plt.plot(streamCommandTimes, color='b', label='Stream Command Times')
-	plt.title("Stream Time vs Time" + ' (ID:' + str(devId) + ')')
-	plt.legend(loc='upper right')
-	plt.xlabel("Time (ms)")
-	plt.ylabel("Command Time (ms)")
-
-	# Figure: stream time occurrences, log
-	plt.figure(fig)
-	fig += 1
-	plt.yscale('log')
-	plt.hist(streamCommandTimes, bins=100, label = 'Stream Commands')
-	plt.yscale('log')
-	plt.title("Stream time occurrence (log)" + ' (ID:' + str(devId) + ')')
-	plt.legend(loc='upper right')
-	plt.xlabel("Time (ms)")
-	plt.ylabel("Occurrences")
-
-	return fig
 
 if __name__ == '__main__':
 	baudRate = sys.argv[1]
