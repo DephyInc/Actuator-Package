@@ -79,7 +79,7 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
 	# Get initial position:
 	if(controllerType == hssPosition):
 		#Get initial position:
-		print('Reading initial position...')		
+		print('Reading initial position...')
 		# Give the device time to consume the startStreaming command and start streaming
 		sleep(0.1)
 		data = fxReadDevice(devId0)
@@ -145,7 +145,6 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
 
 			sleep(delay_time)
 
-			# Set controller to the next sample
 			# Read ActPack data
 			dev0ReadTimeBefore = time()
 			data0 = fxReadDevice(devId0)
@@ -155,6 +154,7 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
 				data1 = fxReadDevice(devId1)
 				dev1ReadTimeAfter = time()
 
+			# Write setpoint
 			if(controllerType == hssCurrent):
 				dev0WriteTimeBefore = time()
 				fxSendMotorCommand(devId0, FxCurrent, sample)
@@ -167,16 +167,21 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
 					measurements1.append(data1.motorCurrent)
 
 			elif(controllerType == hssPosition):
+				dev0WriteTimeBefore = time()
 				fxSendMotorCommand(devId0, FxPosition, sample + initialPos0)
+				dev0WriteTimeAfter = time()
 				measurements0.append(data0.encoderAngle - initialPos0)
 				if(secondDevice):
+					dev1WriteTimeBefore = time()
 					fxSendMotorCommand(devId1, FxPosition, sample + initialPos1)
+					dev1WriteTimeAfter = time()
 					measurements1.append(data1.encoderAngle - initialPos1)
 
 			dev0ReadCommandTimes.append(dev0ReadTimeAfter - dev0ReadTimeBefore)
-			dev1ReadCommandTimes.append(dev1ReadTimeAfter - dev1ReadTimeBefore)
 			dev0WriteCommandTimes.append(dev0WriteTimeAfter - dev0WriteTimeBefore)
-			dev1WriteCommandTimes.append(dev1WriteTimeAfter - dev1WriteTimeBefore)
+			if secondDevice:
+				dev1ReadCommandTimes.append(dev1ReadTimeAfter - dev1ReadTimeBefore)
+				dev1WriteCommandTimes.append(dev1WriteTimeAfter - dev1WriteTimeBefore)
 			times.append(time() - t0)
 			requests.append(sample)
 			i = i + 1

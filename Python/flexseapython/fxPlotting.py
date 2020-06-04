@@ -18,7 +18,7 @@ def plotSetpointVsDesired(devId, fig, controllerType, signalFrequency, signalAmp
 
 	# Specific to the position controller:
 	elif(controllerType == hssPosition):#Controller.position):
-		plt.figure(fig)
+
 		title = "Position control with " + "{:.2f}".format(signalFrequency) + " Hz, " + \
 			str(signalAmplitude) + " ticks " + signalTypeStr + " and " + \
 				"{:.2f}".format(commandFrequency) + " Hz commands" + ' (ID:' + str(devId) + ')'
