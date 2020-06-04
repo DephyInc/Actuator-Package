@@ -5,21 +5,23 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
 from flexseapython.fxUtil import *
+from flexseapython.fxPlotting import *
 matplotlib.use('WebAgg')
 
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 print(pardir)
 sys.path.append(pardir)
 
-# Controller type to send to controller
-class Controller(Enum):
-	position = 1
-	current = 2
-
+# # Controller type to send to controller
+# # ToDo: this was in High Speed Test. Is that needed? Duplicated?
+# class Controller(Enum):
+#  position = 1
+#  current = 2
+#
 # Signal type to send to controller
 class signal(Enum):
-	sine = 1
-	line = 2
+ sine = 1
+ line = 2
 
 # Generate a sine wave of a specific amplitude and frequency
 def sinGenerator(amplitude, frequency, commandFreq):
@@ -35,7 +37,7 @@ def lineGenerator(amplitude, commandFreq):
 	line_vals = [ amplitude for i in range(num_samples) ]
 	return line_vals
 
-def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = Controller.current,
+def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
 	signalType = signal.sine, commandFreq = 1000, signalAmplitude = 1000, numberOfLoops = 30,
 	signalFreq = 5, cycleDelay = 0.1, requestJitter = False, jitter = 20):
 	"""
@@ -81,7 +83,7 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = Controller.cur
 		print('Connected to device 1 with ID ', devId1)
 
 	# Get initial position:
-	if(controllerType == Controller.position):
+	if(controllerType == hssPosition):#Controller.position):
 		#Get initial position:
 		print('Reading initial position...')		
 		# Give the device time to consume the startStreaming command and start streaming
@@ -119,13 +121,13 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = Controller.cur
 	streamCommandTimes = []
 
 	# Prepare controller:
-	if(controllerType == Controller.current):
+	if(controllerType == hssCurrent):	#Controller.current):
 		print("Setting up current control demo. Low current, high frequency")
 		fxSetGains(devId0, 300, 50, 0, 0, 0)
 		if(secondDevice):
 			fxSetGains(devId1, 300, 50, 0, 0, 0)
 
-	elif(controllerType == Controller.position):
+	elif(controllerType == hssPosition ):#Controller.position):
 		print("Setting up position control demo")
 		fxSetGains(devId0, 300, 50, 0, 0, 0)
 		if(secondDevice):
@@ -155,7 +157,7 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = Controller.cur
 			if(secondDevice):
 				data1 = fxReadDevice(devId1)
 
-			if(controllerType == Controller.current):
+			if(controllerType == hssCurrent):	#Controller.current):
 				tCommandTime0 = time()
 				fxSendMotorCommand(devId0, FxCurrent, sample)
 				tCommandTime1 = time()
@@ -164,7 +166,7 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = Controller.cur
 					fxSendMotorCommand(devId1, FxCurrent, sample)
 					measurements1.append(data1.motorCurrent)
 
-			elif(controllerType == Controller.position):
+			elif(controllerType == hssPosition):	#Controller.position):
 				fxSendMotorCommand(devId0, FxPosition, sample + initialPos0)
 				measurements0.append(data0.encoderAngle - initialPos0)
 				if(secondDevice):
@@ -187,12 +189,12 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = Controller.cur
 				if(secondDevice):
 					data1 = fxReadDevice(devId1)
 
-				if(controllerType == Controller.current):
+				if(controllerType == hssCurrent):	#Controller.current):
 					measurements0.append(data0.motorCurrent)
 					if(secondDevice):
 						measurements1.append(data1.motorCurrent)
 
-				elif(controllerType == Controller.position):
+				elif(controllerType == hssPosition):	#.position):
 					measurements0.append(data0.encoderAngle - initialPos0)
 					if(secondDevice):
 						measurements1.append(data1.encoderAngle - initialPos1)
@@ -235,41 +237,6 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = Controller.cur
 	
 	fxCloseAll()
 
-# Figure: setpoint, desired vs measured
-def plotSetpointVsDesired(devId, fig, controllerType, signalFrequency, signalAmplitude, signalTypeStr, commandFrequency, times, requests, measurements, cycleStopTimes):
-
-	plt.figure(fig)
-	fig += 1
-
-	# Specific to the current controller:
-	if(controllerType == Controller.current):
-
-		title = "Current control with " + "{:.2f}".format(signalFrequency) + " Hz, " + \
-			str(signalAmplitude) + " mA " + signalTypeStr + " and " + \
-				"{:.2f}".format(commandFrequency) + " Hz commands" + ' (ID:' + str(devId) + ')'
-		plt.ylabel("Motor current (mA)")
-
-	# Specific to the position controller:
-	elif(controllerType == Controller.position):
-		plt.figure(fig)
-		title = "Position control with " + "{:.2f}".format(signalFrequency) + " Hz, " + \
-			str(signalAmplitude) + " ticks " + signalTypeStr + " and " + \
-				"{:.2f}".format(commandFrequency) + " Hz commands" + ' (ID:' + str(devId) + ')'
-		plt.ylabel("Encoder position")
-
-	# Common info:
-	plt.plot(times, requests, color='b', label='Desired')
-	plt.plot(times, measurements, color='r', label='Measured')
-	plt.xlabel("Time (s)")
-	plt.title(title)
-	plt.legend(loc='upper right')
-
-	# Draw a vertical line at the end of each cycle
-	for endpoints in cycleStopTimes:
-		plt.axvline(x=endpoints, color='xkcd:light grey')
-
-	return fig
-
 # Multiple figures: command and stream times in linear and occurrence log
 def plotExpStats(devId, fig, currentCommandTimes, streamCommandTimes):
 	# Figure: command time vs time, linear scale
@@ -278,7 +245,6 @@ def plotExpStats(devId, fig, currentCommandTimes, streamCommandTimes):
 	# Convert command times into ms
 	currentCommandTimes = [i * 1000 for i in currentCommandTimes]
 	plt.plot(currentCommandTimes, color='b', label='Current Command Times')
-	#title = "Command Time vs Time" + ' (' + str(devId) + ')'
 	plt.title("Command Time vs Time" + ' (ID:' + str(devId) + ')')
 	plt.legend(loc='upper right')
 	plt.xlabel("Time (ms)")
