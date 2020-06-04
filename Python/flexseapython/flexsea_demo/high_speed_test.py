@@ -14,8 +14,8 @@ sys.path.append(pardir)
 
 # Signal type to send to controller
 class signal(Enum):
- sine = 1
- line = 2
+	sine = 1
+	line = 2
 
 # Generate a sine wave of a specific amplitude and frequency
 def sinGenerator(amplitude, frequency, commandFreq):
@@ -111,8 +111,10 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
 	measurements1 = []
 	times = []
 	cycleStopTimes = []
-	writeCommandTimes = []
-	readCommandTimes = []
+	dev0WriteCommandTimes = []
+	dev1WriteCommandTimes = []
+	dev0ReadCommandTimes = []
+	dev1ReadCommandTimes = []
 
 	# Prepare controller:
 	if(controllerType == hssCurrent):
@@ -145,19 +147,23 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
 
 			# Set controller to the next sample
 			# Read ActPack data
-			tReadTime0 = time()
+			dev0ReadTimeBefore = time()
 			data0 = fxReadDevice(devId0)
-			tReadTime1 = time()
+			dev0ReadTimeAfter = time()
 			if(secondDevice):
+				dev1ReadTimeBefore = time()
 				data1 = fxReadDevice(devId1)
+				dev1ReadTimeAfter = time()
 
 			if(controllerType == hssCurrent):
-				tCommandTime0 = time()
+				dev0WriteTimeBefore = time()
 				fxSendMotorCommand(devId0, FxCurrent, sample)
-				tCommandTime1 = time()
+				dev0WriteTimeAfter = time()
 				measurements0.append(data0.motorCurrent)
 				if(secondDevice):
+					dev1WriteTimeBefore = time()
 					fxSendMotorCommand(devId1, FxCurrent, sample)
+					dev1WriteTimeAfter = time()
 					measurements1.append(data1.motorCurrent)
 
 			elif(controllerType == hssPosition):
@@ -167,8 +173,10 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
 					fxSendMotorCommand(devId1, FxPosition, sample + initialPos1)
 					measurements1.append(data1.encoderAngle - initialPos1)
 
-			readCommandTimes.append(tReadTime1 - tReadTime0)
-			writeCommandTimes.append(tCommandTime1 - tCommandTime0)
+			dev0ReadCommandTimes.append(dev0ReadTimeAfter - dev0ReadTimeBefore)
+			dev1ReadCommandTimes.append(dev1ReadTimeAfter - dev1ReadTimeBefore)
+			dev0WriteCommandTimes.append(dev0WriteTimeAfter - dev0WriteTimeBefore)
+			dev1WriteCommandTimes.append(dev1WriteTimeAfter - dev1WriteTimeBefore)
 			times.append(time() - t0)
 			requests.append(sample)
 			i = i + 1
@@ -216,13 +224,13 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
 	fig = 1	# First time, functions will increment
 	fig = plotSetpointVsDesired(devId0, fig, controllerType, actualFrequency, signalAmplitude, signalTypeStr, commandFrequency, times,
 						requests, measurements0, cycleStopTimes)
-
-	fig = plotExpStats(devId0, fig, writeCommandTimes, readCommandTimes)
+	fig = plotExpStats(devId0, fig, dev0WriteCommandTimes, dev0ReadCommandTimes)
 
 	# Figure: setpoint, desired vs measured (2nd device)
 	if(secondDevice):
-		plotSetpointVsDesired(devId1, fig, controllerType, actualFrequency, signalAmplitude, signalTypeStr, commandFrequency,
+		fig = plotSetpointVsDesired(devId1, fig, controllerType, actualFrequency, signalAmplitude, signalTypeStr, commandFrequency,
 						times, requests, measurements1, cycleStopTimes)
+		fig = plotExpStats(devId1, fig, dev1WriteCommandTimes, dev1ReadCommandTimes)
 
 	printPlotExit()
 	plt.show()
