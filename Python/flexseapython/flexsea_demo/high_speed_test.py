@@ -5,16 +5,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
 from flexseapython.fxUtil import *
+from flexseapython.fxPlotting import *
 matplotlib.use('WebAgg')
 
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 print(pardir)
 sys.path.append(pardir)
-
-# Controller type to send to controller
-class Controller(Enum):
-	position = 1
-	current = 2
 
 # Signal type to send to controller
 class signal(Enum):
@@ -35,7 +31,7 @@ def lineGenerator(amplitude, commandFreq):
 	line_vals = [ amplitude for i in range(num_samples) ]
 	return line_vals
 
-def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = Controller.current,
+def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
 	signalType = signal.sine, commandFreq = 1000, signalAmplitude = 1000, numberOfLoops = 30,
 	signalFreq = 5, cycleDelay = 0.1, requestJitter = False, jitter = 20):
 	"""
@@ -47,7 +43,7 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = Controller.cur
 					command frequency will be slower due to OS overhead.
 	signalAmplitude	Amplitude of signal to send to controller. Encoder position
 					if position controller, current in mA if current controller
-	nmberOfLoops	Number of times to send desired signal to controller
+	numberOfLoops	Number of times to send desired signal to controller
 	signalFreq		Frequency of sine wave if using sine wave signal
 	cycleDelay		Delay between signals sent to controller, use with sine wave only
 	requestJitter	Add jitter amount to every other sample sent to controller
@@ -58,38 +54,34 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = Controller.cur
 		secondDevice = True
 
 	if(secondDevice):
-		print("Running high speed test with two devices")
+		print("Running High Speed Test with two devices")
 	else:
-		print("Running high speed test with one device")
+		print("Running High Speed Test with one device")
 
-	########### Debug & Data Logging ############
+	# Debug & Data Logging
 	debugLoggingLevel = 6 	# 6 is least verbose, 0 is most verbose
 	dataLog = False 		# Data log logs device data
 
 	delay_time = float(1 / (float(commandFreq)))
 	print(delay_time)
 
-	########### Open the device and start streaming ############
+	# Open the device and start streaming
 	devId0 = fxOpen(port0, baudRate, debugLoggingLevel) 
 	fxStartStreaming(devId0, commandFreq, dataLog)
-	print('Connected to device with ID ',devId0)
+	print('Connected to device 0 with ID', devId0)
 
 	devId1 = -1
 	if(secondDevice):
 		devId1 = fxOpen(port1, baudRate, debugLoggingLevel) 
 		fxStartStreaming(devId1, commandFreq, dataLog)
-		print('Connected to device with ID ',devId1)
+		print('Connected to device 1 with ID', devId1)
 
-	############# Main Code ############
-	######## Make your changes here #########
-
-	if(controllerType == Controller.position):
+	# Get initial position:
+	if(controllerType == hssPosition):
 		#Get initial position:
 		print('Reading initial position...')
-		
 		# Give the device time to consume the startStreaming command and start streaming
 		sleep(0.1)
-
 		data = fxReadDevice(devId0)
 		initialPos0 = data.encoderAngle
 
@@ -119,17 +111,19 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = Controller.cur
 	measurements1 = []
 	times = []
 	cycleStopTimes = []
-	currentCommandTimes = []
-	streamCommandTimes = []
+	dev0WriteCommandTimes = []
+	dev1WriteCommandTimes = []
+	dev0ReadCommandTimes = []
+	dev1ReadCommandTimes = []
 
 	# Prepare controller:
-	if(controllerType == Controller.current):
+	if(controllerType == hssCurrent):
 		print("Setting up current control demo. Low current, high frequency")
 		fxSetGains(devId0, 300, 50, 0, 0, 0)
 		if(secondDevice):
 			fxSetGains(devId1, 300, 50, 0, 0, 0)
 
-	elif(controllerType == Controller.position):
+	elif(controllerType == hssPosition):
 		print("Setting up position control demo")
 		fxSetGains(devId0, 300, 50, 0, 0, 0)
 		if(secondDevice):
@@ -143,40 +137,51 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = Controller.cur
 	loopCtr = 0
 	for reps in range(0, numberOfLoops):
 		loopCtr += 1
-		elapsed_time = time() - t0
-		print('Loop:', loopCtr, 'of ', numberOfLoops, '- Elapsed time:', int(elapsed_time+0.5), 's', end='\r')
+		elapsedTime = time() - t0
+		printLoopCountAndTime(loopCtr, numberOfLoops, elapsedTime)
 		for sample in samples:
 			if(i % 2 == 0 and requestJitter):
 				sample = sample + jitter
 
 			sleep(delay_time)
 
-			# set controller to the next sample
-			# read ActPack data
-			tReadTime0 = time()
+			# Read ActPack data
+			dev0ReadTimeBefore = time()
 			data0 = fxReadDevice(devId0)
-			tReadTime1 = time()
+			dev0ReadTimeAfter = time()
 			if(secondDevice):
+				dev1ReadTimeBefore = time()
 				data1 = fxReadDevice(devId1)
+				dev1ReadTimeAfter = time()
 
-			if(controllerType == Controller.current):
-				tCommandTime0 = time()
+			# Write setpoint
+			if(controllerType == hssCurrent):
+				dev0WriteTimeBefore = time()
 				fxSendMotorCommand(devId0, FxCurrent, sample)
-				tCommandTime1 = time()
+				dev0WriteTimeAfter = time()
 				measurements0.append(data0.motorCurrent)
 				if(secondDevice):
+					dev1WriteTimeBefore = time()
 					fxSendMotorCommand(devId1, FxCurrent, sample)
+					dev1WriteTimeAfter = time()
 					measurements1.append(data1.motorCurrent)
 
-			elif(controllerType == Controller.position):
+			elif(controllerType == hssPosition):
+				dev0WriteTimeBefore = time()
 				fxSendMotorCommand(devId0, FxPosition, sample + initialPos0)
+				dev0WriteTimeAfter = time()
 				measurements0.append(data0.encoderAngle - initialPos0)
 				if(secondDevice):
+					dev1WriteTimeBefore = time()
 					fxSendMotorCommand(devId1, FxPosition, sample + initialPos1)
+					dev1WriteTimeAfter = time()
 					measurements1.append(data1.encoderAngle - initialPos1)
 
-			streamCommandTimes.append(tReadTime1 - tReadTime0)
-			currentCommandTimes.append(tCommandTime1 - tCommandTime0)
+			dev0ReadCommandTimes.append(dev0ReadTimeAfter - dev0ReadTimeBefore)
+			dev0WriteCommandTimes.append(dev0WriteTimeAfter - dev0WriteTimeBefore)
+			if secondDevice:
+				dev1ReadCommandTimes.append(dev1ReadTimeAfter - dev1ReadTimeBefore)
+				dev1WriteCommandTimes.append(dev1WriteTimeAfter - dev1WriteTimeBefore)
 			times.append(time() - t0)
 			requests.append(sample)
 			i = i + 1
@@ -191,12 +196,12 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = Controller.cur
 				if(secondDevice):
 					data1 = fxReadDevice(devId1)
 
-				if(controllerType == Controller.current):
+				if(controllerType == hssCurrent):
 					measurements0.append(data0.motorCurrent)
 					if(secondDevice):
 						measurements1.append(data1.motorCurrent)
 
-				elif(controllerType == Controller.position):
+				elif(controllerType == hssPosition):
 					measurements0.append(data0.encoderAngle - initialPos0)
 					if(secondDevice):
 						measurements1.append(data1.encoderAngle - initialPos1)
@@ -208,120 +213,34 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = Controller.cur
 		# We'll draw a line at the end of every period
 		cycleStopTimes.append(time() - t0)
 
-	#Disable the controller, send 0 PWM
+	# Disable the controller, send 0 PWM
 	fxSendMotorCommand(devId0, FxNone, 0)
 	fxSendMotorCommand(devId1, FxNone, 0)
 	sleep(0.1)
 
-	######## End of Main Code #########
+	# End of Main Code - Start of plotting code
 
-	######## Plotting Code, you can edit this ##################
-
-	elapsed_time = time() - t0
-	actual_period = cycleStopTimes[0]
-	actual_frequency = 1 / actual_period
-	command_frequency = i / elapsed_time
+	elapsedTime = time() - t0
+	actualPeriod = cycleStopTimes[0]
+	actualFrequency = 1 / actualPeriod
+	commandFrequency = i / elapsedTime
 
 	# Figure: setpoint, desired vs measured (1st device)
-	fig = 1
-	plotSetpointVsDesired(fig, controllerType, actual_frequency, signalAmplitude, signalTypeStr, command_frequency, times,
-						  requests, measurements0, cycleStopTimes)
+	fig = 1	# First time, functions will increment
+	fig = plotSetpointVsDesired(devId0, fig, controllerType, actualFrequency, signalAmplitude, signalTypeStr, commandFrequency, times,
+						requests, measurements0, cycleStopTimes)
+	fig = plotExpStats(devId0, fig, dev0WriteCommandTimes, dev0ReadCommandTimes)
 
-	fig += 1
-	plotExpStats(fig, currentCommandTimes, streamCommandTimes)
-
-	##### End command times plotting ########################################33
-
-	# Figure(6): setpoint, desired vs measured (2nd device)
+	# Figure: setpoint, desired vs measured (2nd device)
 	if(secondDevice):
-		fig = 6
-		plotSetpointVsDesired(fig, controllerType, actual_frequency, signalAmplitude, signalTypeStr, command_frequency,
-						  times, requests, measurements1, cycleStopTimes)
+		fig = plotSetpointVsDesired(devId1, fig, controllerType, actualFrequency, signalAmplitude, signalTypeStr, commandFrequency,
+						times, requests, measurements1, cycleStopTimes)
+		fig = plotExpStats(devId1, fig, dev1WriteCommandTimes, dev1ReadCommandTimes)
 
-	if(os.name == 'nt'):
-		print('\nIn Windows, press Ctrl+BREAK to exit. Ctrl+C may not work.')
+	printPlotExit()
 	plt.show()
 	
 	fxCloseAll()
-
-# Figure: setpoint, desired vs measured
-def plotSetpointVsDesired(fig, controllerType, actual_frequency, signalAmplitude, signalTypeStr, command_frequency, times, requests, measurements, cycleStopTimes):
-
-	if(controllerType == Controller.current):
-		plt.figure(fig)
-		title = "Current control with " + "{:.2f}".format(actual_frequency) + " Hz, " + \
-			str(signalAmplitude) + " mA amplitude " + signalTypeStr + " and " + "{:.2f}".format(command_frequency) + " Hz commands"
-		plt.plot(times, requests, color = 'b', label = 'desired current')
-		plt.plot(times, measurements, color = 'r', label = 'measured current')
-		plt.xlabel("Time (s)")
-		plt.ylabel("Motor current (mA)")
-		plt.title(title)
-		plt.legend(loc='upper right')
-
-		# Draw a vertical line at the end of each cycle
-		for endpoints in cycleStopTimes:
-			plt.axvline(x=endpoints)
-
-	elif(controllerType == Controller.position):
-		plt.figure(fig)
-		title = "Position control with " + "{:.2f}".format(actual_frequency) + " Hz, " + \
-			str(signalAmplitude) + " ticks amplitude " + signalTypeStr + " and " + "{:.2f}".format(command_frequency) + " Hz commands"
-		plt.plot(times, requests, color = 'b', label = 'desired position')
-		plt.plot(times, measurements, color = 'r', label = 'measured position')
-		plt.xlabel("Time (s)")
-		plt.ylabel("Encoder position")
-		plt.title(title)
-		plt.legend(loc='upper right')
-
-		# Draw a vertical line at the end of each cycle
-		for endpoints in cycleStopTimes:
-			plt.axvline(x=endpoints)
-
-# Multiple figures: command and stream times in linear and occurrence log
-def plotExpStats(firstFig, currentCommandTimes, streamCommandTimes):
-	# Figure: command time vs time, linear scale
-	fig = firstFig
-	plt.figure(fig)
-	# Convert command times into ms
-	currentCommandTimes = [i * 1000 for i in currentCommandTimes]
-	plt.plot(currentCommandTimes, color='b', label='Current Command Times')
-	plt.title("Command Time vs Time")
-	plt.legend(loc='upper right')
-	plt.xlabel("Time (ms)")
-	plt.ylabel("Command Time (ms)")
-
-	# Figure: command time occurrences, log
-	fig += 1
-	plt.figure(fig)
-	plt.yscale('log')
-	plt.hist(currentCommandTimes, bins=100, label = 'Current Commands')
-	plt.yscale('log')
-	plt.title("Command time occurrence (log)")
-	plt.legend(loc='upper right')
-	plt.xlabel("Time (ms)")
-	plt.ylabel("Occurrences")
-
-	# Figure: stream time vs time, linear scale
-	fig += 1
-	plt.figure(fig)
-	streamCommandTimes = [i * 1000 for i in streamCommandTimes]
-	# Convert command times into ms
-	plt.plot(streamCommandTimes, color='b', label='Stream Command Times')
-	plt.title("Stream Time vs Time")
-	plt.legend(loc='upper right')
-	plt.xlabel("Time (ms)")
-	plt.ylabel("Command Time (ms)")
-
-	# Figure: stream time occurrences, log
-	fig += 1
-	plt.figure(fig)
-	plt.yscale('log')
-	plt.hist(streamCommandTimes, bins=100, label = 'Stream Commands')
-	plt.yscale('log')
-	plt.title("Stream time occurrence (log)")
-	plt.legend(loc='upper right')
-	plt.xlabel("Time (ms)")
-	plt.ylabel("Occurrences")
 
 if __name__ == '__main__':
 	baudRate = sys.argv[1]

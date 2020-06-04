@@ -6,6 +6,11 @@ from enum import Enum
 
 global flexsea
 
+# High Speed Stress/Test Experiments:
+(hssPosition,
+ hssCurrent,
+ hssMixed) = map(c_int, range(3))
+
 ################### Motor Controller Enums #######################
 
 (FxPosition,
@@ -103,7 +108,7 @@ class BMSState(Structure):
 			("stackVoltage"		, c_int),
 			("packImbalance"	, c_int),
 			("temperature"		, c_int * 4),
-			("genvar"			, c_int * 4),
+			("genVar"			, c_int * 4),
 			("SystemTime"		, c_int),
 			("dataArray" 		, c_int * 26)]
 

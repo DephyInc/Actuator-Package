@@ -2,13 +2,18 @@ from flexseapython.pyFlexsea import *
 from time import sleep
 import os
 
-#Clears the terminal - use before printing new values
+# Clears the terminal - use before printing new values
 def clearTerminal():
 	isWin = os.name == 'nt'
 	if isWin:
 		os.system('cls')	#Clear terminal (Win)
 	else:
 		os.system('clear')	#Clear terminal (Unix)
+
+# Prints plot exit message
+def printPlotExit():
+	if (os.name == 'nt'):
+		print('\nIn Windows, press Ctrl+BREAK to exit. Ctrl+C may not work.')
 
 def printDevice(actPackState: ActPackState):
 	print('[ Printing Actpack ]\n')
@@ -81,6 +86,10 @@ def printNetMaster(netMasterState: NetMasterState):
 # Most scripts will print a loop count:
 def printLoopCount(i, total):
 	print('\nLoop', i + 1, 'of', total)
+
+# And some will include the elapsed time
+def printLoopCountAndTime(i, total, elapsed_time):
+	print('\nLoop', i + 1, 'of', total, '- Elapsed time:', int(elapsed_time+0.5), 's', end='\r')
 
 # By default takes just one device from your com.txt file
 # If two arguments are passed, one is the path of the COM.txt file
