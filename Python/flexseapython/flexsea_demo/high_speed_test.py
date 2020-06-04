@@ -58,38 +58,34 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = Controller.cur
 		secondDevice = True
 
 	if(secondDevice):
-		print("Running high speed test with two devices")
+		print("Running High Speed Test with two devices")
 	else:
-		print("Running high speed test with one device")
+		print("Running High Speed Test with one device")
 
-	########### Debug & Data Logging ############
+	# Debug & Data Logging
 	debugLoggingLevel = 6 	# 6 is least verbose, 0 is most verbose
 	dataLog = False 		# Data log logs device data
 
 	delay_time = float(1 / (float(commandFreq)))
 	print(delay_time)
 
-	########### Open the device and start streaming ############
+	# Open the device and start streaming
 	devId0 = fxOpen(port0, baudRate, debugLoggingLevel) 
 	fxStartStreaming(devId0, commandFreq, dataLog)
-	print('Connected to device with ID ',devId0)
+	print('Connected to device 0 with ID ', devId0)
 
 	devId1 = -1
 	if(secondDevice):
 		devId1 = fxOpen(port1, baudRate, debugLoggingLevel) 
 		fxStartStreaming(devId1, commandFreq, dataLog)
-		print('Connected to device with ID ',devId1)
+		print('Connected to device 1 with ID ', devId1)
 
-	############# Main Code ############
-	######## Make your changes here #########
-
+	# Get initial position:
 	if(controllerType == Controller.position):
 		#Get initial position:
-		print('Reading initial position...')
-		
+		print('Reading initial position...')		
 		# Give the device time to consume the startStreaming command and start streaming
 		sleep(0.1)
-
 		data = fxReadDevice(devId0)
 		initialPos0 = data.encoderAngle
 
@@ -143,8 +139,8 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = Controller.cur
 	loopCtr = 0
 	for reps in range(0, numberOfLoops):
 		loopCtr += 1
-		elapsed_time = time() - t0
-		print('Loop:', loopCtr, 'of ', numberOfLoops, '- Elapsed time:', int(elapsed_time+0.5), 's', end='\r')
+		elapsedTime = time() - t0
+		printLoopCountAndTime(loopCtr, numberOfLoops, elapsedTime)
 		for sample in samples:
 			if(i % 2 == 0 and requestJitter):
 				sample = sample + jitter
@@ -208,35 +204,30 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = Controller.cur
 		# We'll draw a line at the end of every period
 		cycleStopTimes.append(time() - t0)
 
-	#Disable the controller, send 0 PWM
+	# Disable the controller, send 0 PWM
 	fxSendMotorCommand(devId0, FxNone, 0)
 	fxSendMotorCommand(devId1, FxNone, 0)
 	sleep(0.1)
+	# End of Main Code
+	
+	# Plotting Code begins here
 
-	######## End of Main Code #########
-
-	######## Plotting Code, you can edit this ##################
-
-	elapsed_time = time() - t0
-	actual_period = cycleStopTimes[0]
-	actual_frequency = 1 / actual_period
-	command_frequency = i / elapsed_time
+	elapsedTime = time() - t0
+	actualPeriod = cycleStopTimes[0]
+	actualFrequency = 1 / actualPeriod
+	commandFrequency = i / elapsedTime
 
 	# Figure: setpoint, desired vs measured (1st device)
-	fig = 1
-	plotSetpointVsDesired(fig, controllerType, actual_frequency, signalAmplitude, signalTypeStr, command_frequency, times,
-						  requests, measurements0, cycleStopTimes)
+	fig = 1	# First time, functions will increment
+	fig = plotSetpointVsDesired(devId0, fig, controllerType, actualFrequency, signalAmplitude, signalTypeStr, commandFrequency, times,
+						requests, measurements0, cycleStopTimes)
 
-	fig += 1
-	plotExpStats(fig, currentCommandTimes, streamCommandTimes)
+	fig = plotExpStats(devId0, fig, currentCommandTimes, streamCommandTimes)
 
-	##### End command times plotting ########################################33
-
-	# Figure(6): setpoint, desired vs measured (2nd device)
+	# Figure: setpoint, desired vs measured (2nd device)
 	if(secondDevice):
-		fig = 6
-		plotSetpointVsDesired(fig, controllerType, actual_frequency, signalAmplitude, signalTypeStr, command_frequency,
-						  times, requests, measurements1, cycleStopTimes)
+		plotSetpointVsDesired(devId1, fig, controllerType, actualFrequency, signalAmplitude, signalTypeStr, commandFrequency,
+						times, requests, measurements1, cycleStopTimes)
 
 	if(os.name == 'nt'):
 		print('\nIn Windows, press Ctrl+BREAK to exit. Ctrl+C may not work.')
@@ -245,83 +236,88 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = Controller.cur
 	fxCloseAll()
 
 # Figure: setpoint, desired vs measured
-def plotSetpointVsDesired(fig, controllerType, actual_frequency, signalAmplitude, signalTypeStr, command_frequency, times, requests, measurements, cycleStopTimes):
+def plotSetpointVsDesired(devId, fig, controllerType, signalFrequency, signalAmplitude, signalTypeStr, commandFrequency, times, requests, measurements, cycleStopTimes):
 
+	plt.figure(fig)
+	fig += 1
+
+	# Specific to the current controller:
 	if(controllerType == Controller.current):
-		plt.figure(fig)
-		title = "Current control with " + "{:.2f}".format(actual_frequency) + " Hz, " + \
-			str(signalAmplitude) + " mA amplitude " + signalTypeStr + " and " + "{:.2f}".format(command_frequency) + " Hz commands"
-		plt.plot(times, requests, color = 'b', label = 'desired current')
-		plt.plot(times, measurements, color = 'r', label = 'measured current')
-		plt.xlabel("Time (s)")
+
+		title = "Current control with " + "{:.2f}".format(signalFrequency) + " Hz, " + \
+			str(signalAmplitude) + " mA " + signalTypeStr + " and " + \
+				"{:.2f}".format(commandFrequency) + " Hz commands" + ' (ID:' + str(devId) + ')'
 		plt.ylabel("Motor current (mA)")
-		plt.title(title)
-		plt.legend(loc='upper right')
 
-		# Draw a vertical line at the end of each cycle
-		for endpoints in cycleStopTimes:
-			plt.axvline(x=endpoints)
-
+	# Specific to the position controller:
 	elif(controllerType == Controller.position):
 		plt.figure(fig)
-		title = "Position control with " + "{:.2f}".format(actual_frequency) + " Hz, " + \
-			str(signalAmplitude) + " ticks amplitude " + signalTypeStr + " and " + "{:.2f}".format(command_frequency) + " Hz commands"
-		plt.plot(times, requests, color = 'b', label = 'desired position')
-		plt.plot(times, measurements, color = 'r', label = 'measured position')
-		plt.xlabel("Time (s)")
+		title = "Position control with " + "{:.2f}".format(signalFrequency) + " Hz, " + \
+			str(signalAmplitude) + " ticks " + signalTypeStr + " and " + \
+				"{:.2f}".format(commandFrequency) + " Hz commands" + ' (ID:' + str(devId) + ')'
 		plt.ylabel("Encoder position")
-		plt.title(title)
-		plt.legend(loc='upper right')
 
-		# Draw a vertical line at the end of each cycle
-		for endpoints in cycleStopTimes:
-			plt.axvline(x=endpoints)
+	# Common info:
+	plt.plot(times, requests, color='b', label='Desired')
+	plt.plot(times, measurements, color='r', label='Measured')
+	plt.xlabel("Time (s)")
+	plt.title(title)
+	plt.legend(loc='upper right')
+
+	# Draw a vertical line at the end of each cycle
+	for endpoints in cycleStopTimes:
+		plt.axvline(x=endpoints, color='xkcd:light grey')
+
+	return fig
 
 # Multiple figures: command and stream times in linear and occurrence log
-def plotExpStats(firstFig, currentCommandTimes, streamCommandTimes):
+def plotExpStats(devId, fig, currentCommandTimes, streamCommandTimes):
 	# Figure: command time vs time, linear scale
-	fig = firstFig
 	plt.figure(fig)
+	fig += 1
 	# Convert command times into ms
 	currentCommandTimes = [i * 1000 for i in currentCommandTimes]
 	plt.plot(currentCommandTimes, color='b', label='Current Command Times')
-	plt.title("Command Time vs Time")
+	#title = "Command Time vs Time" + ' (' + str(devId) + ')'
+	plt.title("Command Time vs Time" + ' (ID:' + str(devId) + ')')
 	plt.legend(loc='upper right')
 	plt.xlabel("Time (ms)")
 	plt.ylabel("Command Time (ms)")
 
 	# Figure: command time occurrences, log
-	fig += 1
 	plt.figure(fig)
+	fig += 1
 	plt.yscale('log')
 	plt.hist(currentCommandTimes, bins=100, label = 'Current Commands')
 	plt.yscale('log')
-	plt.title("Command time occurrence (log)")
+	plt.title("Command time occurrence (log)" + ' (ID:' + str(devId) + ')')
 	plt.legend(loc='upper right')
 	plt.xlabel("Time (ms)")
 	plt.ylabel("Occurrences")
 
 	# Figure: stream time vs time, linear scale
-	fig += 1
 	plt.figure(fig)
+	fig += 1
 	streamCommandTimes = [i * 1000 for i in streamCommandTimes]
 	# Convert command times into ms
 	plt.plot(streamCommandTimes, color='b', label='Stream Command Times')
-	plt.title("Stream Time vs Time")
+	plt.title("Stream Time vs Time" + ' (ID:' + str(devId) + ')')
 	plt.legend(loc='upper right')
 	plt.xlabel("Time (ms)")
 	plt.ylabel("Command Time (ms)")
 
 	# Figure: stream time occurrences, log
-	fig += 1
 	plt.figure(fig)
+	fig += 1
 	plt.yscale('log')
 	plt.hist(streamCommandTimes, bins=100, label = 'Stream Commands')
 	plt.yscale('log')
-	plt.title("Stream time occurrence (log)")
+	plt.title("Stream time occurrence (log)" + ' (ID:' + str(devId) + ')')
 	plt.legend(loc='upper right')
 	plt.xlabel("Time (ms)")
 	plt.ylabel("Occurrences")
+
+	return fig
 
 if __name__ == '__main__':
 	baudRate = sys.argv[1]

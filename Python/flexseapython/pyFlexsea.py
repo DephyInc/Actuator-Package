@@ -103,7 +103,7 @@ class BMSState(Structure):
 			("stackVoltage"		, c_int),
 			("packImbalance"	, c_int),
 			("temperature"		, c_int * 4),
-			("genvar"			, c_int * 4),
+			("genVar"			, c_int * 4),
 			("SystemTime"		, c_int),
 			("dataArray" 		, c_int * 26)]
 
