@@ -29,7 +29,7 @@ def fxReadOnly(port, baudRate, time = 8, time_step = 0.1):
 		print('\nYour device is a BMS.\n')
 		input("Press Enter to continue...")
 	elif (appType == FxExo):
-		print('\nYour device is an Exo.\n')
+		print('\nYour device is an Exo or ActPack Plus.\n')
 		input("Press Enter to continue...")
 	else:
 		raise RuntimeError('Unsupported application type: ', appType)

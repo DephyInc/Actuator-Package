@@ -8,6 +8,21 @@ sys.path.append(pardir)
 def fxCurrentControl(port, baudRate, holdCurrent = [1000], time = 6, time_step = 0.1):
 	devId = fxOpen(port, baudRate, logLevel = 6)
 	fxStartStreaming(devId, 100, shouldLog = False)
+	appType = fxGetAppType(devId)
+
+	if(appType != FxActPack):
+		print('\n Unless you are using an ActPackPlus or have a VERY SPECIFIC '
+			  'reason to call this script, please exit.  '
+			  'Ignoring this advice could result in BROKEN electronics, '
+			  'ROBOTS, COMPUTERS, or in PHYSICAL INJURY. '
+			  '\n \nWould you like to run the script?\n')
+		continueRunning=input("Enter yes or no....  ")
+		if continueRunning.lower() != 'yes':
+			#button it up
+			print('quitting....')
+			fxClose(devId)
+			return True
+
 	result = True
 	print('Setting controller to current...')
 	fxSetGains(devId, 50, 32, 0, 0, 0)

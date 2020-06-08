@@ -31,7 +31,7 @@ def printDevice(actPackState: ActPackState):
 	print('Battery Temp (C):     ', actPackState.batteryTemp)
 
 def printExo(exoState: ExoState):
-	print('[ Printing Exo ]\n')
+	print('[ Printing Exo/ActPack Plus ]\n')
 	print('State time:           ', exoState.timestamp)
 	print('Accel X:              ', exoState.accelx)
 	print('Accel Y:              ', exoState.accely)
