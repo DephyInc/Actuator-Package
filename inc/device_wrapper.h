@@ -23,14 +23,14 @@ typedef enum fxError
 
 typedef enum fxControlMode
 {
-	FxPosition = 0,
-	FxVoltage,
-	FxCurrent,
-	FxImpedance,
-	FxNone,
-	FxCustom,
-	FxMeasRes,
-	FxStalk
+    FxPosition	=0, //Position - Send a position setpoint
+    FxVoltage	=1, //Voltage - Open Control Command
+    FxCurrent	=2, //Current - Send a current Setpoint command
+    FxImpedance	=3, //Impedance - Send an impedance command. Position setpoints but with stiffness and damping coefficients
+    FxNone		=4, //No controller type. Shutoff command.
+    FxCustom	=5,
+    FxMeasRes	=6,
+    FxStalk		=7, // Send an stalking command. It uses the position controller to stalk an ankle angle at a certain distance
 
 } FxControlMode;
 
@@ -45,10 +45,10 @@ typedef enum fxAppType
 
 } FxAppType;
 
-struct ActPackState;
-struct NetMasterState;
-struct BMSState;
-struct HabsoluteState;
+struct ActPackState;	//Contains Actuator Pack Data
+struct NetMasterState;	//Contains Network Data from NetNodes
+struct BMSState;		//Contains Battery Management System Data
+struct HabsoluteState;	//Contains Ankle position data
 
 // Valid streaming frequencies 
 #define NUM_TIMER_FREQS 11
