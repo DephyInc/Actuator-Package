@@ -226,16 +226,16 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
 	commandFrequency = i / elapsedTime
 
 	# Figure: setpoint, desired vs measured (1st device)
-	fig = 1	# First time, functions will increment
-	fig = plotSetpointVsDesired(devId0, fig, controllerType, actualFrequency, signalAmplitude, signalTypeStr, commandFrequency, times,
+	figureCounter = 1	# First time, functions will increment
+	fig = plotSetpointVsDesired(devId0, figureCounter, controllerType, actualFrequency, signalAmplitude, signalTypeStr, commandFrequency, times,
 						requests, measurements0, cycleStopTimes)
-	fig = plotExpStats(devId0, fig, dev0WriteCommandTimes, dev0ReadCommandTimes)
+	figureCounter = plotExpStats(devId0, figureCounter, dev0WriteCommandTimes, dev0ReadCommandTimes)
 
 	# Figure: setpoint, desired vs measured (2nd device)
 	if(secondDevice):
-		fig = plotSetpointVsDesired(devId1, fig, controllerType, actualFrequency, signalAmplitude, signalTypeStr, commandFrequency,
+		figureCounter = plotSetpointVsDesired(devId1, figureCounter, controllerType, actualFrequency, signalAmplitude, signalTypeStr, commandFrequency,
 						times, requests, measurements1, cycleStopTimes)
-		fig = plotExpStats(devId1, fig, dev1WriteCommandTimes, dev1ReadCommandTimes)
+		figureCounter = plotExpStats(devId1, figureCounter, dev1WriteCommandTimes, dev1ReadCommandTimes)
 
 	printPlotExit()
 	plt.show()
