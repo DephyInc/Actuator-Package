@@ -67,8 +67,7 @@ class ActPackState(Structure):
 			("genVar"    , c_int * 10),
 			("ankleAngle"	  , c_int),
 			("ankleVelocity"  , c_int),
-			("SystemTime"	  , c_int),
-			("dataArray" , c_int * 33)]
+			("SystemTime"	  , c_int)]
 
 class NetNodeState(Structure):
 	_pack_ = 1
