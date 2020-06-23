@@ -32,32 +32,35 @@ cycleStopTimes = []		# Use to draw a line at end of every period
 data0 = 0				# Contains state of ActPack0 
 data1 = 0				# Contains state of ActPack1
 
-# Port: port with outgoing serial connection to ActPack
-# Baud Rate : baud rate of outgoing serial connection to ActPack
-# Command Freq: Desired frequency of issuing commands to controller, actual 
-#	command frequency will be slower due to OS overhead.
-# positionAmplitude: amplitude (in ticks), position controller
-# currentAmplitude: amplitude (in mA), current controller
-# positionFreq: frequency (Hz) of the sine wave, position controller
-# currentFreq: frequency (Hz) of the sine wave, current controller
-# currentAsymmetricG: we use more current on the "way back" to come back closer to the staring
-# point. Positive numbers only, 1-3 range.
-# Number of Loops: Number of times to send desired signal to controller
 def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 		positionAmplitude = 10000, currentAmplitude = 2500,
 		positionFreq = 1, currentFreq = 5, currentAsymmetricG = 1.25,
 		numberOfLoops = 1):
-	global times		# Elapsed time since strart of run
+	"""
+	portX: port with outgoing serial connection to ActPack
+	baudRate : baud rate of outgoing serial connection to ActPack
+	commandFreq: Desired frequency of issuing commands to controller, actual
+		command frequency will be slower due to OS overhead.
+	positionAmplitude: amplitude (in ticks), position controller
+	currentAmplitude: amplitude (in mA), current controller
+	positionFreq: frequency (Hz) of the sine wave, position controller
+	currentFreq: frequency (Hz) of the sine wave, current controller
+	currentAsymmetricG: we use more current on the "way back" to come back closer to the staring
+		point. Positive numbers only, 1-3 range.
+	numberOfLoops: Number of times to send desired signal to controller
+	"""
+
+	global times			# Elapsed time since strart of run
 	global currentRequests
 	global positionRequests
 	global readDeviceTimes	# Timing data for fxReadDevice()
 	global sendMotorTimes	# Timing data for fxSendMotorCommand
 	global setGainsTimes	# Timing data for fxSetGains()
 	global cycleStopTimes
-	global data0		# Contains state of ActPack0 
-	global data1 		# Contains state of ActPack1
+	global data0			# Contains state of ActPack0
+	global data1 			# Contains state of ActPack1
 
-	########### One vs two devices ############
+	# One vs two devices
 	secondDevice = False
 	if(port1 != ""):
 		secondDevice = True
@@ -67,14 +70,14 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 	else:
 		print("Running high stress test with one device")
 
-	########### Debug & Data Logging ############
-	debugLoggingLevel = 6 # 6 is least verbose, 0 is most verbose
-	dataLog = False # Data log logs device data
+	# Debug & Data Logging
+	debugLoggingLevel = 6 	# 6 is least verbose, 0 is most verbose
+	dataLog = False 		# Data log logs device data
 
 	delay_time = float(1/(float(commandFreq)))
 	print('Delay time: ', delay_time)
 
-	########### Open the device(s) and start streaming ############
+	# Open the device and start streaming
 	devId0 = fxOpen(port0, baudRate, debugLoggingLevel) 
 	fxStartStreaming(devId0, commandFreq, dataLog)
 	print('Connected to device with Id:', devId0)
@@ -89,7 +92,6 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 		print('Connected to device with Id:', devId1)
 
 	############# Main Code ############
-	######## Make your changes here #########
 
 	# Get initial position:
 	print('Reading initial position...')
@@ -133,15 +135,16 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 			if(i):	# Second or later iterations in loop
 				# setPositionCtrl(  devId0, devId1, secondDevice, data0.encoderAngle, initialPos1)
 				sendAndTimeCmds(t0, devId0, devId1, secondDevice, initialPos0, initialPos1,
-					current0=0, current1=0, motorCmd=FxPosition,
-					position0=data0.encoderAngle, position1=initialPos1,
-					posReq=0, setGains=True)
+					current0 = 0, current1 = 0, motorCmd = FxPosition,
+					position0 = data0.encoderAngle, position1 = initialPos1,
+					posReq = 0, setGains = True)
 				# ToDo: data1.encoderAngle
 			else:	# First loop iteration
 				# setPositionCtrl(  devId0, devId1, secondDevice, initialPos0, initialPos1)
-				sendAndTimeCmds(t0, devId0, devId1, secondDevice, initialPos0=0, initialPos1=0,
-					current0=0, current1=0, motorCmd=FxPosition,
-					position0=initialPos0, position1=initialPos1, posReq=0, setGains=True)
+				sendAndTimeCmds(t0, devId0, devId1, secondDevice, initialPos0 = 0, initialPos1 = 0,
+					current0 = 0, current1 = 0, motorCmd = FxPosition,
+					position0 = initialPos0, position1 = initialPos1,
+					posReq = 0, setGains = True)
 
 			# Step 1: go to initial position
 			# -------------------------------
@@ -154,9 +157,9 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 
 					sleep(delay_time)
 					sendAndTimeCmds(t0, devId0, devId1, secondDevice, initialPos0, initialPos1,
-						current0=0, current1=0, motorCmd=FxPosition,
-						position0=sample+initialPos0, position1=sample+initialPos1,
-						posReq=sample, setGains=False)
+						current0 = 0, current1 = 0, motorCmd = FxPosition,
+						position0 = sample + initialPos0, position1 = sample + initialPos1,
+						posReq = sample, setGains = False)
 
 					i = i + 1
 			else:
@@ -170,10 +173,10 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 			for sample in positionSamples:
 
 				sleep(delay_time)
-				sendAndTimeCmds(t0, devId0, devId1, secondDevice,initialPos0, initialPos1,
-					current0=0, current1=0, motorCmd=FxPosition,
-					position0=sample+initialPos0, position1=sample+initialPos1,
-					posReq=0, setGains=False)
+				sendAndTimeCmds(t0, devId0, devId1, secondDevice, initialPos0, initialPos1,
+					current0 = 0, current1 = 0, motorCmd = FxPosition,
+					position0 = sample + initialPos0, position1 = sample + initialPos1,
+					posReq = 0, setGains = False)
 
 				i = i + 1
 
@@ -182,8 +185,9 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 			print("Step 3: set current controller")
 			# setCurrentCtrl(   devId0, devId1, secondDevice, 0, 0)
 			sendAndTimeCmds(t0, devId0, devId1, secondDevice, initialPos0, initialPos1,
-				current0=0, current1=0, motorCmd=FxCurrent,
-				position0=0, position1=0, posReq=0, setGains=True)
+				current0 = 0, current1 = 0, motorCmd = FxCurrent,
+				position0 = 0, position1 = 0,
+				posReq = 0, setGains=True)
 
 
 			# Step 4: current setpoint
@@ -200,8 +204,9 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 					compensatedSample = np.int64(currentAsymmetricG * sample)
 
 				sendAndTimeCmds(t0, devId0, devId1, secondDevice,initialPos0, initialPos1,
-					current0=compensatedSample, current1=compensatedSample,
-					motorCmd=FxCurrent, position0=0, position1=0, posReq=0, setGains=False)
+					current0 = compensatedSample, current1 = compensatedSample,
+					motorCmd = FxCurrent, position0 = 0, position1 = 0,
+					posReq = 0, setGains = False)
 
 				i = i + 1
 				
@@ -213,20 +218,19 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 
 				sleep(delay_time)
 				sendAndTimeCmds(t0, devId0, devId1, secondDevice,initialPos0, initialPos1,
-				 	current0=sample, current1=sample, motorCmd=FxCurrent,
-				 	position0=0, position1=0, posReq=0, setGains=False)
+				 	current0 = sample, current1 = sample, motorCmd = FxCurrent,
+				 	position0 = 0, position1 = 0,
+					posReq = 0, setGains = False)
 
 				i = i + 1
 
 			# We'll draw a line at the end of every period
 			cycleStopTimes.append(time() - t0)
 			elapsed_time = time() - t0
+
 	except KeyboardInterrupt:
 		print ('Keypress detected. Exiting gracefully...')
 
-	#fxClose(devId0)	//STACK-169
-	#fxClose(devId1)
-	
 	#Disable the controller, send 0 PWM
 	fxSendMotorCommand(devId0, FxVoltage, 0)
 	fxSendMotorCommand(devId1, FxVoltage, 0)
@@ -321,10 +325,10 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 def sendAndTimeCmds(t0, devId0, devId1, device2: bool, initialPos0, initialPos1,
 		current0, current1, motorCmd, position0, position1, posReq, setGains: bool):
 	"""
-	t0:	Timestamp for start of run. (Current time-t0) = Elapsed time
+	t0: Timestamp for start of run. (Current time-t0) = Elapsed time
 	initialPos0, initialPos1: Initial encoder angles for devId0, devId1. Used to provide offsets
 		to encoder angle readings.
-	current0, current1:	Desired currents for devId0 and devId1
+	current0, current1: Desired currents for devId0 and devId1
 	position0, position1: Desired positions for devId0 and devId1
 	motorCmd: An enum defined in flexseapython.py. Allowed values:
 		FxPosition, FxVoltage, FxCurrent, FxImpedance

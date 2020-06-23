@@ -22,7 +22,7 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
 	signalFreq = 5, cycleDelay = 0.1, requestJitter = False, jitter = 20):
 	"""
 	baudRate		Baud rate of outgoing serial connection to ActPack
-	port			Port with outgoing serial connection to ActPack
+	portX			Port with outgoing serial connection to ActPack
 	controllerType	Position controller or current controller
 	signalType		Sine wave or line
 	commandFreq		Desired frequency of issuing commands to controller, actual 
@@ -35,6 +35,8 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
 	requestJitter	Add jitter amount to every other sample sent to controller
 	jitter			Amount of jitter
 	"""
+
+	# One vs two devices
 	secondDevice = False
 	if(port1 != ""):
 		secondDevice = True
