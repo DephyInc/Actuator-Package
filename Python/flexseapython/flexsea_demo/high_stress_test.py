@@ -32,36 +32,6 @@ cycleStopTimes = []		# Use to draw a line at end of every period
 data0 = 0				# Contains state of ActPack0 
 data1 = 0				# Contains state of ActPack1
 
-# Controller type to send to controller
-class Controller(Enum):
-	position = 1
-	current = 2
-
-# Signal type to send to controller
-class signal(Enum):
-	sine = 1
-	line = 2
-
-# Generate a sine wave of a specific amplitude and frequency
-def sinGenerator(amplitude, frequency, commandFreq):
-	num_samples = commandFreq / frequency
-	print(num_samples)
-	in_array = np.linspace(-np.pi, np.pi, int(num_samples))
-	sin_vals = amplitude * np.sin(in_array)
-	return sin_vals
-
-# Generate a line with specific amplitude
-def lineGenerator(amplitude, length, commandFreq):
-	num_samples = np.int32(length * commandFreq)
-	line_vals = [ amplitude for i in range(num_samples) ]
-	return line_vals
-
-# Interpolates between two positions (A to B)
-def linearInterp(a, b, points):
-	lin_array = np.linspace(a, b, points)
-	#print("Lin interp from",a,"to",b)
-	return lin_array
-
 """
 # Set the device(s) for position control
 def setPositionCtrl(t0, devId0, devId1, secondDevice, position0, position1):
@@ -204,7 +174,7 @@ def sendAndTimeCmds(t0, devId0, devId1, device2: bool, initialPos0, initialPos1,
 def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 		positionAmplitude = 10000, currentAmplitude = 2500,
 		positionFreq = 1, currentFreq = 5, currentAsymmetricG = 1.25,
-		numberOfLoops = 5):
+		numberOfLoops = 1):
 	global times		# Elapsed time since strart of run
 	global currentRequests
 	global positionRequests
