@@ -79,7 +79,7 @@ class NetNodeState(Structure):
 			("gyroy"	  , c_int),
 			("gyroz"	  , c_int),
 			("pressure"	  , c_int),
-			("dataArray" , c_int * 7)]
+			("SystemTime"	, c_int)]
 
 class NetMasterState(Structure):
 	_pack_ = 1
@@ -90,8 +90,7 @@ class NetMasterState(Structure):
 			("genVar"     	, c_int * 4),
 			("status"	  	, c_int),
 			("netNode"		, NetNodeState * 8),
-			("SystemTime"	, c_int),
-			("dataArray" 	, c_int * 65)]
+			("SystemTime"	, c_int)]
 
 class BMSState(Structure):
 	_pack_ = 1
@@ -108,8 +107,7 @@ class BMSState(Structure):
 			("packImbalance"	, c_int),
 			("temperature"		, c_int * 4),
 			("genVar"			, c_int * 4),
-			("SystemTime"		, c_int),
-			("dataArray" 		, c_int * 26)]
+			("SystemTime"		, c_int)]
 
 class ExoState(Structure):
 		_pack_ = 1
@@ -158,8 +156,7 @@ class ExoState(Structure):
 			("bi_training_status"				, c_int),
 			("bi_need_steps"					, c_int),
 			("bi_step_count"					, c_int),
-			("SystemTime"						, c_int),
-			("dataArray" 						, c_int * 54)]
+			("SystemTime"						, c_int)]
 
 
 ####################### Begin API ##################################
