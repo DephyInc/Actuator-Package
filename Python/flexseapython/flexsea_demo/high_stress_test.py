@@ -16,7 +16,7 @@ pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 print(pardir)
 sys.path.append(pardir)
 
-######## These arrays are updated concurrently with every new timestamp ############
+# Global arrays updated concurrently with every new timestamp
 times = []
 currentRequests = []
 currentMeasurements0 = []	# For devId0
@@ -27,10 +27,11 @@ positionMeasurements1 = []	# For devId1
 readDeviceTimes = []		# Timing data for fxReadDevice()
 sendMotorTimes = []			# Timing data for fxSendMotorCommand
 setGainsTimes = []			# Timing data for fxSetGains()
-#####################################################################
-cycleStopTimes = []		# Use to draw a line at end of every period
-data0 = 0				# Contains state of ActPack0 
-data1 = 0				# Contains state of ActPack1
+
+# Plotting:
+cycleStopTimes = []			# Use to draw a line at end of every period
+data0 = 0					# Contains state of ActPack0
+data1 = 0					# Contains state of ActPack1
 
 def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 		positionAmplitude = 10000, currentAmplitude = 2500,
@@ -91,8 +92,6 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 		fxStartStreaming(devId1, commandFreq, dataLog)
 		print('Connected to device with Id:', devId1)
 
-	############# Main Code ############
-
 	# Get initial position:
 	print('Reading initial position...')
 
@@ -110,7 +109,7 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 		print("Initial position 1:", initialPos1)
 
 	# Generate control profiles
-	print('Genating 3x Command tables...')
+	print('Generating 3x Command tables...')
 	positionSamples = sinGenerator(positionAmplitude, positionFreq, commandFreq)
 	currentSamples = sinGenerator(currentAmplitude, currentFreq, commandFreq)
 	currentSamplesLine = lineGenerator(0, 0.15, commandFreq)
@@ -154,7 +153,6 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 				#print(np.int64(linSamples))
 
 				for sample in linSamples:
-
 					sleep(delay_time)
 					sendAndTimeCmds(t0, devId0, devId1, secondDevice, initialPos0, initialPos1,
 						current0 = 0, current1 = 0, motorCmd = FxPosition,
@@ -177,7 +175,6 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 					current0 = 0, current1 = 0, motorCmd = FxPosition,
 					position0 = sample + initialPos0, position1 = sample + initialPos1,
 					posReq = 0, setGains = False)
-
 				i = i + 1
 
 			# Step 3: set current controller
@@ -207,7 +204,6 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 					current0 = compensatedSample, current1 = compensatedSample,
 					motorCmd = FxCurrent, position0 = 0, position1 = 0,
 					posReq = 0, setGains = False)
-
 				i = i + 1
 				
 			# Step 5: short pause at 0 current to allow a slow-down
@@ -247,9 +243,9 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 	print("Requested command frequency:"+"{:.2f}".format(commandFreq))
 	print("Actual command frequency (Hz):"+"{:.2f}".format(command_frequency))
 	print("")
-	print('currentSamplesLine:',		len(currentSamplesLine))
-	print('size(times):',			len(times))
-	print('size(currentRequests):',	len(currentRequests))
+	print('currentSamplesLine:',len(currentSamplesLine))
+	print('size(times):',len(times))
+	print('size(currentRequests):',len(currentRequests))
 	print('size(currentMeasurements0):',	len(currentMeasurements0))
 	print('size(setGainsTimes):',		len(setGainsTimes))
 	print('')
