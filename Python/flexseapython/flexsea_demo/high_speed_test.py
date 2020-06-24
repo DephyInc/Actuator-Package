@@ -17,26 +17,12 @@ class signal(Enum):
 	sine = 1
 	line = 2
 
-# Generate a sine wave of a specific amplitude and frequency
-def sinGenerator(amplitude, frequency, commandFreq):
-	num_samples = commandFreq / frequency
-	print("number of samples is: ", int(num_samples))
-	in_array = np.linspace(-np.pi, np.pi, int(num_samples))
-	sin_vals = amplitude * np.sin(in_array)
-	return sin_vals
-
-# Generate a line with specific amplitude
-def lineGenerator(amplitude, commandFreq):
-	num_samples = commandFreq
-	line_vals = [ amplitude for i in range(num_samples) ]
-	return line_vals
-
 def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
-	signalType = signal.sine, commandFreq = 1000, signalAmplitude = 1000, numberOfLoops = 30,
+	signalType = signal.sine, commandFreq = 1000, signalAmplitude = 1000, numberOfLoops = 4,
 	signalFreq = 5, cycleDelay = 0.1, requestJitter = False, jitter = 20):
 	"""
 	baudRate		Baud rate of outgoing serial connection to ActPack
-	port			Port with outgoing serial connection to ActPack
+	portX			Port with outgoing serial connection to ActPack
 	controllerType	Position controller or current controller
 	signalType		Sine wave or line
 	commandFreq		Desired frequency of issuing commands to controller, actual 
@@ -49,6 +35,8 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
 	requestJitter	Add jitter amount to every other sample sent to controller
 	jitter			Amount of jitter
 	"""
+
+	# One vs two devices
 	secondDevice = False
 	if(port1 != ""):
 		secondDevice = True
@@ -99,7 +87,7 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
 		samples = sinGenerator(signalAmplitude, signalFreq, commandFreq)
 		signalTypeStr = "sine wave"
 	elif(signalType == signal.line):
-		samples = lineGenerator(signalAmplitude, commandFreq)
+		samples = lineGenerator(signalAmplitude, 1, commandFreq)
 		signalTypeStr = "line"
 	else:
 		assert 0
