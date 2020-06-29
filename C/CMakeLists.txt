@@ -6,19 +6,22 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 include_directories(
-	${CMAKE_CURRENT_SOURCE_DIR}/../inc
+	"${CMAKE_CURRENT_SOURCE_DIR}/inc"
+	"${CMAKE_CURRENT_SOURCE_DIR}/../inc"
+	"${CMAKE_CURRENT_SOURCE_DIR}/src"
 )
 
 set(CSCRIPT_SRCS
 	main.cpp
-	readOnly.cpp
+	"${CMAKE_CURRENT_SOURCE_DIR}/src/readonly.cpp"
+		"${CMAKE_CURRENT_SOURCE_DIR}/src/fxUtil.cpp"
 	#open_speed_example.cpp
 	#current_control.cpp
 	#hold_position_example.cpp
 	#findpolesexample.cpp
 	#two_dev_position_example.cpp
 	#leaderfollower.cpp
-	utils.h
+	"${CMAKE_CURRENT_SOURCE_DIR}/inc/utils.h"
 )
 
 add_executable(main ${CSCRIPT_SRCS})
