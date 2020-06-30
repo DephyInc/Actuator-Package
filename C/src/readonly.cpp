@@ -1,17 +1,4 @@
 #include "readonly.h"
-#include "fxUtil.h"
-
-#include <chrono>
-#include <thread>
-#include <iostream>
-#include "utils.h"
-#include "device_wrapper.h"
-
-#define TIME_STEP .1 //in seconds
-#define TIME 8
-
-using namespace std;
-using namespace std::literals::chrono_literals;
 
 /*void displayState(ActPackState& state)
 {
@@ -53,7 +40,7 @@ void init_actPackState(ActPackState* state)
 
 }
 
-void runReadAll(int devId, bool *shouldQuit)
+void runReadOnly(int devId, bool *shouldQuit)
 {
     cout << "\n Running the READ-ALL Demo\n" << endl;
     //
@@ -67,24 +54,25 @@ void runReadAll(int devId, bool *shouldQuit)
 
 
     //get the app type
-    FxAppType apptype=fxGetAppType(devId);
+    FxAppType apptype;
+    apptype=fxGetAppType(devId);
 
     switch(apptype)
     {
         case FxActPack:
             cout << "Your device is an ActPack.";
             break;
-        case:FxExo
+        case FxExo:
             cout << "Your device is an Exo or ActPack Plus.";
             break;
-        case:FxNetMaster:
+        case FxNetMaster:
             cout << "Your device is a NetMaster.  ";
             break;
-        case:FxBMS
+        case FxBMS:
             cout << "Your device is a BMS.  ";
             break;
         default:
-            cout << "Unknown device Type.  Exiting... "
+            cout << "Unknown device Type.  Exiting... ";
             return;
     }
 
@@ -92,11 +80,10 @@ void runReadAll(int devId, bool *shouldQuit)
     getchar();
 
     // Read and display the data
-    //
-    ActPackState actPackState;
-    ExoState exoState;
-    NetMasterState netMasterState;
-    BMSState bmsState;
+    struct ActPackState actPackState;
+    struct ExoState exoState;
+    struct NetMasterState netMasterState;
+    struct BMSState bmsState;
 
     init_actPackState(&actPackState);
     //while(!(*shouldQuit))
@@ -104,21 +91,23 @@ void runReadAll(int devId, bool *shouldQuit)
     for(int index=0;index<reps ;index++)
     {
 
-	this_thread::sleep_for(100ms);
-	clearScreen();
-	if(apptype==FxActPack)
-    {
-        fxReadDevice(devId, &actPackState);
-        printDevice(&actPackState);
-        cout << endl;
-    }else if(appType==FxExo)
-    {
-        fxReadDevice(devId, &exoState);
-        printDevice(&exoState);
+        this_thread::sleep_for(100ms);
+        clearScreen();
+        if (apptype == FxActPack || apptype==FxExo)
+        {
+            fxReadDevice(devId, &actPackState);
+            printDevice(&actPackState);
+            cout << endl;
+        } else if (apptype == FxNetMaster)
+        {
+            fxReadNetMasterDevice(devId, &netMasterState);
+            printDevice(&netMasterState);
+        } else if (apptype == FxBMS)
+        {
+            fxReadBMSDevice(devId, &bmsState);
+            printDevice(&bmsState);
+        }
     }
 
-
-
-    }
     fxStopStreaming(devId);
 }

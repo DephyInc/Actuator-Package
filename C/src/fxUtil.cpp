@@ -48,25 +48,45 @@ void printDevice(struct NetMasterState *netMasterState)
 {
     cout<<"[ Printing Exo/Actpack Plus ]\n";
     cout<<"State time:           "<<netMasterState->state_time<<"\n";
-    cout<<"Accel X:              "<<netMasterState->genvar_0<<"\n";
-    cout<<"Accel Y:              "<<netMasterState->genvar_1<<"\n";
-    cout<<"Accel Z:              "<<netMasterState->genvar_2<<"\n";
-    cout<<"Gyro X:               "<<netMasterState->genvar_3<<"\n";
-    cout<<"Gyro Y:               "<<netMasterState->status<<"\n";
-    cout<<"Gyro Z:               "<<netMasterState->a_accelx<<"\n";
-    cout<<"Motor Angle:          "<<netMasterState->a_gyrox<<"\n";
-    cout<<"Motor Voltage (mV):   "<<netMasterState->mot_volt<<"\n";
-    cout<<"Battery Current (mA): "<<netMasterState->batt_curr<<"\n";
-    cout<<"Battery Voltage (mV): "<<netMasterState->batt_volt<<"\n";
-    cout<<"Battery Temp (C):     "<<netMasterState->temperature<<"\n";
-    cout<<"GenVar 0:             "<<netMasterState->a_accelx"\n";
-    cout<<"GenVar 1:             "<<netMasterState->a_gyrox<<"\n";
-    cout<<"GenVar 2:             "<<netMasterState->b_accelx<<"\n";
-    cout<<"GenVar 3:             "<<netMasterState->b_gyrox<<"\n";
-    cout<<"GenVar 4:             "<<netMasterState->c_accelx<<"\n";
-    cout<<"GenVar 5:             "<<netMasterState->c_gyrox<<"\n";
-    cout<<"GenVar 6:             "<<netMasterState->d_accelx<<"\n";
-    cout<<"GenVar 7:             "<<netMasterState->d_gyrox<<"\n";
-    cout<<"GenVar 8:             "<<netMasterState->genvar_8<<"\n";
-    cout<<"GenVar 9:             "<<netMasterState->genvar_9<<"\n";
+    cout<<"GenVar[0]:            "<<netMasterState->genvar_0<<"\n";
+    cout<<"GenVar[1]:            "<<netMasterState->genvar_1<<"\n";
+    cout<<"GenVar[2]:            "<<netMasterState->genvar_2<<"\n";
+    cout<<"GenVar[3]:            "<<netMasterState->genvar_3<<"\n";
+    cout<<"Status:               "<<netMasterState->status<<"\n";
+    cout<<"NetNode 0 - AccelX:   "<<netMasterState->a_accelx<<", accely:  "<<netMasterState->a_accely<<", accelz: "<<netMasterState->a_accelz<<"\n";
+    cout<<"NetNode 0 - GyroX:    "<<netMasterState->a_gyrox <<", gyroY:   "<<netMasterState->a_gyroy <<",  gyroZ: "<<netMasterState->a_gyroz<<"\n";
+    cout<<"NetNode 1 - AccelX:   "<<netMasterState->b_accelx<<", accely:  "<<netMasterState->b_accely<<", accelz: "<<netMasterState->b_accelz<<"\n";
+    cout<<"NetNode 1 - GyroX:    "<<netMasterState->b_gyrox <<", gyroY:   "<<netMasterState->b_gyroy <<",  gyroZ: "<<netMasterState->b_gyroz<<"\n";
+    cout<<"NetNode 2 - AccelX:   "<<netMasterState->c_accelx<<", accely:  "<<netMasterState->c_accely<<", accelz: "<<netMasterState->c_accelz<<"\n";
+    cout<<"NetNode 2 - GyroX:    "<<netMasterState->c_gyrox <<", gyroY:   "<<netMasterState->c_gyroy <<",  gyroZ: "<<netMasterState->c_gyroz<<"\n";
+    cout<<"NetNode 3 - AccelX:   "<<netMasterState->d_accelx<<", accely:  "<<netMasterState->d_accely<<", accelz: "<<netMasterState->d_accelz<<"\n";
+    cout<<"NetNode 3 - GyroX:    "<<netMasterState->d_gyrox <<", gyroY:   "<<netMasterState->d_gyroy <<",  gyroZ: "<<netMasterState->d_gyroz<<"\n";
+    cout<<"NetNode 4 - AccelX:   "<<netMasterState->e_accelx<<", accely:  "<<netMasterState->e_accely<<", accelz: "<<netMasterState->e_accelz<<"\n";
+    cout<<"NetNode 4 - GyroX:    "<<netMasterState->e_gyrox <<", gyroY:   "<<netMasterState->e_gyroy <<",  gyroZ: "<<netMasterState->e_gyroz<<"\n";
+    cout<<"NetNode 5 - AccelX:   "<<netMasterState->f_accelx<<", accely:  "<<netMasterState->f_accely<<", accelz: "<<netMasterState->f_accelz<<"\n";
+    cout<<"NetNode 5 - GyroX:    "<<netMasterState->f_gyrox <<", gyroY:   "<<netMasterState->f_gyroy <<",  gyroZ: "<<netMasterState->f_gyroz<<"\n";
+    cout<<"NetNode 6 - AccelX:   "<<netMasterState->g_accelx<<", accely:  "<<netMasterState->g_accely<<", accelz: "<<netMasterState->g_accelz<<"\n";
+    cout<<"NetNode 6 - GyroX:    "<<netMasterState->g_gyrox <<", gyroY:   "<<netMasterState->g_gyroy <<",  gyroZ: "<<netMasterState->g_gyroz<<"\n";
+    cout<<"NetNode 7 - AccelX:   "<<netMasterState->h_accelx<<", accely:  "<<netMasterState->h_accely<<", accelz: "<<netMasterState->h_accelz<<"\n";
+    cout<<"NetNode 7 - GyroX:    "<<netMasterState->h_gyrox <<", gyroY:   "<<netMasterState->h_gyroy <<",  gyroZ: "<<netMasterState->h_gyroz<<"\n";
+}
+
+void printDevice(struct BMSState *bmsState)
+{
+    cout<<"[ Printing BMS ]\n";
+    cout<<"State time:      "<<bmsState->state_time<<"\n";
+    cout<<"Cell 0 mV:       "<<bmsState->cells_0_mv<<"\n";
+    cout<<"Cell 1 mV:       "<<bmsState->cells_1_mv<<"\n";
+    cout<<"Cell 2 mV:       "<<bmsState->cells_2_mv<<"\n";
+    cout<<"Cell 3 mV:       "<<bmsState->cells_3_mv<<"\n";
+    cout<<"Cell 4 mV:       "<<bmsState->cells_4_mv<<"\n";
+    cout<<"Cell 5 mV:       "<<bmsState->cells_5_mv<<"\n";
+    cout<<"Cell 6 mV:       "<<bmsState->cells_6_mv<<"\n";
+    cout<<"Cell 7 mV:       "<<bmsState->cells_7_mv<<"\n";
+    cout<<"Cell 8 mV:       "<<bmsState->cells_8_mv<<"\n";
+    cout<<"Current:         "<<bmsState->current<<"\n";
+    cout<<"timer:           "<<bmsState->timer<<"\n";
+    cout<<"temp 0:          "<<bmsState->temp_0_<<"\n";
+    cout<<"temp 1:          "<<bmsState->temp_1_<<"\n";
+    cout<<"temp 2:          "<<bmsState->temp_2_<<"\n";
 }

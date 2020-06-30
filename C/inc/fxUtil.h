@@ -3,9 +3,12 @@
 
 #include <iostream>
 #include "device_wrapper.h"
+#include "exo_struct.h"
+#include "actpack_struct.h"
+#include "netmaster_struct.h"
+#include "bms_struct.h"
 
 using namespace std;
-struct ActPackState;
 
 /// \brief Prints ActPack data
 ///
