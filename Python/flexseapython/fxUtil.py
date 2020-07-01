@@ -15,20 +15,17 @@ def printPlotExit():
 	if (os.name == 'nt'):
 		print('\nIn Windows, press Ctrl+BREAK to exit. Ctrl+C may not work.')
 
-def printDevice(actPackState: ActPackState):
-	print('[ Printing Actpack ]\n')
-	print('State time:           ', actPackState.timestamp)
-	print('Accel X:              ', actPackState.accelx)
-	print('Accel Y:              ', actPackState.accely)
-	print('Accel Z:              ', actPackState.accelz)
-	print('Gyro X:               ', actPackState.gyrox)
-	print('Gyro Y:               ', actPackState.gyroy)
-	print('Gyro Z:               ', actPackState.gyroz)
-	print('Motor angle:          ', actPackState.encoderAngle)
-	print('Motor voltage (mV):   ', actPackState.motorVoltage)
-	print('Battery Current (mA): ', actPackState.batteryCurrent)
-	print('Battery Voltage (mV): ', actPackState.batteryVoltage)
-	print('Battery Temp (C):     ', actPackState.batteryTemp)
+def printDeviceAll(device, appType):
+	if (appType == FxActPack):
+		printDevice(Device)
+	elif (appType == FxNetMaster):
+		printNetmaster(device)
+	elif (appType == FxBMS):
+		printBMS(device)
+	elif (appType == FxExo):
+		printExo(device)
+	else:
+		raise RuntimeError('Unsupported application type: ', appType)
 
 def printExo(exoState: ExoState):
 	print('[ Printing Exo/ActPack Plus ]\n')
@@ -57,6 +54,21 @@ def printExo(exoState: ExoState):
 	print('genVar[9]:            ', exoState.genVar[9])
 	print('Ankle angle:          ', exoState.ankleAngle)
 	print('Ankle velocity:       ', exoState.ankleVelocity)
+
+def printDevice(actPackState: ActPackState):
+	print('[ Printing Actpack ]\n')
+	print('State time:           ', actPackState.timestamp)
+	print('Accel X:              ', actPackState.accelx)
+	print('Accel Y:              ', actPackState.accely)
+	print('Accel Z:              ', actPackState.accelz)
+	print('Gyro X:               ', actPackState.gyrox)
+	print('Gyro Y:               ', actPackState.gyroy)
+	print('Gyro Z:               ', actPackState.gyroz)
+	print('Motor angle:          ', actPackState.encoderAngle)
+	print('Motor voltage (mV):   ', actPackState.motorVoltage)
+	print('Battery Current (mA): ', actPackState.batteryCurrent)
+	print('Battery Voltage (mV): ', actPackState.batteryVoltage)
+	print('Battery Temp (C):     ', actPackState.batteryTemp)
 
 def printNetMaster(netMasterState: NetMasterState):
 	print('[ Printing NetMaster ]\n')

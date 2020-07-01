@@ -39,21 +39,8 @@ def fxReadOnly(port, baudRate, time = 8, time_step = 0.1):
 		printLoopCount(i, totalLoopCount)
 		sleep(time_step)
 		clearTerminal()
-		if (appType == FxActPack):
-			myData = fxReadDevice(devId)
-			printDevice(myData)
-		elif (appType == FxNetMaster):
-			myData = fxReadNetMasterDevice(devId)
-			printNetMaster(myData)
-		elif (appType == FxBMS):
-			fxReadBMSDevice(devId)
-			printBMSState(devId)
-		elif (appType == FxExo):
-			myData = fxReadExoDevice(devId)
-			printExo(myData)
-		else:
-			raise RuntimeError('Unsupported application type: ', appType)
-
+		myData = fxReadDevice(devId)
+		printDeviceAll(myData, appType)
 	fxClose(devId)
 	return True
 

@@ -305,15 +305,34 @@ def fxReadDevice(devId):
 	"""
 	global flexsea
 
-	actPackState = ActPackState();
-	retCode = flexsea.fxReadDevice(devId, byref(actPackState))
+	#get the device type
+	appType = fxGetAppType(devId)
+
+	if (appType == FxActPack):
+		print('actpack\n')
+		deviceState = ActPackState();
+		retCode = flexsea.fxReadDevice(devId, byref(deviceState))
+	elif (appType == FxNetMaster):
+		print('netmaster\n')
+		deviceState = NetMasterState();
+		retCode = flexsea.fxReadNetMasterDevice(devId, byref(deviceState))
+	elif (appType == FxBMS):
+		print('bms\n')
+		deviceState = BMSState();
+		retCode = flexsea.fxReadBMSDevice(devId, byref(deviceState))
+	elif (appType == FxExo):
+		print('exo\n')
+		deviceState = ExoState();
+		retCode = flexsea.fxReadExoDevice(devId, byref(deviceState))
+	else:
+		raise RuntimeError('Unsupported application type: ', appType)
 
 	if (retCode == FxInvalidDevice):
 		raise ValueError('fxReadDevice: invalid device ID')
 	elif (retCode == FxNotStreaming):
 		raise RuntimeError('fxReadDevice: no read data')
 
-	return actPackState
+	return deviceState
 
 def fxReadExoDevice(devId):
 	"""
