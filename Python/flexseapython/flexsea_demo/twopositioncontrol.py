@@ -50,7 +50,7 @@ def fxTwoPositionControl(port, baudRate, expTime = 13, time_step = 0.1,
 		print('Desired:              ', positions[current_pos])
 		print('Measured:             ', measuredPos)
 		print('Difference:           ', (measuredPos - positions[current_pos]), '\n')
-		printDevice(actPackState)
+		printDevice(actPackState,FxActPack)
 		
 		if i % transition_steps == 0:
 			current_pos = (current_pos + 1) % num_pos

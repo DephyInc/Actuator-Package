@@ -44,13 +44,13 @@ def fxTwoDevicePositionControl(port0, baudRate, port1):
 		print('Desired:              ', initialAngle0)
 		print('Measured:             ', currentAngle0)
 		print('Difference:           ', currentAngle0 - initialAngle0, '\n')
-		printDevice(actPackState0)
+		printDevice(actPackState0,FxActPack)
 
 		print('\nDevice 1:\n---------\n')
 		print('Desired:              ', initialAngle1)
 		print('Measured:             ', currentAngle1)
 		print('Difference:           ', currentAngle1 - initialAngle1, '\n', flush=True)
-		printDevice(actPackState1)
+		printDevice(actPackState1,FxActPack)
 
 		printLoopCount(i, num_time_steps)
 

@@ -42,9 +42,9 @@ def fxLeaderFollower(leaderPort, baudRate, followerPort):
 			diff = angle0 - initialAngle0
 			fxSendMotorCommand(devId1, FxPosition, initialAngle1 + diff)
 			print('Device', devId1, 'following device',  devId0, '\n')
-			printDevice(followerData)
+			printDevice(followerData,FxActPack)
 			print('')	# Empty line
-			printDevice(leaderData)
+			printDevice(leaderData, FxActPack)
 			printLoopCount(i, loopCount)
 
 	except Exception as e:

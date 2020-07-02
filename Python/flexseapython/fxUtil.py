@@ -15,9 +15,9 @@ def printPlotExit():
 	if (os.name == 'nt'):
 		print('\nIn Windows, press Ctrl+BREAK to exit. Ctrl+C may not work.')
 
-def printDeviceAll(device, appType):
+def printDevice(device, appType):
 	if (appType == FxActPack):
-		printDevice(Device)
+		printActPack(device)
 	elif (appType == FxNetMaster):
 		printNetmaster(device)
 	elif (appType == FxBMS):
@@ -55,7 +55,7 @@ def printExo(exoState: ExoState):
 	print('Ankle angle:          ', exoState.ankleAngle)
 	print('Ankle velocity:       ', exoState.ankleVelocity)
 
-def printDevice(actPackState: ActPackState):
+def printActPack(actPackState: ActPackState):
 	print('[ Printing Actpack ]\n')
 	print('State time:           ', actPackState.timestamp)
 	print('Accel X:              ', actPackState.accelx)

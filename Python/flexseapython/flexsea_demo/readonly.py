@@ -40,7 +40,7 @@ def fxReadOnly(port, baudRate, time = 8, time_step = 0.1):
 		sleep(time_step)
 		clearTerminal()
 		myData = fxReadDevice(devId)
-		printDeviceAll(myData, appType)
+		printDevice(myData, appType)
 	fxClose(devId)
 	return True
 

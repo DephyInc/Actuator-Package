@@ -297,7 +297,7 @@ def fxReadDevice(devId):
 	devId (int): The device ID of the device to read from.
 
 	Returns:
-	exoState (ExoState): Contains the most recent data from the device
+	deviceState: Contains the most recent data from the device
 
 	Raises:
 	ValueError if invalid device ID
@@ -309,19 +309,15 @@ def fxReadDevice(devId):
 	appType = fxGetAppType(devId)
 
 	if (appType == FxActPack):
-		print('actpack\n')
 		deviceState = ActPackState();
 		retCode = flexsea.fxReadDevice(devId, byref(deviceState))
 	elif (appType == FxNetMaster):
-		print('netmaster\n')
 		deviceState = NetMasterState();
 		retCode = flexsea.fxReadNetMasterDevice(devId, byref(deviceState))
 	elif (appType == FxBMS):
-		print('bms\n')
 		deviceState = BMSState();
 		retCode = flexsea.fxReadBMSDevice(devId, byref(deviceState))
 	elif (appType == FxExo):
-		print('exo\n')
 		deviceState = ExoState();
 		retCode = flexsea.fxReadExoDevice(devId, byref(deviceState))
 	else:
@@ -386,59 +382,6 @@ def fxReadDeviceAll(devId, dataQueueSize):
 		raise ValueError('fxGetReadDataQueueSize: Invalid device ID')
 	return itemsRead
 
-def fxReadNetMasterDevice(devId):
-	"""
-	Read the most recent data from a streaming FlexSEA NetMaster device stream.
-	IMPORTANT! Must call fxStartStreaming before calling this.
-
-	Parameters:
-	devId (int): The device ID of the device to read from.
-
-	Returns:
-	netMasterState (NetMasterState): Contains the most recent data from the device
-
-	Raises:
-	ValueError if invalid device ID
-	RuntimeError if no read data
-	"""
-	global flexsea
-
-	netMasterState = NetMasterState();
-	retCode = flexsea.fxReadNetMasterDevice(devId, byref(netMasterState))
-
-	if (retCode == FxInvalidDevice):
-		raise ValueError('fxReadDevice: invalid device ID')
-	elif (retCode == FxNotStreaming):
-		raise RuntimeError('fxReadDevice: no read data')
-
-	return netMasterState
-
-def fxReadBMSDevice(devId):
-	"""
-	Read the most recent data from a streaming FlexSEA BMS device stream.
-	IMPORTANT! Must call fxStartStreaming before calling this.
-
-	Parameters:
-	devId (int): The device ID of the device to read from.
-
-	Returns:
-	bmsState (BMSState): Contains the most recent data from the device
-
-	Raises:
-	ValueError if invalid device ID
-	RuntimeError if no read data
-	"""
-	global flexsea
-
-	bmsState = BMSState();
-	retCode = flexsea.fxReadBMSDevice(devId, byref(bmsState))
-
-	if (retCode == FxInvalidDevice):
-		raise ValueError('fxReadDevice: invalid device ID')
-	elif (retCode == FxNotStreaming):
-		raise RuntimeError('fxReadDevice: no read data')
-
-	return bmsState
 
 def fxReadNetMasterDeviceAll(devId, dataQueueSize):
 	"""

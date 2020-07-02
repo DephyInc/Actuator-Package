@@ -40,7 +40,8 @@ def fxCurrentControl(port, baudRate, holdCurrent = [1000], time = 6, time_step =
 			print('Desired  (mA):        ', desCurrent)
 			print('Measured  (mA):       ', actPack.motorCurrent)
 			print('Difference (mA):      ', (actPack.motorCurrent - desCurrent), '\n')
-			printDevice(actPack)
+
+			printDevice(actPack, appType)
 		prevCurrent = current
 
 	print('Turning off current control...')
@@ -54,7 +55,7 @@ def fxCurrentControl(port, baudRate, holdCurrent = [1000], time = 6, time_step =
 		print('Desired  (mA):        ', desCurrent)
 		print('Measured  (mA):       ', actPack.motorCurrent)
 		print('Difference (mA):      ', (actPack.motorCurrent - desCurrent), '\n')
-		printDevice(actPack)
+		printDevice(actPack,appType)
 		sleep(time_step)
 
 	# When we exit we want the motor to be off

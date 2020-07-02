@@ -25,7 +25,8 @@ def sinGenerator(amplitude, frequency, commandFreq):
 	sin_vals = amplitude * np.sin(in_array)
 	return sin_vals
 
-# Generate a line with specific amplitude
+# Generate a line with specific amplitude7
+
 def lineGenerator(amplitude, commandFreq):
 	num_samples = commandFreq
 	line_vals = [ amplitude for i in range(num_samples) ]

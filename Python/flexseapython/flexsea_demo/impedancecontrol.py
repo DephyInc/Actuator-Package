@@ -74,7 +74,7 @@ def fxImpedanceControl(port, baudRate, expTime = 20, time_step = 0.02, delta = 7
 			print('Loop', loop_ctr, 'of', num_time_steps)
 			print('Holding position:', positions[currentPos])
 			print('K =', K, 'B =', B, 'kp =', kp, 'ki =', ki, '\n')
-			printDevice(data)
+			printDevice(data,FxActPack)
 		# Plotting:
 		measurements.append(measuredPos)
 		times.append(time() - t0)
