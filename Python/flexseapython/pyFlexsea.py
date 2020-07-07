@@ -318,6 +318,8 @@ def fxReadDevice(devId):
 		raise ValueError('fxReadDevice: invalid device ID')
 	elif (retCode == FxNotStreaming):
 		raise RuntimeError('fxReadDevice: no read data')
+	elif (retCode == FxFailure):
+		raise IOError('fxReadDevice: command failed')
 
 	return deviceState
 
@@ -372,6 +374,7 @@ def fxReadDeviceAll(devId, dataQueueSize):
 	if (itemsRead == -1):
 		raise ValueError('fxGetReadDataQueueSize: Invalid device ID')
 	return itemsRead
+
 
 
 def fxReadNetMasterDeviceAll(devId, dataQueueSize):
@@ -445,6 +448,8 @@ def fxSetReadDataQueueSize(devId, readDataQueueSize):
 		raise ValueError('fxSetReadDataQueueSize: Invalid device ID')
 	elif (retCode == FxInvalidParam):
 		raise ValueError('fxSetReadDataQueueSize: Invalid readDataQueueSize')
+	elif (retCode == FxFailure):
+		raise IOError('fxSetReadDataQueueSize: command failed')
 
 def fxGetReadDataQueueSize(devId):
 	"""
@@ -489,6 +494,8 @@ def fxSetGains(devId, kp, ki, kd, K, B):
 
 	if (retCode == FxInvalidDevice):
 		raise ValueError('fxSetGains: invalid device ID')
+	elif (retCode == FxFailure):
+		raise IOError('fxsetGains: command failed')
 
 def fxSendMotorCommand(devId, controlMode, value):
 	"""
@@ -516,9 +523,9 @@ def fxSendMotorCommand(devId, controlMode, value):
 
 	if (retCode == FxInvalidDevice):
 		raise ValueError('fxSendMotorCommand: invalid device ID')
-	if (retCode == FxFailure):
+	elif (retCode == FxFailure):
 		raise IOError('fxSendMotorCommand: command failed')
-	if (retCode == FxInvalidParam):
+	elif (retCode == FxInvalidParam):
 		raise ValueError('fxSendMotorCommand: invalid controlType')
 
 def fxGetAppType(devId):
@@ -554,8 +561,11 @@ def fxFindPoles(devId):
 
 	DO NOT USE THIS FUNCTION UNLESS YOU KNOW WHAT YOU ARE DOING
 	"""
-	if (flexsea.fxFindPoles(devId) == FxInvalidDevice):
+	retCode = flexsea.fxFindPoles(devId)
+	if (retCode == FxInvalidDevice):
 		raise ValueError('fxFindPoles: invalid device ID')
+	elif (retCode == FxFailure):
+		raise ValueError('fxFindPoles: command failed')
 
 # Loads the library from the c lib
 def loadFlexsea():
@@ -656,7 +666,7 @@ def loadFlexsea():
 	flexsea.fxSendMotorCommand.restype = c_int
 
 	flexsea.fxGetAppType.argtypes = [c_uint]
-	flexsea.fxSendMotorCommand.restype = c_int
+	flexsea.fxGetAppType.restype = c_int
 
 	return True
 

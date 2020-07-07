@@ -1,5 +1,6 @@
 from flexseapython.pyFlexsea import *
 from time import sleep
+import numpy as np
 import os
 
 # Clears the terminal - use before printing new values
@@ -102,6 +103,25 @@ def printLoopCount(i, total):
 # And some will include the elapsed time
 def printLoopCountAndTime(i, total, elapsed_time):
 	print('\nLoop', i + 1, 'of', total, '- Elapsed time:', int(elapsed_time+0.5), 's', end='\r')
+
+# Generate a sine wave of a specific amplitude and frequency
+def sinGenerator(amplitude, frequency, commandFreq):
+	num_samples = commandFreq / frequency
+	print("number of samples is: ", int(num_samples))
+	in_array = np.linspace(-np.pi, np.pi, int(num_samples))
+	sin_vals = amplitude * np.sin(in_array)
+	return sin_vals
+
+# Generate a line with specific amplitude
+def lineGenerator(amplitude, length, commandFreq):
+	num_samples = np.int32(length * commandFreq)
+	line_vals = [ amplitude for i in range(num_samples) ]
+	return line_vals
+
+# Interpolates between two positions (A to B)
+def linearInterp(a, b, points):
+	lin_array = np.linspace(a, b, points)
+	return lin_array
 
 # By default takes just one device from your com.txt file
 # If two arguments are passed, one is the path of the COM.txt file
