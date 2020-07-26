@@ -4,6 +4,8 @@ import sys
 import platform
 from enum import Enum
 
+from .dev_spec import *
+
 global flexsea
 
 # High Speed Stress/Test Experiments:
