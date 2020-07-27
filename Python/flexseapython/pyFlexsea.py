@@ -4,7 +4,7 @@ import sys
 import platform
 from enum import Enum
 
-from .dev_spec import *
+from .dev_spec import ActPackState, NetMasterState, NetNodeState, BMSState, ExoState
 
 global flexsea
 
@@ -39,118 +39,6 @@ global flexsea
  FxExo,
  FxNetMaster,
  FxBMS) = map(int, range(-1,4))
-
-##################### Redefine ActPackState Structure #################
-# See "actpack_struct.h" for C definition
-
-class ActPackState(Structure):
-	_pack_ = 1
-	_fields_ = [
-			("rigid"	  , c_int),
-			("id"		  , c_int),
-			("timestamp"	  , c_int),
-			("accelx"	  , c_int),
-			("accely"	  , c_int),
-			("accelz"	  , c_int),
-			("gyrox"	  , c_int),
-			("gyroy"	  , c_int),
-			("gyroz"	  , c_int),
-			("encoderAngle"   , c_int),
-			("encoderVelocity", c_int),
-			("encoderAccel"   , c_int),
-			("motorCurrent"   , c_int),
-			("motorVoltage"   , c_int),
-			("batteryVoltage" , c_int),
-			("batteryCurrent" , c_int),
-			("batteryTemp" 	  , c_int),
-			("deviceStatus"   , c_int),
-			("motorStatus"	  , c_int),
-			("batteryStatus"  , c_int),
-			("genVar"    , c_int * 10),
-			("ankleAngle"	  , c_int),
-			("ankleVelocity"  , c_int),
-			("SystemTime"	  , c_int)]
-
-class NetNodeState(Structure):
-	_pack_ = 1
-	_fields_ = [
-			("accelx"	  , c_int),
-			("accely"	  , c_int),
-			("accelz"	  , c_int),
-			("gyrox"	  , c_int),
-			("gyroy"	  , c_int),
-			("gyroz"	  , c_int),
-			("pressure"	  , c_int),
-			("SystemTime"	, c_int)]
-
-class NetMasterState(Structure):
-	_pack_ = 1
-	_fields_ = [
-			("netmaster"	, c_int),
-			("id"		  	, c_int),
-			("timestamp"  	, c_int),
-			("genVar"     	, c_int * 4),
-			("status"	  	, c_int),
-			("netNode"		, NetNodeState * 8),
-			("SystemTime"	, c_int)]
-
-class BMSState(Structure):
-	_pack_ = 1
-	_fields_ = [
-			("bms" 		  		, c_int),
-			("id"		  		, c_int),
-			("timestamp"	  	, c_int),
-			("cellVoltage"     	, c_int * 9),
-			("status"	  		, c_int),
-			("current"	  		, c_int),
-			("timer"	  		, c_int),
-			("balancing"		, c_int),
-			("stackVoltage"		, c_int),
-			("packImbalance"	, c_int),
-			("temperature"		, c_int * 4),
-			("genVar"			, c_int * 4),
-			("SystemTime"		, c_int)]
-
-class ExoState(Structure):
-		_pack_ = 1
-		_fields_ = [
-			("rigid"							, c_int),
-			("id"		  						, c_int),
-			("timestamp"	  					, c_int),
-			("accelx"	  						, c_int),
-			("accely"	  						, c_int),
-			("accelz"	  						, c_int),
-			("gyrox"	  						, c_int),
-			("gyroy"	  						, c_int),
-			("gyroz"	  						, c_int),
-			("encoderAngle"   					, c_int),
-			("encoderVelocity"					, c_int),
-			("encoderAccel"   					, c_int),
-			("motorCurrent"   					, c_int),
-			("motorVoltage"   					, c_int),
-			("batteryVoltage" 					, c_int),
-			("batteryCurrent" 					, c_int),
-			("batteryTemp" 	  					, c_int),
-			("deviceStatus"   					, c_int),
-			("motorStatus"	  					, c_int),
-			("batteryStatus"  					, c_int),
-			("genVar"    						, c_int * 10),
-			("ankleAngle"	  					, c_int),
-			("ankleVelocity"  					, c_int),
-			("global_shank_ang"					, c_int),
-			("ank_pos_x"						, c_int),
-			("ank_pos_y"						, c_int),
-			("ank_pos_z"						, c_int),
-			("ank_linear_vel_x"					, c_int),
-			("ank_linear_vel_y"					, c_int),
-			("ank_linear_vel_z"					, c_int),
-			("ank_torque"						, c_int),
-			("step_energy"						, c_int),
-			("step_time"						, c_int),
-			("gait_state" 						, c_int),
-			("movement"							, c_int),
-			("SystemTime"						, c_int)]
-
 
 ####################### Begin API ##################################
 
