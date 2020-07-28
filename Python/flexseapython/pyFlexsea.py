@@ -4,7 +4,8 @@ import sys
 import platform
 from enum import Enum
 
-from .dev_spec import ActPackState, NetMasterState, NetNodeState, BMSState, ExoState
+from .dev_spec import AllDevices
+
 
 global flexsea
 
@@ -190,16 +191,16 @@ def fxReadDevice(devId):
 	appType = fxGetAppType(devId)
 
 	if (appType == FxActPack):
-		deviceState = ActPackState();
+		deviceState = AllDevices.ActPackState();
 		retCode = flexsea.fxReadDevice(devId, byref(deviceState))
 	elif (appType == FxNetMaster):
-		deviceState = NetMasterState();
+		deviceState = AllDevices.NetMasterState();
 		retCode = flexsea.fxReadNetMasterDevice(devId, byref(deviceState))
 	elif (appType == FxBMS):
-		deviceState = BMSState();
+		deviceState = AllDevices.BMSState();
 		retCode = flexsea.fxReadBMSDevice(devId, byref(deviceState))
 	elif (appType == FxExo):
-		deviceState = ExoState();
+		deviceState = AllDevices.ExoState();
 		retCode = flexsea.fxReadExoDevice(devId, byref(deviceState))
 	else:
 		raise RuntimeError('Unsupported application type: ', appType)
@@ -230,7 +231,7 @@ def fxReadExoDevice(devId):
 	"""
 	global flexsea
 
-	exoState = ExoState();
+	exoState = AllDevices.ExoState();
 	retCode = flexsea.fxReadExoDevice(devId, byref(exoState))
 
 	if (retCode == FxInvalidDevice):
@@ -258,9 +259,9 @@ def fxReadDeviceAll(devId, dataQueueSize):
 	"""
 	global flexsea
 
-	actPackStateDataQueue = [ActPackState() for count in range(dataQueueSize)];
+	AllDevices.ActPackStateDataQueue = [AllDevices.ActPackState() for count in range(dataQueueSize)];
 
-	itemsRead = flexsea.fxReadDeviceAll(devId, byref(actPackStateDataQueue), dataQueueSize)
+	itemsRead = flexsea.fxReadDeviceAll(devId, byref(AllDevices.ActPackStateDataQueue), dataQueueSize)
 	if (itemsRead == -1):
 		raise ValueError('fxGetReadDataQueueSize: Invalid device ID')
 	return itemsRead
@@ -285,9 +286,9 @@ def fxReadNetMasterDeviceAll(devId, dataQueueSize):
 	"""
 	global flexsea
 
-	netMasterStateDataQueue = [NetMasterState() for count in range(dataQueueSize)];
+	AllDevices.NetMasterStateDataQueue = [AllDevices.NetMasterState() for count in range(dataQueueSize)];
 
-	itemsRead = flexsea.fxReadNetMasterDeviceAll(devId, byref(netMasterStateDataQueue), dataQueueSize)
+	itemsRead = flexsea.fxReadNetMasterDeviceAll(devId, byref(AllDevices.NetMasterStateDataQueue), dataQueueSize)
 	if (itemsRead == -1):
 		raise ValueError('fxReadNetMasterDeviceAll: Invalid device ID')
 	return itemsRead
@@ -310,9 +311,9 @@ def fxReadBMSDeviceAll(devId, dataQueueSize):
 	"""
 	global flexsea
 
-	bmsStateDataQueue = [BMSState() for count in range(dataQueueSize)]
+	AllDevices.BMSStateDataQueue = [AllDevices.BMSState() for count in range(dataQueueSize)]
 
-	itemsRead = flexsea.fxReadNetMasterDeviceAll(devId, byref(bmsStateDataQueue), dataQueueSize)
+	itemsRead = flexsea.fxReadNetMasterDeviceAll(devId, byref(AllDevices.BMSStateDataQueue), dataQueueSize)
 	if (itemsRead == -1):
 		raise ValueError('fxReadBMSDeviceAll: Invalid device ID')
 	return itemsRead
@@ -531,16 +532,16 @@ def loadFlexsea():
 	flexsea.fxStopStreaming.argtypes = [c_uint]
 	flexsea.fxStopStreaming.restype = c_int
 
-	flexsea.fxReadDevice.argtypes = [c_uint, POINTER(ActPackState)]
+	flexsea.fxReadDevice.argtypes = [c_uint, POINTER(AllDevices.ActPackState)]
 	flexsea.fxReadDevice.restype = c_int
 
-	flexsea.fxReadDeviceAll.argtypes = [c_uint, POINTER(ActPackState), c_uint]
+	flexsea.fxReadDeviceAll.argtypes = [c_uint, POINTER(AllDevices.ActPackState), c_uint]
 	flexsea.fxReadDeviceAll.restype = c_int
 
-	flexsea.fxReadNetMasterDevice.argtypes = [c_uint, POINTER(NetMasterState)]
+	flexsea.fxReadNetMasterDevice.argtypes = [c_uint, POINTER(AllDevices.NetMasterState)]
 	flexsea.fxReadDevice.restype = c_int
 
-	flexsea.fxReadNetMasterDeviceAll.argtypes = [c_uint, POINTER(NetMasterState), c_uint]
+	flexsea.fxReadNetMasterDeviceAll.argtypes = [c_uint, POINTER(AllDevices.NetMasterState), c_uint]
 	flexsea.fxReadNetMasterDeviceAll.restype = c_int
 
 	flexsea.fxSetReadDataQueueSize.argtypes = [c_uint, c_uint]
