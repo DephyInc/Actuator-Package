@@ -1,6 +1,7 @@
 from signal import signal, SIGINT
 import os
 import sys
+import pandas
 
 C_STRUCTS_DIR = os.path.join(os.getcwd(),"..","inc")
 PYTHON_DIR = os.path.join(os.getcwd(),"flexseapython", "dev_spec")
@@ -20,13 +21,38 @@ def find_files(file_path, ignore_list, strip_characters):
     files_found = [file[:-len(strip_characters)] for file in files_found]
     return files_found
 
+def get_py_fields(filename):
+    filename = os.path.join(SPECS_DIR,filename)
+    print("\n>>> IN-PROCESS: Extracting fields from python state file: " + filename)
+    return
+
+def get_spec_fields(filename):
+    filename = os.path.join(SPECS_DIR,filename)
+    print("\n>>> IN-PROCESS: Extracting fields from spec CSV file: " + filename)
+    fields = []
+    try:
+        # read fields
+        with open(filename) as spec_file:
+            fields = pandas.read_csv(filename, usecols=[0])[1:]
+    except FileNotFoundError as e:
+        sys.exit("ERR: " + filename + " was not found at " + SPECS_DIR + " -- Exiting Script")
+    print("\n>>> INFO: " + str(len(list(fields.variable_label))) + " Fields detected in " + filename + ": ")
+    print(*fields.variable_label, sep=", ")
+    return list(fields.variable_label)
+
+def get_c_fields(filename):
+    filename = os.path.join(SPECS_DIR,filename)
+    print("\n>>> IN-PROCESS: Extracting fields from c struct file: " + filename)
+    return
+
+
 def validate_struct_files(filename_pairs):
     """print ("Python file: " + os.path.join(PYTHON_DIR,filename_pairs[0]))
     print ("C file: " + os.path.join(C_STRUCTS_DIR,filename_pairs[1]))
-    print ("Spec file: " + os.path.join(SPECS_DIR,filename_pairs[2]))
+    print ("Spec file: " + os.path.join(SPECS_DIR,filename_pairs[2]))"""
     py_fields = get_py_fields(filename_pairs[0])
     c_fields = get_c_fields(filename_pairs[1])
-    spec_fields = get_spec_fields(filename_pairs[2])"""
+    spec_fields = get_spec_fields(filename_pairs[2])
     return
 
 if __name__ == '__main__':
@@ -76,13 +102,16 @@ if __name__ == '__main__':
         #validate single struct file
         all_python_files = find_files(PYTHON_DIR, IGNORE_FILES, "State.py")
         all_c_files = find_files(C_STRUCTS_DIR, IGNORE_FILES, "_struct.h")
+        all_spec_files = find_files(SPECS_DIR, IGNORE_FILES, "_specs.csv")
         if sys.argv[1].lower() in [file.lower() for file in all_python_files] and \
             sys.argv[1].lower() in [file.lower() for file in all_c_files]:
             filename_py = [file for file in all_python_files
                            if file.lower() == sys.argv[1].lower()][0]
             filename_c = [file for file in all_c_files
                            if file.lower() == sys.argv[1].lower()][0]
+            filename_spec = [file for file in all_spec_files
+                          if file.lower() == sys.argv[1].lower()][0]
             print("\n>>> INFO: Matching struct file found for: " )
-            filename_pairs = (filename_py + "State.py", filename_c + "_struct.h")
+            filename_pairs = (filename_py + "State.py", filename_c + "_struct.h", filename_spec + "_specs.csv")
             print(*filename_pairs)
             validate_struct_files(filename_pairs)
