@@ -25,7 +25,7 @@ if __name__ == '__main__':
           "\n>>> It only validates the fields of the structs")
     list_of_structs_to_compare = []
 
-    if sys.argv != 2:
+    if len(sys.argv)!= 2:
         sys.exit("\n>>> ERR: Invalid arguments."+ \
                  "\n>>> Usage: python fxStructsValidatePy-C.py all" + \
                  "\n>>>        python fxStructsValidatePy-C.py ActPack" +\
