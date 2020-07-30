@@ -9,24 +9,16 @@ IGNORE_FILES = ['__init__.py', '__pycache__', 'AllDevices.py']
 def sig_handler(frame, signal_received):
     return sys.exit('\nCTRL-C or SIGINT detected\nExiting ...')
 
-def get_py_structs():
+def find_files(file_path, ignore_list, strip_characters):
     #Filter only files that we are concerned with. Endswith: *State.py
-    all_py_files = [file for file in os.listdir(PYTHON_DIR)
-                    if file not in IGNORE_FILES
-                    if file.endswith("State.py")]
+    files_found = [file for file in os.listdir(file_path)
+                    if file not in ignore_list
+                    if file.endswith(strip_characters)]
     #strip filenames
-    all_py_files = [file[:-8].lower() for file in all_py_files ]
-    return all_py_files
+    files_found = [file[:-len(strip_characters)] for file in files_found]
+    return files_found
 
-def get_c_structs():
-    #Filter only files that we are concerned with. Endswith: *struct.h
-    all_c_files = [file for file in os.listdir(C_STRUCTS_DIR)
-                   if file.endswith("_struct.h")]
-    #Strip out "_struct.h" from the end of filename
-    all_c_files = [file[:-9].lower() for file in all_c_files]
-    return all_c_files
-
-def validate_struct_files(struct_filename):
+def validate_struct_files(filename_python, filename_c):
     return
 
 
@@ -41,9 +33,10 @@ if __name__ == '__main__':
                  "\n>>>        python fxStructsValidatePy-C.py BMS" )
 
     if sys.argv[1] == "all":
-        all_python_files = get_py_structs()
-        all_c_files = get_c_structs()
-        files_w_matching_names = set(all_python_files) & set(all_c_files)
+        all_python_files = find_files(PYTHON_DIR, IGNORE_FILES, "State.py")
+        all_c_files = find_files(C_STRUCTS_DIR, IGNORE_FILES, "_struct.h")
+        files_w_matching_names = set([file.lower() for file in all_python_files]) &\
+                                 set([file.lower() for file in all_c_files])
         print("\n>>> INFO: Validating " + str(len(files_w_matching_names)) + \
               " struct file(s): " )
         print(*files_w_matching_names, sep="\t")
