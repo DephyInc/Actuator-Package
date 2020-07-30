@@ -14,22 +14,24 @@ def get_py_structs():
     all_py_files = [file for file in os.listdir(PYTHON_DIR)
                     if file not in IGNORE_FILES
                     if file.endswith("State.py")]
-    print ("\n>>> INFO: " + str(len(all_py_files)) + \
+    #strip filenames
+    all_py_files = [file[:-8] for file in all_py_files ]
+    all_py_files = [file.lower() for file in all_py_files]
+    """print ("\n>>> INFO: " + str(len(all_py_files)) + \
            " Python State file(s) detected at " + PYTHON_DIR + ":")
-    print(*all_py_files, sep=", ")
-    return
+    print(*all_py_files, sep=", ")"""
+    return all_py_files
 
 def get_c_structs():
     #Filter only files that we are concerned with. Endswith: *struct.h
     all_c_files = [file for file in os.listdir(C_STRUCTS_DIR)
-                   if file.endswith("struct.h")]
-    print ("\n>>> INFO: " + str(len(all_c_files)) + \
+                   if file.endswith("_struct.h")]
+    all_c_files = [file[:-9] for file in all_c_files]
+    all_c_files = [file.lower() for file in all_c_files]
+    """print ("\n>>> INFO: " + str(len(all_c_files)) + \
            " C struct file(s) detected at " + C_STRUCTS_DIR+ ":")
-    print(*all_c_files, sep=", ")
-    return
-
-def get_matching_struct_files(python_struct_files, c_struct_files):
-    return
+    print(*all_c_files, sep=", ")"""
+    return all_c_files
 
 def validate_struct_files(struct_filename):
     return
@@ -50,9 +52,11 @@ if __name__ == '__main__':
     if sys.argv[1] == "all":
         all_python_files = get_py_structs()
         all_c_files = get_c_structs()
-        files_w_matching_names = get_matching_struct_files(all_python_files, all_c_files)
-        """print("\n>>> INFO: Validating struct file(s): " + files_w_matching_names)
-        for struct_file in files_w_matching_names:
+        files_w_matching_names = set(all_python_files) & set(all_c_files)
+        print("\n>>> INFO: Validating " + str(len(files_w_matching_names)) + \
+              " struct file(s): " )
+        print(*files_w_matching_names, sep="\t")
+        """for struct_file in files_w_matching_names:
             validate_struct_files(struct_file)"""
 
 
