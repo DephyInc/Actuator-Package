@@ -21,8 +21,12 @@ def find_files(file_path, ignore_list, strip_characters):
     return files_found
 
 def validate_struct_files(filename_pairs):
-    #print ("Python file: " + os.path.join(PYTHON_DIR,filename_pairs[0]))
-    #print ("C file: " + os.path.join(C_STRUCTS_DIR,filename_pairs[1]))
+    """print ("Python file: " + os.path.join(PYTHON_DIR,filename_pairs[0]))
+    print ("C file: " + os.path.join(C_STRUCTS_DIR,filename_pairs[1]))
+    print ("Spec file: " + os.path.join(SPECS_DIR,filename_pairs[2]))
+    py_fields = get_py_fields(filename_pairs[0])
+    c_fields = get_c_fields(filename_pairs[1])
+    spec_fields = get_spec_fields(filename_pairs[2])"""
     return
 
 if __name__ == '__main__':
@@ -54,12 +58,14 @@ if __name__ == '__main__':
         #sort the filenames
         python_files = sorted(all_python_files, key=str.casefold)
         c_files = sorted(all_c_files, key=str.casefold)
+        spec_files = sorted(all_spec_files, key=str.casefold)
         #At this point the list is exactly how we want. So reformat it as required
         all_python_files = [file + "State.py" for file in python_files]
         all_c_files = [file + "_struct.h" for file in c_files]
+        all_spec_files = [file + "_specs.csv" for file in spec_files]
 
         #create pairs of filenames that need to eb validated
-        matching_filename_pairs = list(zip(all_python_files,all_c_files))
+        matching_filename_pairs = list(zip(all_python_files,all_c_files,all_spec_files))
         print("\n>>> INFO: " + str(len(files_w_matching_names)) + " Pairs of matching file(s) found:\n")
         print(*matching_filename_pairs)
         for filename_pairs in matching_filename_pairs:
