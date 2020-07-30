@@ -18,9 +18,10 @@ def find_files(file_path, ignore_list, strip_characters):
     files_found = [file[:-len(strip_characters)] for file in files_found]
     return files_found
 
-def validate_struct_files(filename_python, filename_c):
+def validate_struct_files(filename_pairs):
+    #print ("Python file: " + os.path.join(PYTHON_DIR,filename_pairs[0]))
+    #print ("C file: " + os.path.join(C_STRUCTS_DIR,filename_pairs[1]))
     return
-
 
 if __name__ == '__main__':
     signal(SIGINT, sig_handler)	# Handle Ctrl-C or SIGINT
@@ -37,17 +38,25 @@ if __name__ == '__main__':
         all_c_files = find_files(C_STRUCTS_DIR, IGNORE_FILES, "_struct.h")
         files_w_matching_names = set([file.lower() for file in all_python_files]) &\
                                  set([file.lower() for file in all_c_files])
-        print("\n>>> INFO: Validating " + str(len(files_w_matching_names)) + \
-              " struct file(s): " )
-        print(*files_w_matching_names, sep="\t")
-        """for struct_file in files_w_matching_names:
-            validate_struct_files(struct_file)"""
+        all_python_files = [file for file in all_python_files
+                            if file.lower() in files_w_matching_names]
+        all_c_files = [file for file in all_c_files
+                       if file.lower() in files_w_matching_names]
+        all_python_files.sort()
+        all_c_files.sort()
+        all_python_files = [file + "State.py" for file in all_python_files]
+        all_c_files = [file + "_struct.h" for file in all_c_files]
+
+        matching_filename_pairs = list(zip(all_python_files,all_c_files))
+        print("\n>>> INFO: Tupples of matching file:")
+        print(*matching_filename_pairs)
+        for filename_pairs in matching_filename_pairs:
+            validate_struct_files(filename_pairs)
 
 
     else:
         #validate single struct file
         print("\n>>> INFO: Validating struct file(s): " + sys.argv[1])
-        #validate_struct_files(sys.argv[1])
 
 
 
