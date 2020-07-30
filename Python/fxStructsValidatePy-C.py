@@ -15,22 +15,15 @@ def get_py_structs():
                     if file not in IGNORE_FILES
                     if file.endswith("State.py")]
     #strip filenames
-    all_py_files = [file[:-8] for file in all_py_files ]
-    all_py_files = [file.lower() for file in all_py_files]
-    """print ("\n>>> INFO: " + str(len(all_py_files)) + \
-           " Python State file(s) detected at " + PYTHON_DIR + ":")
-    print(*all_py_files, sep=", ")"""
+    all_py_files = [file[:-8].lower() for file in all_py_files ]
     return all_py_files
 
 def get_c_structs():
     #Filter only files that we are concerned with. Endswith: *struct.h
     all_c_files = [file for file in os.listdir(C_STRUCTS_DIR)
                    if file.endswith("_struct.h")]
-    all_c_files = [file[:-9] for file in all_c_files]
-    all_c_files = [file.lower() for file in all_c_files]
-    """print ("\n>>> INFO: " + str(len(all_c_files)) + \
-           " C struct file(s) detected at " + C_STRUCTS_DIR+ ":")
-    print(*all_c_files, sep=", ")"""
+    #Strip out "_struct.h" from the end of filename
+    all_c_files = [file[:-9].lower() for file in all_c_files]
     return all_c_files
 
 def validate_struct_files(struct_filename):
@@ -40,9 +33,7 @@ def validate_struct_files(struct_filename):
 if __name__ == '__main__':
     signal(SIGINT, sig_handler)	# Handle Ctrl-C or SIGINT
 
-    print('\n>>> Actuator Package Python Demo Scripts : Validates Python and C structs.<<<'+\
-          "\n>>> It only validates the fields of the structs")
-
+    print('\n>>> Actuator Package Python Demo Scripts : Validates Python and C structs.<<<')
     if len(sys.argv)!= 2:
         sys.exit("\n>>> ERR: Invalid arguments."+ \
                  "\n>>> Usage: python fxStructsValidatePy-C.py all" + \
