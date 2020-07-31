@@ -34,7 +34,12 @@ def get_spec_fields(filename):
             fields = pandas.read_csv(filename, usecols=[0])[1:]
     except FileNotFoundError as e:
         sys.exit("ERR - " + filename + " was not found at " + SPECS_DIR + " -- Exiting Script")
-    return list(fields.variable_label)
+
+    #formatting name for accommodation of variation if field names in python and c structs
+    spec_fields = [field.replace('[', r'_').replace(']', r'_').replace('.', r'').lower() for field in
+              list(fields.variable_label)]
+    return spec_fields
+
 
 def extract_py_fields(ast_fields):
     fields = []
@@ -139,19 +144,28 @@ def validate_struct_files(filename_pairs):
     print("-----------------------------------------------------------------------------")
     print(">>>>> INFO - Attempting Validation for filenames: ", *filename_pairs)
     spec_fields = get_spec_fields(filename_pairs[2])
-    #print(">>>>> INFO - ", len(spec_fields), " Fields extracted")
-    #print(">>>>> INFO - Fields: ", *spec_fields)
+    spec_fields = sorted(spec_fields, key=str.casefold)
+    print(">>>>> INFO - ", len(spec_fields), " Fields extracted")
+    print(">>>>> INFO - Fields: ", *spec_fields)
     py_fields = get_py_fields(filename_pairs[0])
-    #print(">>>>> INFO - ", len(py_fields), " Fields extracted")
-    #print(">>>>> INFO - Fields: ", *py_fields)
+    py_fields = sorted(py_fields, key=str.casefold)
+    print(">>>>> INFO - ", len(py_fields), " Fields extracted")
+    print(">>>>> INFO - Fields: ", *py_fields)
     c_fields = get_c_fields(filename_pairs[1])
-    #print(">>>>> INFO - ", len(c_fields), " Fields extracted")
-    #print(">>>>> INFO - Fields: ", *c_fields)
+    c_fields = sorted(c_fields, key=str.casefold)
+    print(">>>>> INFO - ", len(c_fields), " Fields extracted")
+    print(">>>>> INFO - Fields: ", *c_fields)
+    matching_fields = set(spec_fields) & set(py_fields) & set(c_fields)
+    print(">>>>> INFO - ", len(matching_fields), " fields were found in common!")
     if len(spec_fields) == len(py_fields)\
         and len(spec_fields) == len(c_fields):
-        print(">>> VALIDATION SUCCESS - Good news. Length validation of fields in spec, struct and python class files were successful. That is all three files have the same number of fields!")
+        print(">>> VALIDATION(1) SUCCESS - Good news. Length validation of fields in spec, struct and python class files were successful. That is all three files have the same number of fields!")
     else:
-        print(">>> VALIDATION FAILURE - Bad news. Complete validation was not successful")
+        print(">>> VALIDATION(1) FAILURE - Bad news. Complete validation was not successful")
+    if len(spec_fields) == len(matching_fields):
+        print(">>> VALIDATION(2) SUCCESS - Good news. All fields are matching in all three files!")
+    else:
+        print(">>> VALIDATION(2) FAILURE - Bad news. Field validation error. Could not validate individual field")
     print("-----------------------------------------------------------------------------")
     return
 
