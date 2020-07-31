@@ -2,6 +2,7 @@ from signal import signal, SIGINT
 import os
 import sys
 import pandas
+import ast
 
 C_STRUCTS_DIR = os.path.join(os.getcwd(),"..","inc")
 PYTHON_DIR = os.path.join(os.getcwd(),"flexseapython", "dev_spec")
@@ -21,28 +22,65 @@ def find_files(file_path, ignore_list, strip_characters):
     files_found = [file[:-len(strip_characters)] for file in files_found]
     return files_found
 
-def get_py_fields(filename):
-    filename = os.path.join(SPECS_DIR,filename)
-    print("\n>>> IN-PROCESS: Extracting fields from python state file: " + filename)
-    return
-
 def get_spec_fields(filename):
     filename = os.path.join(SPECS_DIR,filename)
-    print("\n>>> IN-PROCESS: Extracting fields from spec CSV file: " + filename)
+    print("\n>>> IN-PROCESS - Extracting fields from spec CSV file: " + filename)
     fields = []
     try:
         # read fields
         with open(filename) as spec_file:
             fields = pandas.read_csv(filename, usecols=[0])[1:]
     except FileNotFoundError as e:
-        sys.exit("ERR: " + filename + " was not found at " + SPECS_DIR + " -- Exiting Script")
-    print("\n>>> INFO: " + str(len(list(fields.variable_label))) + " Fields detected in " + filename + ": ")
+        sys.exit("ERR - " + filename + " was not found at " + SPECS_DIR + " -- Exiting Script")
+    print("\n>>>>> INFO - " + str(len(list(fields.variable_label))) + " Fields detected in " + filename + ": ")
     print(*fields.variable_label, sep=", ")
     return list(fields.variable_label)
 
+def show_info(classNode):
+    """for node in ast.iter_fields(classNode):
+        print(">>>>> DEBUG - Class node: ", node)
+        print(">>>>> DEBUG - Class node number of target fields: ", node)"""
+    #print(">>>>> DEBUG - Showing Class Info ")
+    all_nodes = [node for node in ast.iter_child_nodes(classNode)]
+    for eachnode in all_nodes:
+        print(">>>>> DEBUG - Class Node: ", eachnode)
+        if isinstance(eachnode, ast.Name) and eachnode.id == "_fields_":
+            print(">>>>> DEBUG - Class variable detected: ", eachnode.id)
+        if isinstance(eachnode,ast.List):
+            fields = [e for e in eachnode.elts]
+            print(">>>>> DEBUG - Class variable value detected: ", *fields)
+
+        #print(">>>>> DEBUG - is of Length: ", str(len(eachnode.targets)))
+
+def get_py_fields(filename):
+    filename = os.path.join(PYTHON_DIR,filename)
+    print("\n>>> IN-PROCESS - Extracting fields from python state file: " + filename)
+    try:
+        with open(filename) as py_file:
+            node = ast.parse(py_file.read())
+    except FileNotFoundError as e:
+        sys.exit("ERR - " + filename + " was not found at " + SPECS_DIR + " -- Exiting Script")
+
+    class_definitions = [n for n in node.body if isinstance(n, ast.ClassDef)]
+
+    if len(class_definitions) == 1:
+        print(">>>>> INFO - " + str(len(class_definitions)) + " class definitions parsed!")
+        for class_ in class_definitions:
+            print(">>>>> INFO - Class name detected: ", class_.name)
+            print(">>>>> INFO - Class has ", len(class_.body), " fields")
+            if len(class_.body) != 2:
+                print("ERR: Bad parsong! Something has changed. Contact the developers!")
+                return
+            else:
+                show_info(class_.body[1])
+    else:
+        print("ERR: Bad parsing in py files! Something has changed. Contact the developers!")
+
+    return
+
 def get_c_fields(filename):
     filename = os.path.join(SPECS_DIR,filename)
-    print("\n>>> IN-PROCESS: Extracting fields from c struct file: " + filename)
+    print("\n>>> IN-PROCESS - Extracting fields from c struct file: " + filename)
     return
 
 
@@ -50,9 +88,11 @@ def validate_struct_files(filename_pairs):
     """print ("Python file: " + os.path.join(PYTHON_DIR,filename_pairs[0]))
     print ("C file: " + os.path.join(C_STRUCTS_DIR,filename_pairs[1]))
     print ("Spec file: " + os.path.join(SPECS_DIR,filename_pairs[2]))"""
+    print("-----------------------------------------------------------------------------")
+    spec_fields = get_spec_fields(filename_pairs[2])
     py_fields = get_py_fields(filename_pairs[0])
     c_fields = get_c_fields(filename_pairs[1])
-    spec_fields = get_spec_fields(filename_pairs[2])
+    print("-----------------------------------------------------------------------------")
     return
 
 if __name__ == '__main__':
@@ -60,7 +100,7 @@ if __name__ == '__main__':
 
     print('\n>>> Actuator Package Python Demo Scripts : Validates Python and C structs.<<<')
     if len(sys.argv)!= 2:
-        sys.exit("\n>>> ERR: Invalid arguments."+ \
+        sys.exit("\nERR - Invalid arguments."+ \
                  "\n>>> Usage: python fxStructsValidatePy-C.py all" + \
                  "\n>>>        python fxStructsValidatePy-C.py ActPack" +\
                  "\n>>>        python fxStructsValidatePy-C.py BMS" )
