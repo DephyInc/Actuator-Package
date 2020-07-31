@@ -32,25 +32,33 @@ def get_spec_fields(filename):
             fields = pandas.read_csv(filename, usecols=[0])[1:]
     except FileNotFoundError as e:
         sys.exit("ERR - " + filename + " was not found at " + SPECS_DIR + " -- Exiting Script")
-    print("\n>>>>> INFO - " + str(len(list(fields.variable_label))) + " Fields detected in " + filename + ": ")
-    print(*fields.variable_label, sep=", ")
     return list(fields.variable_label)
 
-def show_info(classNode):
-    """for node in ast.iter_fields(classNode):
-        print(">>>>> DEBUG - Class node: ", node)
-        print(">>>>> DEBUG - Class node number of target fields: ", node)"""
-    #print(">>>>> DEBUG - Showing Class Info ")
-    all_nodes = [node for node in ast.iter_child_nodes(classNode)]
-    for eachnode in all_nodes:
-        print(">>>>> DEBUG - Class Node: ", eachnode)
-        if isinstance(eachnode, ast.Name) and eachnode.id == "_fields_":
-            print(">>>>> DEBUG - Class variable detected: ", eachnode.id)
-        if isinstance(eachnode,ast.List):
-            fields = [e for e in eachnode.elts]
-            print(">>>>> DEBUG - Class variable value detected: ", *fields)
+def extract_fields(ast_fields):
+    fields = []
+    for each_tup in ast_fields:
+        fields.append(each_tup.elts[0].s)
+    fields = [field for field in fields
+              if not field.endswith("SystemTime")]
+    return fields
 
-        #print(">>>>> DEBUG - is of Length: ", str(len(eachnode.targets)))
+def extract_info(classNode):
+    all_nodes = [node for node in ast.iter_child_nodes(classNode)]
+    fields_extracted = []
+    if len(all_nodes) != 2:
+        print("ERR: Bad parsing in py files! Something has changed. Contact the developers!")
+        return
+    if not (isinstance(all_nodes[0], ast.Name) and all_nodes[0].id == "_fields_"):
+        print("ERR - Bad parsing in py files! Something has changed. Contact the developers!")
+        print("ERR - Parsed file couldn't find _fields_")
+        return
+    if not isinstance(all_nodes[1], ast.List):
+        print("ERR - Bad parsing in py files! Something has changed. Contact the developers!")
+        return
+    else:
+        fields = [e for e in all_nodes[1].elts]
+        fields_extracted = extract_fields(fields)
+    return fields_extracted
 
 def get_py_fields(filename):
     filename = os.path.join(PYTHON_DIR,filename)
@@ -64,19 +72,15 @@ def get_py_fields(filename):
     class_definitions = [n for n in node.body if isinstance(n, ast.ClassDef)]
 
     if len(class_definitions) == 1:
-        print(">>>>> INFO - " + str(len(class_definitions)) + " class definitions parsed!")
-        for class_ in class_definitions:
-            print(">>>>> INFO - Class name detected: ", class_.name)
-            print(">>>>> INFO - Class has ", len(class_.body), " fields")
-            if len(class_.body) != 2:
-                print("ERR: Bad parsong! Something has changed. Contact the developers!")
-                return
-            else:
-                show_info(class_.body[1])
+        print(">>>>> INFO - Class name detected: ", class_definitions[0].name)
+        if len(class_definitions[0].body) != 2:
+            print("ERR: Bad parsong! Something has changed. Contact the developers!")
+            return
+        else:
+            return extract_info(class_definitions[0].body[1])
     else:
         print("ERR: Bad parsing in py files! Something has changed. Contact the developers!")
 
-    return
 
 def get_c_fields(filename):
     filename = os.path.join(SPECS_DIR,filename)
@@ -90,7 +94,11 @@ def validate_struct_files(filename_pairs):
     print ("Spec file: " + os.path.join(SPECS_DIR,filename_pairs[2]))"""
     print("-----------------------------------------------------------------------------")
     spec_fields = get_spec_fields(filename_pairs[2])
+    print(">>>>> INFO - ", len(spec_fields), " Fields detected")
+    print(">>>>> INFO - Fields: ", *spec_fields)
     py_fields = get_py_fields(filename_pairs[0])
+    print(">>>>> INFO - ", len(py_fields), " Fields detected in ")
+    print(">>>>> INFO - Fields: ", *py_fields)
     c_fields = get_c_fields(filename_pairs[1])
     print("-----------------------------------------------------------------------------")
     return
