@@ -4,6 +4,7 @@ import sys
 import pandas
 import ast
 import pyclibrary
+import inspect
 
 C_STRUCTS_DIR = os.path.join(os.getcwd(),"..","inc")
 PYTHON_DIR = os.path.join(os.getcwd(),"flexseapython", "dev_spec")
@@ -43,7 +44,7 @@ def extract_py_fields(ast_fields):
               if not field.endswith("SystemTime")]
     return fields
 
-def extract_py_info(classNode):
+def extract_py_node(classNode):
     all_nodes = [node for node in ast.iter_child_nodes(classNode)]
     fields_extracted = []
     if len(all_nodes) != 2:
@@ -69,6 +70,7 @@ def get_py_fields(filename):
             node = ast.parse(py_file.read())
     except FileNotFoundError as e:
         sys.exit("ERR - " + filename + " was not found at " + SPECS_DIR + " -- Exiting Script")
+        return
 
     class_definitions = [n for n in node.body if isinstance(n, ast.ClassDef)]
 
@@ -78,31 +80,56 @@ def get_py_fields(filename):
             print("ERR: Bad parsong! Something has changed. Contact the developers!")
             return
         else:
-            return extract_py_info(class_definitions[0].body[1])
+            return extract_py_node(class_definitions[0].body[1])
     else:
         print("ERR: Bad parsing in py files! Something has changed. Contact the developers!")
+        return
 
 
-def extract_c_fields(fields):
-    fields = []
-    return
+def extract_c_fields(structs):
+    fields_extracted = []
+    #Initial validation
+    if not isinstance(structs, dict) or len(structs) != 1:
+        print("ERR: - Incorrect object passed for extracting C fields. Contact developer team.")
+        return
+
+    key= list(structs)[0]
+    value = list(structs.values())[0]
+    #print('----------\nKEY: ', key)#, '\nVALUE: ', value,"\n----------")
+    #print('----------\nKEY-TYPE: ', type(key), '\nVALUE-TYPE: ', type(value), "\n----------")
+    if not isinstance(value, pyclibrary.c_parser.Struct):
+        print("ERR: - Incorrect object passed for extracting C fields. Contact developer team.")
+        return
+
+    #print(">>>>> DEBUG - c_parser.Struct detected! Number of fields before processing: ", len(value.members))
+
+    fields_extracted = [each_field[0] for each_field in value.members]
+    fields_extracted = [each_field for each_field in fields_extracted
+                        if not each_field.endswith("systemTime")
+                        if not each_field.endswith("deviceData")]
+
+    return fields_extracted
 
 def get_c_fields(filename):
     filename = os.path.join(C_STRUCTS_DIR,filename)
     print("\n>>> IN-PROCESS - Extracting fields from c struct file: " + filename)
     parser = pyclibrary.CParser(process_all=False)
     fields = []
+    fields_extracted = []
     try:
-        parser.load_file(filename)
+        fl = parser.load_file(filename)
+        if not fl :
+            print("ERR - Could not load file")
+            return
         parser.remove_comments(filename)
         parser.preprocess(filename)
         parser.parse_defs(filename)
-        fields = parser.defs['structs']
-        fields_extracted = extract_c_fields(fields)
-        print(">>>>> DEBUG - Fields detected: ", fields)
+        structs = parser.defs['structs']
     except:
-        print("ERR - Caught a bad exception")
-    return
+        print("ERR - File not found")
+        return
+
+    return extract_c_fields(structs)
 
 
 def validate_struct_files(filename_pairs):
@@ -110,14 +137,21 @@ def validate_struct_files(filename_pairs):
     print ("C file: " + os.path.join(C_STRUCTS_DIR,filename_pairs[1]))
     print ("Spec file: " + os.path.join(SPECS_DIR,filename_pairs[2]))"""
     print("-----------------------------------------------------------------------------")
-    print(">>>>> INFO - Filenames: ", *filename_pairs)
+    print(">>>>> INFO - Attempting Validation for filenames: ", *filename_pairs)
     spec_fields = get_spec_fields(filename_pairs[2])
-    print(">>>>> INFO - ", len(spec_fields), " Fields detected")
-    print(">>>>> INFO - Fields: ", *spec_fields)
+    #print(">>>>> INFO - ", len(spec_fields), " Fields extracted")
+    #print(">>>>> INFO - Fields: ", *spec_fields)
     py_fields = get_py_fields(filename_pairs[0])
-    print(">>>>> INFO - ", len(py_fields), " Fields detected")
-    print(">>>>> INFO - Fields: ", *py_fields)
+    #print(">>>>> INFO - ", len(py_fields), " Fields extracted")
+    #print(">>>>> INFO - Fields: ", *py_fields)
     c_fields = get_c_fields(filename_pairs[1])
+    #print(">>>>> INFO - ", len(c_fields), " Fields extracted")
+    #print(">>>>> INFO - Fields: ", *c_fields)
+    if len(spec_fields) == len(py_fields)\
+        and len(spec_fields) == len(c_fields):
+        print(">>> VALIDATION SUCCESS - Good news. Length validation of fields in spec, struct and python class files were successful. That is all three files have the same number of fields!")
+    else:
+        print(">>> VALIDATION FAILURE - Bad news. Complete validation was not successful")
     print("-----------------------------------------------------------------------------")
     return
 
