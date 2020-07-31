@@ -3,6 +3,7 @@ import os
 import sys
 import pandas
 import ast
+import pyclibrary
 
 C_STRUCTS_DIR = os.path.join(os.getcwd(),"..","inc")
 PYTHON_DIR = os.path.join(os.getcwd(),"flexseapython", "dev_spec")
@@ -34,7 +35,7 @@ def get_spec_fields(filename):
         sys.exit("ERR - " + filename + " was not found at " + SPECS_DIR + " -- Exiting Script")
     return list(fields.variable_label)
 
-def extract_fields(ast_fields):
+def extract_py_fields(ast_fields):
     fields = []
     for each_tup in ast_fields:
         fields.append(each_tup.elts[0].s)
@@ -42,7 +43,7 @@ def extract_fields(ast_fields):
               if not field.endswith("SystemTime")]
     return fields
 
-def extract_info(classNode):
+def extract_py_info(classNode):
     all_nodes = [node for node in ast.iter_child_nodes(classNode)]
     fields_extracted = []
     if len(all_nodes) != 2:
@@ -57,7 +58,7 @@ def extract_info(classNode):
         return
     else:
         fields = [e for e in all_nodes[1].elts]
-        fields_extracted = extract_fields(fields)
+        fields_extracted = extract_py_fields(fields)
     return fields_extracted
 
 def get_py_fields(filename):
@@ -77,14 +78,30 @@ def get_py_fields(filename):
             print("ERR: Bad parsong! Something has changed. Contact the developers!")
             return
         else:
-            return extract_info(class_definitions[0].body[1])
+            return extract_py_info(class_definitions[0].body[1])
     else:
         print("ERR: Bad parsing in py files! Something has changed. Contact the developers!")
 
 
+def extract_c_fields(fields):
+    fields = []
+    return
+
 def get_c_fields(filename):
-    filename = os.path.join(SPECS_DIR,filename)
+    filename = os.path.join(C_STRUCTS_DIR,filename)
     print("\n>>> IN-PROCESS - Extracting fields from c struct file: " + filename)
+    parser = pyclibrary.CParser(process_all=False)
+    fields = []
+    try:
+        parser.load_file(filename)
+        parser.remove_comments(filename)
+        parser.preprocess(filename)
+        parser.parse_defs(filename)
+        fields = parser.defs['structs']
+        fields_extracted = extract_c_fields(fields)
+        print(">>>>> DEBUG - Fields detected: ", fields)
+    except:
+        print("ERR - Caught a bad exception")
     return
 
 
@@ -93,11 +110,12 @@ def validate_struct_files(filename_pairs):
     print ("C file: " + os.path.join(C_STRUCTS_DIR,filename_pairs[1]))
     print ("Spec file: " + os.path.join(SPECS_DIR,filename_pairs[2]))"""
     print("-----------------------------------------------------------------------------")
+    print(">>>>> INFO - Filenames: ", *filename_pairs)
     spec_fields = get_spec_fields(filename_pairs[2])
     print(">>>>> INFO - ", len(spec_fields), " Fields detected")
     print(">>>>> INFO - Fields: ", *spec_fields)
     py_fields = get_py_fields(filename_pairs[0])
-    print(">>>>> INFO - ", len(py_fields), " Fields detected in ")
+    print(">>>>> INFO - ", len(py_fields), " Fields detected")
     print(">>>>> INFO - Fields: ", *py_fields)
     c_fields = get_c_fields(filename_pairs[1])
     print("-----------------------------------------------------------------------------")
@@ -141,7 +159,7 @@ if __name__ == '__main__':
         #create pairs of filenames that need to eb validated
         matching_filename_pairs = list(zip(all_python_files,all_c_files,all_spec_files))
         print("\n>>> INFO: " + str(len(files_w_matching_names)) + " Pairs of matching file(s) found:\n")
-        print(*matching_filename_pairs)
+        #print(*matching_filename_pairs)
         for filename_pairs in matching_filename_pairs:
             validate_struct_files(filename_pairs)
 
@@ -161,5 +179,5 @@ if __name__ == '__main__':
                           if file.lower() == sys.argv[1].lower()][0]
             print("\n>>> INFO: Matching struct file found for: " )
             filename_pairs = (filename_py + "State.py", filename_c + "_struct.h", filename_spec + "_specs.csv")
-            print(*filename_pairs)
+            #print(*filename_pairs)
             validate_struct_files(filename_pairs)
