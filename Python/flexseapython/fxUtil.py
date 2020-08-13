@@ -1,7 +1,9 @@
-from flexseapython.pyFlexsea import *
+from .pyFlexsea import *
 from time import sleep
 import numpy as np
 import os
+
+from .dev_spec import AllDevices
 
 # Clears the terminal - use before printing new values
 def clearTerminal():
@@ -28,7 +30,7 @@ def printDevice(device, appType):
 	else:
 		raise RuntimeError('Unsupported application type: ', appType)
 
-def printExo(exoState: ExoState):
+def printExo(exoState: AllDevices.ExoState):
 	print('[ Printing Exo/ActPack Plus ]\n')
 	print('State time:           ', exoState.timestamp)
 	print('Accel X:              ', exoState.accelx)
@@ -56,7 +58,7 @@ def printExo(exoState: ExoState):
 	print('Ankle angle:          ', exoState.ankleAngle)
 	print('Ankle velocity:       ', exoState.ankleVelocity)
 
-def printActPack(actPackState: ActPackState):
+def printActPack(actPackState: AllDevices.ActPackState):
 	print('[ Printing Actpack ]\n')
 	print('State time:           ', actPackState.timestamp)
 	print('Accel X:              ', actPackState.accelx)
@@ -71,7 +73,7 @@ def printActPack(actPackState: ActPackState):
 	print('Battery Voltage (mV): ', actPackState.batteryVoltage)
 	print('Battery Temp (C):     ', actPackState.batteryTemp)
 
-def printNetMaster(netMasterState: NetMasterState):
+def printNetMaster(netMasterState: AllDevices.NetMasterState):
 	print('[ Printing NetMaster ]\n')
 	print('State time:        ', netMasterState.timestamp)
 	print('genVar[0]:         ', netMasterState.genVar[0])

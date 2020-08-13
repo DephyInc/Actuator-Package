@@ -259,9 +259,9 @@ def fxReadDeviceAll(devId, dataQueueSize):
 	"""
 	global flexsea
 
-	AllDevices.ActPackStateDataQueue = [AllDevices.ActPackState() for count in range(dataQueueSize)];
+	ActPackStateDataQueue = [AllDevices.ActPackState() for count in range(dataQueueSize)];
 
-	itemsRead = flexsea.fxReadDeviceAll(devId, byref(AllDevices.ActPackStateDataQueue), dataQueueSize)
+	itemsRead = flexsea.fxReadDeviceAll(devId, byref(ActPackStateDataQueue), dataQueueSize)
 	if (itemsRead == -1):
 		raise ValueError('fxGetReadDataQueueSize: Invalid device ID')
 	return itemsRead
@@ -286,9 +286,9 @@ def fxReadNetMasterDeviceAll(devId, dataQueueSize):
 	"""
 	global flexsea
 
-	AllDevices.NetMasterStateDataQueue = [AllDevices.NetMasterState() for count in range(dataQueueSize)];
+	NetMasterStateDataQueue = [AllDevices.NetMasterState() for count in range(dataQueueSize)];
 
-	itemsRead = flexsea.fxReadNetMasterDeviceAll(devId, byref(AllDevices.NetMasterStateDataQueue), dataQueueSize)
+	itemsRead = flexsea.fxReadNetMasterDeviceAll(devId, byref(NetMasterStateDataQueue), dataQueueSize)
 	if (itemsRead == -1):
 		raise ValueError('fxReadNetMasterDeviceAll: Invalid device ID')
 	return itemsRead
@@ -311,9 +311,9 @@ def fxReadBMSDeviceAll(devId, dataQueueSize):
 	"""
 	global flexsea
 
-	AllDevices.BMSStateDataQueue = [AllDevices.BMSState() for count in range(dataQueueSize)]
+	BMSStateDataQueue = [AllDevices.BMSState() for count in range(dataQueueSize)]
 
-	itemsRead = flexsea.fxReadNetMasterDeviceAll(devId, byref(AllDevices.BMSStateDataQueue), dataQueueSize)
+	itemsRead = flexsea.fxReadNetMasterDeviceAll(devId, byref(BMSStateDataQueue), dataQueueSize)
 	if (itemsRead == -1):
 		raise ValueError('fxReadBMSDeviceAll: Invalid device ID')
 	return itemsRead
