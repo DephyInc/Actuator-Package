@@ -8,8 +8,8 @@ import inspect
 
 C_STRUCTS_DIR = os.path.join(os.getcwd(),"..","inc")
 PYTHON_DIR = os.path.join(os.getcwd(),"flexseapython", "dev_spec")
-SPECS_DIR = os.path.join(os.getcwd(),"..", "..", "flexsea-core","flexsea-system", "device_specs_csv")
 IGNORE_FILES = ['__init__.py', '__pycache__', 'AllDevices.py']
+COMPARE_FILE = os.path.join(os.getcwd(),"py-c-files.config")
 
 
 def sig_handler(frame, signal_received):
@@ -23,23 +23,6 @@ def find_files(file_path, ignore_list, strip_characters):
     #strip filenames
     files_found = [file[:-len(strip_characters)] for file in files_found]
     return files_found
-
-def get_spec_fields(filename):
-    filename = os.path.join(SPECS_DIR,filename)
-    print("\n>>> IN-PROCESS - Extracting fields from spec CSV file: " + filename)
-    fields = []
-    try:
-        # read fields
-        with open(filename) as spec_file:
-            fields = pandas.read_csv(filename, usecols=[0])[1:]
-    except FileNotFoundError as e:
-        sys.exit("ERR - " + filename + " was not found at " + SPECS_DIR + " -- Exiting Script")
-
-    #formatting name for accommodation of variation if field names in python and c structs
-    spec_fields = [field.replace('[', r'_').replace(']', r'_').replace('.', r'').lower() for field in
-              list(fields.variable_label)]
-    return spec_fields
-
 
 def extract_py_fields(ast_fields):
     fields = []
@@ -69,18 +52,18 @@ def extract_py_node(classNode):
 
 def get_py_fields(filename):
     filename = os.path.join(PYTHON_DIR,filename)
-    print("\n>>> IN-PROCESS - Extracting fields from python state file: " + filename)
+    #print("\n>>> IN-PROCESS - Extracting fields from python state file: " + filename)
     try:
         with open(filename) as py_file:
             node = ast.parse(py_file.read())
     except FileNotFoundError as e:
-        sys.exit("ERR - " + filename + " was not found at " + SPECS_DIR + " -- Exiting Script")
+        sys.exit("ERR - " + filename + " was not found at " + PYTHON_DIR + " -- Exiting Script")
         return
 
     class_definitions = [n for n in node.body if isinstance(n, ast.ClassDef)]
 
     if len(class_definitions) == 1:
-        print(">>>>> INFO - Class name detected: ", class_definitions[0].name)
+        #print(">>>>> INFO - Class name detected: ", class_definitions[0].name)
         if len(class_definitions[0].body) != 2:
             print("ERR: Bad parsong! Something has changed. Contact the developers!")
             return
@@ -115,9 +98,12 @@ def extract_c_fields(structs):
 
     return fields_extracted
 
-def get_c_fields(filename):
-    filename = os.path.join(C_STRUCTS_DIR,filename)
-    print("\n>>> IN-PROCESS - Extracting fields from c struct file: " + filename)
+def get_c_fields(name):
+    filename = os.path.join(C_STRUCTS_DIR,name)
+    #print("\n>>> IN-PROCESS - Extracting fields from c struct file: " + filename)
+    if not (os.path.isfile(filename)):
+        print("ERR - Could not find file", filename)
+        return
     parser = pyclibrary.CParser(process_all=False)
     fields = []
     fields_extracted = []
@@ -137,95 +123,55 @@ def get_c_fields(filename):
     return extract_c_fields(structs)
 
 
-def validate_struct_files(filename_pairs):
-    """print ("Python file: " + os.path.join(PYTHON_DIR,filename_pairs[0]))
-    print ("C file: " + os.path.join(C_STRUCTS_DIR,filename_pairs[1]))
-    print ("Spec file: " + os.path.join(SPECS_DIR,filename_pairs[2]))"""
+def validate_struct_files(pythonFile, cStructFile):
     print("-----------------------------------------------------------------------------")
-    print(">>>>> INFO - Attempting Validation for filenames: ", *filename_pairs)
-    spec_fields = get_spec_fields(filename_pairs[2])
-    spec_fields = sorted(spec_fields, key=str.casefold)
-    print(">>>>> INFO - ", len(spec_fields), " Fields extracted")
-    print(">>>>> INFO - Fields: ", *spec_fields)
-    py_fields = get_py_fields(filename_pairs[0])
+    print(">>>>> INFO - Attempting Validation for filenames: ", pythonFile, cStructFile)
+    py_fields = get_py_fields(pythonFile)
     py_fields = sorted(py_fields, key=str.casefold)
-    print(">>>>> INFO - ", len(py_fields), " Fields extracted")
-    print(">>>>> INFO - Fields: ", *py_fields)
-    c_fields = get_c_fields(filename_pairs[1])
+    #print(">>>>> INFO - ", len(py_fields), " Fields extracted")
+    #print(">>>>> INFO - Fields: ", *py_fields)
+    c_fields = get_c_fields(cStructFile)
     c_fields = sorted(c_fields, key=str.casefold)
-    print(">>>>> INFO - ", len(c_fields), " Fields extracted")
-    print(">>>>> INFO - Fields: ", *c_fields)
-    matching_fields = set(spec_fields) & set(py_fields) & set(c_fields)
-    print(">>>>> INFO - ", len(matching_fields), " fields were found in common!")
-    if len(spec_fields) == len(py_fields)\
-        and len(spec_fields) == len(c_fields):
-        print(">>> VALIDATION(1) SUCCESS - Good news. Length validation of fields in spec, struct and python class files were successful. That is all three files have the same number of fields!")
+    #print(">>>>> INFO - ", len(c_fields), " Fields extracted")
+    #print(">>>>> INFO - Fields: ", *c_fields)
+    matching_fields = set(py_fields) & set(c_fields)
+    #print(">>>>> INFO - ", len(matching_fields), " fields were found in common!")
+    if len(py_fields) == len(c_fields):
+        print(">>> Success! Number of fields were the same!")
     else:
-        print(">>> VALIDATION(1) FAILURE - Bad news. Complete validation was not successful")
-    if len(spec_fields) == len(matching_fields):
-        print(">>> VALIDATION(2) SUCCESS - Good news. All fields are matching in all three files!")
+        print(">>> Valiation failure! Number of fields differ!")
+        return
+    if len(py_fields) == len(matching_fields) == len(c_fields):
+        print(">>> Hooray! Validations successful!")
+        print("---------------------------------------------------------------------------")
+        return
     else:
-        print(">>> VALIDATION(2) FAILURE - Bad news. Field validation error. Could not validate individual field")
-    print("-----------------------------------------------------------------------------")
-    return
+        print(">>> Validation failure! Mismatch in fields!")
+        print("---------------------------------------------------------------------------")
+        return
 
 if __name__ == '__main__':
     signal(SIGINT, sig_handler)	# Handle Ctrl-C or SIGINT
 
     print('\n>>> Actuator Package Python Demo Scripts : Validates Python and C structs.<<<')
-    if len(sys.argv)!= 2:
+    if len(sys.argv) > 2:
         sys.exit("\nERR - Invalid arguments."+ \
                  "\n>>> Usage: python fxStructsValidatePy-C.py all" + \
-                 "\n>>>        python fxStructsValidatePy-C.py ActPack" +\
-                 "\n>>>        python fxStructsValidatePy-C.py BMS" )
+                 "\n>>>        python fxStructsValidatePy-C.py")
 
-    if sys.argv[1] == "all":
-        #find all files
-        all_python_files = find_files(PYTHON_DIR, IGNORE_FILES, "State.py")
-        all_c_files = find_files(C_STRUCTS_DIR, IGNORE_FILES, "_struct.h")
-        all_spec_files = find_files(SPECS_DIR, IGNORE_FILES, "_specs.csv")
-        #find matching file names
-        files_w_matching_names = set([file.lower() for file in all_python_files]) &\
-                                 set([file.lower() for file in all_c_files]) &\
-                                 set([file.lower() for file in all_spec_files])
-        #Remove non matching file names from the list
-        all_python_files = [file for file in all_python_files
-                            if file.lower() in files_w_matching_names]
-        all_c_files = [file for file in all_c_files
-                       if file.lower() in files_w_matching_names]
-        all_spec_files = [file for file in all_spec_files
-                       if file.lower() in files_w_matching_names]
-        #sort the filenames
-        python_files = sorted(all_python_files, key=str.casefold)
-        c_files = sorted(all_c_files, key=str.casefold)
-        spec_files = sorted(all_spec_files, key=str.casefold)
-        #At this point the list is exactly how we want. So reformat it as required
-        all_python_files = [file + "State.py" for file in python_files]
-        all_c_files = [file + "_struct.h" for file in c_files]
-        all_spec_files = [file + "_specs.csv" for file in spec_files]
-
-        #create pairs of filenames that need to eb validated
-        matching_filename_pairs = list(zip(all_python_files,all_c_files,all_spec_files))
-        print("\n>>> INFO: " + str(len(files_w_matching_names)) + " Pairs of matching file(s) found:\n")
-        #print(*matching_filename_pairs)
-        for filename_pairs in matching_filename_pairs:
-            validate_struct_files(filename_pairs)
-
-
+    if  len(sys.argv) == 1 or sys.argv[1] == "all":
+        try:
+            # read fields
+            with open(COMPARE_FILE, 'r') as compare_file:
+                lines = compare_file.readlines()
+            for line in lines:
+                pyFile = line.split(",")[0].strip()
+                cStructFile = line.split(",")[1].strip()
+                validate_struct_files(pyFile,cStructFile)
+        except FileNotFoundError as e:
+            sys.exit("ERR: " + COMPARE_FILE + " was not found at -- Exiting Script")
     else:
-        #validate single struct file
-        all_python_files = find_files(PYTHON_DIR, IGNORE_FILES, "State.py")
-        all_c_files = find_files(C_STRUCTS_DIR, IGNORE_FILES, "_struct.h")
-        all_spec_files = find_files(SPECS_DIR, IGNORE_FILES, "_specs.csv")
-        if sys.argv[1].lower() in [file.lower() for file in all_python_files] and \
-            sys.argv[1].lower() in [file.lower() for file in all_c_files]:
-            filename_py = [file for file in all_python_files
-                           if file.lower() == sys.argv[1].lower()][0]
-            filename_c = [file for file in all_c_files
-                           if file.lower() == sys.argv[1].lower()][0]
-            filename_spec = [file for file in all_spec_files
-                          if file.lower() == sys.argv[1].lower()][0]
-            print("\n>>> INFO: Matching struct file found for: " )
-            filename_pairs = (filename_py + "State.py", filename_c + "_struct.h", filename_spec + "_specs.csv")
-            #print(*filename_pairs)
-            validate_struct_files(filename_pairs)
+        print(">>> ERR: Bad Argument. ")
+        sys.exit("\nERR - Invalid arguments."+ \
+                 "\n>>> Usage: python fxStructsValidatePy-C.py all" + \
+                 "\n>>>        python fxStructsValidatePy-C.py")
