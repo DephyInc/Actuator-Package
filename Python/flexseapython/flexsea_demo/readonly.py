@@ -1,9 +1,10 @@
 import os, sys
 from time import sleep
-from flexseapython.fxUtil import *
 
 pardir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(pardir)
+
+from flexseapython.fxUtil import *
 
 def printBMSState(devId):
 	bmsState = fxReadBMSDevice(devId)
@@ -58,10 +59,13 @@ def fxReadOnly(port, baudRate, time = 8, time_step = 0.1):
 	return True
 
 if __name__ == '__main__':
-	baudRate = sys.argv[1]
-	ports = sys.argv[2:3]
+	baudRate = int(sys.argv[1])
+	port = sys.argv[2]
 	try:
-		fxReadOnly(ports, baudRate)
+		loadSuccess = loadFlexsea()
+		if(not loadSuccess):
+			raise Exception('Could not load FlexSEA libraries')
+		fxReadOnly(port, baudRate)
 	except Exception as e:
 		print("broke: " + str(e))
 		pass
