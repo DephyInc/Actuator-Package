@@ -25,14 +25,14 @@ typedef enum fxError
 
 typedef enum fxControlMode
 {
-    FxPosition	=0, //Position - Send a position setpoint
-    FxVoltage	=1, //Voltage - Open Control Command
-    FxCurrent	=2, //Current - Send a current Setpoint command
-    FxImpedance	=3, //Impedance - Send an impedance command. Position setpoints but with stiffness and damping coefficients
-    FxNone		=4, //No controller type. Shutoff command.
-    FxCustom	=5,
-    FxMeasRes	=6,
-    FxStalk		=7, // Send an stalking command. It uses the position controller to stalk an ankle angle at a certain distance
+	FxPosition	= 0, //Position - Send a position setpoint
+	FxVoltage	= 1, //Voltage - Open Control Command
+	FxCurrent	= 2, //Current - Send a current Setpoint command
+	FxImpedance	= 3, //Impedance - Send an impedance command. Position setpoints but with stiffness and damping coefficients
+	FxNone		= 4, //No controller type. Shutoff command.
+	FxCustom	= 5,
+	FxMeasRes	= 6,
+	FxStalk		= 7, //Send an stalking command. It uses the position controller to stalk an ankle angle at a certain distance
 
 } FxControlMode;
 
@@ -373,13 +373,16 @@ int fxReadBattCyclerDeviceAll(const unsigned int deviceId,
 ///
 /// @param B : Damping (used in impedance control only)
 ///
+/// @param ff : Feed Forward gain
+///
 /// @returns Error codes defined at top of the header
 FxError fxSetGains(const unsigned int deviceId, 
-			const unsigned int kp, 
-			const unsigned int ki, 
-			const unsigned int kd, 
-			const unsigned int K, 
-			const unsigned int B);
+			const unsigned int kp,
+			const unsigned int ki,
+			const unsigned int kd,
+			const unsigned int K,
+			const unsigned int B,
+			const unsigned int ff);
 
 /// \brief Send a command to the device.
 ///
