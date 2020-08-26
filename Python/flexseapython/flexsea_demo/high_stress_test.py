@@ -351,10 +351,10 @@ def sendAndTimeCmds(t0, devId0, devId1, device2: bool, initialPos0, initialPos1,
 	if setGains:
 		tstart = time()
 		for i in range(2):
-			fxSetGains(devId0, 300, 50, 0, 0, 0)
+			fxSetGains(devId0, 300, 50, 0, 0, 0, 0)
 		setGainsTimes.append(time() - tstart)
 		if(device2):
-			fxSetGains(devId1, 300, 50, 0, 0, 0)
+			fxSetGains(devId1, 300, 50, 0, 0, 0, 0)
 	else:
 		setGainsTimes.append(0)
 

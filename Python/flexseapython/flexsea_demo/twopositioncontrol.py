@@ -28,8 +28,8 @@ def fxTwoPositionControl(port, baudRate, expTime = 13, time_step = 0.1,
 	num_time_steps = int(expTime/time_step)
 	transition_steps = int(transition_time/time_step)
 
-	# Setting gains (devId, kp, ki, kd, K, B)
-	fxSetGains(devId, 150, 100, 0, 0, 0)
+	# Setting gains (devId, kp, ki, kd, K, B, ff)
+	fxSetGains(devId, 150, 100, 0, 0, 0, 0)
 
 	# Setting position control at initial position
 	fxSendMotorCommand(devId, FxPosition, initialAngle)

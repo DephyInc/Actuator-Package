@@ -11,12 +11,13 @@ sys.path.append(pardir)
 
 # Control gain constants
 kp = 100
-ki = 32
+ki = 100
 K = 325
 B = 0
-B_Increments = 125
+B_Increments = 200
+FF = 50
 
-def fxImpedanceControl(port, baudRate, expTime = 20, time_step = 0.02, delta = 7500,
+def fxImpedanceControl(port, baudRate, expTime = 10, time_step = 0.02, delta = 7500,
 	transition_time = 0.8, resolution = 500):
 
 	# Open device
@@ -40,8 +41,8 @@ def fxImpedanceControl(port, baudRate, expTime = 20, time_step = 0.02, delta = 7
 	# Setpoint = initial angle
 	fxSendMotorCommand(devId, FxImpedance, initialAngle)
 	# Set gains
-	global B, K, kp, ki
-	fxSetGains(devId, kp, ki, 0, K, B)
+	global B, K, kp, ki, FF
+	fxSetGains(devId, kp, ki, 0, K, B, FF)
 
 	# Select transition rate and positions
 	currentPos = 0
@@ -62,7 +63,7 @@ def fxImpedanceControl(port, baudRate, expTime = 20, time_step = 0.02, delta = 7
 		measuredPos = data.encoderAngle
 		if i % transition_steps == 0:
 			B = B + B_Increments	# Increments every cycle
-			fxSetGains(devId, kp, ki, 0, K, B)
+			fxSetGains(devId, kp, ki, 0, K, B, FF)
 			delta = abs(positions[currentPos] - measuredPos)
 			result &= delta < resolution
 			currentPos = (currentPos + 1) % 2
