@@ -139,6 +139,7 @@ def validate_struct_files(pythonFile, cStructFile):
         print(">>> Success! Number of fields were the same!")
     else:
         print(">>> Valiation failure! Number of fields differ!")
+        input("Press enter to continue...")
         return
     if len(py_fields) == len(matching_fields) == len(c_fields):
         print(">>> Hooray! Validations successful!")
@@ -146,6 +147,7 @@ def validate_struct_files(pythonFile, cStructFile):
         return
     else:
         print(">>> Validation failure! Mismatch in fields!")
+        input("Press enter to continue...")
         print("---------------------------------------------------------------------------")
         return
 
