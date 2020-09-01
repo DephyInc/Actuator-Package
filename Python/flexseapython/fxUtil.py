@@ -60,18 +60,18 @@ def printExo(exoState: AllDevices.ExoState):
 
 def printActPack(actPackState: AllDevices.ActPackState):
 	print('[ Printing Actpack ]\n')
-	print('State time:           ', actPackState.timestamp)
+	print('State time:           ', actPackState.state_time)
 	print('Accel X:              ', actPackState.accelx)
 	print('Accel Y:              ', actPackState.accely)
 	print('Accel Z:              ', actPackState.accelz)
 	print('Gyro X:               ', actPackState.gyrox)
 	print('Gyro Y:               ', actPackState.gyroy)
 	print('Gyro Z:               ', actPackState.gyroz)
-	print('Motor angle:          ', actPackState.encoderAngle)
-	print('Motor voltage (mV):   ', actPackState.motorVoltage)
-	print('Battery Current (mA): ', actPackState.batteryCurrent)
-	print('Battery Voltage (mV): ', actPackState.batteryVoltage)
-	print('Battery Temp (C):     ', actPackState.batteryTemp)
+	print('Motor angle:          ', actPackState.mot_ang)
+	print('Motor voltage (mV):   ', actPackState.mot_volt)
+	print('Battery Current (mA): ', actPackState.batt_curr)
+	print('Battery Voltage (mV): ', actPackState.batt_volt)
+	print('Battery Temp (C):     ', actPackState.temperature)
 
 def printNetMaster(netMasterState: AllDevices.NetMasterState):
 	print('[ Printing NetMaster ]\n')
