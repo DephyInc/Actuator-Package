@@ -1,7 +1,6 @@
 from signal import signal, SIGINT
 import os
 import sys
-import pandas
 import ast
 import pyclibrary
 import inspect
