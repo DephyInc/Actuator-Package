@@ -4,6 +4,8 @@
 #include <stdbool.h>
 #include "actpack_struct.h"
 #include "netmaster_struct.h"
+#include "cellscreener_struct.h"
+#include "battcycler_struct.h"
 #include "i2t_struct.h"
 
 #ifdef __cplusplus
@@ -41,7 +43,9 @@ typedef enum fxAppType
 	FxExo,
 	FxNetMaster,
 	FxBMS,
-	FxHabsolute
+	FxHabsolute,
+	FxCellScreener,
+	FxBattCycler
 
 } FxAppType;
 
@@ -49,6 +53,8 @@ struct ActPackState;	//Contains Actuator Pack Data
 struct NetMasterState;	//Contains Network Data from NetNodes
 struct BMSState;		//Contains Battery Management System Data
 struct HabsoluteState;	//Contains Ankle position data
+struct CellScreenerState;
+struct BattCyclerState;
 
 // Valid streaming frequencies 
 #define NUM_TIMER_FREQS 11
@@ -205,8 +211,30 @@ FxError fxReadBMSDevice(const unsigned int deviceId, BMSState* readData);
 /// @param readData contains the most recent data from the device
 ///
 /// @returns FxNotStreaming if device is not streaming when this is called.
-///          FxInvalidDevice if deviceId is invalid or is not a BMS device.
+///          FxInvalidDevice if deviceId is invalid or is not a Habsolute device.
 FxError fxReadHabsoluteDevice(const unsigned int deviceId, HabsoluteState* readData);
+
+/// \brief Read the most recent data from a streaming FlexSEA CellScreener device.
+/// Must call fxStartStreaming before calling this.
+///
+/// @param deviceId is the device ID of the device to read from.
+///
+/// @param readData contains the most recent data from the device
+///
+/// @returns FxNotStreaming if device is not streaming when this is called.
+///          FxInvalidDevice if deviceId is invalid or is not a CellScreener device.
+FxError fxReadCellScreenerDevice(const unsigned int deviceId, CellScreenerState* readData);
+
+/// \brief Read the most recent data from a streaming FlexSEA BattCycler device.
+/// Must call fxStartStreaming before calling this.
+///
+/// @param deviceId is the device ID of the device to read from.
+///
+/// @param readData contains the most recent data from the device
+///
+/// @returns FxNotStreaming if device is not streaming when this is called.
+///          FxInvalidDevice if deviceId is invalid or is not a BattCycler device.
+FxError fxReadBattCyclerDevice(const unsigned int deviceId, BattCyclerState* readData);
 
 /// \brief Set the maximum read data queue size of a device.
 /// 
@@ -296,6 +324,40 @@ int fxReadBMSDeviceAll(const unsigned int deviceId,
 int fxReadHabsoluteDeviceAll(const unsigned int deviceId, 
 			HabsoluteState* readData, 
 			const unsigned int n);
+
+/// \brief Read all data from a streaming FlexSEA CellScreener device.
+/// Must call fxStartStreaming before calling this.
+///
+/// @param deviceId is the device ID of the device to read from.
+///
+/// @param readData is an array of size n which contains read results
+///
+/// @param n is the size of the readData y
+///
+/// @returns The actual number of entries read. You will probably need
+/// to use this number.
+///
+/// @note Will only fill readData array up to read data queue size.
+int fxReadCellScreenerDeviceAll(const unsigned int deviceId,
+							 CellScreenerState* readData,
+							 const unsigned int n);
+
+/// \brief Read all data from a streaming FlexSEA BattCycler device.
+/// Must call fxStartStreaming before calling this.
+///
+/// @param deviceId is the device ID of the device to read from.
+///
+/// @param readData is an array of size n which contains read results
+///
+/// @param n is the size of the readData y
+///
+/// @returns The actual number of entries read. You will probably need
+/// to use this number.
+///
+/// @note Will only fill readData array up to read data queue size.
+int fxReadBattCyclerDeviceAll(const unsigned int deviceId,
+								BattCyclerState* readData,
+								const unsigned int n);
 
 /// \brief Sets the gains used by PID controllers on the FlexSEA device.
 ///

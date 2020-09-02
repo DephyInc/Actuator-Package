@@ -4,7 +4,7 @@ Please do not make any changes to this file!
 """
 from ctypes import Structure, c_int
 
-class CycleTesterState(Structure):
+class EB60State(Structure):
 	_pack_ = 1
 	_fields_ = [
 		("rigid", c_int),
@@ -39,4 +39,19 @@ class CycleTesterState(Structure):
 		("genvar_9", c_int),
 		("ank_ang", c_int),
 		("ank_vel", c_int),
+		("shank_ang", c_int),
+		("shank_vel", c_int),
+		("global_shank_ang", c_int),
+		("ank_pos_x", c_int),
+		("ank_pos_y", c_int),
+		("ank_pos_z", c_int),
+		("ank_linear_vel_x", c_int),
+		("ank_linear_vel_y", c_int),
+		("ank_linear_vel_z", c_int),
+		("ank_torque", c_int),
+		("step_energy", c_int),
+		("step_time", c_int),
+		("gait_state", c_int),
+		("intermediate_state", c_int),
+		("movement", c_int),
 		("SystemTime", c_int)]

@@ -10,9 +10,9 @@ class NetNodeState(Structure):
 		("netnode", c_int),
 		("id", c_int),
 		("state_time", c_int),
-		("genvar_0", c_int),
-		("genvar_1", c_int),
-		("genvar_2", c_int),
-		("genvar_3", c_int),
+		("genVar_0", c_int),
+		("genVar_1", c_int),
+		("genVar_2", c_int),
+		("genVar_3", c_int),
 		("status", c_int),
 		("SystemTime", c_int)]
