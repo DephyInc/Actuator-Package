@@ -71,12 +71,12 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
 		# Give the device time to consume the startStreaming command and start streaming
 		sleep(0.1)
 		data = fxReadDevice(devId0)
-		initialPos0 = data.encoderAngle
+		initialPos0 = data.mot_ang
 
 		initialPos1 = 0
 		if(secondDevice):
 			data = fxReadDevice(devId1)
-			initialPos1 = data.encoderAngle
+			initialPos1 = data.mot_ang
 	else:
 		initialPos0 = 0
 		initialPos1 = 0
@@ -158,12 +158,12 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
 				dev0WriteTimeBefore = time()
 				fxSendMotorCommand(devId0, FxPosition, sample + initialPos0)
 				dev0WriteTimeAfter = time()
-				measurements0.append(data0.encoderAngle - initialPos0)
+				measurements0.append(data0.mot_ang - initialPos0)
 				if(secondDevice):
 					dev1WriteTimeBefore = time()
 					fxSendMotorCommand(devId1, FxPosition, sample + initialPos1)
 					dev1WriteTimeAfter = time()
-					measurements1.append(data1.encoderAngle - initialPos1)
+					measurements1.append(data1.mot_ang - initialPos1)
 
 			dev0ReadCommandTimes.append(dev0ReadTimeAfter - dev0ReadTimeBefore)
 			dev0WriteCommandTimes.append(dev0WriteTimeAfter - dev0WriteTimeBefore)
@@ -190,9 +190,9 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
 						measurements1.append(data1.motorCurrent)
 
 				elif(controllerType == hssPosition):
-					measurements0.append(data0.encoderAngle - initialPos0)
+					measurements0.append(data0.mot_ang - initialPos0)
 					if(secondDevice):
-						measurements1.append(data1.encoderAngle - initialPos1)
+						measurements1.append(data1.mot_ang - initialPos1)
 
 				times.append(time() - t0)
 				requests.append(sample)

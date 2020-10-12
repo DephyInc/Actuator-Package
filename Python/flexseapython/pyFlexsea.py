@@ -480,8 +480,10 @@ def loadFlexsea():
 		# load proper library based on host architecture
 		if architecture == "32bit":
 			lpath_base = os.path.join(dir_path,'../../libs/win32')
+			print("==============I'm running 32 bit libs===================\n")
 		else:
 			lpath_base = os.path.join(dir_path,'../../libs/win64')
+			print("-----------I'm running 64 bit libs------------\n")
 		librarypaths = [os.path.join(lpath_base,'libfx_plan_stack.dll')]
 		# Python 3.8+ requires location of all DLLs AND their dependencies be explicitly
 		# stated. Provide location of DLLs that libfx_plan_stack.dll depends on

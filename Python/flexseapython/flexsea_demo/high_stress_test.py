@@ -99,13 +99,13 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 	sleep(0.1)
 
 	data0 = fxReadDevice(devId0)
-	initialPos0 = data0.encoderAngle	# May be used to offset subsequent readings
+	initialPos0 = data0.mot_ang	# May be used to offset subsequent readings
 	print("Initial position 0:", initialPos0)
 
 	initialPos1 = 0
 	if(secondDevice):
 		data1 = fxReadDevice(devId1)
-		initialPos1 = data1.encoderAngle
+		initialPos1 = data1.mot_ang
 		print("Initial position 1:", initialPos1)
 
 	# Generate control profiles
@@ -132,12 +132,12 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 
 			sleep(delay_time)	# Important in loop 2+
 			if(i):	# Second or later iterations in loop
-				# setPositionCtrl(  devId0, devId1, secondDevice, data0.encoderAngle, initialPos1)
+				# setPositionCtrl(  devId0, devId1, secondDevice, data0.mot_ang, initialPos1)
 				sendAndTimeCmds(t0, devId0, devId1, secondDevice, initialPos0, initialPos1,
 					current0 = 0, current1 = 0, motorCmd = FxPosition,
-					position0 = data0.encoderAngle, position1 = initialPos1,
+					position0 = data0.mot_ang, position1 = initialPos1,
 					posReq = 0, setGains = True)
-				# ToDo: data1.encoderAngle
+				# ToDo: data1.mot_ang
 			else:	# First loop iteration
 				# setPositionCtrl(  devId0, devId1, secondDevice, initialPos0, initialPos1)
 				sendAndTimeCmds(t0, devId0, devId1, secondDevice, initialPos0 = 0, initialPos1 = 0,
@@ -149,7 +149,7 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 			# -------------------------------
 			if(i):	# Second or later iterations in loop
 				print("Step 1: go to initial position")
-				linSamples = linearInterp(data0.encoderAngle-initialPos0, 0, 100)
+				linSamples = linearInterp(data0.mot_ang-initialPos0, 0, 100)
 				#print(np.int64(linSamples))
 
 				for sample in linSamples:
@@ -364,8 +364,8 @@ def sendAndTimeCmds(t0, devId0, devId1, device2: bool, initialPos0, initialPos1,
 		sendMotorTimes.append(time() - tstart)
 		if(device2):
 			fxSendMotorCommand(devId1, FxCurrent, current1)
-			positionMeasurements1.append(data1.encoderAngle - initialPos1)
-		positionMeasurements0.append(data0.encoderAngle)
+			positionMeasurements1.append(data1.mot_ang - initialPos1)
+		positionMeasurements0.append(data0.mot_ang)
 
 	elif motorCmd == FxPosition:	# Set device(s) for position control
 		tstart = time()
@@ -373,8 +373,8 @@ def sendAndTimeCmds(t0, devId0, devId1, device2: bool, initialPos0, initialPos1,
 		sendMotorTimes.append(time() - tstart)
 		if(device2):
 			fxSendMotorCommand(devId1, FxPosition, position1)
-			positionMeasurements1.append(data1.encoderAngle - initialPos1)
-		positionMeasurements0.append(data0.encoderAngle - initialPos0)
+			positionMeasurements1.append(data1.mot_ang - initialPos1)
+		positionMeasurements0.append(data0.mot_ang - initialPos0)
 	else:	# Defensive code.  It should not execute!
 		assert 0, 'Unexpected motor command in record_timing()'
 
