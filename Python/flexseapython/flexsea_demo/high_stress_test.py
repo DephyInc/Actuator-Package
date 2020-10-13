@@ -379,9 +379,9 @@ def sendAndTimeCmds(t0, devId0, devId1, device2: bool, initialPos0, initialPos1,
 		assert 0, 'Unexpected motor command in record_timing()'
 
 	currentRequests.append(current0)
-	currentMeasurements0.append(data0.motorCurrent)
+	currentMeasurements0.append(data0.mot_cur)
 	if(device2):
-		currentMeasurements1.append(data1.motorCurrent)
+		currentMeasurements1.append(data1.mot_cur)
 	positionRequests.append(position0)
 	times.append(time() - t0)
 

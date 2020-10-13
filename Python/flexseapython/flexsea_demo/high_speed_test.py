@@ -147,12 +147,12 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
 				dev0WriteTimeBefore = time()
 				fxSendMotorCommand(devId0, FxCurrent, sample)
 				dev0WriteTimeAfter = time()
-				measurements0.append(data0.motorCurrent)
+				measurements0.append(data0.mot_cur)
 				if(secondDevice):
 					dev1WriteTimeBefore = time()
 					fxSendMotorCommand(devId1, FxCurrent, sample)
 					dev1WriteTimeAfter = time()
-					measurements1.append(data1.motorCurrent)
+					measurements1.append(data1.mot_cur)
 
 			elif(controllerType == hssPosition):
 				dev0WriteTimeBefore = time()
@@ -185,9 +185,9 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
 					data1 = fxReadDevice(devId1)
 
 				if(controllerType == hssCurrent):
-					measurements0.append(data0.motorCurrent)
+					measurements0.append(data0.mot_cur)
 					if(secondDevice):
-						measurements1.append(data1.motorCurrent)
+						measurements1.append(data1.mot_cur)
 
 				elif(controllerType == hssPosition):
 					measurements0.append(data0.mot_ang - initialPos0)
@@ -200,7 +200,6 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
 
 		# We'll draw a line at the end of every period
 		cycleStopTimes.append(time() - t0)
-
 	# Disable the controller, send 0 PWM
 	fxSendMotorCommand(devId0, FxNone, 0)
 	fxSendMotorCommand(devId1, FxNone, 0)
@@ -215,7 +214,7 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
 
 	# Figure: setpoint, desired vs measured (1st device)
 	figureCounter = 1	# First time, functions will increment
-	fig = plotSetpointVsDesired(devId0, figureCounter, controllerType, actualFrequency, signalAmplitude, signalTypeStr, commandFrequency, times,
+	figureCounter = plotSetpointVsDesired(devId0, figureCounter, controllerType, actualFrequency, signalAmplitude, signalTypeStr, commandFrequency, times,
 						requests, measurements0, cycleStopTimes)
 	figureCounter = plotExpStats(devId0, figureCounter, dev0WriteCommandTimes, dev0ReadCommandTimes)
 
@@ -227,7 +226,6 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
 
 	printPlotExit()
 	plt.show()
-	
 	fxCloseAll()
 
 if __name__ == '__main__':
