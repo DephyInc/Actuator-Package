@@ -29,7 +29,7 @@ def fxReadOnly(port, baudRate, time = 8, time_step = 0.1):
 		print('\nYour device is a BMS.\n')
 		input("Press Enter to continue...")
 	elif (appType == FxExo):
-		print('\nYour device is an Exo.\n')
+		print('\nYour device is an Exo or ActPack Plus.\n')
 		input("Press Enter to continue...")
 	else:
 		raise RuntimeError('Unsupported application type: ', appType)
@@ -39,21 +39,8 @@ def fxReadOnly(port, baudRate, time = 8, time_step = 0.1):
 		printLoopCount(i, totalLoopCount)
 		sleep(time_step)
 		clearTerminal()
-		if (appType == FxActPack):
-			myData = fxReadDevice(devId)
-			printDevice(myData)
-		elif (appType == FxNetMaster):
-			myData = fxReadNetMasterDevice(devId)
-			printNetMaster(myData)
-		elif (appType == FxBMS):
-			fxReadBMSDevice(devId)
-			printBMSState(devId)
-		elif (appType == FxExo):
-			myData = fxReadExoDevice(devId)
-			printExo(myData)
-		else:
-			raise RuntimeError('Unsupported application type: ', appType)
-
+		myData = fxReadDevice(devId)
+		printDevice(myData, appType)
 	fxClose(devId)
 	return True
 

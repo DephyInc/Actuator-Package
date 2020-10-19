@@ -24,12 +24,9 @@ def fxOpenControl(port, baudRate, time = 2, num_times = 5,
 			fxSendMotorCommand(devId, FxVoltage, mV)
 			clearTerminal()
 			print('Ramping up motor voltage...\n')
-			if(appType == FxActPack):
-				data0 = fxReadDevice(devId)
-				printDevice(data0)
-			elif(appType == FxExo):
-				data0 = fxReadExoDevice(devId)
-				printExo(data0)
+			data0 = fxReadDevice(devId)
+			printDevice(data0, appType)
+
 
 		#Ramp-down:
 		for i in range(numSteps):
@@ -38,12 +35,9 @@ def fxOpenControl(port, baudRate, time = 2, num_times = 5,
 			fxSendMotorCommand(devId, FxVoltage, mV)
 			clearTerminal()
 			print('Ramping down motor voltage...\n')
-			if(appType == FxActPack):
-				data0 = fxReadDevice(devId)
-				printDevice(data0)
-			elif(appType == FxExo):
-				data0 = fxReadExoDevice(devId)
-				printExo(data0)
+			data0 = fxReadDevice(devId)
+			printDevice(data0, appType)
+
 
 	fxClose(devId)
 	return True

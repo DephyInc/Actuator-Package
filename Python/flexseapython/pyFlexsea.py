@@ -4,7 +4,15 @@ import sys
 import platform
 from enum import Enum
 
+from .dev_spec import AllDevices
+
+
 global flexsea
+
+# High Speed Stress/Test Experiments:
+(hssPosition,
+ hssCurrent,
+ hssMixed) = map(c_int, range(3))
 
 ################### Motor Controller Enums #######################
 
@@ -32,131 +40,6 @@ global flexsea
  FxExo,
  FxNetMaster,
  FxBMS) = map(int, range(-1,4))
-
-##################### Redefine ActPackState Structure #################
-# See "actpack_struct.h" for C definition
-
-class ActPackState(Structure):
-	_pack_ = 1
-	_fields_ = [
-			("rigid"	  , c_int),
-			("id"		  , c_int),
-			("timestamp"	  , c_int),
-			("accelx"	  , c_int),
-			("accely"	  , c_int),
-			("accelz"	  , c_int),
-			("gyrox"	  , c_int),
-			("gyroy"	  , c_int),
-			("gyroz"	  , c_int),
-			("encoderAngle"   , c_int),
-			("encoderVelocity", c_int),
-			("encoderAccel"   , c_int),
-			("motorCurrent"   , c_int),
-			("motorVoltage"   , c_int),
-			("batteryVoltage" , c_int),
-			("batteryCurrent" , c_int),
-			("batteryTemp" 	  , c_int),
-			("deviceStatus"   , c_int),
-			("motorStatus"	  , c_int),
-			("batteryStatus"  , c_int),
-			("genVar"    , c_int * 10),
-			("ankleAngle"	  , c_int),
-			("ankleVelocity"  , c_int),
-			("SystemTime"	  , c_int),
-			("dataArray" , c_int * 33)]
-
-class NetNodeState(Structure):
-	_pack_ = 1
-	_fields_ = [
-			("accelx"	  , c_int),
-			("accely"	  , c_int),
-			("accelz"	  , c_int),
-			("gyrox"	  , c_int),
-			("gyroy"	  , c_int),
-			("gyroz"	  , c_int),
-			("pressure"	  , c_int),
-			("dataArray" , c_int * 7)]
-
-class NetMasterState(Structure):
-	_pack_ = 1
-	_fields_ = [
-			("netmaster"	, c_int),
-			("id"		  	, c_int),
-			("timestamp"  	, c_int),
-			("genVar"     	, c_int * 4),
-			("status"	  	, c_int),
-			("netNode"		, NetNodeState * 8),
-			("SystemTime"	, c_int),
-			("dataArray" 	, c_int * 65)]
-
-class BMSState(Structure):
-	_pack_ = 1
-	_fields_ = [
-			("bms" 		  		, c_int),
-			("id"		  		, c_int),
-			("timestamp"	  	, c_int),
-			("cellVoltage"     	, c_int * 9),
-			("status"	  		, c_int),
-			("current"	  		, c_int),
-			("timer"	  		, c_int),
-			("balancing"		, c_int),
-			("stackVoltage"		, c_int),
-			("packImbalance"	, c_int),
-			("temperature"		, c_int * 4),
-			("genvar"			, c_int * 4),
-			("SystemTime"		, c_int),
-			("dataArray" 		, c_int * 26)]
-
-class ExoState(Structure):
-		_pack_ = 1
-		_fields_ = [
-			("rigid"							, c_int),
-			("id"		  						, c_int),
-			("timestamp"	  					, c_int),
-			("accelx"	  						, c_int),
-			("accely"	  						, c_int),
-			("accelz"	  						, c_int),
-			("gyrox"	  						, c_int),
-			("gyroy"	  						, c_int),
-			("gyroz"	  						, c_int),
-			("encoderAngle"   					, c_int),
-			("encoderVelocity"					, c_int),
-			("encoderAccel"   					, c_int),
-			("motorCurrent"   					, c_int),
-			("motorVoltage"   					, c_int),
-			("batteryVoltage" 					, c_int),
-			("batteryCurrent" 					, c_int),
-			("batteryTemp" 	  					, c_int),
-			("deviceStatus"   					, c_int),
-			("motorStatus"	  					, c_int),
-			("batteryStatus"  					, c_int),
-			("genVar"    						, c_int * 10),
-			("ankleAngle"	  					, c_int),
-			("ankleVelocity"  					, c_int),
-			("ank_from_mot"						, c_int),
-			("ank_torque"						, c_int),
-			("step_energy"						, c_int),
-			("walking_state"					, c_int),
-			("gait_state"						, c_int),
-			("shk_ang_deg"						, c_int),
-			("bilateral_active"					, c_int),
-			("dge_state"						, c_int),
-			("mot_from_ank_ang"					, c_int),
-			("step_count"						, c_int),
-			("training_data_current_status" 	, c_int),
-			("need_to_add_steps"				, c_int),
-			("training_progress"				, c_int),
-			("substatedpeb42"					, c_int),
-			("bi_state"							, c_int),
-			("bi_substate"						, c_int),
-			("bi_power"							, c_int),
-			("bi_training_progress"				, c_int),
-			("bi_training_status"				, c_int),
-			("bi_need_steps"					, c_int),
-			("bi_step_count"					, c_int),
-			("SystemTime"						, c_int),
-			("dataArray" 						, c_int * 54)]
-
 
 ####################### Begin API ##################################
 
@@ -296,7 +179,7 @@ def fxReadDevice(devId):
 	devId (int): The device ID of the device to read from.
 
 	Returns:
-	exoState (ExoState): Contains the most recent data from the device
+	deviceState: Contains the most recent data from the device
 
 	Raises:
 	ValueError if invalid device ID
@@ -304,15 +187,32 @@ def fxReadDevice(devId):
 	"""
 	global flexsea
 
-	actPackState = ActPackState();
-	retCode = flexsea.fxReadDevice(devId, byref(actPackState))
+	#get the device type
+	appType = fxGetAppType(devId)
+
+	if (appType == FxActPack):
+		deviceState = AllDevices.ActPackState();
+		retCode = flexsea.fxReadDevice(devId, byref(deviceState))
+	elif (appType == FxNetMaster):
+		deviceState = AllDevices.NetMasterState();
+		retCode = flexsea.fxReadNetMasterDevice(devId, byref(deviceState))
+	elif (appType == FxBMS):
+		deviceState = AllDevices.BMSState();
+		retCode = flexsea.fxReadBMSDevice(devId, byref(deviceState))
+	elif (appType == FxExo):
+		deviceState = AllDevices.ExoState();
+		retCode = flexsea.fxReadExoDevice(devId, byref(deviceState))
+	else:
+		raise RuntimeError('Unsupported application type: ', appType)
 
 	if (retCode == FxInvalidDevice):
 		raise ValueError('fxReadDevice: invalid device ID')
 	elif (retCode == FxNotStreaming):
 		raise RuntimeError('fxReadDevice: no read data')
+	elif (retCode == FxFailure):
+		raise IOError('fxReadDevice: command failed')
 
-	return actPackState
+	return deviceState
 
 def fxReadExoDevice(devId):
 	"""
@@ -331,7 +231,7 @@ def fxReadExoDevice(devId):
 	"""
 	global flexsea
 
-	exoState = ExoState();
+	exoState = AllDevices.ExoState();
 	retCode = flexsea.fxReadExoDevice(devId, byref(exoState))
 
 	if (retCode == FxInvalidDevice):
@@ -359,66 +259,14 @@ def fxReadDeviceAll(devId, dataQueueSize):
 	"""
 	global flexsea
 
-	actPackStateDataQueue = [ActPackState() for count in range(dataQueueSize)];
+	ActPackStateDataQueue = [AllDevices.ActPackState() for count in range(dataQueueSize)];
 
-	itemsRead = flexsea.fxReadDeviceAll(devId, byref(actPackStateDataQueue), dataQueueSize)
+	itemsRead = flexsea.fxReadDeviceAll(devId, byref(ActPackStateDataQueue), dataQueueSize)
 	if (itemsRead == -1):
 		raise ValueError('fxGetReadDataQueueSize: Invalid device ID')
 	return itemsRead
 
-def fxReadNetMasterDevice(devId):
-	"""
-	Read the most recent data from a streaming FlexSEA NetMaster device stream.
-	IMPORTANT! Must call fxStartStreaming before calling this.
 
-	Parameters:
-	devId (int): The device ID of the device to read from.
-
-	Returns:
-	netMasterState (NetMasterState): Contains the most recent data from the device
-
-	Raises:
-	ValueError if invalid device ID
-	RuntimeError if no read data
-	"""
-	global flexsea
-
-	netMasterState = NetMasterState();
-	retCode = flexsea.fxReadNetMasterDevice(devId, byref(netMasterState))
-
-	if (retCode == FxInvalidDevice):
-		raise ValueError('fxReadDevice: invalid device ID')
-	elif (retCode == FxNotStreaming):
-		raise RuntimeError('fxReadDevice: no read data')
-
-	return netMasterState
-
-def fxReadBMSDevice(devId):
-	"""
-	Read the most recent data from a streaming FlexSEA BMS device stream.
-	IMPORTANT! Must call fxStartStreaming before calling this.
-
-	Parameters:
-	devId (int): The device ID of the device to read from.
-
-	Returns:
-	bmsState (BMSState): Contains the most recent data from the device
-
-	Raises:
-	ValueError if invalid device ID
-	RuntimeError if no read data
-	"""
-	global flexsea
-
-	bmsState = BMSState();
-	retCode = flexsea.fxReadBMSDevice(devId, byref(bmsState))
-
-	if (retCode == FxInvalidDevice):
-		raise ValueError('fxReadDevice: invalid device ID')
-	elif (retCode == FxNotStreaming):
-		raise RuntimeError('fxReadDevice: no read data')
-
-	return bmsState
 
 def fxReadNetMasterDeviceAll(devId, dataQueueSize):
 	"""
@@ -438,9 +286,9 @@ def fxReadNetMasterDeviceAll(devId, dataQueueSize):
 	"""
 	global flexsea
 
-	netMasterStateDataQueue = [NetMasterState() for count in range(dataQueueSize)];
+	NetMasterStateDataQueue = [AllDevices.NetMasterState() for count in range(dataQueueSize)];
 
-	itemsRead = flexsea.fxReadNetMasterDeviceAll(devId, byref(netMasterStateDataQueue), dataQueueSize)
+	itemsRead = flexsea.fxReadNetMasterDeviceAll(devId, byref(NetMasterStateDataQueue), dataQueueSize)
 	if (itemsRead == -1):
 		raise ValueError('fxReadNetMasterDeviceAll: Invalid device ID')
 	return itemsRead
@@ -463,9 +311,9 @@ def fxReadBMSDeviceAll(devId, dataQueueSize):
 	"""
 	global flexsea
 
-	bmsStateDataQueue = [BMSState() for count in range(dataQueueSize)]
+	BMSStateDataQueue = [AllDevices.BMSState() for count in range(dataQueueSize)]
 
-	itemsRead = flexsea.fxReadNetMasterDeviceAll(devId, byref(bmsStateDataQueue), dataQueueSize)
+	itemsRead = flexsea.fxReadNetMasterDeviceAll(devId, byref(BMSStateDataQueue), dataQueueSize)
 	if (itemsRead == -1):
 		raise ValueError('fxReadBMSDeviceAll: Invalid device ID')
 	return itemsRead
@@ -491,6 +339,8 @@ def fxSetReadDataQueueSize(devId, readDataQueueSize):
 		raise ValueError('fxSetReadDataQueueSize: Invalid device ID')
 	elif (retCode == FxInvalidParam):
 		raise ValueError('fxSetReadDataQueueSize: Invalid readDataQueueSize')
+	elif (retCode == FxFailure):
+		raise IOError('fxSetReadDataQueueSize: command failed')
 
 def fxGetReadDataQueueSize(devId):
 	"""
@@ -535,6 +385,8 @@ def fxSetGains(devId, kp, ki, kd, K, B):
 
 	if (retCode == FxInvalidDevice):
 		raise ValueError('fxSetGains: invalid device ID')
+	elif (retCode == FxFailure):
+		raise IOError('fxsetGains: command failed')
 
 def fxSendMotorCommand(devId, controlMode, value):
 	"""
@@ -561,10 +413,13 @@ def fxSendMotorCommand(devId, controlMode, value):
 	retCode = flexsea.fxSendMotorCommand(devId, controlMode, c_int(int(value)))
 
 	if (retCode == FxInvalidDevice):
+		print('fxSendMotorCommand(): Invalid device ID: retCode:', retCode)
 		raise ValueError('fxSendMotorCommand: invalid device ID')
-	if (retCode == FxFailure):
+	elif (retCode == FxFailure):
+		print('fxSendMotorCommand(): Command failed: retCode:', retCode)
 		raise IOError('fxSendMotorCommand: command failed')
-	if (retCode == FxInvalidParam):
+	elif (retCode == FxInvalidParam):
+		print('fxSendMotorCommand(): Invalid control type: retCode:', retCode)
 		raise ValueError('fxSendMotorCommand: invalid controlType')
 
 def fxGetAppType(devId):
@@ -600,8 +455,11 @@ def fxFindPoles(devId):
 
 	DO NOT USE THIS FUNCTION UNLESS YOU KNOW WHAT YOU ARE DOING
 	"""
-	if (flexsea.fxFindPoles(devId) == FxInvalidDevice):
+	retCode = flexsea.fxFindPoles(devId)
+	if (retCode == FxInvalidDevice):
 		raise ValueError('fxFindPoles: invalid device ID')
+	elif (retCode == FxFailure):
+		raise ValueError('fxFindPoles: command failed')
 
 # Loads the library from the c lib
 def loadFlexsea():
@@ -677,16 +535,16 @@ def loadFlexsea():
 	flexsea.fxStopStreaming.argtypes = [c_uint]
 	flexsea.fxStopStreaming.restype = c_int
 
-	flexsea.fxReadDevice.argtypes = [c_uint, POINTER(ActPackState)]
+	flexsea.fxReadDevice.argtypes = [c_uint, POINTER(AllDevices.ActPackState)]
 	flexsea.fxReadDevice.restype = c_int
 
-	flexsea.fxReadDeviceAll.argtypes = [c_uint, POINTER(ActPackState), c_uint]
+	flexsea.fxReadDeviceAll.argtypes = [c_uint, POINTER(AllDevices.ActPackState), c_uint]
 	flexsea.fxReadDeviceAll.restype = c_int
 
-	flexsea.fxReadNetMasterDevice.argtypes = [c_uint, POINTER(NetMasterState)]
+	flexsea.fxReadNetMasterDevice.argtypes = [c_uint, POINTER(AllDevices.NetMasterState)]
 	flexsea.fxReadDevice.restype = c_int
 
-	flexsea.fxReadNetMasterDeviceAll.argtypes = [c_uint, POINTER(NetMasterState), c_uint]
+	flexsea.fxReadNetMasterDeviceAll.argtypes = [c_uint, POINTER(AllDevices.NetMasterState), c_uint]
 	flexsea.fxReadNetMasterDeviceAll.restype = c_int
 
 	flexsea.fxSetReadDataQueueSize.argtypes = [c_uint, c_uint]
@@ -702,7 +560,7 @@ def loadFlexsea():
 	flexsea.fxSendMotorCommand.restype = c_int
 
 	flexsea.fxGetAppType.argtypes = [c_uint]
-	flexsea.fxSendMotorCommand.restype = c_int
+	flexsea.fxGetAppType.restype = c_int
 
 	return True
 

@@ -15,7 +15,7 @@
 #endif
 #include "hold_position_example.h"
 #include "open_speed_example.h"
-#include "readOnly.h"
+#include "inc/readonly.h"
 #include "current_control.h"
 //#include "findpolesexample.h"
 #include "two_dev_position_example.h"
@@ -99,7 +99,7 @@ int main()
         switch(activeDemo)
         {
             case 0:
-                runReadAll(deviceIds[0], &shouldQuit);
+                runReadOnly(deviceIds[0], &shouldQuit);
                 break;
             case 1:
                 //runOpenSpeed(deviceIds[0], &shouldQuit);
