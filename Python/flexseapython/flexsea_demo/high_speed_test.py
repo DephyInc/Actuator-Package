@@ -71,12 +71,12 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
 		# Give the device time to consume the startStreaming command and start streaming
 		sleep(0.1)
 		data = fxReadDevice(devId0)
-		initialPos0 = data.encoderAngle
+		initialPos0 = data.mot_ang
 
 		initialPos1 = 0
 		if(secondDevice):
 			data = fxReadDevice(devId1)
-			initialPos1 = data.encoderAngle
+			initialPos1 = data.mot_ang
 	else:
 		initialPos0 = 0
 		initialPos1 = 0
@@ -147,23 +147,23 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
 				dev0WriteTimeBefore = time()
 				fxSendMotorCommand(devId0, FxCurrent, sample)
 				dev0WriteTimeAfter = time()
-				measurements0.append(data0.motorCurrent)
+				measurements0.append(data0.mot_cur)
 				if(secondDevice):
 					dev1WriteTimeBefore = time()
 					fxSendMotorCommand(devId1, FxCurrent, sample)
 					dev1WriteTimeAfter = time()
-					measurements1.append(data1.motorCurrent)
+					measurements1.append(data1.mot_cur)
 
 			elif(controllerType == hssPosition):
 				dev0WriteTimeBefore = time()
 				fxSendMotorCommand(devId0, FxPosition, sample + initialPos0)
 				dev0WriteTimeAfter = time()
-				measurements0.append(data0.encoderAngle - initialPos0)
+				measurements0.append(data0.mot_ang - initialPos0)
 				if(secondDevice):
 					dev1WriteTimeBefore = time()
 					fxSendMotorCommand(devId1, FxPosition, sample + initialPos1)
 					dev1WriteTimeAfter = time()
-					measurements1.append(data1.encoderAngle - initialPos1)
+					measurements1.append(data1.mot_ang - initialPos1)
 
 			dev0ReadCommandTimes.append(dev0ReadTimeAfter - dev0ReadTimeBefore)
 			dev0WriteCommandTimes.append(dev0WriteTimeAfter - dev0WriteTimeBefore)
@@ -185,14 +185,14 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
 					data1 = fxReadDevice(devId1)
 
 				if(controllerType == hssCurrent):
-					measurements0.append(data0.motorCurrent)
+					measurements0.append(data0.mot_cur)
 					if(secondDevice):
-						measurements1.append(data1.motorCurrent)
+						measurements1.append(data1.mot_cur)
 
 				elif(controllerType == hssPosition):
-					measurements0.append(data0.encoderAngle - initialPos0)
+					measurements0.append(data0.mot_ang - initialPos0)
 					if(secondDevice):
-						measurements1.append(data1.encoderAngle - initialPos1)
+						measurements1.append(data1.mot_ang - initialPos1)
 
 				times.append(time() - t0)
 				requests.append(sample)
@@ -200,7 +200,6 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
 
 		# We'll draw a line at the end of every period
 		cycleStopTimes.append(time() - t0)
-
 	# Disable the controller, send 0 PWM
 	fxSendMotorCommand(devId0, FxNone, 0)
 	fxSendMotorCommand(devId1, FxNone, 0)
@@ -215,7 +214,7 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
 
 	# Figure: setpoint, desired vs measured (1st device)
 	figureCounter = 1	# First time, functions will increment
-	fig = plotSetpointVsDesired(devId0, figureCounter, controllerType, actualFrequency, signalAmplitude, signalTypeStr, commandFrequency, times,
+	figureCounter = plotSetpointVsDesired(devId0, figureCounter, controllerType, actualFrequency, signalAmplitude, signalTypeStr, commandFrequency, times,
 						requests, measurements0, cycleStopTimes)
 	figureCounter = plotExpStats(devId0, figureCounter, dev0WriteCommandTimes, dev0ReadCommandTimes)
 
@@ -227,7 +226,6 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
 
 	printPlotExit()
 	plt.show()
-	
 	fxCloseAll()
 
 if __name__ == '__main__':

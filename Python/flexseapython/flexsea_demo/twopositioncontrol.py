@@ -17,7 +17,7 @@ def fxTwoPositionControl(port, baudRate, expTime = 13, time_step = 0.1,
 
 	# Setting initial angle and angle waypoints
 	actPackState = fxReadDevice(devId)
-	initialAngle = actPackState.encoderAngle
+	initialAngle = actPackState.mot_ang
 
 	# Setting angle waypoints
 	positions = [initialAngle, initialAngle + delta]
@@ -46,7 +46,7 @@ def fxTwoPositionControl(port, baudRate, expTime = 13, time_step = 0.1,
 		sleep(time_step)
 		actPackState = fxReadDevice(devId)
 		clearTerminal()
-		measuredPos = actPackState.encoderAngle
+		measuredPos = actPackState.mot_ang
 		print('Desired:              ', positions[current_pos])
 		print('Measured:             ', measuredPos)
 		print('Difference:           ', (measuredPos - positions[current_pos]), '\n')

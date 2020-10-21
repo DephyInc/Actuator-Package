@@ -38,8 +38,8 @@ def fxCurrentControl(port, baudRate, holdCurrent = [1000], time = 6, time_step =
 			actPack = fxReadDevice(devId)
 			clearTerminal()
 			print('Desired  (mA):        ', desCurrent)
-			print('Measured  (mA):       ', actPack.motorCurrent)
-			print('Difference (mA):      ', (actPack.motorCurrent - desCurrent), '\n')
+			print('Measured  (mA):       ', actPack.mot_cur)
+			print('Difference (mA):      ', (actPack.mot_cur - desCurrent), '\n')
 
 			printDevice(actPack, appType)
 		prevCurrent = current
@@ -53,8 +53,8 @@ def fxCurrentControl(port, baudRate, holdCurrent = [1000], time = 6, time_step =
 		actPack = fxReadDevice(devId)
 		clearTerminal()
 		print('Desired  (mA):        ', desCurrent)
-		print('Measured  (mA):       ', actPack.motorCurrent)
-		print('Difference (mA):      ', (actPack.motorCurrent - desCurrent), '\n')
+		print('Measured  (mA):       ', actPack.mot_cur)
+		print('Difference (mA):      ', (actPack.mot_cur - desCurrent), '\n')
 		printDevice(actPack,appType)
 		sleep(time_step)
 
