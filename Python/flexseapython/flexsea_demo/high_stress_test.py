@@ -375,6 +375,7 @@ def sendAndTimeCmds(t0, devId0, devId1, device2: bool, initialPos0, initialPos1,
 			fxSendMotorCommand(devId1, FxPosition, position1)
 			positionMeasurements1.append(data1.mot_ang)
 		positionMeasurements0.append(data0.mot_ang)
+
 	else:	# Defensive code.  It should not execute!
 		assert 0, 'Unexpected motor command in record_timing()'
 

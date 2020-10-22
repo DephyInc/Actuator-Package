@@ -25,14 +25,14 @@ typedef enum fxError
 
 typedef enum fxControlMode
 {
-    FxPosition	=0, //Position - Send a position setpoint
-    FxVoltage	=1, //Voltage - Open Control Command
-    FxCurrent	=2, //Current - Send a current Setpoint command
-    FxImpedance	=3, //Impedance - Send an impedance command. Position setpoints but with stiffness and damping coefficients
-    FxNone		=4, //No controller type. Shutoff command.
-    FxCustom	=5,
-    FxMeasRes	=6,
-    FxStalk		=7, // Send an stalking command. It uses the position controller to stalk an ankle angle at a certain distance
+	FxPosition	= 0, //Position - Send a position setpoint
+	FxVoltage	= 1, //Voltage - Open Control Command
+	FxCurrent	= 2, //Current - Send a current Setpoint command
+	FxImpedance	= 3, //Impedance - Send an impedance command. Position setpoints but with stiffness and damping coefficients
+	FxNone		= 4, //No controller type. Shutoff command.
+	FxCustom	= 5,
+	FxMeasRes	= 6,
+	FxStalk		= 7, //Send an stalking command. It uses the position controller to stalk an ankle angle at a certain distance
 
 } FxControlMode;
 
@@ -373,13 +373,16 @@ int fxReadBattCyclerDeviceAll(const unsigned int deviceId,
 ///
 /// @param B : Damping (used in impedance control only)
 ///
+/// @param ff : Feed Forward gain
+///
 /// @returns Error codes defined at top of the header
 FxError fxSetGains(const unsigned int deviceId, 
-			const unsigned int kp, 
-			const unsigned int ki, 
-			const unsigned int kd, 
-			const unsigned int K, 
-			const unsigned int B);
+			const unsigned int kp,
+			const unsigned int ki,
+			const unsigned int kd,
+			const unsigned int K,
+			const unsigned int B,
+			const unsigned int ff);
 
 /// \brief Send a command to the device.
 ///
@@ -513,6 +516,14 @@ FxError fxRequestI2T(const unsigned int deviceId);
 ///
 i2tVals fxGetLastReceivedI2T(const unsigned int deviceId);
 
+/// \brief
+///
+/// @param flag is the value of the flag you wish to set
+///
+/// @param time is duration of time this flag should be
+/// present in millisecond.
+FxError fxSendEventFlags(int flag, int time);
+
 /// DO NOT USE THIS FUNCTION UNLESS YOU KNOW WHAT YOU ARE DOING
 ///
 /// \brief Find the motor poles
@@ -523,6 +534,32 @@ i2tVals fxGetLastReceivedI2T(const unsigned int deviceId);
 ///
 /// @note DO NOT USE THIS FUNCTION UNLESS YOU KNOW WHAT YOU ARE DOING
 FxError fxFindPoles(const unsigned int deviceId);
+
+/// \brief Sends new Ankle Torque points to device (Read/Write)
+///
+/// @param deviceId is the device ID
+///
+/// @returns FxInvalidDevice if deviceId is invalid
+/////          FxSuccess otherwise
+///
+FxError fxSetAnkleTorquePoints(const unsigned int deviceId, int16_t *newAnkleTorque, const uint8_t controller, const uint8_t points);
+
+/// \brief Reads new Ankle Torque points to device (pure read)
+///
+/// @param deviceId is the device ID
+///
+/// @returns FxInvalidDevice if deviceId is invalid
+/////          FxSuccess otherwise
+///
+FxError fxReadAnkleTorquePoints(const unsigned int deviceId, const uint8_t points);
+
+/// \brief Returns the last points read by the stack
+///
+/// @param deviceId is the device ID
+///
+/// @returns pointer to array
+///
+int16_t * fxGetLastReceivedAnkleTorquePoints(const unsigned int deviceId);
 
 #ifdef __cplusplus
 } // extern "C"

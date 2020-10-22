@@ -26,7 +26,7 @@ def fxImpedanceControl(port, baudRate, expTime = 20, time_step = 0.02, delta = 7
 	
 	# Read initial angle
 	data = fxReadDevice(devId)
-	initialAngle = data.encoderAngle
+	initialAngle = data.mot_ang
 	
 	result = True
 	transition_steps = int(transition_time / time_step)
@@ -59,7 +59,7 @@ def fxImpedanceControl(port, baudRate, expTime = 20, time_step = 0.02, delta = 7
 	for i in range(num_time_steps):
 		loop_ctr += 1
 		data = fxReadDevice(devId)
-		measuredPos = data.encoderAngle
+		measuredPos = data.mot_ang
 		if i % transition_steps == 0:
 			B = B + B_Increments	# Increments every cycle
 			fxSetGains(devId, kp, ki, 0, K, B)

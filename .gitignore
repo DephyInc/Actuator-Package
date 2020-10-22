@@ -3,6 +3,7 @@ __pycache__
 *.pyc
 *.project
 *.csv
+*.orig
 test_scripts/build/
 
 Python/flexseapython/com_local\.txt

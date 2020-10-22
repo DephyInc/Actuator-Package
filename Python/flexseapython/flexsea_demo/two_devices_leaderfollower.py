@@ -19,8 +19,8 @@ def fxLeaderFollower(leaderPort, baudRate, followerPort):
 	actPackState0 = fxReadDevice(devId0)
 	actPackState1 = fxReadDevice(devId1)
 
-	initialAngle0 = actPackState0.encoderAngle
-	initialAngle1 = actPackState1.encoderAngle
+	initialAngle0 = actPackState0.mot_ang
+	initialAngle1 = actPackState1.mot_ang
 
 	# set first device to current controller with 0 current (0 torque)
 	fxSetGains(devId0, 100, 20, 0, 0, 0)
@@ -38,7 +38,7 @@ def fxLeaderFollower(leaderPort, baudRate, followerPort):
 			clearTerminal()
 			leaderData   = fxReadDevice(devId0)
 			followerData = fxReadDevice(devId1)
-			angle0 = leaderData.encoderAngle
+			angle0 = leaderData.mot_ang
 			diff = angle0 - initialAngle0
 			fxSendMotorCommand(devId1, FxPosition, initialAngle1 + diff)
 			print('Device', devId1, 'following device',  devId0, '\n')
