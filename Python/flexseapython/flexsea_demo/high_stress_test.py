@@ -1,3 +1,4 @@
+"""Perform High Stress Test"""
 import os
 import sys
 import math
@@ -163,7 +164,7 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 			else:
 				# First time in loop
 				print("Step 1: skipped, first round")
-
+			
 			# Step 2: position sine wave
 			# --------------------------
 			print("Step 2: track position sine wave")
@@ -183,9 +184,8 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 			# setCurrentCtrl(   devId0, devId1, secondDevice, 0, 0)
 			sendAndTimeCmds(t0, devId0, devId1, secondDevice, initialPos0, initialPos1,
 				current0 = 0, current1 = 0, motorCmd = FxCurrent,
-				position0 = 0, position1 = 0,
+				position0 = initialPos0, position1 = initialPos1,
 				posReq = 0, setGains=True)
-
 
 			# Step 4: current setpoint
 			# --------------------------
@@ -200,9 +200,9 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 				else:			#Apply gain
 					compensatedSample = np.int64(currentAsymmetricG * sample)
 
-				sendAndTimeCmds(t0, devId0, devId1, secondDevice,initialPos0, initialPos1,
-					current0 = compensatedSample, current1 = compensatedSample,
-					motorCmd = FxCurrent, position0 = 0, position1 = 0,
+				sendAndTimeCmds(t0, devId0, devId1, secondDevice, initialPos0, initialPos1,
+					current0 = compensatedSample, current1 = compensatedSample, motorCmd = FxCurrent,
+					position0 = initialPos0, position1 = initialPos1,
 					posReq = 0, setGains = False)
 				i = i + 1
 				
@@ -213,9 +213,9 @@ def fxHighStressTest(port0, baudRate, port1 = "", commandFreq = 1000,
 			for sample in currentSamplesLine:
 
 				sleep(delay_time)
-				sendAndTimeCmds(t0, devId0, devId1, secondDevice,initialPos0, initialPos1,
-				 	current0 = sample, current1 = sample, motorCmd = FxCurrent,
-				 	position0 = 0, position1 = 0,
+				sendAndTimeCmds(t0, devId0, devId1, secondDevice, initialPos0, initialPos1,
+					current0 = sample, current1 = sample, motorCmd = FxCurrent,
+					position0 = initialPos0, position1 = initialPos1,
 					posReq = 0, setGains = False)
 
 				i = i + 1
@@ -364,7 +364,7 @@ def sendAndTimeCmds(t0, devId0, devId1, device2: bool, initialPos0, initialPos1,
 		sendMotorTimes.append(time() - tstart)
 		if(device2):
 			fxSendMotorCommand(devId1, FxCurrent, current1)
-			positionMeasurements1.append(data1.mot_ang - initialPos1)
+			positionMeasurements1.append(data1.mot_ang)
 		positionMeasurements0.append(data0.mot_ang)
 
 	elif motorCmd == FxPosition:	# Set device(s) for position control
@@ -373,8 +373,9 @@ def sendAndTimeCmds(t0, devId0, devId1, device2: bool, initialPos0, initialPos1,
 		sendMotorTimes.append(time() - tstart)
 		if(device2):
 			fxSendMotorCommand(devId1, FxPosition, position1)
-			positionMeasurements1.append(data1.mot_ang - initialPos1)
-		positionMeasurements0.append(data0.mot_ang - initialPos0)
+			positionMeasurements1.append(data1.mot_ang)
+		positionMeasurements0.append(data0.mot_ang)
+
 	else:	# Defensive code.  It should not execute!
 		assert 0, 'Unexpected motor command in record_timing()'
 
