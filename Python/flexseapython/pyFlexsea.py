@@ -360,7 +360,7 @@ def fxGetReadDataQueueSize(devId):
 	return retVal
 
 
-def fxSetGains(devId, kp, ki, kd, K, B):
+def fxSetGains(devId, kp, ki, kd, K, B, ff):
 	"""
 	Sets the gains used by PID controllers on the FlexSEA device.
 
@@ -377,11 +377,13 @@ def fxSetGains(devId, kp, ki, kd, K, B):
 
 	B (int): Damping (used in impedance control only)
 
+	ff (int): Feed forward gain
+
 	Raises:
 	ValueError if the device ID is invalid
 	"""
 	global flexsea
-	retCode = flexsea.fxSetGains(devId, kp, ki, kd, K, B)
+	retCode = flexsea.fxSetGains(devId, kp, ki, kd, K, B, ff)
 
 	if (retCode == FxInvalidDevice):
 		raise ValueError('fxSetGains: invalid device ID')
