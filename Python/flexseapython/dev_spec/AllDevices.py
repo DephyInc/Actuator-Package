@@ -4,7 +4,6 @@ from .BattCyclerState import BattCyclerState
 from .BMSState import BMSState
 from .CellScreenerState import CellScreenerState
 from .CycleTesterState import CycleTesterState
-from .EB603State import EB603State
 from .EB60State import EB60State
 from .ExoState import ExoState
 from .HabsoluteState import HabsoluteState
