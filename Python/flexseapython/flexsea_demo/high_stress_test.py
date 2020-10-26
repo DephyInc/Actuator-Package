@@ -1,6 +1,4 @@
 #!/usr/bin/python3
-from flexseapython import fxUtil as fx
-from flexseapython.fxPlotting import plotSetpointVsDesired
 """'Performs high-stress test on ActuatorPackage.'"""
 
 import os
@@ -10,10 +8,8 @@ from time import sleep, time
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
-
-pardir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
-print(pardir)
-sys.path.append(pardir)
+from flexseapython import fxUtil as fx
+from flexseapython.fxPlotting import plotSetpointVsDesired
 
 # Plot in a browser:
 matplotlib.use('WebAgg')
