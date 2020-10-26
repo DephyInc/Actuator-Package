@@ -1,4 +1,5 @@
-"""Perform High Stress Test"""
+#!/usr/bin/python3
+"""'Performs high-stress test on ActuatorPackage.'"""
 
 import os
 import sys
@@ -6,7 +7,7 @@ from time import sleep, time
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
-from flexseapython.fxUtil import *
+import flexseapython.fxUtil as fx
 
 # Plot in a browser:
 matplotlib.use('WebAgg')
@@ -63,8 +64,8 @@ def fxHighStressTest(port0, baudRate, port1='', commandFreq=1000,
         print('Port: ', dev['port'])
         print('BaudRate: ', baudRate)
         print('Logging Level: ', debug_logging_level)
-        dev['id'] = fxOpen(dev['port'], baudRate, debug_logging_level)
-        fxStartStreaming(dev['id'], commandFreq, data_log)
+        dev['id'] = fx.fxOpen(dev['port'], baudRate, debug_logging_level)
+        fx.fxStartStreaming(dev['id'], commandFreq, data_log)
         print('Connected to device with Id: ', dev['id'])
 
     # Get initial position:
@@ -75,16 +76,17 @@ def fxHighStressTest(port0, baudRate, port1='', commandFreq=1000,
 
     # Get initial position
     for dev in devices:
-        dev['data'] = fxReadDevice(dev['id'])
+        dev['data'] = fx.fxReadDevice(dev['id'])
         dev['initial_pos'] = dev['data'].mot_ang  # Used to offset readings
         print('Initial Position: {}'.format(dev['initial_pos']))
 
     # Generate control profiles
     print('Generating three Command tables...')
-    position_samples = sinGenerator(
+    position_samples = fx.sinGenerator(
         positionAmplitude, positionFreq, commandFreq)
-    current_samples = sinGenerator(currentAmplitude, currentFreq, commandFreq)
-    current_samples_line = lineGenerator(0, 0.15, commandFreq)
+    current_samples = fx.sinGenerator(
+        currentAmplitude, currentFreq, commandFreq)
+    current_samples_line = fx.lineGenerator(0, 0.15, commandFreq)
 
     # Initialize lists
 
@@ -92,7 +94,7 @@ def fxHighStressTest(port0, baudRate, port1='', commandFreq=1000,
     cmd_count = 0
     try:
         for rep in range(0, numberOfLoops):
-            printLoopCountAndTime(rep, numberOfLoops, time() - start_time)
+            fx.printLoopCountAndTime(rep, numberOfLoops, time() - start_time)
 
             # Step 0: set position controller
             # -------------------------------
@@ -107,7 +109,7 @@ def fxHighStressTest(port0, baudRate, port1='', commandFreq=1000,
                     initial_cmd = {'cur': 0, 'pos': dev['initial_pos']}
                 cmds.append(initial_cmd)
 
-            send_and_time_cmds(start_time, devices, cmds, FxPosition, True)
+            send_and_time_cmds(start_time, devices, cmds, fx.FxPosition, True)
 
             # Step 1: go to initial position
             # -------------------------------
@@ -116,7 +118,7 @@ def fxHighStressTest(port0, baudRate, port1='', commandFreq=1000,
                 # Create interpolation angles for each device
                 lin_samples = list()
                 for dev in devices:
-                    lin_samples.append(linearInterp(
+                    lin_samples.append(fx.linearInterp(
                         dev['data'].mot_ang - dev['initial_pos'], 0, 100))
 
                 for samples in lin_samples:
@@ -125,7 +127,7 @@ def fxHighStressTest(port0, baudRate, port1='', commandFreq=1000,
                                 for dev in devices]
                         sleep(delay_time)
                         send_and_time_cmds(start_time, devices,
-                                           cmds, FxPosition, False)
+                                           cmds, fx.FxPosition, False)
                         cmd_count += 1
             else:
                 # First time in loop
@@ -140,14 +142,14 @@ def fxHighStressTest(port0, baudRate, port1='', commandFreq=1000,
                         for dev in devices]
                 sleep(delay_time)
                 send_and_time_cmds(start_time, devices,
-                                   cmds, FxPosition, False)
+                                   cmds, fx.FxPosition, False)
                 cmd_count += 1
 
             # Step 3: set current controller
             # -------------------------------
             print('Step 3: set current controller')
             cmds = [{'cur': 0, 'pos': 0} for dev in devices]
-            send_and_time_cmds(start_time, devices, cmds, FxCurrent, True)
+            send_and_time_cmds(start_time, devices, cmds, fx.FxCurrent, True)
 
             # Step 4: current setpoint
             # --------------------------
@@ -162,7 +164,8 @@ def fxHighStressTest(port0, baudRate, port1='', commandFreq=1000,
                         for dev in devices]
 
                 sleep(delay_time)
-                send_and_time_cmds(start_time, devices, cmds, FxCurrent, False)
+                send_and_time_cmds(start_time, devices,
+                                   cmds, fx.FxCurrent, False)
                 cmd_count += 1
 
             # Step 5: short pause at 0 current to allow a slow-down
@@ -173,7 +176,8 @@ def fxHighStressTest(port0, baudRate, port1='', commandFreq=1000,
                 cmds = [{'cur': sample, 'pos': dev['initial_pos']}
                         for dev in devices]
                 sleep(delay_time)
-                send_and_time_cmds(start_time, devices, cmds, FxCurrent, False)
+                send_and_time_cmds(start_time, devices,
+                                   cmds, fx.FxCurrent, False)
                 cmd_count += 1
 
             # Draw a line at the end of every loop
@@ -186,7 +190,7 @@ def fxHighStressTest(port0, baudRate, port1='', commandFreq=1000,
 
     # Disable the controller, send 0 PWM
     for dev in devices:
-        fxSendMotorCommand(dev['id'], FxVoltage, 0)
+        fx.fxSendMotorCommand(dev['id'], fx.FxVoltage, 0)
     sleep(0.1)
 
     ######## Stats: #########
@@ -261,8 +265,8 @@ def plot_data(devices):
     plt.show()
     sleep(0.1)
 
-    printPlotExit()
-    fxCloseAll()
+    fx.printPlotExit()
+    fx.fxCloseAll()
     print('Communication closed')
 
 
@@ -276,26 +280,26 @@ def send_and_time_cmds(start_time, devices, cmds, motor_cmd, set_gains: bool):
     """
     global TIMESTAMPS  # Elapsed times from start of run
 
-    assert (motor_cmd in [FxPosition, FxCurrent]
+    assert (motor_cmd in [fx.FxPosition, fx.FxCurrent]
             ), 'Unexpected motor command, only FxPosition, FxCurrent allowed'
 
     for dev, cmd in zip(devices, cmds):
         tstart = time()
-        dev['data'] = fxReadDevice(dev['id'])  # Get ActPackState
+        dev['data'] = fx.fxReadDevice(dev['id'])  # Get ActPackState
         dev['read_times'].append(time() - tstart)
 
         if set_gains:
             tstart = time()
-            fxSetGains(dev['id'], 300, 50, 0, 0, 0)
+            fx.fxSetGains(dev['id'], 300, 50, 0, 0, 0)
             dev['gains_times'].append(time() - tstart)
         else:
             dev['gains_times'].append(0)
 
         # Select command value
-        cmd_val = cmd['cur'] if motor_cmd == FxCurrent else cmd['pos']
+        cmd_val = cmd['cur'] if motor_cmd == fx.FxCurrent else cmd['pos']
         # Command motor
         tstart = time()
-        fxSendMotorCommand(dev['id'], motor_cmd, cmd_val)
+        fx.fxSendMotorCommand(dev['id'], motor_cmd, cmd_val)
         dev['motor_times'].append(time() - tstart)
         dev['pos_measurements'].append(dev['data'].mot_ang)
 
@@ -308,9 +312,25 @@ def send_and_time_cmds(start_time, devices, cmds, motor_cmd, set_gains: bool):
 
 
 if __name__ == '__main__':
+    import argparse
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('baud', metavar='b', type=int,
+                        help='Communication baudrate')
+
+    parser.add_argument('port', metavar='p', type=str, nargs='+',
+                        help='Ports for test devices')
+
+    args = parser.parse_args()
+    print(args)
+
     baud_rate = sys.argv[1]
     ports = sys.argv[2:3]
     try:
-        fxHighStressTest(ports, baud_rate)
+        # TODO: Support more than 2 ports
+        if len(args.port) > 1:
+            fxHighStressTest(args.port[0], args.baud, args.port[1])
+        else:
+            fxHighStressTest(args.port[0], args.baud)
     except Exception as err:
         print('broke: {}'.format(err))
