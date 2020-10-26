@@ -3,12 +3,12 @@
 import os
 import sys
 from time import sleep, time
-from enum import Enum
 import numpy as np
 import matplotlib.pyplot as plt
-from flexseapython.fxUtil import *
-# Next two lines are used to plot in a browser:
 import matplotlib
+from flexseapython.fxUtil import *
+
+# Plot in a browser:
 matplotlib.use('WebAgg')
 
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -101,7 +101,7 @@ def fxHighStressTest(port0, baudRate, port1="", commandFreq=1000,
         print("Initial Position: ", dev['initial_pos'])
 
     # Generate control profiles
-    print('Generating 3x Command tables...')
+    print('Generating three Command tables...')
     position_samples = sinGenerator(
         positionAmplitude, positionFreq, commandFreq)
     current_samples = sinGenerator(currentAmplitude, currentFreq, commandFreq)
@@ -110,7 +110,7 @@ def fxHighStressTest(port0, baudRate, port1="", commandFreq=1000,
     # Initialize lists
 
     t0 = time()  # Record start time of experiment
-    i = 0
+    cmd_count = 0
     try:
         for rep in range(0, numberOfLoops):
             printLoopCountAndTime(rep, numberOfLoops, time() - t0)
@@ -123,35 +123,30 @@ def fxHighStressTest(port0, baudRate, port1="", commandFreq=1000,
             cmds = list()
             for dev in devices:
                 if rep:  # Second or later iterations in loop
-                    initial_cmd = {{'cur': 0, 'pos': dev['data'].mot_ang}}
+                    initial_cmd = {'cur': 0, 'pos': dev['data'].mot_ang}
                 else:
-                    initial_cmd = {{'cur': 0, 'pos': dev['initial_pos']}}
+                    initial_cmd = {'cur': 0, 'pos': dev['initial_pos']}
                 cmds.append(initial_cmd)
 
-            sendAndTimeCmds(t0, devices, cmds, motor_cmd=FxPosition,
-                            pos_req=0, set_gains=True)
+            sendAndTimeCmds(t0, devices, cmds, FxPosition, True)
 
             # Step 1: go to initial position
             # -------------------------------
-            cmds = list()
             if rep:  # Second or later iterations in loop
                 print("Step 1: go to initial position")
-                lin_samples = linearInterp(data0.mot_ang-initialPos0, 0, 100)
+                # Create interpolation angles for each device
+                lin_samples = list()
+                for dev in devices:
+                    lin_samples.append(linearInterp(
+                        dev['data'].mot_ang - dev['initial_pos'], 0, 100))
 
-                for sample in lin_samples:
-                    for dev in devices:
-                        cmd = {{'cur': 0, 'pos': dev['data'].mot_ang}}
-                        cmds.append(cmd)
-
-                    sendAndTimeCmds(t0, devices, cmds, motor_cmd=FxPosition,
-                                    pos_req=0, set_gains=True)
-                    sleep(delay_time)
-                    sendAndTimeCmds(t0, devId0, devId1, second_device, initialPos0, initialPos1,
-                                    current0=0, current1=0, motor_cmd=FxPosition,
-                                    position0=sample + initialPos0, position1=sample + initialPos1,
-                                    pos_req=sample, set_gains=False)
-
-                    i = i + 1
+                for samples in lin_samples:
+                    for sample in samples:
+                        cmds = [{'cur': 0, 'pos': sample + dev['initial_pos']}
+                                for dev in devices]
+                        sleep(delay_time)
+                        sendAndTimeCmds(t0, devices, cmds, FxPosition, False)
+                        cmd_count += 1
             else:
                 # First time in loop
                 print("Step 1: skipped, first round")
@@ -161,222 +156,185 @@ def fxHighStressTest(port0, baudRate, port1="", commandFreq=1000,
             print("Step 2: track position sine wave")
 
             for sample in position_samples:
-
+                cmds = [{'cur': 0, 'pos': sample + dev['initial_pos']}
+                        for dev in devices]
                 sleep(delay_time)
-                sendAndTimeCmds(t0, devId0, devId1, second_device, initialPos0, initialPos1,
-                                current0=0, current1=0, motor_cmd=FxPosition,
-                                position0=sample + initialPos0, position1=sample + initialPos1,
-                                pos_req=0, set_gains=False)
-                i = i + 1
+                sendAndTimeCmds(t0, devices, cmds, FxPosition, False)
+                cmd_count += 1
 
             # Step 3: set current controller
             # -------------------------------
             print("Step 3: set current controller")
-            # setCurrentCtrl(   devId0, devId1, second_device, 0, 0)
-            sendAndTimeCmds(t0, devId0, devId1, second_device, initialPos0, initialPos1,
-                            current0=0, current1=0, motor_cmd=FxCurrent,
-                            position0=initialPos0, position1=initialPos1,
-                            pos_req=0, set_gains=True)
+            cmds = [{'cur': 0, 'pos': 0} for dev in devices]
+            sendAndTimeCmds(t0, devices, cmds, FxCurrent, True)
 
             # Step 4: current setpoint
             # --------------------------
             print("Step 4: track current sine wave")
             for sample in current_samples:
-
                 sleep(delay_time)
                 # We use more current on the "way back" to come back closer to
                 # the staring point
-                if(sample <= 0):  # No change
-                    compensatedSample = sample
-                else:  # Apply gain
-                    compensatedSample = np.int64(currentAsymmetricG * sample)
+                if sample > 0:  # Apply gain
+                    sample = np.int64(currentAsymmetricG * sample)
+                cmds = [{'cur': sample, 'pos': dev['initial_pos']}
+                        for dev in devices]
 
-                sendAndTimeCmds(t0, devId0, devId1, second_device, initialPos0, initialPos1,
-                                current0=compensatedSample, current1=compensatedSample, motor_cmd=FxCurrent,
-                                position0=initialPos0, position1=initialPos1,
-                                pos_req=0, set_gains=False)
-                i = i + 1
+                sleep(delay_time)
+                sendAndTimeCmds(t0, devices, cmds, FxCurrent, False)
+                cmd_count += 1
 
             # Step 5: short pause at 0 current to allow a slow-down
             # -----------------------------------------------------
             print("Step 5: motor slow-down, zero current")
 
             for sample in current_samples_line:
-
+                cmds = [{'cur': sample, 'pos': dev['initial_pos']}
+                        for dev in devices]
                 sleep(delay_time)
-                sendAndTimeCmds(t0, devId0, devId1, second_device, initialPos0, initialPos1,
-                                current0=sample, current1=sample, motor_cmd=FxCurrent,
-                                position0=initialPos0, position1=initialPos1,
-                                pos_req=0, set_gains=False)
+                sendAndTimeCmds(t0, devices, cmds, FxCurrent, False)
+                cmd_count += 1
 
-                i = i + 1
-
-            # We'll draw a line at the end of every period
+            # Draw a line at the end of every loop
             cycleStopTimes.append(time() - t0)
-            elapsed_time = time() - t0
 
     except KeyboardInterrupt:
         print('Keypress detected. Exiting gracefully...')
 
+    elapsed_time = time() - t0
+
     # Disable the controller, send 0 PWM
-    fxSendMotorCommand(devId0, FxVoltage, 0)
-    fxSendMotorCommand(devId1, FxVoltage, 0)
+    for dev in devices:
+        fxSendMotorCommand(dev['id'], FxVoltage, 0)
     sleep(0.1)
 
     ######## Stats: #########
     print("")
     print("Final Stats:")
     print("------------")
-    actual_period = cycleStopTimes[0]
-    command_frequency = i / elapsed_time
-    print("Number of commands sent:" + str(i))
-    print("Total time (s):" + str(elapsed_time))
-    print("Requested command frequency:"+"{:.2f}".format(commandFreq))
-    print("Actual command frequency (Hz):"+"{:.2f}".format(command_frequency))
+    print("Number of commands sent: {}".format(cmd_count))
+    print("Total time (s): {}".format(elapsed_time))
+    print("Requested command frequency: {:.2f}".format(commandFreq))
+    assert (elapsed_time != 0), "Elapsed time is 0."
+    print("Actual command frequency (Hz): {:.2f}".format(
+        cmd_count / elapsed_time))
     print("")
-    print('current_samples_line:', len(current_samples_line))
-    print('size(times):', len(times))
-    print('size(currentRequests):', len(currentRequests))
-    print('size(currentMeasurements0):',    len(currentMeasurements0))
-    print('size(setGainsTimes):',       len(setGainsTimes))
-    print('')
+    print("current_samples_line: {}".format(len(current_samples_line)))
+    print("size(times): {}".format(len(times)))
+    print("size(currentRequests): {}".format(len(devices[0]['curr_requests'])))
+    print("size(currentMeasurements0): {}".format(
+        len(devices[0]['curr_measurements'])))
+    print("size(setGainsTimes): {}".format(len(setGainsTimes)))
+    print("")
 
-    ######## Summary stats about individual arrays: #########
-    # print('\n\ntimes: ',          stats.describe(times))
-    # print('\n\ncurrentRequests: ',        stats.describe(currentRequests))
-    # print('\n\ncurrentMeasurements0: ',   stats.describe(currentMeasurements0))
-    # print('\n\ncurrentMeasurements1: ',   stats.describe(currentMeasurements1))
-    # print('\n\npositionRequests: ',       stats.describe(positionRequests))
-    # print('\n\npositionMeasurements0: ',  stats.describe(positionMeasurements0))
-    # print('\n\npositionMeasurements1: ',  stats.describe(positionMeasurements1))
-    # print('\n\nreadDeviceTimes: ',        stats.describe(readDeviceTimes))
-    # print('\n\nsendMotorTimes: ',     stats.describe(sendMotorTimes))
-    # print('\n\nseetGainsTimes: ',     stats.describe(setGainsTimes))
+    for dev in devices:
+        # Current Plot:
+        print('Preparing plot 1')
+        plt.figure(1)
+        title = "Motor Current"
+        plt.plot(times, dev['curr_requests'],
+                 color='b', label='desired current')
+        plt.plot(times, dev['curr_measurements'],
+                 color='r', label='measured current')
+        plt.xlabel("Time (s)")
+        plt.ylabel("Motor current (mA)")
+        plt.title(title)
+        plt.legend(loc='upper right')
 
-    ######## End of Main Code #########
+        # Draw a vertical line at the end of each cycle
+        for endpoints in cycleStopTimes:
+            plt.axvline(x=endpoints)
 
-    ######## Plotting Code, you can edit this ##################
+        # Position Plot:
+        print('Preparing plot 2')
+        plt.figure(2)
+        title = "Motor Position"
+        plt.plot(times, dev['pos_requests'], color='b', label='desired position')
+        plt.plot(times, dev['pos_measurements'],
+                 color='r', label='measured position')
+        plt.xlabel("Time (s)")
+        plt.ylabel("Encoder position")
+        plt.title(title)
+        plt.legend(loc='upper right')
 
-    # Begin Create unique data filename and save desired and measured values
-    # now = datetime.now().strftime("%Y-%m-%d_%H-%M")
-    # data_fn = 'log/' + now + '_Current.csv'
-    # print('Do create Current  data file ['+ data_fn + ']')
-    # NON-PYTHONIC, but efficient write to file:
-    # with open(data_fn, 'w') as df:
-    #   for i in range(len(currentRequests)):
-    #       df.write(str(times[i]) + ',' + str(currentRequests[i]) + ','
-    #           + str(currentMeasurements0[i]) + '\n')
-
-    # data_fn = 'log/' + now + '_Position.csv'
-    # print('Do create Position data file ['+ data_fn + ']')
-    # with open(data_fn, 'w') as df:
-    #   for i in range(len(positionRequests)):
-    #       df.write(str(times[i]) + ',' + str(positionRequests[i]) + ','
-    #           + str(positionMeasurements0[i]) + '\n')
-    # End Create unique data filename and save desired and measured values
-
-    # Current Plot:
-    print('Preparing plot 1')
-    plt.figure(1)
-    title = "Motor Current"
-    plt.plot(times, currentRequests, color='b', label='desired current')
-    plt.plot(times, currentMeasurements0, color='r', label='measured current')
-    plt.xlabel("Time (s)")
-    plt.ylabel("Motor current (mA)")
-    plt.title(title)
-    plt.legend(loc='upper right')
-
-    # Draw a vertical line at the end of each cycle
-    for endpoints in cycleStopTimes:
-        plt.axvline(x=endpoints)
-
-    # Position Plot:
-    print('Preparing plot 2')
-    plt.figure(2)
-    title = "Motor Position"
-    plt.plot(times, positionRequests, color='b', label='desired position')
-    plt.plot(times, positionMeasurements0,
-             color='r', label='measured position')
-    plt.xlabel("Time (s)")
-    plt.ylabel("Encoder position")
-    plt.title(title)
-    plt.legend(loc='upper right')
-
-    print('Showing plot')
+    print('Showing plots')
     plt.show()
     sleep(0.1)
 
+    printPlotExit()
     print('End of script, fxCloseAll()')
     fxCloseAll()
 
 # Send FlexSEA commands and record their execution time.
-def sendAndTimeCmds(t0, devId0, devId1, device2: bool, initialPos0, initialPos1,
-		current0, current1, motorCmd, position0, position1, posReq, setGains: bool):
-	"""
-	t0: Timestamp for start of run. (Current time-t0) = Elapsed time
-	initialPos0, initialPos1: Initial encoder angles for devId0, devId1. Used to provide offsets
-		to encoder angle readings.
-	current0, current1: Desired currents for devId0 and devId1
-	position0, position1: Desired positions for devId0 and devId1
-	motorCmd: An enum defined in flexseapython.py. Allowed values:
-		FxPosition, FxVoltage, FxCurrent, FxImpedance
-	"""
-	global times					# Elapsed time from start of run
-	global currentRequests
-	global currentMeasurements0		# For devId0
-	global currentMeasurements1		# For devId1
-	global positionRequests
-	global positionMeasurements0	# For devId0
-	global positionMeasurements1	# For devId1
-	global readDeviceTimes			# Timing data for fxReadDevice()
-	global sendMotorTimes			# Timing data for fxSendMotorCommand
-	global setGainsTimes			# Timing data for fxSetGains()
-	global data0					# Contains state of ActPack0
-	global data1 					# Contains state of ActPack1
 
-	tstart = time()
-	data0 = fxReadDevice(devId0)	# Get ActPackState
-	readDeviceTimes.append(time() - tstart)
-	if(device2):
-		data1 = fxReadDevice(devId1)
 
-	if setGains:
-		tstart = time()
-		for i in range(2):
-			fxSetGains(devId0, 300, 50, 0, 0, 0)
-		setGainsTimes.append(time() - tstart)
-		if(device2):
-			fxSetGains(devId1, 300, 50, 0, 0, 0)
-	else:
-		setGainsTimes.append(0)
+def sendAndTimeCmds(t0, devices, cmds, motor_cmd, set_gains: bool):
+    """
+    t0: Timestamp for start of run. (Current time-t0) = Elapsed time
+    initialPos0, initialPos1: Initial encoder angles for devId0, devId1. Used to provide offsets
+            to encoder angle readings.
+    current0, current1: Desired currents for devId0 and devId1
+    position0, position1: Desired positions for devId0 and devId1
+    motor_cmd: An enum defined in flexseapython.py. Allowed values:
+            FxPosition, FxVoltage, FxCurrent, FxImpedance
+    """
+    global times                    # Elapsed time from start of run
+    global currentRequests
+    global currentMeasurements0     # For devId0
+    global currentMeasurements1     # For devId1
+    global positionRequests
+    global positionMeasurements0  # For devId0
+    global positionMeasurements1  # For devId1
+    global readDeviceTimes          # Timing data for fxReadDevice()
+    global sendMotorTimes           # Timing data for fxSendMotorCommand
+    global setGainsTimes            # Timing data for fxSetGains()
+    global data0                    # Contains state of ActPack0
+    global data1                    # Contains state of ActPack1
 
-	if motorCmd == FxCurrent:	# Set device(s) for current control
-		tstart = time()
-		fxSendMotorCommand(devId0, FxCurrent, current0)
-		sendMotorTimes.append(time() - tstart)
-		if(device2):
-			fxSendMotorCommand(devId1, FxCurrent, current1)
-			positionMeasurements1.append(data1.mot_ang)
-		positionMeasurements0.append(data0.mot_ang)
+    tstart = time()
+    data0 = fxReadDevice(devId0)  # Get ActPackState
+    readDeviceTimes.append(time() - tstart)
+    if(device2):
+        data1 = fxReadDevice(devId1)
 
-	elif motorCmd == FxPosition:	# Set device(s) for position control
-		tstart = time()
-		fxSendMotorCommand(devId0, FxPosition, position0)
-		sendMotorTimes.append(time() - tstart)
-		if(device2):
-			fxSendMotorCommand(devId1, FxPosition, position1)
-			positionMeasurements1.append(data1.mot_ang)
-		positionMeasurements0.append(data0.mot_ang)
+    if set_gains:
+        tstart = time()
+        for i in range(2):
+            fxSetGains(devId0, 300, 50, 0, 0, 0)
+        setGainsTimes.append(time() - tstart)
+        if(device2):
+            fxSetGains(devId1, 300, 50, 0, 0, 0)
+    else:
+        setGainsTimes.append(0)
 
-	else:	# Defensive code.  It should not execute!
-		assert 0, 'Unexpected motor command in record_timing()'
+    if motor_cmd == FxCurrent:  # Set device(s) for current control
+        tstart = time()
+        fxSendMotorCommand(devId0, FxCurrent, current0)
+        sendMotorTimes.append(time() - tstart)
+        if(device2):
+            fxSendMotorCommand(devId1, FxCurrent, current1)
+            positionMeasurements1.append(data1.mot_ang)
+        positionMeasurements0.append(data0.mot_ang)
 
-	currentRequests.append(current0)
-	currentMeasurements0.append(data0.mot_cur)
-	if(device2):
-		currentMeasurements1.append(data1.mot_cur)
-	positionRequests.append(position0)
-	times.append(time() - t0)
+    elif motor_cmd == FxPosition:  # Set device(s) for position control
+        tstart = time()
+        fxSendMotorCommand(devId0, FxPosition, position0)
+        sendMotorTimes.append(time() - tstart)
+        if(device2):
+            fxSendMotorCommand(devId1, FxPosition, position1)
+            positionMeasurements1.append(data1.mot_ang)
+        positionMeasurements0.append(data0.mot_ang)
+
+    else:  # Defensive code.  It should not execute!
+        assert 0, 'Unexpected motor command in record_timing()'
+
+    currentRequests.append(current0)
+    currentMeasurements0.append(data0.mot_cur)
+    if(device2):
+        currentMeasurements1.append(data1.mot_cur)
+    positionRequests.append(position0)
+    times.append(time() - t0)
+
 
 if __name__ == '__main__':
     baudRate = sys.argv[1]
