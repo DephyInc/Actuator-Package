@@ -1,7 +1,6 @@
 from .ActPackPlusState import ActPackPlusState
 from .ActPackState import ActPackState
 from .BattCyclerState import BattCyclerState
-from .BattCyclerState import BattCyclerState
 from .BMSState import BMSState
 from .CellScreenerState import CellScreenerState
 from .CycleTesterState import CycleTesterState

@@ -24,8 +24,8 @@ def fxTwoDevicePositionControl(port0, baudRate, port1):
 	initialAngle0 = actPackState0.mot_ang
 	initialAngle1 = actPackState1.mot_ang
 
-	fxSetGains(devId0, 50, 3, 0, 0, 0)
-	fxSetGains(devId1, 50, 3, 0, 0, 0)
+	fxSetGains(devId0, 50, 3, 0, 0, 0, 0)
+	fxSetGains(devId1, 50, 3, 0, 0, 0, 0)
 	
 	fxSendMotorCommand(devId0, FxPosition, initialAngle0)
 	fxSendMotorCommand(devId1, FxPosition, initialAngle1)
@@ -55,8 +55,8 @@ def fxTwoDevicePositionControl(port0, baudRate, port1):
 		printLoopCount(i, num_time_steps)
 
 	print('Turning off position control...')
-	fxSetGains(devId0, 0, 0, 0, 0, 0)
-	fxSetGains(devId1, 0, 0, 0, 0, 0)
+	fxSetGains(devId0, 0, 0, 0, 0, 0, 0)
+	fxSetGains(devId1, 0, 0, 0, 0, 0, 0)
 	fxSendMotorCommand(devId1, FxNone, 0)
 	fxSendMotorCommand(devId0, FxNone, 0)
 	sleep(0.5)
