@@ -15,9 +15,9 @@ pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 print(pardir)
 sys.path.append(pardir)
 
-# Global arrays updated concurrently with every new timestamp. For plotting
-TIMESTAMPS = list()
-CYCLE_STOP_TIMES = list()  # Use to draw a line at end of every period
+# Globals updated with every timestamp for plotting
+TIMESTAMPS = list()  # Elapsed times since strart of run
+CYCLE_STOP_TIMES = list()  # Timestamps for each loop end
 
 
 def fxHighStressTest(port0, baudRate, port1='', commandFreq=1000,
@@ -40,8 +40,8 @@ def fxHighStressTest(port0, baudRate, port1='', commandFreq=1000,
     numberOfLoops       Number of times to send desired signal to controller
     """
 
-    global TIMESTAMPS            # Elapsed time since strart of run
-    global CYCLE_STOP_TIMES
+    global TIMESTAMPS            # Elapsed times since strart of run
+    global CYCLE_STOP_TIMES      # Timestamps for each loop end
 
     devices = list()
     devices.append({'port': port0})
@@ -107,7 +107,7 @@ def fxHighStressTest(port0, baudRate, port1='', commandFreq=1000,
                     initial_cmd = {'cur': 0, 'pos': dev['initial_pos']}
                 cmds.append(initial_cmd)
 
-            sendAndTimeCmds(start_time, devices, cmds, FxPosition, True)
+            send_and_time_cmds(start_time, devices, cmds, FxPosition, True)
 
             # Step 1: go to initial position
             # -------------------------------
@@ -124,7 +124,8 @@ def fxHighStressTest(port0, baudRate, port1='', commandFreq=1000,
                         cmds = [{'cur': 0, 'pos': sample + dev['initial_pos']}
                                 for dev in devices]
                         sleep(delay_time)
-                        sendAndTimeCmds(start_time, devices, cmds, FxPosition, False)
+                        send_and_time_cmds(start_time, devices,
+                                           cmds, FxPosition, False)
                         cmd_count += 1
             else:
                 # First time in loop
@@ -138,14 +139,15 @@ def fxHighStressTest(port0, baudRate, port1='', commandFreq=1000,
                 cmds = [{'cur': 0, 'pos': sample + dev['initial_pos']}
                         for dev in devices]
                 sleep(delay_time)
-                sendAndTimeCmds(start_time, devices, cmds, FxPosition, False)
+                send_and_time_cmds(start_time, devices,
+                                   cmds, FxPosition, False)
                 cmd_count += 1
 
             # Step 3: set current controller
             # -------------------------------
             print('Step 3: set current controller')
             cmds = [{'cur': 0, 'pos': 0} for dev in devices]
-            sendAndTimeCmds(start_time, devices, cmds, FxCurrent, True)
+            send_and_time_cmds(start_time, devices, cmds, FxCurrent, True)
 
             # Step 4: current setpoint
             # --------------------------
@@ -160,7 +162,7 @@ def fxHighStressTest(port0, baudRate, port1='', commandFreq=1000,
                         for dev in devices]
 
                 sleep(delay_time)
-                sendAndTimeCmds(start_time, devices, cmds, FxCurrent, False)
+                send_and_time_cmds(start_time, devices, cmds, FxCurrent, False)
                 cmd_count += 1
 
             # Step 5: short pause at 0 current to allow a slow-down
@@ -171,7 +173,7 @@ def fxHighStressTest(port0, baudRate, port1='', commandFreq=1000,
                 cmds = [{'cur': sample, 'pos': dev['initial_pos']}
                         for dev in devices]
                 sleep(delay_time)
-                sendAndTimeCmds(start_time, devices, cmds, FxCurrent, False)
+                send_and_time_cmds(start_time, devices, cmds, FxCurrent, False)
                 cmd_count += 1
 
             # Draw a line at the end of every loop
@@ -205,6 +207,17 @@ def fxHighStressTest(port0, baudRate, port1='', commandFreq=1000,
         len(devices[0]['curr_measurements'])))
     print('size(SET_GAINS_TIMES): {}'.format(len(devices[0]['gains_times'])))
     print('')
+
+    plot_data(devices)
+
+
+def plot_data(devices):
+    """
+    Plots received data
+    devices:  Dictionarty containing iinfor foir ach connected device.
+    """
+    global TIMESTAMPS            # Elapsed times since strart of run
+    global CYCLE_STOP_TIMES      # Timestamps for each loop end
 
     figure_ind = 0
     for dev in devices:
@@ -252,28 +265,25 @@ def fxHighStressTest(port0, baudRate, port1='', commandFreq=1000,
     fxCloseAll()
     print('Communication closed')
 
-# Send FlexSEA commands and record their execution time.
 
-
-def sendAndTimeCmds(start_time, devices, cmds, motor_cmd, set_gains: bool):
+def send_and_time_cmds(start_time, devices, cmds, motor_cmd, set_gains: bool):
     """
+    Send FlexSEA commands and record their execution time.
     start_time: Timestamp for start of run. (Current time-start_time) = Elapsed time
-    initialPos0, initialPos1: Initial encoder angles for devId0, devId1. Used to provide offsets
-            to encoder angle readings.
-    current0, current1: Desired currents for devId0 and devId1
-    position0, position1: Desired positions for devId0 and devId1
-    motor_cmd: An enum defined in flexseapython.py. Allowed values:
-            FxPosition, FxVoltage, FxCurrent, FxImpedance
+    devices:    Dictionary containing info on all connected devices
+    cmds:       Dictionary containing position and current commands e.g. {pos: 0, curr: 0}
+    motor_cmd:  An enum defined in flexseapython.py. Allowed values: FxPosition,, FxCurrent
     """
-    global TIMESTAMPS                    # Elapsed time from start of run
+    global TIMESTAMPS  # Elapsed times from start of run
 
-    assert motor_cmd in [
-        FxPosition, FxCurrent], 'Unexpected motor command, only FxPosition, FxCurrent allowed'
+    assert (motor_cmd in [FxPosition, FxCurrent]
+            ), 'Unexpected motor command, only FxPosition, FxCurrent allowed'
 
     for dev, cmd in zip(devices, cmds):
         tstart = time()
         dev['data'] = fxReadDevice(dev['id'])  # Get ActPackState
         dev['read_times'].append(time() - tstart)
+
         if set_gains:
             tstart = time()
             fxSetGains(dev['id'], 300, 50, 0, 0, 0)
@@ -281,8 +291,9 @@ def sendAndTimeCmds(start_time, devices, cmds, motor_cmd, set_gains: bool):
         else:
             dev['gains_times'].append(0)
 
-        # Command motor
+        # Select command value
         cmd_val = cmd['cur'] if motor_cmd == FxCurrent else cmd['pos']
+        # Command motor
         tstart = time()
         fxSendMotorCommand(dev['id'], motor_cmd, cmd_val)
         dev['motor_times'].append(time() - tstart)
@@ -292,6 +303,7 @@ def sendAndTimeCmds(start_time, devices, cmds, motor_cmd, set_gains: bool):
         dev['curr_measurements'].append(dev['data'].mot_cur)
 
         dev['pos_requests'].append(cmd['pos'])
+
     TIMESTAMPS.append(time() - start_time)
 
 
