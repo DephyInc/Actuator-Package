@@ -3,18 +3,19 @@
 
 import os
 import sys
+import traceback
 from time import sleep, time
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
-import flexseapython.fxUtil as fx
+
+pardir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
+print(pardir)
+sys.path.append(pardir)
+from flexseapython import fxUtil as fx
 
 # Plot in a browser:
 matplotlib.use('WebAgg')
-
-pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-print(pardir)
-sys.path.append(pardir)
 
 # Globals updated with every timestamp for plotting
 TIMESTAMPS = list()  # Elapsed times since strart of run
@@ -48,6 +49,16 @@ def fxHighStressTest(port0, baudRate, port1='', commandFreq=1000,
     devices.append({'port': port0})
     if port1:
         devices.append({'port': port1})
+
+    # initialize devices
+    for dev in devices:
+        dev['read_times'] = list()
+        dev['gains_times'] = list()
+        dev['motor_times'] = list()
+        dev['pos_requests'] = list()
+        dev['pos_measurements'] = list()
+        dev['curr_requests'] = list()
+        dev['curr_measurements'] = list()
 
     print('Running high stress test with {} device'.format(len(devices)) +
           's' if len(devices) > 1 else '')
@@ -290,7 +301,7 @@ def send_and_time_cmds(start_time, devices, cmds, motor_cmd, set_gains: bool):
 
         if set_gains:
             tstart = time()
-            fx.fxSetGains(dev['id'], 300, 50, 0, 0, 0)
+            fx.fxSetGains(dev['id'], 300, 50, 0, 0, 0, 0)
             dev['gains_times'].append(time() - tstart)
         else:
             dev['gains_times'].append(0)
@@ -301,12 +312,10 @@ def send_and_time_cmds(start_time, devices, cmds, motor_cmd, set_gains: bool):
         tstart = time()
         fx.fxSendMotorCommand(dev['id'], motor_cmd, cmd_val)
         dev['motor_times'].append(time() - tstart)
+        dev['pos_requests'].append(cmd['pos'])
         dev['pos_measurements'].append(dev['data'].mot_ang)
-
         dev['curr_requests'].append(cmd['cur'])
         dev['curr_measurements'].append(dev['data'].mot_cur)
-
-        dev['pos_requests'].append(cmd['pos'])
 
     TIMESTAMPS.append(time() - start_time)
 
@@ -315,10 +324,10 @@ if __name__ == '__main__':
     import argparse
 
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('baud', metavar='b', type=int,
+    parser.add_argument('baudrate', type=int,
                         help='Communication baudrate')
 
-    parser.add_argument('port', metavar='p', type=str, nargs='+',
+    parser.add_argument('port', type=str, nargs='+',
                         help='Ports for test devices')
 
     args = parser.parse_args()
@@ -327,10 +336,11 @@ if __name__ == '__main__':
     baud_rate = sys.argv[1]
     ports = sys.argv[2:3]
     try:
-        # TODO: Support more than 2 ports
+       # TODO: Support more than 2 ports
         if len(args.port) > 1:
-            fxHighStressTest(args.port[0], args.baud, args.port[1])
+            fxHighStressTest(args.port[0], args.baudrate, args.port[1])
         else:
-            fxHighStressTest(args.port[0], args.baud)
+            fxHighStressTest(args.port[0], args.baudrate)
     except Exception as err:
         print('broke: {}'.format(err))
+        traceback.print_exc()
