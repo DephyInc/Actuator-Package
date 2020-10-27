@@ -154,7 +154,7 @@ def fxHighStressTest(port0, baudRate, port1='', commandFreq=1000,
 			# Step 3: set current controller
 			# -------------------------------
 			print('Step 3: set current controller')
-			cmds = [{'cur': 0, 'pos': 0} for dev in devices]
+			cmds = [{'cur': 0, 'pos': dev['initial_pos']} for dev in devices]
 			send_and_time_cmds(start_time, devices, cmds, fx.FxCurrent, True)
 
 			# Step 4: current setpoint
