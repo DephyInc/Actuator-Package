@@ -24,30 +24,30 @@ def fxHighStressTest(port0, baudRate, port1='', commandFreq=1000,
 					 positionFreq=1, currentFreq=5, currentAsymmetricG=1.25,
 					 numberOfLoops=3):
 	"""
-	portX               port with outgoing serial connection to ActPack
-	baudRate            baud rate of outgoing serial connection to ActPack
-	commandFreq         Desired frequency of issuing commands to controller,
+	portX				port with outgoing serial connection to ActPack
+	baudRate			baud rate of outgoing serial connection to ActPack
+	commandFreq			Desired frequency of issuing commands to controller,
 						actual command frequency will be slower due to OS
 						overhead.
-	positionAmplitude   amplitude (in ticks), position controller
-	currentAmplitude    amplitude (in mA), current controller
-	positionFreq        frequency (Hz) of the sine wave, position controller
-	currentFreq         frequency (Hz) of the sine wave, current controller
-	currentAsymmetricG  we use more current on the "way back" to come back
+	positionAmplitude	amplitude (in ticks), position controller
+	currentAmplitude	amplitude (in mA), current controller
+	positionFreq		frequency (Hz) of the sine wave, position controller
+	currentFreq			frequency (Hz) of the sine wave, current controller
+	currentAsymmetricG	we use more current on the "way back" to come back
 						closer to the staring point. Positive numbers only,
 						1-3 range.
-	numberOfLoops       Number of times to send desired signal to controller
+	numberOfLoops		Number of times to send desired signal to controller
 	"""
 
-	global TIMESTAMPS            # Elapsed times since strart of run
-	global CYCLE_STOP_TIMES      # Timestamps for each loop end
+	global TIMESTAMPS			# Elapsed times since strart of run
+	global CYCLE_STOP_TIMES		# Timestamps for each loop end
 
 	devices = list()
 	devices.append({'port': port0})
 	if port1:
 		devices.append({'port': port1})
 
-	# initialize devices
+	# Initialize devices
 	for dev in devices:
 		dev['read_times'] = list()
 		dev['gains_times'] = list()
@@ -61,8 +61,8 @@ def fxHighStressTest(port0, baudRate, port1='', commandFreq=1000,
 		  's' if len(devices) > 1 else '')
 
 	# Debug & Data Logging
-	debug_logging_level = 6     # 6 is least verbose, 0 is most verbose
-	data_log = False        # Data log logs device data
+	debug_logging_level = 6		# 6 is least verbose, 0 is most verbose
+	data_log = False			# Data log logs device data
 
 	delay_time = float(1/(float(commandFreq)))
 	print('Delay time: ', delay_time)
@@ -95,8 +95,6 @@ def fxHighStressTest(port0, baudRate, port1='', commandFreq=1000,
 	current_samples = fx.sinGenerator(
 		currentAmplitude, currentFreq, commandFreq)
 	current_samples_line = fx.lineGenerator(0, 0.15, commandFreq)
-
-	# Initialize lists
 
 	start_time = time()  # Record start time of experiment
 	cmd_count = 0
@@ -261,10 +259,10 @@ def plot_data(devices, pos_amp, pos_freq, curr_amp, curr_freq, cmd_freq,
 def send_and_time_cmds(start_time, devices, cmds, motor_cmd, set_gains: bool):
 	"""
 	Send FlexSEA commands and record their execution time.
-	start_time: Timestamp for start of run. (Current time-start_time) = Elapsed time
-	devices:    Dictionary containing info on all connected devices
-	cmds:       Dictionary containing position and current commands e.g. {pos: 0, curr: 0}
-	motor_cmd:  An enum defined in flexseapython.py. Allowed values: FxPosition,, FxCurrent
+	start_time:	Timestamp for start of run. (Current time-start_time) = Elapsed time
+	devices:	Dictionary containing info on all connected devices
+	cmds:		Dictionary containing position and current commands e.g. {pos: 0, curr: 0}
+	motor_cmd:	An enum defined in flexseapython.py. Allowed values: FxPosition,, FxCurrent
 	"""
 	global TIMESTAMPS  # Elapsed times from start of run
 
@@ -278,7 +276,8 @@ def send_and_time_cmds(start_time, devices, cmds, motor_cmd, set_gains: bool):
 
 		if set_gains:
 			tstart = time()
-			fx.fxSetGains(dev['id'], 300, 50, 0, 0, 0, 0)
+			# Gains are, in order: kp, ki, kd, K, B & ff
+			fx.fxSetGains(dev['id'], 250, 200, 0, 0, 0, 128)
 			dev['gains_times'].append(time() - tstart)
 		else:
 			dev['gains_times'].append(0)
