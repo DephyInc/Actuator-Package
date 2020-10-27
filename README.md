@@ -12,13 +12,14 @@ The repo contains the FlexSEA-Rigid Actuator Package library and sample programs
 Install Python 3.7.x on Ubuntu 20.04 or 18.04
 ```bash
 sudo apt update
+# Enter password if prompted
 sudo apt install software-properties-common -y
 sudo add-apt-repository ppa:deadsnakes/ppa
 # Press [ENTER] to continue
 sudo apt install python3.7 -y
 ```
 
-On Windows, use [this installer](https://www.python.org/ftp/python/3.7.9/python-3.7.9.exe) to isntall.
+On Windows, use [this installer](https://www.python.org/ftp/python/3.7.9/python-3.7.9.exe) to install.
 
 In order to install the required Python dependencies, run the following command from the root directory of this repository:
 
