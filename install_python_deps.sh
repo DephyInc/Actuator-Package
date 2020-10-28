@@ -20,7 +20,7 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
 elif [[ "$OSTYPE" == "linux-gnueabihf" ]]; then
 	sudo apt update &&
 	sudo apt install python-scipy libatlas-base-dev -y &&
-	echo -e "${GREEN}Python dependencies installed$.{NC}" &&
+	echo -e "${GREEN}Python dependencies installed.${NC}" &&
 	python3 -m pip install -U -r ${REQS_PATH} &&
 	echo -e "${GREEN}Python libraries installed${NC}" && exit 0 ||
 	echo -e "${RED}An issue was encountered when installing the python dependencies.${NC}" &&
