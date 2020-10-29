@@ -28,8 +28,10 @@ def plotSetpointVsDesired(devId, fig, controllerType, signalFrequency, signalAmp
 	plt.xlabel("Time (s)")
 	plt.title(title, wrap=True)
 	plt.legend(loc='upper right')
+	# Style parameters and webb server address for external clients
 	matplotlib.rcParams.update({'figure.constrained_layout.use': True,
-								'figure.constrained_layout.h_pad': 0.5})
+								'figure.constrained_layout.h_pad': 0.5,
+								'webagg.address': '0.0.0.0'})
 
 	# Draw a vertical line at the end of each cycle
 	for endpoints in cycleStopTimes:
