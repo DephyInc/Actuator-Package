@@ -10,12 +10,12 @@ pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pardir)
 
 # Control gain constants
-kp = 100
-ki = 100
-K = 325
+kp = 200
+ki = 200
+K = 2000
 B = 0
-B_Increments = 200
-FF = 50
+B_Increments = 350
+FF = 32
 
 def fxImpedanceControl(port, baudRate, expTime = 10, time_step = 0.02, delta = 7500,
 	transition_time = 0.8, resolution = 500):
