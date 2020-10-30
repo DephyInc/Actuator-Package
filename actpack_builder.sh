@@ -4,8 +4,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"
 PLAN_STACK_DIR="${SCRIPT_DIR}/../fx_plan_stack"
 ACPAC_DIR="${SCRIPT_DIR}/C"
 
-# guest host OS
-if [[ $1 = "-pi" ]]; then
+# Dertermine host OS
+if [[ "$OSTYPE" == "linux-gnueabihf" ]]; then
     HOST_OS="raspberryPi"
 elif [[ "$OSTYPE" == "linux-gnu" ]]; then
     HOST_OS="linux"
