@@ -20,7 +20,7 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
 elif [[ "$OSTYPE" == "linux-gnueabihf" ]]; then
 	sudo apt update &&
 	sudo apt install ufw python-scipy libatlas-base-dev -y &&
-	sudo ufw enable && sudo ufw allow 8988 &&  # Open port for graph display
+	sudo ufw enable && sudo ufw allow 8988 && sudo ufw allow 22 && # Open port for graph display
 	echo -e "${GREEN}Python dependencies installed.${NC}" &&
 	python3 -m pip install -U -r ${REQS_PATH} &&
 	echo -e "${GREEN}Python libraries installed${NC}" && exit 0 ||
