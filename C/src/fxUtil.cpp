@@ -86,7 +86,7 @@ void printDevice(struct BMSState *bmsState)
     cout<<"Cell 8 mV:       "<<bmsState->cells_8_mv<<"\n";
     cout<<"Current:         "<<bmsState->current<<"\n";
     cout<<"timer:           "<<bmsState->timer<<"\n";
-    cout<<"temp 0:          "<<bmsState->temp_0_<<"\n";
-    cout<<"temp 1:          "<<bmsState->temp_1_<<"\n";
-    cout<<"temp 2:          "<<bmsState->temp_2_<<"\n";
+    cout<<"temp 0:          "<<bmsState->temperature_0<<"\n";
+    cout<<"temp 1:          "<<bmsState->temperature_1<<"\n";
+    cout<<"temp 2:          "<<bmsState->temperature_2<<"\n";
 }

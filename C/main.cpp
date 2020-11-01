@@ -3,6 +3,7 @@
 #include <csignal>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <unistd.h>
 
 #include <chrono>
@@ -10,6 +11,8 @@
 #include <fstream>
 
 #include "device_wrapper.h"
+#include "exo_wrapper.h"
+
 #ifdef _WIN32
 	#include "windows.h"
 #endif
@@ -190,6 +193,22 @@ void getUserPort(const string filename, string *ports, int *baudRate)
 
     string line;
     getline(cfgFile, line);
+
+    //check line for #
+    char *hashTagPointer=NULL;
+    hashTagPointer=strchr(line.c_str(),'#');
+
+    while(hashTagPointer!=NULL  && !cfgFile.eof())
+    {
+        if(cfgFile.eof())
+        {
+            cout<<"Check your com.txt file! \n";
+            exit(1);
+        }
+        getline(cfgFile, line);
+        hashTagPointer=strchr(line.c_str(),'#');
+    }
+
     *baudRate = std::stoi(line);
 
     std::cout << "using baud rate: " << *baudRate << std::endl;
@@ -198,7 +217,10 @@ void getUserPort(const string filename, string *ports, int *baudRate)
     while( ! cfgFile.eof() )
     {
         getline(cfgFile, line);
-        if(! line.empty())
+
+        hashTagPointer=strchr(line.c_str(),'#');
+
+        if(! line.empty() && hashTagPointer==NULL)
         {
             ports[i] = line;
             // cout << "read Com port " << line << " (" << ports[i] << ")" << endl;
