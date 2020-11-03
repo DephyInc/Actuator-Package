@@ -34,7 +34,7 @@ char userSelection(void);
 
 void getUserPort(const string filename, string *ports, int *baudRate);
 
-string      configFile = "../com.txt";
+const string      configFile = "../com.txt";
 const int   MAX_FLEXSEA_DEVS = 4;
 int         deviceIds[MAX_FLEXSEA_DEVS];
 bool        shouldQuit = false;
@@ -195,7 +195,7 @@ void getUserPort(const string filename, string *ports, int *baudRate)
     getline(cfgFile, line);
 
     //check line for #
-    char *hashTagPointer=NULL;
+    const char *hashTagPointer=NULL;
     hashTagPointer=strchr(line.c_str(),'#');
 
     while(hashTagPointer!=NULL  && !cfgFile.eof())
