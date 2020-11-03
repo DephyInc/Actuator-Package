@@ -104,7 +104,8 @@ def printLoopCount(i, total):
 
 # And some will include the elapsed time
 def printLoopCountAndTime(i, total, elapsed_time):
-	print('\nLoop', i + 1, 'of', total, '- Elapsed time:', int(elapsed_time+0.5), 's', end='\r')
+	print('\nLoop {} of {} - Elapsed time: {}s'.format(
+		i + 1, total, round(elapsed_time)))
 
 # Generate a sine wave of a specific amplitude and frequency
 def sinGenerator(amplitude, frequency, commandFreq):
