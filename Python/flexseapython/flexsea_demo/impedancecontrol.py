@@ -5,6 +5,9 @@ import matplotlib.pyplot as plt
 from flexseapython.fxUtil import *
 
 matplotlib.use('WebAgg')
+matplotlib.rcParams.update({'figure.constrained_layout.use': True,
+							'figure.constrained_layout.h_pad': 0.5,
+							'webagg.address': '0.0.0.0'})
 
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pardir)
