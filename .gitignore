@@ -4,6 +4,7 @@ __pycache__
 *.project
 *.csv
 *.orig
+*.sublime*
 test_scripts/build/
 
 Python/flexseapython/com_local\.txt
