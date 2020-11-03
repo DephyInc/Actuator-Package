@@ -5,9 +5,8 @@ import matplotlib.pyplot as plt
 matplotlib.use('WebAgg')
 from flexseapython.fxUtil import *
 
-matplotlib.rcParams.update({'figure.constrained_layout.use': True,
-							'figure.constrained_layout.h_pad': 0.5,
-							'webagg.address': '0.0.0.0'})
+if isPi():
+	matplotlib.rcParams.update({'webagg.address': '0.0.0.0'})
 
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pardir)
@@ -83,6 +82,7 @@ def fxTwoPositionControl(port, baudRate, expTime = 13, time_step = 0.1,
 	if (os.name == 'nt'):
 		print('\nIn Windows, press Ctrl+BREAK to exit. Ctrl+C may not work.')
 	plt.show()
+	openBrowser()
 	
 	# Close device and do device cleanup
 	close_check = fxClose(devId)

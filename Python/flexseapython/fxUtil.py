@@ -5,10 +5,20 @@ import os
 
 from .dev_spec import AllDevices
 
+# Returns if the OS is windows
+def isWin():
+	return os.name == 'nt'
+
+# Returns if the OS is windows
+def isPi():
+	try:
+		return os.uname()[4][:3] == 'arm'
+	except AttributeError:
+		return False
+
 # Clears the terminal - use before printing new values
 def clearTerminal():
-	isWin = os.name == 'nt'
-	if isWin:
+	if isWin():
 		os.system('cls')	#Clear terminal (Win)
 	else:
 		os.system('clear')	#Clear terminal (Unix)

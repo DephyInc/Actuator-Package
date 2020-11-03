@@ -249,9 +249,9 @@ def plot_data(devices, pos_amp, pos_freq, curr_amp, curr_freq, cmd_freq,
 										   CYCLE_STOP_TIMES)
 
 	print('Showing plots')
+	fx.printPlotExit()
 	plt.show()
 	sleep(0.1)
-	fx.printPlotExit()
 	fx.fxCloseAll()
 	print('Communication closed')
 
