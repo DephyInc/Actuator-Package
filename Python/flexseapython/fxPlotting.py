@@ -1,5 +1,5 @@
 from flexseapython.pyFlexsea import *
-from fxUtils import isPi
+from flexseapython.fxUtil import isPi
 import matplotlib
 import matplotlib.pyplot as plt
 
