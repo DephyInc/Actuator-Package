@@ -97,7 +97,8 @@ def fxImpedanceControl(port, baudRate, expTime = 10, time_step = 0.02, delta = 7
 	if(os.name == 'nt'):
 		print('\nIn Windows, press Ctrl+BREAK to exit. Ctrl+C may not work...')
 	plt.show()
-	openBrowser()
+	if(os.name != 'nt'):
+		openBrowser()
 
 	#Close device
 	print('End of script, fxClose()')
