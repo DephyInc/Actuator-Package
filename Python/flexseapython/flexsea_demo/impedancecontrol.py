@@ -5,18 +5,21 @@ import matplotlib.pyplot as plt
 from flexseapython.fxUtil import *
 
 matplotlib.use('WebAgg')
+if isPi():
+	matplotlib.rcParams.update({'webagg.address': '0.0.0.0'})
 
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pardir)
 
 # Control gain constants
-kp = 100
-ki = 32
-K = 325
+kp = 200
+ki = 200
+K = 2000
 B = 0
-B_Increments = 125
+B_Increments = 350
+FF = 32
 
-def fxImpedanceControl(port, baudRate, expTime = 20, time_step = 0.02, delta = 7500,
+def fxImpedanceControl(port, baudRate, expTime = 10, time_step = 0.02, delta = 7500,
 	transition_time = 0.8, resolution = 500):
 
 	# Open device
@@ -26,7 +29,7 @@ def fxImpedanceControl(port, baudRate, expTime = 20, time_step = 0.02, delta = 7
 	
 	# Read initial angle
 	data = fxReadDevice(devId)
-	initialAngle = data.encoderAngle
+	initialAngle = data.mot_ang
 	
 	result = True
 	transition_steps = int(transition_time / time_step)
@@ -40,8 +43,8 @@ def fxImpedanceControl(port, baudRate, expTime = 20, time_step = 0.02, delta = 7
 	# Setpoint = initial angle
 	fxSendMotorCommand(devId, FxImpedance, initialAngle)
 	# Set gains
-	global B, K, kp, ki
-	fxSetGains(devId, kp, ki, 0, K, B)
+	global B, K, kp, ki, FF
+	fxSetGains(devId, kp, ki, 0, K, B, FF)
 
 	# Select transition rate and positions
 	currentPos = 0
@@ -59,10 +62,10 @@ def fxImpedanceControl(port, baudRate, expTime = 20, time_step = 0.02, delta = 7
 	for i in range(num_time_steps):
 		loop_ctr += 1
 		data = fxReadDevice(devId)
-		measuredPos = data.encoderAngle
+		measuredPos = data.mot_ang
 		if i % transition_steps == 0:
 			B = B + B_Increments	# Increments every cycle
-			fxSetGains(devId, kp, ki, 0, K, B)
+			fxSetGains(devId, kp, ki, 0, K, B, FF)
 			delta = abs(positions[currentPos] - measuredPos)
 			result &= delta < resolution
 			currentPos = (currentPos + 1) % 2
@@ -94,6 +97,8 @@ def fxImpedanceControl(port, baudRate, expTime = 20, time_step = 0.02, delta = 7
 	if(os.name == 'nt'):
 		print('\nIn Windows, press Ctrl+BREAK to exit. Ctrl+C may not work...')
 	plt.show()
+	if(os.name != 'nt'):
+		openBrowser()
 
 	#Close device
 	print('End of script, fxClose()')

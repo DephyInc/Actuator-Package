@@ -9,6 +9,7 @@
 #include <iostream>
 #include "utils.h"
 #include "device_wrapper.h"
+#include "exo_wrapper.h"
 
 #define TIME_STEP .1 //in seconds
 #define TIME 8

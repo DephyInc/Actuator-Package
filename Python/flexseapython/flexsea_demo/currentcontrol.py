@@ -25,7 +25,8 @@ def fxCurrentControl(port, baudRate, holdCurrent = [1000], time = 6, time_step =
 
 	result = True
 	print('Setting controller to current...')
-	fxSetGains(devId, 50, 32, 0, 0, 0)
+	# Gains are, in order: kp, ki, kd, K, B & ff
+	fxSetGains(devId, 250, 200, 128, 0, 0, 0)
 	sleep(0.5)
 	prevCurrent = holdCurrent[0]
 	num_time_steps = int(time/time_step)
@@ -38,8 +39,8 @@ def fxCurrentControl(port, baudRate, holdCurrent = [1000], time = 6, time_step =
 			actPack = fxReadDevice(devId)
 			clearTerminal()
 			print('Desired  (mA):        ', desCurrent)
-			print('Measured  (mA):       ', actPack.motorCurrent)
-			print('Difference (mA):      ', (actPack.motorCurrent - desCurrent), '\n')
+			print('Measured  (mA):       ', actPack.mot_cur)
+			print('Difference (mA):      ', (actPack.mot_cur - desCurrent), '\n')
 
 			printDevice(actPack, appType)
 		prevCurrent = current
@@ -53,8 +54,8 @@ def fxCurrentControl(port, baudRate, holdCurrent = [1000], time = 6, time_step =
 		actPack = fxReadDevice(devId)
 		clearTerminal()
 		print('Desired  (mA):        ', desCurrent)
-		print('Measured  (mA):       ', actPack.motorCurrent)
-		print('Difference (mA):      ', (actPack.motorCurrent - desCurrent), '\n')
+		print('Measured  (mA):       ', actPack.mot_cur)
+		print('Difference (mA):      ', (actPack.mot_cur - desCurrent), '\n')
 		printDevice(actPack,appType)
 		sleep(time_step)
 

@@ -5,6 +5,9 @@ import matplotlib.pyplot as plt
 matplotlib.use('WebAgg')
 from flexseapython.fxUtil import *
 
+if isPi():
+	matplotlib.rcParams.update({'webagg.address': '0.0.0.0'})
+
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pardir)
 
@@ -17,7 +20,7 @@ def fxTwoPositionControl(port, baudRate, expTime = 13, time_step = 0.1,
 
 	# Setting initial angle and angle waypoints
 	actPackState = fxReadDevice(devId)
-	initialAngle = actPackState.encoderAngle
+	initialAngle = actPackState.mot_ang
 
 	# Setting angle waypoints
 	positions = [initialAngle, initialAngle + delta]
@@ -28,8 +31,8 @@ def fxTwoPositionControl(port, baudRate, expTime = 13, time_step = 0.1,
 	num_time_steps = int(expTime/time_step)
 	transition_steps = int(transition_time/time_step)
 
-	# Setting gains (devId, kp, ki, kd, K, B)
-	fxSetGains(devId, 150, 100, 0, 0, 0)
+	# Setting gains (devId, kp, ki, kd, K, B, ff)
+	fxSetGains(devId, 150, 75, 0, 0, 0, 0)
 
 	# Setting position control at initial position
 	fxSendMotorCommand(devId, FxPosition, initialAngle)
@@ -46,7 +49,7 @@ def fxTwoPositionControl(port, baudRate, expTime = 13, time_step = 0.1,
 		sleep(time_step)
 		actPackState = fxReadDevice(devId)
 		clearTerminal()
-		measuredPos = actPackState.encoderAngle
+		measuredPos = actPackState.mot_ang
 		print('Desired:              ', positions[current_pos])
 		print('Measured:             ', measuredPos)
 		print('Difference:           ', (measuredPos - positions[current_pos]), '\n')
@@ -79,6 +82,7 @@ def fxTwoPositionControl(port, baudRate, expTime = 13, time_step = 0.1,
 	if (os.name == 'nt'):
 		print('\nIn Windows, press Ctrl+BREAK to exit. Ctrl+C may not work.')
 	plt.show()
+	openBrowser()
 	
 	# Close device and do device cleanup
 	close_check = fxClose(devId)

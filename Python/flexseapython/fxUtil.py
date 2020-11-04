@@ -5,10 +5,20 @@ import os
 
 from .dev_spec import AllDevices
 
+# Returns if the OS is windows
+def isWin():
+	return os.name == 'nt'
+
+# Returns if the OS is windows
+def isPi():
+	try:
+		return os.uname()[4][:3] == 'arm'
+	except AttributeError:
+		return False
+
 # Clears the terminal - use before printing new values
 def clearTerminal():
-	isWin = os.name == 'nt'
-	if isWin:
+	if isWin():
 		os.system('cls')	#Clear terminal (Win)
 	else:
 		os.system('clear')	#Clear terminal (Unix)
@@ -104,7 +114,8 @@ def printLoopCount(i, total):
 
 # And some will include the elapsed time
 def printLoopCountAndTime(i, total, elapsed_time):
-	print('\nLoop', i + 1, 'of', total, '- Elapsed time:', int(elapsed_time+0.5), 's', end='\r')
+	print('\nLoop {} of {} - Elapsed time: {}s'.format(
+		i + 1, total, round(elapsed_time)))
 
 # Generate a sine wave of a specific amplitude and frequency
 def sinGenerator(amplitude, frequency, commandFreq):
