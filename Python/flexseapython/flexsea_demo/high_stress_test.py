@@ -20,7 +20,7 @@ CYCLE_STOP_TIMES = list()  # Timestamps for each loop end
 
 
 def fxHighStressTest(port0, baudRate, port1='', commandFreq=1000,
-					 positionAmplitude=10000, currentAmplitude=1000,
+					 positionAmplitude=10000, currentAmplitude=2500,
 					 positionFreq=1, currentFreq=5, currentAsymmetricG=1.25,
 					 numberOfLoops=3):
 	"""
@@ -154,7 +154,7 @@ def fxHighStressTest(port0, baudRate, port1='', commandFreq=1000,
 			# Step 3: set current controller
 			# -------------------------------
 			print('Step 3: set current controller')
-			cmds = [{'cur': 0, 'pos': dev['initial_pos']} for dev in devices]
+			cmds = [{'cur': 0, 'pos': 0} for dev in devices]
 			send_and_time_cmds(start_time, devices, cmds, fx.FxCurrent, True)
 
 			# Step 4: current setpoint
@@ -249,9 +249,9 @@ def plot_data(devices, pos_amp, pos_freq, curr_amp, curr_freq, cmd_freq,
 										   CYCLE_STOP_TIMES)
 
 	print('Showing plots')
-	fx.printPlotExit()
 	plt.show()
 	sleep(0.1)
+	fx.printPlotExit()
 	fx.fxCloseAll()
 	print('Communication closed')
 
