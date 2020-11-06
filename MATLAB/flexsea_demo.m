@@ -67,7 +67,7 @@ function test = displayMenu()
     disp( "2) Current Control");
     disp( "3) Hold Position");
     disp( "4) Find Poles");
-    disp( "5) Two Device Position Control");
+    disp( "5) Two Device Position Control. Temporarily NON-OPERATIONAL.  RUN AT YOUR OWN RISK.");
     disp( "6) Two Device Leader-Follower");
 
     test = input("Choose the test to run: ");
