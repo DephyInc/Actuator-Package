@@ -88,8 +88,8 @@ function [ retCode, deviceIds] = loadAndGetDevice( ports )
     
     % Add relative path to library/header file
     disp('Loading library');
-    addpath( '..\fx_plan_stack\libs\win64');
-    addpath( '..\fx_plan_stack\include\flexseastack');
+    addpath( '..\libs\win64');
+    addpath( '..\inc\flexseastack');
     loadlibrary('libfx_plan_stack', 'com_wrapper');
     if libisloaded( 'libfx_plan_stack' )
         % Initialize the FX environment
