@@ -82,7 +82,8 @@ def fxTwoPositionControl(port, baudRate, expTime = 13, time_step = 0.1,
 	if (os.name == 'nt'):
 		print('\nIn Windows, press Ctrl+BREAK to exit. Ctrl+C may not work.')
 	plt.show()
-	openBrowser()
+	if(os.name != 'nt'):
+		openBrowser()
 	
 	# Close device and do device cleanup
 	close_check = fxClose(devId)

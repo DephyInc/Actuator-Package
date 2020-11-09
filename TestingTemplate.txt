@@ -3,21 +3,21 @@ PYTHON TESTING
 -----------------------------------------------------
 Windows 64
 
-Script#		1	2 	3 	4 	6 	7 	8 	9 	10 
+Script#		0 	1	2 	3 	4 	6 	7 	8 	9 	10 
 
 ActPack
 Exo
 -------------------------------------------------------
 Windows 32
 
-Script#		1	2 	3 	4 	6 	7 	8 	9 	10 
+Script#		0	1	2 	3 	4 	6 	7 	8 	9 	10 
 
 ActPack
 Exo
 -------------------------------------------------------
 Ubuntu 64
 
-Script#		1	2 	3 	4 	6 	7 	8 	9 	10 
+Script#		0	1	2 	3 	4 	6 	7 	8 	9 	10 
 
 ActPack
 Exo
@@ -25,7 +25,7 @@ Exo
 --------------------------------------------------------
 Raspberry Pi 32
 
-Script#		1	2 	3 	4 	6 	7 	8 	9 	10 
+Script#		0	1	2 	3 	4 	6 	7 	8 	9 	10 
 
 ActPack
 Exo
@@ -37,21 +37,21 @@ C TESTING
 -----------------------------------------------------
 Windows 64
 
-Script#		1	
+Script#		0	
 
 ActPack
 Exo
 -------------------------------------------------------
 Windows 32
 
-Script#		1	
+Script#		0	
 
 ActPack
 Exo
 -------------------------------------------------------
 Ubuntu 64
 
-Script#		1	
+Script#		0	
 
 ActPack
 Exo
@@ -59,7 +59,7 @@ Exo
 --------------------------------------------------------
 Raspberry Pi 32
 
-Script#		1	
+Script#		0	
 
 ActPack
 Exo
@@ -71,21 +71,21 @@ MATLAB TESTING
 -----------------------------------------------------
 Windows 64
 
-Script#		1	
+Script#		0	
 
 ActPack
 Exo
 -------------------------------------------------------
 Windows 32
 
-Script#		1	
+Script#		0	
 
 ActPack
 Exo
 -------------------------------------------------------
 Ubuntu 64
 
-Script#		1	
+Script#		0	
 
 ActPack
 Exo
@@ -93,7 +93,7 @@ Exo
 --------------------------------------------------------
 Raspberry Pi 32
 
-Script#		1	
+Script#		0	
 
 ActPack
 Exo
