@@ -23,11 +23,11 @@ def fxLeaderFollower(leaderPort, baudRate, followerPort):
 	initialAngle1 = actPackState1.mot_ang
 
 	# set first device to current controller with 0 current (0 torque)
-	fxSetGains(devId0, 100, 20, 0, 0, 0)
+	fxSetGains(devId0, 100, 20, 0, 0, 0, 0)
 	fxSendMotorCommand(devId0, FxCurrent, 0)
 
 	# set position controller for second device
-	fxSetGains(devId1, 50, 3, 0, 0, 0)
+	fxSetGains(devId1, 50, 3, 0, 0, 0, 0)
 	fxSendMotorCommand(devId1, FxPosition, initialAngle1)
 
 	count = 0
@@ -51,8 +51,8 @@ def fxLeaderFollower(leaderPort, baudRate, followerPort):
 		print(traceback.format_exc())
 
 	print('Turning off position control...')
-	fxSetGains(devId0, 0, 0, 0, 0, 0)
-	fxSetGains(devId1, 0, 0, 0, 0, 0)
+	fxSetGains(devId0, 0, 0, 0, 0, 0, 0)
+	fxSetGains(devId1, 0, 0, 0, 0, 0, 0)
 	fxSendMotorCommand(devId1, FxNone, 0)
 	fxSendMotorCommand(devId0, FxNone, 0)
 	sleep(0.5)

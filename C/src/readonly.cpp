@@ -93,12 +93,17 @@ void runReadOnly(int devId, bool *shouldQuit)
 
         this_thread::sleep_for(100ms);
         clearScreen();
-        if (apptype == FxActPack || apptype==FxExo)
+        if (apptype == FxActPack)
         {
             fxReadDevice(devId, &actPackState);
             printDevice(&actPackState);
             cout << endl;
-        } else if (apptype == FxNetMaster)
+        }else if (apptype==FxExo)
+        {
+            fxReadExoDevice(devId,&exoState);
+            printDevice(&exoState);
+
+        }else if (apptype == FxNetMaster)
         {
             fxReadNetMasterDevice(devId, &netMasterState);
             printDevice(&netMasterState);

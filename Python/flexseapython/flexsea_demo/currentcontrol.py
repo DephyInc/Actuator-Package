@@ -25,7 +25,8 @@ def fxCurrentControl(port, baudRate, holdCurrent = [1000], time = 6, time_step =
 
 	result = True
 	print('Setting controller to current...')
-	fxSetGains(devId, 50, 32, 0, 0, 0)
+	# Gains are, in order: kp, ki, kd, K, B & ff
+	fxSetGains(devId, 250, 200, 128, 0, 0, 0)
 	sleep(0.5)
 	prevCurrent = holdCurrent[0]
 	num_time_steps = int(time/time_step)

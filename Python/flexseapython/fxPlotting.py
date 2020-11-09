@@ -1,6 +1,7 @@
 from flexseapython.pyFlexsea import *
-import matplotlib.pyplot as plt
+from flexseapython.fxUtil import isPi
 import matplotlib
+import matplotlib.pyplot as plt
 
 # Figure: setpoint, desired vs measured
 def plotSetpointVsDesired(devId, fig, controllerType, signalFrequency, signalAmplitude, signalTypeStr, commandFrequency, times, requests, measurements, cycleStopTimes):
@@ -10,30 +11,33 @@ def plotSetpointVsDesired(devId, fig, controllerType, signalFrequency, signalAmp
 
 	# Specific to the current controller:
 	if(controllerType == hssCurrent):	#Controller.current):
-
-		title = "Current control with " + "{:.2f}".format(signalFrequency) + " Hz, " + \
-			str(signalAmplitude) + " mA " + signalTypeStr + " and " + \
-				"{:.2f}".format(commandFrequency) + " Hz commands" + ' (ID:' + str(devId) + ')'
+		title = "Current control with {:.0f} Hz, {:.1f} mA {} and {:.0f} Hz commands (ID: {})".format(
+			signalFrequency, signalAmplitude, signalTypeStr, commandFrequency, devId)
 		plt.ylabel("Motor current (mA)")
 
 	# Specific to the position controller:
 	elif(controllerType == hssPosition):#Controller.position):
 
-		title = "Position control with " + "{:.2f}".format(signalFrequency) + " Hz, " + \
-			str(signalAmplitude) + " ticks " + signalTypeStr + " and " + \
-				"{:.2f}".format(commandFrequency) + " Hz commands" + ' (ID:' + str(devId) + ')'
+		title = "Position control with {:.0f} Hz, {:.0f} tick{} {} and {:.0f} Hz commands (ID: {})".format(
+			signalFrequency, signalAmplitude, ("s" if signalAmplitude > 1 else ""),
+			signalTypeStr, commandFrequency, devId)
 		plt.ylabel("Encoder position")
 
 	# Common info:
 	plt.plot(times, requests, color='b', label='Desired')
 	plt.plot(times, measurements, color='r', label='Measured')
 	plt.xlabel("Time (s)")
-	plt.title(title)
+	plt.title(title, wrap=True)
 	plt.legend(loc='upper right')
+	# Style parameters and webb server address for external clients
+	matplotlib.rcParams.update({'figure.constrained_layout.use': True,
+								'figure.constrained_layout.h_pad': 0.5})
+	if isPi():
+		matplotlib.rcParams.update({'webagg.address': '0.0.0.0'})
 
 	# Draw a vertical line at the end of each cycle
 	for endpoints in cycleStopTimes:
-		plt.axvline(x=endpoints, color='xkcd:light grey')
+		plt.axvline(x=endpoints, color='xkcd:light grey', linestyle='--')
 
 	return fig
 

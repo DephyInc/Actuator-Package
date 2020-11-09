@@ -15,7 +15,8 @@ def fxPositionControl(port, baudRate, time = 8, time_step = 0.1,  resolution = 1
 	printDevice(actPackState,FxActPack)
 	initialAngle = actPackState.mot_ang
 
-	fxSetGains(devId, 50, 3, 0, 0, 0)
+	# Gains are, in order: kp, ki, kd, K, B & ff
+	fxSetGains(devId, 175, 50, 0, 0, 0, 0)
 
 	fxSendMotorCommand(devId, FxPosition, initialAngle)
 

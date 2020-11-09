@@ -67,7 +67,7 @@ function test = displayMenu()
     disp( "2) Current Control");
     disp( "3) Hold Position");
     disp( "4) Find Poles");
-    disp( "5) Two Device Position Control");
+    disp( "5) Two Device Position Control. Temporarily NON-OPERATIONAL.  RUN AT YOUR OWN RISK.");
     disp( "6) Two Device Leader-Follower");
 
     test = input("Choose the test to run: ");
@@ -88,8 +88,8 @@ function [ retCode, deviceIds] = loadAndGetDevice( ports )
     
     % Add relative path to library/header file
     disp('Loading library');
-    addpath( '..\fx_plan_stack\libs\win64');
-    addpath( '..\fx_plan_stack\include\flexseastack');
+    addpath( '..\libs\win64');
+    addpath( '..\inc\flexseastack');
     loadlibrary('libfx_plan_stack', 'com_wrapper');
     if libisloaded( 'libfx_plan_stack' )
         % Initialize the FX environment
