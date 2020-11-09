@@ -42,7 +42,15 @@ if(WIN32)
 	# there are windows and linux specific libraries that also need to be linked in
 	target_link_libraries(main setupapi hid)
 	#target_link_libraries(communication_tester setupapi hid)
-	
+elseif( "${CMAKE_SIZEOF_VOID_P}" EQUAL "8" AND UNIX) # 64 bit Linux
+	# only look for a freshly built plan stack library since we're already set up to compile this find_program
+	# should not be an issues to have a freshly compiled plan stack to prevent confusion
+	find_library(fx_plan_stack_LIBRARY fx_plan_stack_static ${CMAKE_CURRENT_SOURCE_DIR}/../libs/linux)
+
+	# link plan stack library to our application
+	target_link_libraries(main ${fx_plan_stack_LIBRARY})
+
+	target_link_libraries(main pthread)	
 else()
 	# only look for a freshly built plan stack library since we're already set up to compile this find_program
 	# should not be an issues to have a freshly compiled plan stack to prevent confusion
