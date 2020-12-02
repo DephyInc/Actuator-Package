@@ -48,10 +48,10 @@ void runLeaderFollower( int devId0, int devId1, bool *shouldQuit)
 	//
 	// Setup both devices
 	//
-	fxSetGains(devId0, 100, 20, 0, 0, 0);
+	fxSetGains(devId0, 100, 20, 0, 0, 0, 0);
 	fxSendMotorCommand(devId0, FxCurrent, 0);
 
-	fxSetGains(devId1, 50, 3, 0, 0, 0);
+	fxSetGains(devId1, 50, 3, 0, 0, 0, 0);
 	fxSendMotorCommand(devId1, FxPosition, initialAngle[1]);
 
 	int diff  = 0;

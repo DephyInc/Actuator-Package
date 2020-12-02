@@ -26,7 +26,7 @@ void runCurrentControl(int devId, bool* shouldQuit)
 	cout << "Setting controller to current..." << endl;
 	
 	// Start the current, holdCurrent is in mA
-	fxSetGains(devId, 100, 20, 0, 0, 0);
+	fxSetGains(devId, 100, 20, 0, 0, 0, 0);
 	fxSendMotorCommand(devId, FxCurrent, holdCurrent);	 
 
 	int n = 0;
