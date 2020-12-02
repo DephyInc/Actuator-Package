@@ -108,9 +108,9 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
 	if(controllerType == hssCurrent):
 		print("Setting up current control demo. Low current, high frequency")
 		# Gains are, in order: kp, ki, kd, K, B & ff
-		fxSetGains(devId0, 250, 200, 0, 0, 0, 128)
+		fxSetGains(devId0, 250, 200, 128, 0, 0, 0)
 		if(secondDevice):
-			fxSetGains(devId1, 250, 200, 0, 0, 0, 128)
+			fxSetGains(devId1, 250, 200, 128, 0, 0, 0)
 
 	elif(controllerType == hssPosition):
 		print("Setting up position control demo")
