@@ -1,0 +1,14 @@
+- Create a feature branch from develop.
+- run git branch -r --no-merged develop and add a subtask or note each unmerged branch.  Verify list with network map in github.
+- Merge all unmerged branches.
+- Manually Copy libs from merged stack to verify they are the most recent.
+- Perform testing IAW Actuator-Package/TestingTemplate.txt
+- PASS Windows 64 Bit? (python/C/MATLAB)
+- PASS Windows 32 Bit? (python/C/MATLAB)
+- PASS Ubuntu 64 Bit? (python/C/MATLAB)
+- PASS Rasberry Pi 32 Bit? (python/C/MATLAB)
+- Merge with Develop and tag with new version
+- Create pull request
+- Review release notes in JF's google doc
+- Review release notes in Wiki
+- If any changes were made to this checklist, modify "plan_3_0\SmartChecklistForJiraMergeTicket.txt" to reflect changes

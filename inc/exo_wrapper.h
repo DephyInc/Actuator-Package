@@ -11,12 +11,14 @@ Do not send this to external clients
 
 #include <stdbool.h>
 #include "device_wrapper.h"
-
+#define TOTAL_DEFINED_MOVEMENTS 5 ///Total movements that can be defined by the exo such as walking, running etc.
 #ifdef __cplusplus
 
 extern "C" 
 {
 #endif
+
+
 
 typedef enum fxExoSide
 {
@@ -152,6 +154,7 @@ FxError fxRunBeltCalibration(const unsigned int deviceId);
 /// @returns FxInvalidDevice if deviceId does not correspond an exo device.
 ///          FxSuccess otherwise
 FxError fxEnableAugmentation(const unsigned int deviceId);
+
 
 /// \brief Disable augmentation in an exo device. Enabled by default.
 ///
@@ -328,6 +331,8 @@ FxError fxGetLastReceivedProgWalkParams(const unsigned int deviceId,
                                        FxExoTrainingType* exoTrainingType,
                                        FxExoControllerMode* exoControlMode);
 
+double fxGetBatteryLife(const unsigned int deviceId);
+const char* fxGetMovement(int movement);
 
 #ifdef __cplusplus
 } // extern "C"

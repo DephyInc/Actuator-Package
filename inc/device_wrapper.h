@@ -2,6 +2,7 @@
 #define DEVICE_WRAPPER_H
 
 #include <stdbool.h>
+#include <string>
 #include "actpack_struct.h"
 #include "netmaster_struct.h"
 #include "cellscreener_struct.h"
