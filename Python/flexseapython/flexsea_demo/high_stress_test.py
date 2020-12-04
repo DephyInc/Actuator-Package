@@ -20,7 +20,7 @@ CYCLE_STOP_TIMES = list()  # Timestamps for each loop end
 
 
 def fxHighStressTest(port0, baudRate, port1='', commandFreq=1000,
-					 positionAmplitude=10000, currentAmplitude=2500,
+					 positionAmplitude=10000, currentAmplitude=1500,
 					 positionFreq=1, currentFreq=5, currentAsymmetricG=1.25,
 					 numberOfLoops=3):
 	"""

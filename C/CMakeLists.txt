@@ -14,13 +14,13 @@ include_directories(
 set(CSCRIPT_SRCS
 	main.cpp
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/readonly.cpp"
-		"${CMAKE_CURRENT_SOURCE_DIR}/src/fxUtil.cpp"
-	#open_speed_example.cpp
-	#current_control.cpp
-	#hold_position_example.cpp
-	#findpolesexample.cpp
-	#two_dev_position_example.cpp
-	#leaderfollower.cpp
+	"${CMAKE_CURRENT_SOURCE_DIR}/src/fxUtil.cpp"
+	# "${CMAKE_CURRENT_SOURCE_DIR}/src/open_speed_example.cpp"
+	# "${CMAKE_CURRENT_SOURCE_DIR}/src/current_control.cpp"
+	# "${CMAKE_CURRENT_SOURCE_DIR}/src/hold_position_example.cpp"
+	# "${CMAKE_CURRENT_SOURCE_DIR}/src/findpolesexample.cpp"
+	# "${CMAKE_CURRENT_SOURCE_DIR}/src/two_dev_position_example.cpp"
+	# "${CMAKE_CURRENT_SOURCE_DIR}/src/leaderfollower.cpp"
 	"${CMAKE_CURRENT_SOURCE_DIR}/inc/utils.h"
 )
 

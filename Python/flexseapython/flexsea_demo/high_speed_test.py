@@ -108,16 +108,16 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
 	if(controllerType == hssCurrent):
 		print("Setting up current control demo. Low current, high frequency")
 		# Gains are, in order: kp, ki, kd, K, B & ff
-		fxSetGains(devId0, 250, 200, 128, 0, 0, 0)
+		fxSetGains(devId0, 250, 200, 128, 0, 0, 98)
 		if(secondDevice):
-			fxSetGains(devId1, 250, 200, 128, 0, 0, 0)
+			fxSetGains(devId1, 250, 200, 128, 0, 0, 98)
 
 	elif(controllerType == hssPosition):
 		print("Setting up position control demo")
 		# Gains are, in order: kp, ki, kd, K, B & ff
-		fxSetGains(devId0, 300, 50, 0, 0, 0, 0)
+		fxSetGains(devId0, 300, 50, 0, 0, 0, 98)
 		if(secondDevice):
-			fxSetGains(devId1, 300, 50, 0, 0, 0, 0)
+			fxSetGains(devId1, 300, 50, 0, 0, 0, 98)
 	else:
 		assert 0, 'Invalid controllerType'
 
