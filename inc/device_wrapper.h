@@ -169,6 +169,12 @@ FxError fxStartStreaming(const unsigned int deviceId,
 /// @returns Error codes defined at top of the header
 FxError fxStopStreaming(const unsigned int deviceId);
 
+/// \brief check if streaming data from a FlexSEA device.
+///
+/// @param deviceId is the device ID
+///
+/// @returns true if streaming.  false if not streaming
+bool fxIsStreaming(const unsigned int deviceId);
 /// \brief Read the most recent data from a streaming FlexSEA device stream.
 /// Must call fxStartStreaming before calling this.
 /// 
