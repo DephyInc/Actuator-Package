@@ -11,4 +11,4 @@
 - Create pull request
 - Review release notes in JF's google doc
 - Review release notes in Wiki
-- If any changes were made to this checklist, modify "plan_3_0\SmartChecklistForJiraMergeTicket.txt" to reflect changes
+- If any changes were made to this checklist, modify "Actuator-Package\SmartChecklistForJiraMergeTicket.txt" to reflect changes
