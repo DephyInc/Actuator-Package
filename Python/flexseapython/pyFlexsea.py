@@ -555,7 +555,7 @@ def loadFlexsea():
 	flexsea.fxGetReadDataQueueSize.argtypes = [c_uint]
 	flexsea.fxGetReadDataQueueSize.restype  = c_int
 
-	flexsea.fxSetGains.argtypes = [c_uint, c_uint, c_uint, c_uint, c_uint, c_uint]
+	flexsea.fxSetGains.argtypes = [c_uint, c_uint, c_uint, c_uint, c_uint, c_uint, c_uint]
 	flexsea.fxSetGains.restype = c_int
 
 	flexsea.fxSendMotorCommand.argtypes = [c_uint, c_int, c_int]
