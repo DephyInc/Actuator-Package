@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from signal import signal, SIGINT
 import os
 import sys
