@@ -48,8 +48,8 @@ void runTwoDevicePositionControl(int devId0, int devId1, bool* shouldQuit)
 	//
 	// Set position controller for both devices
 	//
-	fxSetGains(devId0, 50, 3, 0, 0, 0);
-	fxSetGains(devId1, 50, 3, 0, 0, 0);
+	fxSetGains(devId0, 50, 3, 0, 0, 0, 0);
+	fxSetGains(devId1, 50, 3, 0, 0, 0, 0);
 	
 	fxSendMotorCommand(devId0, FxPosition, initialAngle[0]);
 	fxSendMotorCommand(devId1, FxPosition, initialAngle[1]);

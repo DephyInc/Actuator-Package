@@ -44,7 +44,7 @@ void runHoldPosition(int devId, bool *shouldQuit)
 	//
 	// Set the motor control
 	//
-	fxSetGains(devId, 50, 3, 0, 0, 0);
+	fxSetGains(devId, 50, 3, 0, 0, 0, 0);
 	fxSendMotorCommand(devId, FxPosition, initialAngle);	 
 
 	while(!(*shouldQuit))

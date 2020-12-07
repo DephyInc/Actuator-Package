@@ -98,23 +98,10 @@ void test_position_commands(int devId)
 	}
 
 	// Set the gains for the position controller
-	fxSetGains(devId, 100, 3, 0, 0, 0);
+	fxSetGains(devId, 100, 3, 0, 0, 0, 0);
 
 	// Allow for the device to start streaming
 	this_thread::sleep_for(1000ms);
-
-	// // Get the initial state of the exo
-	// if(fxReadDevice(devId, &state))
-	// {
-	// 	start_position = state._execute._motor_data._motor_angle;
-	// 	cout << "Our starting position will be " << start_position << endl;
-	// }
-	// else
-	// {
-	// 	cout << "Unable to read from the device so we are exiting now" << endl;
-	// 	// We were unable to read from the device so let's clean up and quit
-	// 	shouldQuit = true;
-	// }
 
 	while(!shouldQuit)
 	{

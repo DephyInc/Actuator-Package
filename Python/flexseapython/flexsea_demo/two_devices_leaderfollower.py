@@ -8,11 +8,11 @@ sys.path.append(pardir)
 
 def fxLeaderFollower(leaderPort, baudRate, followerPort):
 
-	devId0 = fxOpen(leaderPort, baudRate, 0)
-	devId1 = fxOpen(followerPort, baudRate, 0)
+	devId0 = fxOpen(leaderPort, baudRate, 6)
+	devId1 = fxOpen(followerPort, baudRate, 6)
 
-	fxStartStreaming(devId0, 200, True)
-	fxStartStreaming(devId1, 200, True)
+	fxStartStreaming(devId0, 200, False)
+	fxStartStreaming(devId1, 200, False)
 
 	sleep(0.2)
 

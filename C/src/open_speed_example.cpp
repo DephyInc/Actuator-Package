@@ -19,7 +19,7 @@ void runOpenSpeed(int devId, bool *shouldQuit)
 
 	cout << "Setting open control..." << endl;
 
-	fxSetGains(devId, 100, 30, 0, 0, 0);
+	fxSetGains(devId, 100, 30, 0, 0, 0, 0);
 	const int numSteps	 = 100;
 	int maxVoltage   = 3000;
 	int numTimes	 = 2;

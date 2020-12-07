@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from signal import signal, SIGINT
 import os
 import sys
@@ -8,11 +10,6 @@ if((sys.version_info[0] == 3) and (sys.version_info[1] == 8)):
 		print('Detected win32')
 		import asyncio
 		asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-
-# Following code seems redundant, since Python adds CWD: Current Working
-# Directory to os.path by default
-thisdir = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(thisdir)
 
 from flexseapython.pyFlexsea import *
 from flexseapython.fxUtil import *
@@ -43,7 +40,6 @@ experiments = [
 	(fxCurrentControl, 				"Current Control",						1),
 	(fxPositionControl,				"Position Control",						1),
 	(fxImpedanceControl, 			"Impedance Control",					1),
-	#(fxUserRW, 					"User RW",								1),
 	(fxRunFindPoles,				"Find Poles",							1),
 	(fxTwoPositionControl, 			"Two Positions Control",				1),
 	(fxHighSpeedTest, 				"High Speed Test",						4),
