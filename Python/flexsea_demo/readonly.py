@@ -1,58 +1,76 @@
-import os, sys
+#!/usr/bin/env python3
+
+"""
+FlexSEA Read Only Demo
+"""
+import sys
 from time import sleep
+from flexseapython import fxUtils as fxu
+from flexseapython import fxEnums as fxe
+from flexseapython import pyFlexsea as flex
 
-pardir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-sys.path.append(pardir)
 
-from flexseapython.fxUtil import *
+def print_bms_state(fx, dev_id):
+    """
+    Read BMS info
+    """
+    bms_state = fx.read_bms_device_all(dev_id, 1)
+    for i in range(9):
+        print('Cell [{}] Voltage: {}'.format(i, bms_state.cellVoltage[i]))
+    for i in range(3):
+        print('Temperature [{}]: {}'.format(i, bms_state.temperature[i]))
 
-def printBMSState(devId):
-	bmsState = fxReadBMSDevice(devId)
-	for i in range(9):
-		print('cellVoltage[', i, ']: ', bmsState.cellVoltage[i])
-	for i in range(3):
-		print('temperature[', i, ']: ', bmsState.temperature[i])
 
-def fxReadOnly(port, baudRate, time = 8, time_step = 0.1):
-	debugLoggingLevel = 0	# 6 is least verbose, 0 is most verbose
-	dataLog = True 			# False means no logs will be saved
-	devId =	fxOpen(port, baudRate, debugLoggingLevel)
-	fxStartStreaming(devId, frequency = 100, shouldLog = dataLog)
-	appType = fxGetAppType(devId)
+def fx_read_only(fx, port, baud_rate, run_time=8, time_step=0.1):
+    """
+    Reads FlexSEA device and prins gathered data.
+    """
+    debug_logging_level = 0  # 6 is least verbose, 0 is most verbose
+    data_log = True          # False means no logs will be saved
+    dev_id = fx.open(port, baud_rate, debug_logging_level)
+    fx.start_streaming(dev_id, freq=100, log_en=data_log)
+    app_type = fx.get_app_type(dev_id)
 
-	if (appType == FxActPack):
-		print('\nYour device is an ActPack.\n')
-		input("Press Enter to continue...")
-	elif (appType == FxNetMaster):
-		print('\nYour device is a NetMaster.\n')
-		input("Press Enter to continue...")
-	elif (appType == FxBMS):
-		print('\nYour device is a BMS.\n')
-		input("Press Enter to continue...")
-	elif (appType == FxExo):
-		print('\nYour device is an Exo or ActPack Plus.\n')
-		input("Press Enter to continue...")
-	else:
-		raise RuntimeError('Unsupported application type: ', appType)
+    if app_type.value == fxe.FX_ACT_PACK.value:
+        print('\nYour device is an ActPack.\n')
+        input("Press Enter to continue...")
+    elif app_type.value == fxe.FX_NET_MASTER.value:
+        print('\nYour device is a NetMaster.\n')
+        input("Press Enter to continue...")
+    elif app_type.value == fxe.FX_BMS.value:
+        print('\nYour device is a BMS.\n')
+        input("Press Enter to continue...")
+    elif app_type.value == fxe.FX_EXO.value:
+        print('\nYour device is an Exo or ActPack Plus.\n')
+        input("Press Enter to continue...")
+    else:
+        raise RuntimeError('Unsupported application type: {}'.format(app_type))
 
-	totalLoopCount = int(time / time_step)
-	for i in range(totalLoopCount):
-		printLoopCount(i, totalLoopCount)
-		sleep(time_step)
-		clearTerminal()
-		myData = fxReadDevice(devId)
-		printDevice(myData, appType)
-	fxClose(devId)
-	return True
+    total_loop_count = int(run_time / time_step)
+    for i in range(total_loop_count):
+        fxu.print_loop_count(i, total_loop_count)
+        sleep(time_step)
+        fxu.clear_terminal()
+        data = fx.read_device(dev_id)
+        fxu.print_device(data, app_type)
+    fx.close(dev_id)
+    return True
+
+
+def main():
+    """
+    Standalone execution
+    """
+    import argparse
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('port', metavar='P', type=str, nargs=1,
+                        help='Your device serial port.')
+    parser.add_argument('-b', '--baud', metavar='B', dest='baudrate', type=int,
+                        default=230400, help='Serial communication baudrate.')
+    args = parser.parse_args()
+
+    fx_read_only(flex.FlexSEA(), args.port, args.baud)
+
 
 if __name__ == '__main__':
-	baudRate = int(sys.argv[1])
-	port = sys.argv[2]
-	try:
-		loadSuccess = loadFlexsea()
-		if(not loadSuccess):
-			raise Exception('Could not load FlexSEA libraries')
-		fxReadOnly(port, baudRate)
-	except Exception as e:
-		print("broke: " + str(e))
-		pass
+    main()

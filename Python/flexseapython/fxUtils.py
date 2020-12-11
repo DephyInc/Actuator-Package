@@ -1,13 +1,26 @@
 """
 General purpose utilities
 """
-import fxEnums as en
-import numpy as np
 import os
 import platform
-from .dev_spec import AllDevices as fx_devs
 import yaml
+import numpy as np
+from . import fxEnums as en
+from .dev_spec import AllDevices as fx_devs
 
+def print_logo():
+    """
+    print cool logo.
+    """
+    logo_str = """
+    ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+    ██░▄▄▀██░▄▄▄██░▄▄░██░██░██░███░██
+    ██░██░██░▄▄▄██░▀▀░██░▄▄░██▄▀▀▀▄██
+    ██░▀▀░██░▀▀▀██░█████░██░████░████
+    ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+              Beyond Nature
+    """
+    print(logo_str)
 
 def is_win():
     """
@@ -38,7 +51,7 @@ def print_plot_exit():
     Prints plot exit message
     """
     if is_win():
-        print('In Windows, press Ctrl+BREAK to exit. Ctrl+C may not work.')
+        print('In Windows, press Ctrl+Break to exit. Ctrl+C may not work.')
 
 
 def print_device(dev_id, app_type):
@@ -48,105 +61,113 @@ def print_device(dev_id, app_type):
     Parameters:
     dev_id (int): The device ID.
     app_type (int): application type.
-
     """
-    if app_type == en.FX_ACT_PACK:
+    if app_type.value == en.FX_ACT_PACK.value:
         print_act_pack(dev_id)
-    elif app_type == en.FX_NET_MASTER:
+    elif app_type.value == en.FX_NET_MASTER.value:
         print_net_master(dev_id)
-    elif app_type == en.FX_B_M_S:
+    elif app_type.value == en.FX_BMS.value:
         print_bms(dev_id)
-    elif app_type == en.FX_EXO:
+    elif app_type.value == en.FX_EXO.value:
         print_exo(dev_id)
     else:
         raise RuntimeError('Unsupported application type: ', app_type)
 
 
-def print_exo(exoState: fx_devs.ExoState):
+def print_exo(exo_state: fx_devs.ExoState):
+    """
+    Print Exo info
+    """
     print('[ Printing Exo/ActPack Plus ]\n')
-    print('State time:           ', exoState.state_time)
-    print('Accel X:              ', exoState.accelx)
-    print('Accel Y:              ', exoState.accely)
-    print('Accel Z:              ', exoState.accelz)
-    print('Gyro X:               ', exoState.gyrox)
-    print('Gyro Y:               ', exoState.gyroy)
-    print('Gyro Z:               ', exoState.gyroz)
-    print('Motor angle:          ', exoState.mot_ang)
-    print('Motor voltage (mV):   ', exoState.mot_volt)
-    print('Motor current (mA):   ', exoState.mot_cur)
-    print('Battery Current (mA): ', exoState.batt_volt)
-    print('Battery Voltage (mV): ', exoState.batt_curr)
-    print('Battery Temp (C):     ', exoState.temperature)
-    print('genVar[0]:            ', exoState.genvar_0)
-    print('genVar[1]:            ', exoState.genvar_1)
-    print('genVar[2]:            ', exoState.genvar_2)
-    print('genVar[3]:            ', exoState.genvar_3)
-    print('genVar[4]:            ', exoState.genvar_4)
-    print('genVar[5]:            ', exoState.genvar_5)
-    print('genVar[6]:            ', exoState.genvar_6)
-    print('genVar[7]:            ', exoState.genvar_7)
-    print('genVar[8]:            ', exoState.genvar_8)
-    print('genVar[9]:            ', exoState.genvar_9)
-    print('Ankle angle:          ', exoState.ank_ang)
-    print('Ankle velocity:       ', exoState.ank_vel)
+    print('State time:           ', exo_state.state_time)
+    print('Accel X:              ', exo_state.accelx)
+    print('Accel Y:              ', exo_state.accely)
+    print('Accel Z:              ', exo_state.accelz)
+    print('Gyro X:               ', exo_state.gyrox)
+    print('Gyro Y:               ', exo_state.gyroy)
+    print('Gyro Z:               ', exo_state.gyroz)
+    print('Motor angle:          ', exo_state.mot_ang)
+    print('Motor voltage (mV):   ', exo_state.mot_volt)
+    print('Motor current (mA):   ', exo_state.mot_cur)
+    print('Battery Current (mA): ', exo_state.batt_volt)
+    print('Battery Voltage (mV): ', exo_state.batt_curr)
+    print('Battery Temp (C):     ', exo_state.temperature)
+    print('genVar[0]:            ', exo_state.genvar_0)
+    print('genVar[1]:            ', exo_state.genvar_1)
+    print('genVar[2]:            ', exo_state.genvar_2)
+    print('genVar[3]:            ', exo_state.genvar_3)
+    print('genVar[4]:            ', exo_state.genvar_4)
+    print('genVar[5]:            ', exo_state.genvar_5)
+    print('genVar[6]:            ', exo_state.genvar_6)
+    print('genVar[7]:            ', exo_state.genvar_7)
+    print('genVar[8]:            ', exo_state.genvar_8)
+    print('genVar[9]:            ', exo_state.genvar_9)
+    print('Ankle angle:          ', exo_state.ank_ang)
+    print('Ankle velocity:       ', exo_state.ank_vel)
 
 
-def print_act_pack(actPackState: fx_devs.ActPackState):
-    print('[ Printing Actpack ]\n')
-    print('State time:           ', actPackState.state_time)
-    print('Accel X:              ', actPackState.accelx)
-    print('Accel Y:              ', actPackState.accely)
-    print('Accel Z:              ', actPackState.accelz)
-    print('Gyro X:               ', actPackState.gyrox)
-    print('Gyro Y:               ', actPackState.gyroy)
-    print('Gyro Z:               ', actPackState.gyroz)
-    print('Motor angle:          ', actPackState.mot_ang)
-    print('Motor voltage (mV):   ', actPackState.mot_volt)
-    print('Battery Current (mA): ', actPackState.batt_curr)
-    print('Battery Voltage (mV): ', actPackState.batt_volt)
-    print('Battery Temp (C):     ', actPackState.temperature)
+def print_act_pack(act_pack_state: fx_devs.ActPackState):
+    """
+    Print ActPack info
+    """
+    print('[ Printing ActPack ]\n')
+    print('State time:           ', act_pack_state.state_time)
+    print('Accel X:              ', act_pack_state.accelx)
+    print('Accel Y:              ', act_pack_state.accely)
+    print('Accel Z:              ', act_pack_state.accelz)
+    print('Gyro X:               ', act_pack_state.gyrox)
+    print('Gyro Y:               ', act_pack_state.gyroy)
+    print('Gyro Z:               ', act_pack_state.gyroz)
+    print('Motor angle:          ', act_pack_state.mot_ang)
+    print('Motor voltage (mV):   ', act_pack_state.mot_volt)
+    print('Battery Current (mA): ', act_pack_state.batt_curr)
+    print('Battery Voltage (mV): ', act_pack_state.batt_volt)
+    print('Battery Temp (C):     ', act_pack_state.temperature)
 
 
-def print_net_master(netMasterState: fx_devs.NetMasterState):
+def print_net_master(net_master_state: fx_devs.NetMasterState):
+    """
+    Print net master info
+    """
     print('[ Printing NetMaster ]\n')
-    print('State time:        ', netMasterState.state_time)
-    print('genVar[0]:         ', netMasterState.genVar_0)
-    print('genVar[1]:         ', netMasterState.genVar_1)
-    print('genVar[2]:         ', netMasterState.genVar_2)
-    print('genVar[3]:         ', netMasterState.genVar_3)
-    print('Status:            ', netMasterState.status)
-    print('NetNode0 - accelx: ', netMasterState.A_accelx, ', accely: ',
-          netMasterState.A_accely, ' accelz: ', netMasterState.A_accelz)
-    print('NetNode0 - gyrox:  ', netMasterState.A_gyrox, ', gyroy:  ',
-          netMasterState.A_gyroy, ' gyroz:  ', netMasterState.A_gyroz)
-    print('NetNode1 - accelx: ', netMasterState.B_accelx, ', accely: ',
-          netMasterState.B_accely, ' accelz: ', netMasterState.B_accelz)
-    print('NetNode1 - gyrox:  ', netMasterState.B_gyrox, ', gyroy:  ',
-          netMasterState.B_gyroy, ' gyroz:  ', netMasterState.B_gyroz)
-    print('NetNode2 - accelx: ', netMasterState.C_accelx, ', accely: ',
-          netMasterState.C_accely, ' accelz: ', netMasterState.C_accelz)
-    print('NetNode2 - gyrox:  ', netMasterState.C_gyrox, ', gyroy:  ',
-          netMasterState.C_gyroy, ' gyroz:  ', netMasterState.C_gyroz)
-    print('NetNode3 - accelx: ', netMasterState.D_accelx, ', accely: ',
-          netMasterState.D_accely, ' accelz: ', netMasterState.D_accelz)
-    print('NetNode3 - gyrox:  ', netMasterState.D_gyrox, ', gyroy:  ',
-          netMasterState.D_gyroy, ' gyroz:  ', netMasterState.D_gyroz)
-    print('NetNode4 - accelx: ', netMasterState.E_accelx, ', accely: ',
-          netMasterState.E_accely, ' accelz: ', netMasterState.E_accelz)
-    print('NetNode4 - gyrox:  ', netMasterState.E_gyrox, ', gyroy:  ',
-          netMasterState.E_gyroy, ' gyroz:  ', netMasterState.E_gyroz)
-    print('NetNode5 - accelx: ', netMasterState.F_accelx, ', accely: ',
-          netMasterState.F_accely, ' accelz: ', netMasterState.F_accelz)
-    print('NetNode5 - gyrox:  ', netMasterState.F_gyrox, ', gyroy:  ',
-          netMasterState.F_gyroy, ' gyroz:  ', netMasterState.F_gyroz)
-    print('NetNode6 - accelx: ', netMasterState.G_accelx, ', accely: ',
-          netMasterState.G_accely, ' accelz: ', netMasterState.G_accelz)
-    print('NetNode6 - gyrox:  ', netMasterState.G_gyrox, ', gyroy:  ',
-          netMasterState.G_gyroy, ' gyroz:  ', netMasterState.G_gyroz)
-    print('NetNode7 - accelx: ', netMasterState.H_accelx, ', accely: ',
-          netMasterState.H_accely, ' accelz: ', netMasterState.H_accelz)
-    print('NetNode7 - gyrox:  ', netMasterState.H_gyrox, ', gyroy:  ',
-          netMasterState.H_gyroy, ' gyroz:  ', netMasterState.H_gyroz)
+    print('State time:        ', net_master_state.state_time)
+    print('genVar[0]:         ', net_master_state.genVar_0)
+    print('genVar[1]:         ', net_master_state.genVar_1)
+    print('genVar[2]:         ', net_master_state.genVar_2)
+    print('genVar[3]:         ', net_master_state.genVar_3)
+    print('Status:            ', net_master_state.status)
+    print('NetNode0 - accelx: ', net_master_state.A_accelx, ', accely: ',
+          net_master_state.A_accely, ' accelz: ', net_master_state.A_accelz)
+    print('NetNode0 - gyrox:  ', net_master_state.A_gyrox, ', gyroy:  ',
+          net_master_state.A_gyroy, ' gyroz:  ', net_master_state.A_gyroz)
+    print('NetNode1 - accelx: ', net_master_state.B_accelx, ', accely: ',
+          net_master_state.B_accely, ' accelz: ', net_master_state.B_accelz)
+    print('NetNode1 - gyrox:  ', net_master_state.B_gyrox, ', gyroy:  ',
+          net_master_state.B_gyroy, ' gyroz:  ', net_master_state.B_gyroz)
+    print('NetNode2 - accelx: ', net_master_state.C_accelx, ', accely: ',
+          net_master_state.C_accely, ' accelz: ', net_master_state.C_accelz)
+    print('NetNode2 - gyrox:  ', net_master_state.C_gyrox, ', gyroy:  ',
+          net_master_state.C_gyroy, ' gyroz:  ', net_master_state.C_gyroz)
+    print('NetNode3 - accelx: ', net_master_state.D_accelx, ', accely: ',
+          net_master_state.D_accely, ' accelz: ', net_master_state.D_accelz)
+    print('NetNode3 - gyrox:  ', net_master_state.D_gyrox, ', gyroy:  ',
+          net_master_state.D_gyroy, ' gyroz:  ', net_master_state.D_gyroz)
+    print('NetNode4 - accelx: ', net_master_state.E_accelx, ', accely: ',
+          net_master_state.E_accely, ' accelz: ', net_master_state.E_accelz)
+    print('NetNode4 - gyrox:  ', net_master_state.E_gyrox, ', gyroy:  ',
+          net_master_state.E_gyroy, ' gyroz:  ', net_master_state.E_gyroz)
+    print('NetNode5 - accelx: ', net_master_state.F_accelx, ', accely: ',
+          net_master_state.F_accely, ' accelz: ', net_master_state.F_accelz)
+    print('NetNode5 - gyrox:  ', net_master_state.F_gyrox, ', gyroy:  ',
+          net_master_state.F_gyroy, ' gyroz:  ', net_master_state.F_gyroz)
+    print('NetNode6 - accelx: ', net_master_state.G_accelx, ', accely: ',
+          net_master_state.G_accely, ' accelz: ', net_master_state.G_accelz)
+    print('NetNode6 - gyrox:  ', net_master_state.G_gyrox, ', gyroy:  ',
+          net_master_state.G_gyroy, ' gyroz:  ', net_master_state.G_gyroz)
+    print('NetNode7 - accelx: ', net_master_state.H_accelx, ', accely: ',
+          net_master_state.H_accely, ' accelz: ', net_master_state.H_accelz)
+    print('NetNode7 - gyrox:  ', net_master_state.H_gyrox, ', gyroy:  ',
+          net_master_state.H_gyroy, ' gyroz:  ', net_master_state.H_gyroz)
 
 
 def print_bms(dev_id):

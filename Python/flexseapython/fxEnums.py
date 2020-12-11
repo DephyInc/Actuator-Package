@@ -30,4 +30,4 @@ import ctypes as c
  FX_ACT_PACK,
  FX_EXO,
  FX_NET_MASTER,
- FX_B_M_S) = map(c.c_int, range(-1, 4))
+ FX_BMS) = map(c.c_int, range(-1, 4))
