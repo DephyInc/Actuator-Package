@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+"""
+FlexSEA devices Python demo
+"""
 
 from signal import signal, SIGINT
 import os
