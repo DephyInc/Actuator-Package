@@ -5,9 +5,9 @@ FlexSEA Read Only Demo
 """
 import sys
 from time import sleep
-from flexseapython import fxUtils as fxu
-from flexseapython import fxEnums as fxe
-from flexseapython import pyFlexsea as flex
+from flexsea import fxUtils as fxu
+from flexsea import fxEnums as fxe
+from flexsea import flexsea as flex
 
 
 def print_bms_state(fx, dev_id):

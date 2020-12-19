@@ -6,9 +6,9 @@ FlexSEA devices Python demo
 import os
 import sys
 from signal import signal, SIGINT
-from flexseapython import pyFlexsea as flex
-from flexseapython import fxUtils as fxu
-from flexseapython import fxEnums as fxe
+from flexsea import flexsea as flex
+from flexsea import fxUtils as fxu
+from flexsea import fxEnums as fxe
 from flexsea_demo.readonly import fx_read_only
 # from flexsea_demo.opencontrol import fxOpenControl
 # from flexsea_demo.currentcontrol import fxCurrentControl
