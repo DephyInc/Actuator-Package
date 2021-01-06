@@ -126,7 +126,8 @@ def main(argv):
 	dev_num: int = 1
 	
 	print('\n>>> Actuator Package Python Demo Scripts <<<\n')
-	
+
+	print('Stop! Read our important safety information at https://dephy.com/start/ before running the scripts for the first time.\n\n')
 	#Handles command line arguments and experiment setup
 	num_cl_args = len(argv) - 1	# Get count of command line arguments
 	if(num_cl_args < 3):
