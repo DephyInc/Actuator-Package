@@ -462,6 +462,36 @@ def fxFindPoles(devId):
 		raise ValueError('fxFindPoles: invalid device ID')
 	elif (retCode == FxFailure):
 		raise ValueError('fxFindPoles: command failed')
+		
+def fxActivateBootloader(devId, target):
+	"""
+	Sets the gains used by PID controllers on the FlexSEA device.
+
+	Parameters:
+	devId (int): The device ID.
+
+	kp (int): Proportional gain
+
+	ki (int): Integral gain
+
+	kd (int): Differential gain
+
+	K (int): Stiffness (used in impedence control only)
+
+	B (int): Damping (used in impedance control only)
+
+	ff (int): Feed forward gain
+
+	Raises:
+	ValueError if the device ID is invalid
+	"""
+	global flexsea
+	retCode = flexsea.fxActivateBootloader(devId, target)
+
+	if (retCode == FxInvalidDevice):
+		raise ValueError('fxActivateBootloader: invalid device ID')
+	elif (retCode == FxFailure):
+		raise IOError('fxActivateBootloader: command failed')		
 
 # Loads the library from the c lib
 def loadFlexsea():
@@ -563,6 +593,9 @@ def loadFlexsea():
 
 	flexsea.fxGetAppType.argtypes = [c_uint]
 	flexsea.fxGetAppType.restype = c_int
+	
+	flexsea.fxActivateBootloader.argtypes = [c_uint, c_uint8]
+	flexsea.fxActivateBootloader.restype = c_int
 
 	return True
 
