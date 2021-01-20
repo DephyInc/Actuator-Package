@@ -10,6 +10,7 @@ from flexsea import flexsea as flex
 from flexsea import fxUtils as fxu
 from flexsea import fxEnums as fxe
 from flexsea_demo.readonly import fx_read_only
+
 # from flexsea_demo.opencontrol import fxOpenControl
 # from flexsea_demo.currentcontrol import fxCurrentControl
 # from flexsea_demo.positioncontrol import fxPositionControl
@@ -20,11 +21,12 @@ from flexsea_demo.readonly import fx_read_only
 # from flexsea_demo.two_devices_leaderfollower import fxLeaderFollower
 # from flexsea_demo.twopositioncontrol import fxTwoPositionControl
 
-if((sys.version_info[0] == 3) and (sys.version_info[1] == 8)):
-    if fxu.is_win():     # Need for WebAgg server to work in Python 3.8
+if ((sys.version_info[0] == 3) and (sys.version_info[1] == 8)):
+    if fxu.is_win():  # Need for WebAgg server to work in Python 3.8
         print('Detected Python 3.8')
         print('Detected: {}'.format(sys.platform))
         import asyncio
+
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 

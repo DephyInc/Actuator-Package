@@ -44,7 +44,7 @@ def fx_read_only(fx, port, baud_rate, run_time=8, time_step=0.1):
         print('\nYour device is an Exo or ActPack Plus.\n')
         input("Press Enter to continue...")
     else:
-        raise RuntimeError('Unsupported application type: {}'.format(app_type))
+        raise RuntimeError(f'Unsupported application type: {app_type}')
 
     total_loop_count = int(run_time / time_step)
     for i in range(total_loop_count):

@@ -9,6 +9,7 @@ from . import fxEnums as fxe
 from . import fxUtils as fxu
 from .dev_spec import AllDevices as fxd
 
+
 # TODO (CA): make Flexsea devices into objets that can be instantiated and keep
 # track of their state
 
