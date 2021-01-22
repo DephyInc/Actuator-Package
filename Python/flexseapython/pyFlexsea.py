@@ -544,7 +544,7 @@ def loadFlexsea():
 	loadingLogMessages = []
 	for librarypath in librarypaths:
 		try:
-			loadingLogMessages.append("loading... " + librarypath)
+			loadingLogMessages.append("Loading... " + librarypath)
 			flexsea = cdll.LoadLibrary(librarypath)
 		except OSError as arg:
 			loadingLogMessages.append("\n\nThere was a problem loading the library\n {0}\n".format(arg))
@@ -557,7 +557,7 @@ def loadFlexsea():
 		return False
 
 	#print("Loaded " + os.path.realpath(librarypath) + "!")
-	print('loaded!')
+	print('Loaded!')
 
 	# set arg types
 	flexsea.fxOpen.argtypes = [c_char_p, c_uint, c_uint]
