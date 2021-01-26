@@ -1,38 +1,32 @@
-import os, sys, subprocess
+#!/usr/bin/env python3
+"""Build binary libraries from external repo"""
 
-isWindows = os.name == "nt"
-is_64bits = sys.maxsize > 2 ** 32
+import os
+import sys
 
-original_dir = os.getcwd()
-slash = "\\" if isWindows else "/"
-platformdir = "/win" if isWindows else "/unix"
-if is_64bits:
-	platformdir = platformdir + "64"
+IS_WINDOWS = os.name == "nt"
+IS_64BITS = sys.maxsize > 2 ** 32
 
-platformdir = platformdir.replace("/", "\\")
-stack_build_dir = original_dir + "/fx_plan_stack/build"
-cscript_build_dir = original_dir + "/acpac_cscripts/build"
+MAKE_CMD = "mingw32-make -j" if IS_WINDOWS else "make"
+COPY_CMD = "copy" if IS_WINDOWS else "cp"
+CMAKE_CMD = "cmake"
 
-path_to_dll = original_dir + "/fx_plan_stack/build/libs/libfx_plan_stack.dll"
+# Paths
+ORIGINAL_DIR = os.getcwd()
+STACK_BUILD_DIR = os.path.join(ORIGINAL_DIR, "fx_plan_stack", "build")
+CSCRIPT_BUILD_DIR = os.path.join(ORIGINAL_DIR, "acpac_cscripts", "build")
+PATH_TO_DLL = os.path.join(STACK_BUILD_DIR, "libs", "libfx_plan_stack.dll")
 
-makeCmd = "make"
+print(STACK_BUILD_DIR)
 
-if isWindows:
-	stack_build_dir = stack_build_dir.replace("/", "\\")
-	cscript_build_dir = cscript_build_dir.replace("/", "\\")
-	path_to_dll = path_to_dll.replace("/", "\\")
-	makeCmd = "mingw32-make -j"
+os.chdir(STACK_BUILD_DIR)
+os.system(f"{CMAKE_CMD} .. -DCOMPILE_SHARED=ON")
+os.system(MAKE_CMD)
 
-print(stack_build_dir)
+COPY_CMD = f'{COPY_CMD} "{PATH_TO_DLL}" "{CSCRIPT_BUILD_DIR}"'
+print(f"Executing:: {COPY_CMD}")
+os.system(COPY_CMD)
 
-os.chdir(stack_build_dir)
-os.system("cmake .. -DCOMPILE_SHARED=ON")
-os.system(makeCmd)
-
-copycmd = 'copy "' + path_to_dll + '" "' + cscript_build_dir + '"'
-print("Executing:: " + copycmd)
-os.system(copycmd)
-
-os.chdir(cscript_build_dir)
-os.system('cmake .. -G "MinGW Makefiles"')
-os.system(makeCmd)
+os.chdir(CSCRIPT_BUILD_DIR)
+os.system(f'{CMAKE_CMD} .. -G "MinGW Makefiles"')
+os.system(MAKE_CMD)
