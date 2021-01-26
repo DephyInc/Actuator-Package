@@ -15,7 +15,7 @@ void runLeaderFollower( int devId0, int devId1, bool *shouldQuit)
 	FxError errCode[2];
 
 	ActPackState readData[2];
-	
+
 	//
 	// Start streaming the data
 	//
@@ -31,7 +31,7 @@ void runLeaderFollower( int devId0, int devId1, bool *shouldQuit)
 	// Find the initial angles
 	//
 	int initialAngle[2] = {-1, -1};
-	
+
 	errCode[0] = fxReadDevice(devId0, &readData[0]);
 	errCode[1] = fxReadDevice(devId1, &readData[1]);
 	if(errCode[0] != FxSuccess || errCode[1] != FxSuccess)
@@ -62,7 +62,7 @@ void runLeaderFollower( int devId0, int devId1, bool *shouldQuit)
 		// Read device 0 angle
 		//
 		this_thread::sleep_for(50ms);
-		
+
 		errCode[0] = fxReadDevice(devId0, &readData[0]);
 		if(errCode[0] != FxSuccess)
 		{
@@ -76,11 +76,11 @@ void runLeaderFollower( int devId0, int devId1, bool *shouldQuit)
 		//
 		diff = angle[0] - initialAngle[0];
 		fxSendMotorCommand(devId1, FxPosition, initialAngle[1] + diff);
-		
+
 		this_thread::sleep_for(50ms);
 
 		clearScreen();
-		
+
 		errCode[0] = fxReadDevice(devId0, &readData[0]);
 		errCode[1] = fxReadDevice(devId1, &readData[1]);
 		if(errCode[0] != FxSuccess || errCode[1] != FxSuccess)

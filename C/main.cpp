@@ -83,7 +83,7 @@ int main()
 		//
 		// Open the port
 		//
-	int devId = fxOpen((char *)portName[idx].c_str(), baudRate, 0); 
+	int devId = fxOpen((char *)portName[idx].c_str(), baudRate, 0);
 		if (devId != -1)
 	{
 		cout << "Connected to device: " << devId << endl;

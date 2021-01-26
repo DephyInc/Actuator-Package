@@ -24,18 +24,18 @@ void runCurrentControl(int devId, bool* shouldQuit)
 	}
 
 	cout << "Setting controller to current..." << endl;
-	
+
 	// Start the current, holdCurrent is in mA
 	fxSetGains(devId, 100, 20, 0, 0, 0, 0);
-	fxSendMotorCommand(devId, FxCurrent, holdCurrent);	 
+	fxSendMotorCommand(devId, FxCurrent, holdCurrent);
 
 	int n = 0;
 	while(! *shouldQuit)
 	{
 		this_thread::sleep_for(100ms);
 		clearScreen();	                          //Clear terminal (Win)
-		
-		
+
+
 		errCode = fxReadDevice(devId, &readData);
 		if(errCode != FxSuccess)
 		{
@@ -58,7 +58,7 @@ void runCurrentControl(int devId, bool* shouldQuit)
 	n = 50;
 	for(int i =0; i < n; ++i)
 	{
-		fxSendMotorCommand(devId, FxCurrent, holdCurrent * (n-i)/n);	 
+		fxSendMotorCommand(devId, FxCurrent, holdCurrent * (n-i)/n);
 		this_thread::sleep_for(40ms);
 	}
 
@@ -66,11 +66,11 @@ void runCurrentControl(int devId, bool* shouldQuit)
 	// Wait for motor to spin down
 	//
 	cout << "Waiting for motor to spin down..." << endl;
-	fxSendMotorCommand(devId, FxCurrent, 0);	 
+	fxSendMotorCommand(devId, FxCurrent, 0);
 
 	// Read "last" encode angle
 	int lastAngle = 0;
-	
+
 	errCode = fxReadDevice(devId, &readData);
 	if(errCode != FxSuccess)
 	{
@@ -83,7 +83,7 @@ void runCurrentControl(int devId, bool* shouldQuit)
 
 	// Read "Current" encoder angle
 	int currentAngle = 0;
-	
+
 	errCode = fxReadDevice(devId, &readData);
 	if(errCode != FxSuccess)
 	{
@@ -97,16 +97,16 @@ void runCurrentControl(int devId, bool* shouldQuit)
 	// Wait for motor to stop spinning
 	while( abs(currentAngle - lastAngle) > 100)
 	{
-	
+
 		lastAngle = currentAngle;
-		
+
 		errCode = fxReadDevice(devId, &readData);
 		if(errCode != FxSuccess)
 		{
 			cout << "Reading Failed..." << endl;
 			exit(2);
 		}
-	
+
 		currentAngle = readData.encoderAngle;
 
 	}

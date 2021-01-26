@@ -15,12 +15,12 @@
  */
 
 #include "NetMaster_device_spec.h"
-#include <stdio.h> 
-#include <time.h> 
-#include <string.h> 
-#include <stdint.h> 
+#include <stdio.h>
+#include <time.h>
+#include <string.h>
+#include <stdint.h>
 
-#include <stdbool.h> 
+#include <stdbool.h>
 
 #define NETMASTER_SYSTEM_TIME_POS 72
 #define NETMASTER_STRUCT_DEVICE_FIELD_COUNT 73
@@ -131,7 +131,7 @@ void NetMasterSetData(struct NetMasterState *netmaster, uint32_t _deviceStateBuf
 ///
 ///@param NetMaster is the struct with the data to be placed in the string
 ///
-///@param dataString is where the new string wll be placed 
+///@param dataString is where the new string wll be placed
 ///
 void NetMasterDataToString(struct NetMasterState *netmaster, char dataString[NETMASTER_DATA_STRING_LENGTH]);
 
@@ -141,8 +141,8 @@ void NetMasterDataToString(struct NetMasterState *netmaster, char dataString[NET
 ///
 void NetMasterGetLabels(char labels[NETMASTER_STRUCT_DEVICE_FIELD_COUNT][NETMASTER_LABEL_MAX_CHAR_LENGTH]);
 
-/// \brief retrieves the string equivalent of parameter names starting with state time.  Parameters 
-/// prior to state time, such as id,  are not included. 
+/// \brief retrieves the string equivalent of parameter names starting with state time.  Parameters
+/// prior to state time, such as id,  are not included.
 ///
 ///@param labels is the array of labels containing the parameter names
 ///

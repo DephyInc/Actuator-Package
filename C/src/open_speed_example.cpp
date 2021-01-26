@@ -34,7 +34,7 @@ void runOpenSpeed(int devId, bool *shouldQuit)
 			fxSendMotorCommand(devId, FxVoltage, mV);
 			clearScreen();
 			cout << "Ramping up open controller..." << endl;
-				
+
 
 			if (fxReadDevice(devId, &readData) == FxSuccess)
 			{

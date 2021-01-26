@@ -31,31 +31,31 @@ void runHoldPosition(int devId, bool *shouldQuit)
 
 	int timeout = 100;
 	int initialAngle = 0;
-		
+
 	errCode = fxReadDevice(devId, &readData);
 	if(errCode != FxSuccess)
 	{
 		cout << "Reading failed ..." << endl;
 		return;
 	}
-	
+
 	initialAngle = readData.encoderAngle;
 
 	//
 	// Set the motor control
 	//
 	fxSetGains(devId, 50, 3, 0, 0, 0, 0);
-	fxSendMotorCommand(devId, FxPosition, initialAngle);	 
+	fxSendMotorCommand(devId, FxPosition, initialAngle);
 
 	while(!(*shouldQuit))
 	{
 		std::this_thread::sleep_for(50ms);
 		clearScreen();
 		cout << "Holding position " << initialAngle << endl;
-	
+
 		errCode = fxReadDevice(devId, &readData);
 		if(errCode != FxSuccess)
-		{	
+		{
 			cout << "Reading failed ..." << endl;
 			return;
 		}

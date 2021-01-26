@@ -11,7 +11,7 @@ function printDevice( libHandle, devId, vars, labels, n)
     ptrindex = libpointer('int32Ptr', zeros(1:10, 'int32'));
     ptrindex = ptr;
     setdatatype(ptrindex, 'int32Ptr', 1, 10);
-    
+
     % Print the data or failure indication
     for i = 1:length( vars )
         if( success(i) ~= 0)

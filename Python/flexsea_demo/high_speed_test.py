@@ -25,7 +25,7 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
 	portX			Port with outgoing serial connection to ActPack
 	controllerType	Position controller or current controller
 	signalType		Sine wave or line
-	commandFreq		Desired frequency of issuing commands to controller, actual 
+	commandFreq		Desired frequency of issuing commands to controller, actual
 					command frequency will be slower due to OS overhead.
 	signalAmplitude	Amplitude of signal to send to controller. Encoder position
 					if position controller, current in mA if current controller
@@ -54,13 +54,13 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
 	print(delay_time)
 
 	# Open the device and start streaming
-	devId0 = fxOpen(port0, baudRate, debugLoggingLevel) 
+	devId0 = fxOpen(port0, baudRate, debugLoggingLevel)
 	fxStartStreaming(devId0, commandFreq, dataLog)
 	print('Connected to device 0 with ID', devId0)
 
 	devId1 = -1
 	if(secondDevice):
-		devId1 = fxOpen(port1, baudRate, debugLoggingLevel) 
+		devId1 = fxOpen(port1, baudRate, debugLoggingLevel)
 		fxStartStreaming(devId1, commandFreq, dataLog)
 		print('Connected to device 1 with ID', devId1)
 
@@ -80,7 +80,7 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
 	else:
 		initialPos0 = 0
 		initialPos1 = 0
-	
+
 	# Generate a control profile
 	print('Command table:')
 	if(signalType == signal.sine):

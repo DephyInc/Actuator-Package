@@ -1,7 +1,7 @@
 function runOpenControl( libHandle, devId );
 % Run the Open Control demo
 disp('Open Control test');
-    
+
 % Motor & Control commands:
 CTRL_NONE = 0;
 CTRL_OPEN = 1;
@@ -33,17 +33,17 @@ varsToStream = [ 		...
 ];
 
     outVars = [ 99, 99, 99, 99, 99, 99, 99, 99, 99];
-    
+
     % Select the variables to stream
     [retCode, outVars ] = calllib(libHandle, 'fxSetStreamVariables', devId,  varsToStream, 9 );
-    
+
     % Start streaming
     retCode = calllib(libHandle, 'fxStartStreaming', devId, 100, false, 0 );
     if( ~retCode)
         fprintf("Couldn't start streaming...\n");
     else
         calllib(libHandle, 'setControlMode', devId, CTRL_OPEN);
-        
+
         numSteps = 50;
         minVoltage = 1000;
         maxVoltage = 3000;
@@ -61,7 +61,7 @@ varsToStream = [ 		...
                 fprintf("Ramping up controller...\n", mV );
                 printDevice( libHandle, devId, varsToStream, labels, 9);
             end
-            
+
             for i = 1: numSteps
                 pause( tDelay );
                 mV = minVoltage + varVoltage * (((numSteps -i)*1.0) /numSteps);

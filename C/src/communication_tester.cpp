@@ -44,12 +44,12 @@ void displayState(struct ActPackState& state)
 		state._execute._motor_data._motor_voltage << " mV" << endl;
 	cout <<"battery: " << state._regulate._battery._battery_voltage << " mV, " << \
 		state._regulate._battery._battery_current << " mA, " << \
-		state._regulate._battery._battery_temperature << " C" << endl << endl; 
+		state._regulate._battery._battery_temperature << " C" << endl << endl;
 }
 
 void test_training_commands(int devId)
 {
-	// State stores the device's sensor and motor data and can be passed into the read method 
+	// State stores the device's sensor and motor data and can be passed into the read method
 	ActPackState state;
 
 	// Enable auto streaming to have exo automatically send data
@@ -87,7 +87,7 @@ void test_position_commands(int devId)
 	int32_t start_position = 0, stop_position;
 	int32_t position, i;
 
-	// State stores the device's sensor and motor data and can be passed into the read method 
+	// State stores the device's sensor and motor data and can be passed into the read method
 	ActPackState state;
 
 	// Enable auto streaming to have exo automatically send data

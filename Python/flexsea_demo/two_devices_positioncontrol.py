@@ -26,7 +26,7 @@ def fxTwoDevicePositionControl(port0, baudRate, port1):
 
 	fxSetGains(devId0, 50, 3, 0, 0, 0, 0)
 	fxSetGains(devId1, 50, 3, 0, 0, 0, 0)
-	
+
 	fxSendMotorCommand(devId0, FxPosition, initialAngle0)
 	fxSendMotorCommand(devId1, FxPosition, initialAngle1)
 

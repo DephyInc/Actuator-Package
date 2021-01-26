@@ -14,7 +14,7 @@ varsToStream = [FX_GEN_VAR_0, FX_GEN_VAR_1, FX_GEN_VAR_2, \
 			    FX_GEN_VAR_3, FX_GEN_VAR_4, FX_GEN_VAR_5, \
 			    FX_GEN_VAR_6, FX_GEN_VAR_7, FX_GEN_VAR_8, \
 			    FX_GEN_VAR_9]
-																												
+
 
 def fxUserRW(port, baudRate, time = 2, time_step = 0.1,  resolution = 100):
 	result = True
@@ -42,7 +42,7 @@ def fxUserRW(port, baudRate, time = 2, time_step = 0.1,  resolution = 100):
 			writeUser(stream.devId,idx,val)
 		else:
 			print("Invalid input")
-		
+
 		sleep(time_step)
 		preamble = "The current read vals are" + str(getUserRead())
 		print(preamble)

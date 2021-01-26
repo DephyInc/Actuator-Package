@@ -30,10 +30,10 @@ varsToStream = [ 							...
 ];
 
     outVars = [ 99, 99, 99, 99, 99, 99, 99, 99, 99 ];
-    
+
     % Select the variables to stream
     [retCode, outVars ] = calllib(libHandle, 'fxSetStreamVariables', devId,  varsToStream, 9 );
-    
+
     % Start streaming
     retCode = calllib(libHandle, 'fxStartStreaming', devId, 100, false, 0 );
     if( ~retCode)
@@ -47,12 +47,12 @@ varsToStream = [ 							...
             initialAngle = readDeviceVar( libHandle, devId, FX_RIGID_ENC_ANG);
             retries = retries -1;
         end
-        % Enable the controller 
+        % Enable the controller
         calllib(libHandle, 'setPosition', devId, initialAngle);
         calllib(libHandle, 'setControlMode', devId, CTRL_POSITION);
         calllib(libHandle, 'setPosition', devId, initialAngle);
         calllib(libHandle, 'setGains', devId, 50, 3, 0, 0);
-            
+
         % Now, hold this poisition against user turn
         for i = 100: -1: 0
             pause(.250);

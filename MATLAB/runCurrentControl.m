@@ -21,20 +21,20 @@ varsToStream = [ 		...
 ];
 
     [retCode, outVars ] = calllib(libHandle, 'fxSetStreamVariables', devId,  varsToStream, 3 );
-    
+
     % Start streaming
     retCode = calllib(libHandle, 'fxStartStreaming', devId, 100, false, 0 );
     if( ~retCode)
         fprintf("Couldn't start streaming...\n");
     else
-        
+
         holdCurrent = 500;
-    
+
         fprintf('Setting controller to current control mode...')
         calllib(libHandle, 'setControlMode', devId, CTRL_CURRENT );
         calllib(libHandle, 'setGains', devId, 100, 20, 0, 0 );
         calllib(libHandle, 'setMotorCurrent', devId, holdCurrent );
-        
+
         loopCount = 50;
         while( loopCount )
             pause(.200);
@@ -43,7 +43,7 @@ varsToStream = [ 		...
             printDevice(libHandle, devId, varsToStream, labels, 3);
             loopCount = loopCount - 1;
         end
-        
+
         fprintf('Ramping down the current...\n')
         % Ramp down the holding current
         n = 50;
@@ -51,7 +51,7 @@ varsToStream = [ 		...
             pause(.400);
             calllib(libHandle, 'setMotorCurrent', devId, (holdCurrent * (n - i) / n));
         end
-        
+
         % Wait for motor to spin down
         calllib(libHandle, 'setMotorCurrent', devId, 0);
         i = 20;
@@ -63,7 +63,7 @@ varsToStream = [ 		...
                 i = 0;
             end
         end
-        
+
         pause(.200);
         i = 20;
         while( i )
@@ -74,7 +74,7 @@ varsToStream = [ 		...
                 i = 0;
             end
         end
-        
+
         while( abs(currentAngle - lastAngle) > 100)
             temp = readDeviceVar( libHandle, devId, FX_RIGID_ENC_ANG);
             if( ~isnan( temp ))

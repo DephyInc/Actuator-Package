@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3) 
+cmake_minimum_required(VERSION 2.8.3)
 project(flexsea_c_scripts)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -50,7 +50,7 @@ elseif( "${CMAKE_SIZEOF_VOID_P}" EQUAL "8" AND UNIX) # 64 bit Linux
 	# link plan stack library to our application
 	target_link_libraries(main ${fx_plan_stack_LIBRARY})
 
-	target_link_libraries(main pthread)	
+	target_link_libraries(main pthread)
 else()
 	# only look for a freshly built plan stack library since we're already set up to compile this find_program
 	# should not be an issues to have a freshly compiled plan stack to prevent confusion

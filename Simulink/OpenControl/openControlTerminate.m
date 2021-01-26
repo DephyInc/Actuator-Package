@@ -4,7 +4,7 @@ function openControlTerminate( block )
 fprintf('Terminating simulation\n');
 CTRL_NONE = 0;
 
-    % Stop the motor and disable the control mode and 
+    % Stop the motor and disable the control mode and
     fprintf('Cleaning up simulation\n');
     calllib('libfx_plan_stack', 'setMotorVoltage', block.Dwork(1).Data, 0);
     pause(.200);
@@ -19,7 +19,7 @@ CTRL_NONE = 0;
     fprintf('Closing DLL\n');
     calllib('libfx_plan_stack', 'fxCleanup');
     pause(.200);
-    
+
     % Unload the FX_PLAN_STACK DLL
     if libisloaded('libfx_plan_stack')
         fprintf('Unloading library\n');

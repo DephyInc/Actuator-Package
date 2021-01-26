@@ -54,7 +54,7 @@ def fxTwoPositionControl(port, baudRate, expTime = 13, time_step = 0.1,
 		print('Measured:             ', measuredPos)
 		print('Difference:           ', (measuredPos - positions[current_pos]), '\n')
 		printDevice(actPackState,FxActPack)
-		
+
 		if i % transition_steps == 0:
 			current_pos = (current_pos + 1) % num_pos
 			fxSendMotorCommand(devId, FxPosition, positions[current_pos])
@@ -66,7 +66,7 @@ def fxTwoPositionControl(port, baudRate, expTime = 13, time_step = 0.1,
 
 	# Close device and do device cleanup
 	#close_check = fxClose(devId)	#STACK-169
-	
+
 	#Disable the controller, send 0 PWM
 	fxSendMotorCommand(devId, FxVoltage, 0)
 	sleep(0.1)
@@ -82,7 +82,7 @@ def fxTwoPositionControl(port, baudRate, expTime = 13, time_step = 0.1,
 	if (os.name == 'nt'):
 		print('\nIn Windows, press Ctrl+BREAK to exit. Ctrl+C may not work.')
 	plt.show()
-	
+
 	# Close device and do device cleanup
 	close_check = fxClose(devId)
 

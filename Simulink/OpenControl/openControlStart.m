@@ -16,8 +16,8 @@ fprintf('Simulation starting...\n');
         % Initialize the FX environment
         calllib('libfx_plan_stack', 'fxSetup');
     end
-    
-    % Open the com port 
+
+    % Open the com port
     % Hard coded to 'COM3' This should go into a DialogPrm
     com3 =  cellstr(['com4']);
     fprintf("Opening port %s\n", com3{1});
@@ -37,7 +37,7 @@ fprintf('Simulation starting...\n');
         fprintf('Could not open %s (%d)\n', com3{1}, retCode);
         return
     end
-        
+
     % Get the device IDs (only one for this demo)
     deviceIds = [ -1, -1, -1 ];
     deviceIds = calllib('libfx_plan_stack', 'fxGetDeviceIds', deviceIds, 3);

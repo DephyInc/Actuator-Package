@@ -3,7 +3,7 @@ function data = readDeviceVar( libHandle, devId, var )
 
     retData = [ -1 ];
     success = [ -1 ];
-    
+
     varToRead= [ var];
     [ ptr, retData, success] = calllib(libHandle, 'fxReadDevice', devId, varToRead, success, 1);
     ptrindex = libpointer('int32Ptr', zeros(1, 'int32'));

@@ -15,12 +15,12 @@
  */
 
 #include "CycleTester_device_spec.h"
-#include <stdio.h> 
-#include <time.h> 
-#include <string.h> 
-#include <stdint.h> 
+#include <stdio.h>
+#include <time.h>
+#include <string.h>
+#include <stdint.h>
 
-#include <stdbool.h> 
+#include <stdbool.h>
 
 #define CYCLETESTER_SYSTEM_TIME_POS 32
 #define CYCLETESTER_STRUCT_DEVICE_FIELD_COUNT 33
@@ -91,7 +91,7 @@ void CycleTesterSetData(struct CycleTesterState *cycletester, uint32_t _deviceSt
 ///
 ///@param CycleTester is the struct with the data to be placed in the string
 ///
-///@param dataString is where the new string wll be placed 
+///@param dataString is where the new string wll be placed
 ///
 void CycleTesterDataToString(struct CycleTesterState *cycletester, char dataString[CYCLETESTER_DATA_STRING_LENGTH]);
 
@@ -101,8 +101,8 @@ void CycleTesterDataToString(struct CycleTesterState *cycletester, char dataStri
 ///
 void CycleTesterGetLabels(char labels[CYCLETESTER_STRUCT_DEVICE_FIELD_COUNT][CYCLETESTER_LABEL_MAX_CHAR_LENGTH]);
 
-/// \brief retrieves the string equivalent of parameter names starting with state time.  Parameters 
-/// prior to state time, such as id,  are not included. 
+/// \brief retrieves the string equivalent of parameter names starting with state time.  Parameters
+/// prior to state time, such as id,  are not included.
 ///
 ///@param labels is the array of labels containing the parameter names
 ///

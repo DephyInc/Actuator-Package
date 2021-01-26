@@ -2,7 +2,7 @@
 function runReadOnly( libHandle, deviceId )
 % Read the FlexSEA Parameters and display them
     disp('Read Only test');
-    
+
 % field ids
 FX_RIGID_STATETIME = 2;
 FX_RIGID_ACCELX = 3;
@@ -34,10 +34,10 @@ varsToStream = [                ...
 ];
 
     outVars = [ 99, 99, 99, 99, 99, 99, 99, 99, 99, 99 ];
-    
+
     % Select the variables to stream
     [retCode, outVars ] = calllib(libHandle, 'fxSetStreamVariables', deviceId,  varsToStream, 10 );
-    
+
     % Start streaming
     retCode = calllib(libHandle, 'fxStartStreaming', deviceId, 100, false, 0 );
     if( ~retCode)

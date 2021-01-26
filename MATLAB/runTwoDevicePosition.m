@@ -33,7 +33,7 @@ varsToStream = [ 							...
     % Select the variables to stream
     [retCode1, outVars ] = calllib(libHandle, 'fxSetStreamVariables', devIds(1),  varsToStream, 9 );
     [retCode2, outVars ] = calllib(libHandle, 'fxSetStreamVariables', devIds(2),  varsToStream, 9 );
-    
+
     % Start streaming
     retCode1 = calllib(libHandle, 'fxStartStreaming', devIds(1), 100, false, 0 );
     retCode2 = calllib(libHandle, 'fxStartStreaming', devIds(2), 100, false, 0 );
@@ -48,7 +48,7 @@ varsToStream = [ 							...
             initialAngle1 = readDeviceVar( libHandle, devIds(1), FX_RIGID_ENC_ANG);
             initialAngle2 = readDeviceVar( libHandle, devIds(2), FX_RIGID_ENC_ANG);
         end
-        
+
         % Set position control for both devices
         calllib(libHandle, 'setPosition', devIds(1), initialAngle1);
         calllib(libHandle, 'setControlMode', devIds(1), CTRL_POSITION);

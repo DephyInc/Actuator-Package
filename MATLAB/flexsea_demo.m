@@ -9,7 +9,7 @@ deviceIds = [ -99, -99, -99 ];
 ports = cellstr([ '', '', '' ]);
 
 %shouldQuit = false;
-%shouldQuit = onCleanup( @() signalHander(shouldQuit) ) 
+%shouldQuit = onCleanup( @() signalHander(shouldQuit) )
 
 % Check to see what COM ports to use
 ports = readConfig();
@@ -77,15 +77,15 @@ end
 function [ retCode, deviceIds] = loadAndGetDevice( ports )
 % Load the FlexSEA DLL and prepare the environment
     disp('Loading library and Initializing');
-    
+
     retCode = false;
-    
+
     % if the FlexSEA DLL is loaded, unload it
     %  we want to use the latest version
     if libisloaded('libfx_plan_stack')
         unloadlibrary 'libfx_plan_stack'
     end
-    
+
     % Add relative path to library/header file
     disp('Loading library');
     addpath( '..\libs\win64');
@@ -94,7 +94,7 @@ function [ retCode, deviceIds] = loadAndGetDevice( ports )
     if libisloaded( 'libfx_plan_stack' )
         % Initialize the FX environment
         calllib('libfx_plan_stack', 'fxSetup');
-    
+
         % We need to loop until all of the ports are open
         for i = 1:length( ports )
             if( ports{i} )
@@ -114,7 +114,7 @@ function [ retCode, deviceIds] = loadAndGetDevice( ports )
                 end
             end
         end
-        
+
         % Get the device IDs
         deviceIds = [ -3, -2, -2 ];
         deviceIds = calllib('libfx_plan_stack', 'fxGetDeviceIds', deviceIds, 3);

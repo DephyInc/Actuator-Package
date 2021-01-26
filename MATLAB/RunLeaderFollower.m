@@ -40,14 +40,14 @@ VarEncAngle = [ FX_RIGID_ENC_ANG ];
     success1 = zeros( 9, 'int32' );
     success2 = zeros( 9, 'int32' );
     retData  = zeros( 9, 'int32' );
-    
+
     initialAngle1 = 0;
     initialAngle2 = 0;
-    
+
     % Select the variables to stream
     [retCode1, outVars ] = calllib(libHandle, 'fxSetStreamVariables', deviceIds(1),  varsToStream, 9 );
     [retCode2, outVars ] = calllib(libHandle, 'fxSetStreamVariables', deviceIds(2),  varsToStream, 9 );
-    
+
     % Start streaming
     retCode1 = calllib(libHandle, 'fxStartStreaming', deviceIds(1), 100, false, 0 );
     retCode2 = calllib(libHandle, 'fxStartStreaming', deviceIds(2), 100, false, 0 );
@@ -57,7 +57,7 @@ VarEncAngle = [ FX_RIGID_ENC_ANG ];
         retries = 10;
         while ( retries )
             pause(.500);
-            
+
             % Get the initial positions of the two devices
             % Note: We are only interested in the Encoder Angle at this
             % point. So only retrieve that from the devices
@@ -67,7 +67,7 @@ VarEncAngle = [ FX_RIGID_ENC_ANG ];
                 retries = 0;
             end
         end
-        
+
         % If we got the initial angles, proceed
         if( ~isnan( initialAngle1 ) && ~isnan( initialAngle2 ))
             fprintf("Turning on position control for device %d to follow %d\n", deviceIds(1), deviceIds(2));
@@ -89,7 +89,7 @@ VarEncAngle = [ FX_RIGID_ENC_ANG ];
                 if( ~isnan( initialAngle1 ) )
                     diff = angle1 - initialAngle1;
                     calllib(libHandle, 'setPosition', deviceIds(2), initialAngle2 + (3 * diff));
-                
+
                     % Now, for each device get ALL of the values and display them
                     clc;
                     fprintf("Device %d following device %d  (%d)\n", deviceIds(1), deviceIds(2), loopCount);
@@ -102,7 +102,7 @@ VarEncAngle = [ FX_RIGID_ENC_ANG ];
             end
         end
     end
-    
+
     % Clean up
     fprintf("Turning off position control\n");
     calllib(libHandle, 'setControlMode', deviceIds(1), CTRL_NONE);

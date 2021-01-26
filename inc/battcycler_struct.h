@@ -15,12 +15,12 @@
  */
 
 #include "BattCycler_device_spec.h"
-#include <stdio.h> 
-#include <time.h> 
-#include <string.h> 
-#include <stdint.h> 
+#include <stdio.h>
+#include <time.h>
+#include <string.h>
+#include <stdint.h>
 
-#include <stdbool.h> 
+#include <stdbool.h>
 
 #define BATTCYCLER_SYSTEM_TIME_POS 22
 #define BATTCYCLER_STRUCT_DEVICE_FIELD_COUNT 23
@@ -81,7 +81,7 @@ void BattCyclerSetData(struct BattCyclerState *battcycler, uint32_t _deviceState
 ///
 ///@param BattCycler is the struct with the data to be placed in the string
 ///
-///@param dataString is where the new string wll be placed 
+///@param dataString is where the new string wll be placed
 ///
 void BattCyclerDataToString(struct BattCyclerState *battcycler, char dataString[BATTCYCLER_DATA_STRING_LENGTH]);
 
@@ -91,8 +91,8 @@ void BattCyclerDataToString(struct BattCyclerState *battcycler, char dataString[
 ///
 void BattCyclerGetLabels(char labels[BATTCYCLER_STRUCT_DEVICE_FIELD_COUNT][BATTCYCLER_LABEL_MAX_CHAR_LENGTH]);
 
-/// \brief retrieves the string equivalent of parameter names starting with state time.  Parameters 
-/// prior to state time, such as id,  are not included. 
+/// \brief retrieves the string equivalent of parameter names starting with state time.  Parameters
+/// prior to state time, such as id,  are not included.
 ///
 ///@param labels is the array of labels containing the parameter names
 ///
