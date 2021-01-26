@@ -8,7 +8,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
 	name="flexsea",  # Replace with your own username
-	version="4.2.0",
+	version="4.3.0",
 	author="Dephy Inc.",
 	author_email="admin@dephy.com",
 	description="Dephy's Actuator Package API library",

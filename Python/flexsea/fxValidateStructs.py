@@ -1,16 +1,20 @@
+#!/usr/bin/env python3
+"""Validate C structs"""
+
 from signal import signal, SIGINT
 import os
 import sys
 import ast
 import pyclibrary
 
-C_STRUCTS_DIR = os.path.join(os.getcwd(), "..", "inc")
-PYTHON_DIR = os.path.join(os.getcwd(), "flexseapython", "dev_spec")
+C_STRUCTS_DIR = os.path.join(os.getcwd(), "..", "..", "inc")
+PYTHON_DIR = os.path.join(os.getcwd(), "dev_spec")
 IGNORE_FILES = ["__init__.py", "__pycache__", "AllDevices.py"]
 COMPARE_FILE = os.path.join(os.getcwd(), "py-c-files.config")
 
 
-def sig_handler(frame, signal_received):
+def sig_handler(_frame, _signal_received):
+
 	return sys.exit("\nCTRL-C or SIGINT detected\nExiting ...")
 
 
@@ -48,9 +52,9 @@ def extract_py_node(classNode):
 	if not isinstance(all_nodes[1], ast.List):
 		print("ERR - Bad parsing in py files! Something has changed. Contact the developers!")
 		return
-	else:
-		fields = [e for e in all_nodes[1].elts]
-		fields_extracted = extract_py_fields(fields)
+
+	fields = [e for e in all_nodes[1].elts]
+	fields_extracted = extract_py_fields(fields)
 	return fields_extracted
 
 
@@ -89,17 +93,12 @@ def extract_c_fields(structs):
 		)
 		return
 
-	list(structs)[0]
 	value = list(structs.values())[0]
-	# print('----------\nKEY: ', key)#, '\nVALUE: ', value,"\n----------")
-	# print('----------\nKEY-TYPE: ', type(key), '\nVALUE-TYPE: ', type(value), "\n----------")
 	if not isinstance(value, pyclibrary.c_parser.Struct):
 		print(
 			"ERR: - Incorrect object passed for extracting C fields. Contact developer team."
 		)
 		return
-
-	# print(">>>>> DEBUG - c_parser.Struct detected! Number of fields before processing: ", len(value.members))
 
 	fields_extracted = [each_field[0] for each_field in value.members]
 	fields_extracted = [
@@ -115,7 +114,7 @@ def extract_c_fields(structs):
 def get_c_fields(name):
 	filename = os.path.join(C_STRUCTS_DIR, name)
 	# print("\n>>> IN-PROCESS - Extracting fields from c struct file: " + filename)
-	if not (os.path.isfile(filename)):
+	if not os.path.isfile(filename):
 		print("ERR - Could not find file", filename)
 		return
 	parser = pyclibrary.CParser(process_all=False)
@@ -135,19 +134,14 @@ def get_c_fields(name):
 	return extract_c_fields(structs)
 
 
-def validate_struct_files(pythonFile, cStructFile):
+def validate_struct_files(python_file, c_struct_file):
 	print("-----------------------------------------------------------------------------")
-	print(">>>>> INFO - Attempting Validation for filenames: ", pythonFile, cStructFile)
-	py_fields = get_py_fields(pythonFile)
+	print(">>>>> INFO - Attempting Validation for filenames: ", python_file, c_struct_file)
+	py_fields = get_py_fields(python_file)
 	py_fields = sorted(py_fields, key=str.casefold)
-	# print(">>>>> INFO - ", len(py_fields), " Fields extracted")
-	# print(">>>>> INFO - Fields: ", *py_fields)
-	c_fields = get_c_fields(cStructFile)
+	c_fields = get_c_fields(c_struct_file)
 	c_fields = sorted(c_fields, key=str.casefold)
-	# print(">>>>> INFO - ", len(c_fields), " Fields extracted")
-	# print(">>>>> INFO - Fields: ", *c_fields)
 	matching_fields = set(py_fields) & set(c_fields)
-	# print(">>>>> INFO - ", len(matching_fields), " fields were found in common!")
 	if len(py_fields) == len(c_fields):
 		print(">>> Success! Number of fields were the same!")
 	else:
@@ -158,14 +152,14 @@ def validate_struct_files(pythonFile, cStructFile):
 		print(">>> Hooray! Validations successful!")
 		print("---------------------------------------------------------------------------")
 		return
-	else:
-		print(">>> Validation failure! Mismatch in fields!")
-		input("Press enter to continue...")
-		print("---------------------------------------------------------------------------")
-		return
+	print(">>> Validation failure! Mismatch in fields!")
+	input("Press enter to continue...")
+	print("---------------------------------------------------------------------------")
+	return
 
 
-if __name__ == "__main__":
+def main():
+	"""Read py-c config and validate structs"""
 	signal(SIGINT, sig_handler)  # Handle Ctrl-C or SIGINT
 
 	print(
@@ -184,9 +178,9 @@ if __name__ == "__main__":
 			with open(COMPARE_FILE, "r") as compare_file:
 				lines = compare_file.readlines()
 			for line in lines:
-				pyFile = line.split(",")[0].strip()
-				cStructFile = line.split(",")[1].strip()
-				validate_struct_files(pyFile, cStructFile)
+				py_file = line.split(",")[0].strip()
+				c_struct_file = line.split(",")[1].strip()
+				validate_struct_files(py_file, c_struct_file)
 		except FileNotFoundError:
 			sys.exit("ERR: " + COMPARE_FILE + " was not found at -- Exiting Script")
 	else:
@@ -196,3 +190,7 @@ if __name__ == "__main__":
 			+ "\n>>> Usage: python fxStructsValidatePy-C.py all"
 			+ "\n>>>        python fxStructsValidatePy-C.py"
 		)
+
+
+if __name__ == "__main__":
+	main()
