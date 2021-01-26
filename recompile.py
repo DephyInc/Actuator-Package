@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build binary libraries from external repo"""
+"""Build binary libraries from external repo. Can't run form this repo."""
 
 import os
 import sys
