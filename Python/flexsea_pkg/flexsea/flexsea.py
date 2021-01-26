@@ -24,7 +24,7 @@ class FlexSEA:
 	"""
 
 	def __init__(self):
-		self.ids = list()
+		self.ids = []
 		self.c_lib = None
 		self.load_c_libs()
 
@@ -34,7 +34,7 @@ class FlexSEA:
 	def load_c_libs(self):
 		"""Loads the library from the c lib"""
 		path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../libs")
-		lib_paths = list()
+		lib_paths = []
 		nix_lib = "libfx_plan_stack.so"
 		win_lib = "libfx_plan_stack.dll"
 		if fxu.is_win():
@@ -59,7 +59,7 @@ class FlexSEA:
 		else:
 			lib_paths = [os.path.join(path, "linux", nix_lib)]
 
-		loading_log_messages = list()
+		loading_log_messages = []
 		for path in lib_paths:
 			try:
 				loading_log_messages.append("loading... " + path)

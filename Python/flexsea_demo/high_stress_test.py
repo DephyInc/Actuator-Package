@@ -15,8 +15,8 @@ from flexseapython.fxPlotting import plotSetpointVsDesired
 matplotlib.use("WebAgg")
 
 # Globals updated with every timestamp for plotting
-TIMESTAMPS = list()  # Elapsed times since strart of run
-CYCLE_STOP_TIMES = list()  # Timestamps for each loop end
+TIMESTAMPS = []  # Elapsed times since strart of run
+CYCLE_STOP_TIMES = []  # Timestamps for each loop end
 
 
 def fxHighStressTest(
@@ -50,20 +50,20 @@ def fxHighStressTest(
 	global TIMESTAMPS  # Elapsed times since strart of run
 	global CYCLE_STOP_TIMES  # Timestamps for each loop end
 
-	devices = list()
+	devices = []
 	devices.append({"port": port0})
 	if port1:
 		devices.append({"port": port1})
 
 	# Initialize devices
 	for dev in devices:
-		dev["read_times"] = list()
-		dev["gains_times"] = list()
-		dev["motor_times"] = list()
-		dev["pos_requests"] = list()
-		dev["pos_measurements"] = list()
-		dev["curr_requests"] = list()
-		dev["curr_measurements"] = list()
+		dev["read_times"] = []
+		dev["gains_times"] = []
+		dev["motor_times"] = []
+		dev["pos_requests"] = []
+		dev["pos_measurements"] = []
+		dev["curr_requests"] = []
+		dev["curr_measurements"] = []
 
 	print(
 		"Running high stress test with {} device".format(len(devices)) + "s"
@@ -116,7 +116,7 @@ def fxHighStressTest(
 			print("Step 0: set position controller")
 
 			sleep(delay_time)  # Important in loop 2+
-			cmds = list()
+			cmds = []
 			for dev in devices:
 				if rep:  # Second or later iterations in loop
 					initial_cmd = {"cur": 0, "pos": dev["data"].mot_ang}
@@ -131,7 +131,7 @@ def fxHighStressTest(
 			if rep:  # Second or later iterations in loop
 				print("Step 1: go to initial position")
 				# Create interpolation angles for each device
-				lin_samples = list()
+				lin_samples = []
 				for dev in devices:
 					lin_samples.append(
 						fx.linearInterp(dev["data"].mot_ang - dev["initial_pos"], 0, 100)
