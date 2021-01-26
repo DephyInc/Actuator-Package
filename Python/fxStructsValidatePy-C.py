@@ -3,7 +3,6 @@ import os
 import sys
 import ast
 import pyclibrary
-import inspect
 
 C_STRUCTS_DIR = os.path.join(os.getcwd(), "..", "inc")
 PYTHON_DIR = os.path.join(os.getcwd(), "flexseapython", "dev_spec")
@@ -61,7 +60,7 @@ def get_py_fields(filename):
 	try:
 		with open(filename) as py_file:
 			node = ast.parse(py_file.read())
-	except FileNotFoundError as e:
+	except FileNotFoundError:
 		sys.exit(
 			"ERR - " + filename + " was not found at " + PYTHON_DIR + " -- Exiting Script"
 		)
@@ -90,7 +89,7 @@ def extract_c_fields(structs):
 		)
 		return
 
-	key = list(structs)[0]
+	list(structs)[0]
 	value = list(structs.values())[0]
 	# print('----------\nKEY: ', key)#, '\nVALUE: ', value,"\n----------")
 	# print('----------\nKEY-TYPE: ', type(key), '\nVALUE-TYPE: ', type(value), "\n----------")
@@ -120,8 +119,6 @@ def get_c_fields(name):
 		print("ERR - Could not find file", filename)
 		return
 	parser = pyclibrary.CParser(process_all=False)
-	fields = []
-	fields_extracted = []
 	try:
 		fl = parser.load_file(filename)
 		if not fl:
@@ -190,7 +187,7 @@ if __name__ == "__main__":
 				pyFile = line.split(",")[0].strip()
 				cStructFile = line.split(",")[1].strip()
 				validate_struct_files(pyFile, cStructFile)
-		except FileNotFoundError as e:
+		except FileNotFoundError:
 			sys.exit("ERR: " + COMPARE_FILE + " was not found at -- Exiting Script")
 	else:
 		print(">>> ERR: Bad Argument. ")

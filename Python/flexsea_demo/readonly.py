@@ -3,7 +3,6 @@
 """
 FlexSEA Read Only Demo
 """
-import sys
 from time import sleep
 from flexsea import fxUtils as fxu
 from flexsea import fxEnums as fxe

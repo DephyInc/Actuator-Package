@@ -26,7 +26,6 @@ def fxCurrentControl(port, baudRate, holdCurrent=[1000], time=6, time_step=0.1):
 			fxClose(devId)
 			return True
 
-	result = True
 	print("Setting controller to current...")
 	# Gains are, in order: kp, ki, kd, K, B & ff
 	fxSetGains(devId, 250, 200, 128, 0, 0, 0)
@@ -77,4 +76,3 @@ if __name__ == "__main__":
 		fxCurrentControl(ports, baudRate)
 	except Exception as e:
 		print("broke: " + str(e))
-		pass

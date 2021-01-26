@@ -78,4 +78,3 @@ if __name__ == "__main__":
 		fxUserRW(ports, baudRate)
 	except Exception as e:
 		print("broke: " + str(e))
-		pass

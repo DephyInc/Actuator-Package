@@ -1,5 +1,5 @@
 import os, sys
-from time import sleep, time, strftime
+from time import sleep, time
 import matplotlib
 import matplotlib.pyplot as plt
 
@@ -105,4 +105,3 @@ if __name__ == "__main__":
 		fxPositionControl(ports, baudRate)
 	except Exception as e:
 		print("broke: " + str(e))
-		pass

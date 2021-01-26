@@ -1,5 +1,6 @@
-import os, sys, math
-from time import sleep, time, strftime
+import os
+import sys
+from time import sleep, time
 from enum import Enum
 import numpy as np
 import matplotlib.pyplot as plt

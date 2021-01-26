@@ -1,8 +1,6 @@
 #!/usr/bin/python3
 """'Performs high-stress test on ActuatorPackage.'"""
 
-import os
-import sys
 import traceback
 from time import sleep, time
 import numpy as np

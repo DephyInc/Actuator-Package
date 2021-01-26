@@ -31,7 +31,6 @@ def fxLeaderFollower(leaderPort, baudRate, followerPort):
 	fxSetGains(devId1, 50, 3, 0, 0, 0, 0)
 	fxSendMotorCommand(devId1, FxPosition, initialAngle1)
 
-	count = 0
 	loopCount = 200
 	try:
 		for i in range(loopCount):
@@ -48,7 +47,7 @@ def fxLeaderFollower(leaderPort, baudRate, followerPort):
 			printDevice(leaderData, FxActPack)
 			printLoopCount(i, loopCount)
 
-	except Exception as e:
+	except Exception:
 		print(traceback.format_exc())
 
 	print("Turning off position control...")
@@ -68,4 +67,3 @@ if __name__ == "__main__":
 		fxLeaderFollower(ports[0], ports[1], baudRate)
 	except Exception as e:
 		print("broke: " + str(e))
-		pass
