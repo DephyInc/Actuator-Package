@@ -77,4 +77,3 @@ void runOpenSpeed(int devId, bool *shouldQuit)
 	}
 
 }
-

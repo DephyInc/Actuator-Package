@@ -112,4 +112,3 @@ void runCurrentControl(int devId, bool* shouldQuit)
 	}
 
 }
-

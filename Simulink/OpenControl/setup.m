@@ -4,7 +4,7 @@ function setup (block )
 block.NumDialogPrms = 0;    % There are no program inputs
 block.NumInputPorts = 1;    % We have one input to the block
 block.NumOutputPorts = 9;   % Nine outputs from the block
-                            % One for each variable to stream
+							% One for each variable to stream
 
 %block.SetPreCompInpPortInfoToDynamic;
 block.SampleTimes = [ -1 0];

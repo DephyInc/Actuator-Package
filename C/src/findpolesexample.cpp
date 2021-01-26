@@ -10,7 +10,7 @@ using namespace std::literals::chrono_literals;
 
 void runFindPoles(int devId)
 {
-    int blockUntilFound = 1;
-    findPoles(devId, blockUntilFound);
-    return;
+	int blockUntilFound = 1;
+	findPoles(devId, blockUntilFound);
+	return;
 }
