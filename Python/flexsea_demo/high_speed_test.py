@@ -6,7 +6,8 @@ import matplotlib.pyplot as plt
 import matplotlib
 from flexseapython.fxUtil import *
 from flexseapython.fxPlotting import *
-matplotlib.use('WebAgg')
+
+matplotlib.use("WebAgg")
 
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 print(pardir)
@@ -17,9 +18,21 @@ class signal(Enum):
 	sine = 1
 	line = 2
 
-def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
-	signalType = signal.sine, commandFreq = 1000, signalAmplitude = 1000, numberOfLoops = 4,
-	signalFreq = 5, cycleDelay = 0.1, requestJitter = False, jitter = 20):
+
+def fxHighSpeedTest(
+	port0,
+	baudRate,
+	port1="",
+	controllerType=hssCurrent,
+	signalType=signal.sine,
+	commandFreq=1000,
+	signalAmplitude=1000,
+	numberOfLoops=4,
+	signalFreq=5,
+	cycleDelay=0.1,
+	requestJitter=False,
+	jitter=20,
+):
 	"""
 	baudRate		Baud rate of outgoing serial connection to ActPack
 	portX			Port with outgoing serial connection to ActPack
@@ -38,17 +51,17 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
 
 	# One vs two devices
 	secondDevice = False
-	if(port1 != ""):
+	if port1 != "":
 		secondDevice = True
 
-	if(secondDevice):
+	if secondDevice:
 		print("Running High Speed Test with two devices")
 	else:
 		print("Running High Speed Test with one device")
 
 	# Debug & Data Logging
-	debugLoggingLevel = 6 	# 6 is least verbose, 0 is most verbose
-	dataLog = False 		# Data log logs device data
+	debugLoggingLevel = 6  # 6 is least verbose, 0 is most verbose
+	dataLog = False  # Data log logs device data
 
 	delay_time = float(1 / (float(commandFreq)))
 	print(delay_time)
@@ -56,25 +69,25 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
 	# Open the device and start streaming
 	devId0 = fxOpen(port0, baudRate, debugLoggingLevel)
 	fxStartStreaming(devId0, commandFreq, dataLog)
-	print('Connected to device 0 with ID', devId0)
+	print("Connected to device 0 with ID", devId0)
 
 	devId1 = -1
-	if(secondDevice):
+	if secondDevice:
 		devId1 = fxOpen(port1, baudRate, debugLoggingLevel)
 		fxStartStreaming(devId1, commandFreq, dataLog)
-		print('Connected to device 1 with ID', devId1)
+		print("Connected to device 1 with ID", devId1)
 
 	# Get initial position:
-	if(controllerType == hssPosition):
-		#Get initial position:
-		print('Reading initial position...')
+	if controllerType == hssPosition:
+		# Get initial position:
+		print("Reading initial position...")
 		# Give the device time to consume the startStreaming command and start streaming
 		sleep(0.1)
 		data = fxReadDevice(devId0)
 		initialPos0 = data.mot_ang
 
 		initialPos1 = 0
-		if(secondDevice):
+		if secondDevice:
 			data = fxReadDevice(devId1)
 			initialPos1 = data.mot_ang
 	else:
@@ -82,11 +95,11 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
 		initialPos1 = 0
 
 	# Generate a control profile
-	print('Command table:')
-	if(signalType == signal.sine):
+	print("Command table:")
+	if signalType == signal.sine:
 		samples = sinGenerator(signalAmplitude, signalFreq, commandFreq)
 		signalTypeStr = "sine wave"
-	elif(signalType == signal.line):
+	elif signalType == signal.line:
 		samples = lineGenerator(signalAmplitude, 1, commandFreq)
 		signalTypeStr = "line"
 	else:
@@ -105,21 +118,21 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
 	dev1ReadCommandTimes = []
 
 	# Prepare controller:
-	if(controllerType == hssCurrent):
+	if controllerType == hssCurrent:
 		print("Setting up current control demo. Low current, high frequency")
 		# Gains are, in order: kp, ki, kd, K, B & ff
 		fxSetGains(devId0, 250, 200, 128, 0, 0, 98)
-		if(secondDevice):
+		if secondDevice:
 			fxSetGains(devId1, 250, 200, 128, 0, 0, 98)
 
-	elif(controllerType == hssPosition):
+	elif controllerType == hssPosition:
 		print("Setting up position control demo")
 		# Gains are, in order: kp, ki, kd, K, B & ff
 		fxSetGains(devId0, 300, 50, 0, 0, 0, 98)
-		if(secondDevice):
+		if secondDevice:
 			fxSetGains(devId1, 300, 50, 0, 0, 0, 98)
 	else:
-		assert 0, 'Invalid controllerType'
+		assert 0, "Invalid controllerType"
 
 	# Record start time of experiment
 	i = 0
@@ -130,7 +143,7 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
 		elapsedTime = time() - t0
 		printLoopCountAndTime(loopCtr, numberOfLoops, elapsedTime)
 		for sample in samples:
-			if(i % 2 == 0 and requestJitter):
+			if i % 2 == 0 and requestJitter:
 				sample = sample + jitter
 
 			sleep(delay_time)
@@ -139,29 +152,29 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
 			dev0ReadTimeBefore = time()
 			data0 = fxReadDevice(devId0)
 			dev0ReadTimeAfter = time()
-			if(secondDevice):
+			if secondDevice:
 				dev1ReadTimeBefore = time()
 				data1 = fxReadDevice(devId1)
 				dev1ReadTimeAfter = time()
 
 			# Write setpoint
-			if(controllerType == hssCurrent):
+			if controllerType == hssCurrent:
 				dev0WriteTimeBefore = time()
 				fxSendMotorCommand(devId0, FxCurrent, sample)
 				dev0WriteTimeAfter = time()
 				measurements0.append(data0.mot_cur)
-				if(secondDevice):
+				if secondDevice:
 					dev1WriteTimeBefore = time()
 					fxSendMotorCommand(devId1, FxCurrent, sample)
 					dev1WriteTimeAfter = time()
 					measurements1.append(data1.mot_cur)
 
-			elif(controllerType == hssPosition):
+			elif controllerType == hssPosition:
 				dev0WriteTimeBefore = time()
 				fxSendMotorCommand(devId0, FxPosition, sample + initialPos0)
 				dev0WriteTimeAfter = time()
 				measurements0.append(data0.mot_ang - initialPos0)
-				if(secondDevice):
+				if secondDevice:
 					dev1WriteTimeBefore = time()
 					fxSendMotorCommand(devId1, FxPosition, sample + initialPos1)
 					dev1WriteTimeAfter = time()
@@ -177,23 +190,23 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
 			i = i + 1
 
 		# Delay between cycles (sine wave only)
-		if(signalType == signal.sine):
-			for j in range(int(cycleDelay/delay_time)):
+		if signalType == signal.sine:
+			for j in range(int(cycleDelay / delay_time)):
 
 				sleep(delay_time)
 				# Read data from ActPack
 				data0 = fxReadDevice(devId0)
-				if(secondDevice):
+				if secondDevice:
 					data1 = fxReadDevice(devId1)
 
-				if(controllerType == hssCurrent):
+				if controllerType == hssCurrent:
 					measurements0.append(data0.mot_cur)
-					if(secondDevice):
+					if secondDevice:
 						measurements1.append(data1.mot_cur)
 
-				elif(controllerType == hssPosition):
+				elif controllerType == hssPosition:
 					measurements0.append(data0.mot_ang - initialPos0)
-					if(secondDevice):
+					if secondDevice:
 						measurements1.append(data1.mot_ang - initialPos1)
 
 				times.append(time() - t0)
@@ -215,22 +228,49 @@ def fxHighSpeedTest(port0, baudRate, port1 = "", controllerType = hssCurrent,
 	commandFrequency = i / elapsedTime
 
 	# Figure: setpoint, desired vs measured (1st device)
-	figureCounter = 1	# First time, functions will increment
-	figureCounter = plotSetpointVsDesired(devId0, figureCounter, controllerType, actualFrequency, signalAmplitude, signalTypeStr, commandFrequency, times,
-						requests, measurements0, cycleStopTimes)
-	figureCounter = plotExpStats(devId0, figureCounter, dev0WriteCommandTimes, dev0ReadCommandTimes)
+	figureCounter = 1  # First time, functions will increment
+	figureCounter = plotSetpointVsDesired(
+		devId0,
+		figureCounter,
+		controllerType,
+		actualFrequency,
+		signalAmplitude,
+		signalTypeStr,
+		commandFrequency,
+		times,
+		requests,
+		measurements0,
+		cycleStopTimes,
+	)
+	figureCounter = plotExpStats(
+		devId0, figureCounter, dev0WriteCommandTimes, dev0ReadCommandTimes
+	)
 
 	# Figure: setpoint, desired vs measured (2nd device)
-	if(secondDevice):
-		figureCounter = plotSetpointVsDesired(devId1, figureCounter, controllerType, actualFrequency, signalAmplitude, signalTypeStr, commandFrequency,
-						times, requests, measurements1, cycleStopTimes)
-		figureCounter = plotExpStats(devId1, figureCounter, dev1WriteCommandTimes, dev1ReadCommandTimes)
+	if secondDevice:
+		figureCounter = plotSetpointVsDesired(
+			devId1,
+			figureCounter,
+			controllerType,
+			actualFrequency,
+			signalAmplitude,
+			signalTypeStr,
+			commandFrequency,
+			times,
+			requests,
+			measurements1,
+			cycleStopTimes,
+		)
+		figureCounter = plotExpStats(
+			devId1, figureCounter, dev1WriteCommandTimes, dev1ReadCommandTimes
+		)
 
 	printPlotExit()
 	plt.show()
 	fxCloseAll()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
 	baudRate = sys.argv[1]
 	ports = sys.argv[2:3]
 	try:

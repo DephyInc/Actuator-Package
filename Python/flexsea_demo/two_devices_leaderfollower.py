@@ -6,6 +6,7 @@ import traceback
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pardir)
 
+
 def fxLeaderFollower(leaderPort, baudRate, followerPort):
 
 	devId0 = fxOpen(leaderPort, baudRate, 6)
@@ -36,21 +37,21 @@ def fxLeaderFollower(leaderPort, baudRate, followerPort):
 		for i in range(loopCount):
 			sleep(0.05)
 			clearTerminal()
-			leaderData   = fxReadDevice(devId0)
+			leaderData = fxReadDevice(devId0)
 			followerData = fxReadDevice(devId1)
 			angle0 = leaderData.mot_ang
 			diff = angle0 - initialAngle0
 			fxSendMotorCommand(devId1, FxPosition, initialAngle1 + diff)
-			print('Device', devId1, 'following device',  devId0, '\n')
-			printDevice(followerData,FxActPack)
-			print('')	# Empty line
+			print("Device", devId1, "following device", devId0, "\n")
+			printDevice(followerData, FxActPack)
+			print("")  # Empty line
 			printDevice(leaderData, FxActPack)
 			printLoopCount(i, loopCount)
 
 	except Exception as e:
 		print(traceback.format_exc())
 
-	print('Turning off position control...')
+	print("Turning off position control...")
 	fxSetGains(devId0, 0, 0, 0, 0, 0, 0)
 	fxSetGains(devId1, 0, 0, 0, 0, 0, 0)
 	fxSendMotorCommand(devId1, FxNone, 0)
@@ -59,7 +60,8 @@ def fxLeaderFollower(leaderPort, baudRate, followerPort):
 	fxClose(devId0)
 	fxClose(devId1)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
 	baudRate = sys.argv[1]
 	ports = sys.argv[2:4]
 	try:

@@ -2,17 +2,26 @@ import os, sys
 from time import sleep, time, strftime
 import matplotlib
 import matplotlib.pyplot as plt
-matplotlib.use('WebAgg')
+
+matplotlib.use("WebAgg")
 from flexseapython.fxUtil import *
 
 if isPi():
-	matplotlib.rcParams.update({'webagg.address': '0.0.0.0'})
+	matplotlib.rcParams.update({"webagg.address": "0.0.0.0"})
 
 pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(pardir)
 
-def fxTwoPositionControl(port, baudRate, expTime = 13, time_step = 0.1,
-		delta = 10000, transition_time = 1.5, resolution = 100):
+
+def fxTwoPositionControl(
+	port,
+	baudRate,
+	expTime=13,
+	time_step=0.1,
+	delta=10000,
+	transition_time=1.5,
+	resolution=100,
+):
 	# Open device
 	devId = fxOpen(port, baudRate, 0)
 	fxStartStreaming(devId, resolution, shouldLog=True)
@@ -28,8 +37,8 @@ def fxTwoPositionControl(port, baudRate, expTime = 13, time_step = 0.1,
 	num_pos = 2
 
 	# Setting loop duration and transition rate
-	num_time_steps = int(expTime/time_step)
-	transition_steps = int(transition_time/time_step)
+	num_time_steps = int(expTime / time_step)
+	transition_steps = int(transition_time / time_step)
 
 	# Setting gains (devId, kp, ki, kd, K, B, ff)
 	fxSetGains(devId, 150, 75, 0, 0, 0, 0)
@@ -50,10 +59,10 @@ def fxTwoPositionControl(port, baudRate, expTime = 13, time_step = 0.1,
 		actPackState = fxReadDevice(devId)
 		clearTerminal()
 		measuredPos = actPackState.mot_ang
-		print('Desired:              ', positions[current_pos])
-		print('Measured:             ', measuredPos)
-		print('Difference:           ', (measuredPos - positions[current_pos]), '\n')
-		printDevice(actPackState,FxActPack)
+		print("Desired:              ", positions[current_pos])
+		print("Measured:             ", measuredPos)
+		print("Difference:           ", (measuredPos - positions[current_pos]), "\n")
+		printDevice(actPackState, FxActPack)
 
 		if i % transition_steps == 0:
 			current_pos = (current_pos + 1) % num_pos
@@ -65,22 +74,22 @@ def fxTwoPositionControl(port, baudRate, expTime = 13, time_step = 0.1,
 		measurements.append(measuredPos)
 
 	# Close device and do device cleanup
-	#close_check = fxClose(devId)	#STACK-169
+	# close_check = fxClose(devId)	#STACK-169
 
-	#Disable the controller, send 0 PWM
+	# Disable the controller, send 0 PWM
 	fxSendMotorCommand(devId, FxVoltage, 0)
 	sleep(0.1)
 
 	# Plot before exit:
 	title = "Two Position Control Demo"
-	plt.plot(times, requests, color = 'b', label = 'Desired position')
-	plt.plot(times, measurements, color = 'r', label = 'Measured position')
+	plt.plot(times, requests, color="b", label="Desired position")
+	plt.plot(times, measurements, color="r", label="Measured position")
 	plt.xlabel("Time (s)")
 	plt.ylabel("Encoder position")
 	plt.title(title)
-	plt.legend(loc='upper right')
-	if (os.name == 'nt'):
-		print('\nIn Windows, press Ctrl+BREAK to exit. Ctrl+C may not work.')
+	plt.legend(loc="upper right")
+	if os.name == "nt":
+		print("\nIn Windows, press Ctrl+BREAK to exit. Ctrl+C may not work.")
 	plt.show()
 
 	# Close device and do device cleanup
@@ -88,7 +97,8 @@ def fxTwoPositionControl(port, baudRate, expTime = 13, time_step = 0.1,
 
 	return close_check
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
 	baudRate = sys.argv[1]
 	ports = sys.argv[2:3]
 	try:
