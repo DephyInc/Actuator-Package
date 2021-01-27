@@ -31,5 +31,5 @@ setuptools.setup(
 		"Development Status :: 5 - Production/Stable",
 	],
 	python_requires="== 3.7.*",
-	package_data={"libs": ["../../libs"], "inc": ["../../inc"], "": ["README.md"],},
+	include_package_data=True,
 )

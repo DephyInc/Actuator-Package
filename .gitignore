@@ -22,3 +22,6 @@ Python/flexseapython/com.txt
 MATLAB/logFolderConfigFile.txt
 
 Simulink/OpenControl/logFolderConfigFile.txt
+
+dist
+*.egg-info
