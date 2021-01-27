@@ -5,23 +5,22 @@ __pycache__
 *.csv
 *.orig
 *.sublime*
+*.idea*
+
 test_scripts/build/
 
-Python/flexseapython/com_local\.txt
-
+# C
 C/build/
-
-Python/logFolderConfigFile.txt
-
 C/com.txt
 
-Python/.idea/
-
-Python/flexseapython/com.txt
-
+# Matlab
 MATLAB/logFolderConfigFile.txt
-
 Simulink/OpenControl/logFolderConfigFile.txt
 
+# Python
+Python/flexseapython/com_local\.txt
+Python/logFolderConfigFile.txt
+Python/flexseapython/com.txt
 dist
 *.egg-info
+build
