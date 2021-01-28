@@ -5,11 +5,11 @@
 baud_rate: 230400
 ports:
 # Windows
-  # - COM3
+  - COM3
   # - COM4
 # Ubuntu WSL
   # - /dev/ttyS3
   # - /dev/ttyS4
 # Native Linux (e.g. Ubuntu or Raspbian)
-  - /dev/ttyACM0
-  - /dev/ttyACM1
+  # - /dev/ttyACM0
+  # - /dev/ttyACM1
