@@ -48,13 +48,13 @@ If `flexsea` is already installed and you need to upgrade it, run this:
 python3 -m pip install --upgrade flexsea
 ```
 
-## Removal
+### Removal
 To uninstall `flexsea` from your computer, run this:
 ```bash
 python3 -m pip uninstall flexsea
 ```
 
-## Getting Started
+### Getting Started
 The latest instructions for working with the Actuatory Package and sample programs are located on Dephy's Wiki:
 
 [General information about the Dephy Actuator Package](http://dephy.com/wiki/flexsea/doku.php?id=dephyactpack)
@@ -63,3 +63,16 @@ The latest instructions for working with the Actuatory Package and sample progra
 
 License: CC BY-NC-SA 4.0
 [![License: CC BY-NC-SA 4.0](https://licensebuttons.net/l/by-nc-sa/4.0/80x15.png)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+
+### Runing The Demo Scripts
+
+All scripts can be run on their own. use `--help` to see the required command line arguments.
+
+For your convenience, `run_demos.py` displays a menu of all available scripts.
+
+`run_demos.py` uses `ports.yaml` to configure the ports used to communicate with the ActPacks.
+
+Feel free to modify `ports.yaml` to suit your needs. In order to avoid git from traking the changes to that file run the following command.
+```bash
+git --assume-unchanged Python/flexsea_demo/ports.yaml
+```
