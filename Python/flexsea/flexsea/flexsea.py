@@ -33,7 +33,7 @@ class FlexSEA:
 
 	def load_c_libs(self):
 		"""Loads the library from the c lib"""
-		path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../libs")
+		path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "libs")
 		lib_paths = []
 		nix_lib = "libfx_plan_stack.so"
 		win_lib = "libfx_plan_stack.dll"
