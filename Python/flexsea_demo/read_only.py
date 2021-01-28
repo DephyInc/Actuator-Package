@@ -9,26 +9,26 @@ from flexsea import fxEnums as fxe
 from flexsea import flexsea as flex
 
 
-def print_bms_state(fx, dev_id):
+def print_bms_state(fxs, dev_id):
 	"""
 	Read BMS info
 	"""
-	bms_state = fx.read_bms_device_all(dev_id, 1)
+	bms_state = fxs.read_bms_device_all(dev_id, 1)
 	for i in range(9):
 		print("Cell [{}] Voltage: {}".format(i, bms_state.cellVoltage[i]))
 	for i in range(3):
 		print("Temperature [{}]: {}".format(i, bms_state.temperature[i]))
 
 
-def fx_read_only(fx, port, baud_rate, run_time=8, time_step=0.1):
+def read_only(fxs, port, baud_rate, run_time=8, time_step=0.1):
 	"""
 	Reads FlexSEA device and prins gathered data.
 	"""
 	debug_logging_level = 0  # 6 is least verbose, 0 is most verbose
 	data_log = True  # False means no logs will be saved
-	dev_id = fx.open(port, baud_rate, debug_logging_level)
-	fx.start_streaming(dev_id, freq=100, log_en=data_log)
-	app_type = fx.get_app_type(dev_id)
+	dev_id = fxs.open(port, baud_rate, debug_logging_level)
+	fxs.start_streaming(dev_id, freq=100, log_en=data_log)
+	app_type = fxs.get_app_type(dev_id)
 
 	if app_type.value == fxe.FX_ACT_PACK.value:
 		print("\nYour device is an ActPack.\n")
@@ -50,34 +50,34 @@ def fx_read_only(fx, port, baud_rate, run_time=8, time_step=0.1):
 		fxu.print_loop_count(i, total_loop_count)
 		sleep(time_step)
 		fxu.clear_terminal()
-		data = fx.read_device(dev_id)
+		data = fxs.read_device(dev_id)
 		fxu.print_device(data, app_type)
-	fx.close(dev_id)
+	fxs.close(dev_id)
 	return True
 
 
 def main():
 	"""
-	Standalone execution
+	Standalone read only execution
 	"""
+	# pylint: disable=import-outside-toplevel
 	import argparse
 
 	parser = argparse.ArgumentParser(description=__doc__)
 	parser.add_argument(
-		"port", metavar="P", type=str, nargs=1, help="Your device serial port."
+		"port", metavar="Port", type=str, nargs=1, help="Your device serial port."
 	)
 	parser.add_argument(
 		"-b",
 		"--baud",
 		metavar="B",
-		dest="baudrate",
+		dest="baud_rate",
 		type=int,
 		default=230400,
-		help="Serial communication baudrate.",
+		help="Serial communication baud rate.",
 	)
 	args = parser.parse_args()
-
-	fx_read_only(flex.FlexSEA(), args.port, args.baud)
+	read_only(flex.FlexSEA(), args.port[0], args.baud_rate)
 
 
 if __name__ == "__main__":

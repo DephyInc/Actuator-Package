@@ -1,9 +1,9 @@
 import os, sys
 from builtins import input
 
-pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(pardir)
-from flexseapython.fxUtil import *
+from flexsea import fxUtils as fxu
+from flexsea import fxEnums as fxe
+from flexsea import flexsea as flex
 
 labels = [
 	"genVar[0]",
@@ -19,20 +19,20 @@ labels = [
 ]
 
 varsToStream = [
-	FX_GEN_VAR_0,
-	FX_GEN_VAR_1,
-	FX_GEN_VAR_2,
-	FX_GEN_VAR_3,
-	FX_GEN_VAR_4,
-	FX_GEN_VAR_5,
-	FX_GEN_VAR_6,
-	FX_GEN_VAR_7,
-	FX_GEN_VAR_8,
-	FX_GEN_VAR_9,
+	fxe.FX_GEN_VAR_0,
+	fxe.FX_GEN_VAR_1,
+	fxe.FX_GEN_VAR_2,
+	fxe.FX_GEN_VAR_3,
+	fxe.FX_GEN_VAR_4,
+	fxe.FX_GEN_VAR_5,
+	fxe.FX_GEN_VAR_6,
+	fxe.FX_GEN_VAR_7,
+	fxe.FX_GEN_VAR_8,
+	fxe.FX_GEN_VAR_9,
 ]
 
 
-def fxUserRW(port, baudRate, time=2, time_step=0.1, resolution=100):
+def user_rw(port, baudRate, time=2, time_step=0.1, resolution=100):
 	result = True
 	stream = Stream(
 		port, baudRate, printingRate=2, labels=labels, varsToStream=varsToStream
@@ -71,10 +71,29 @@ def fxUserRW(port, baudRate, time=2, time_step=0.1, resolution=100):
 	return result
 
 
+def main():
+	"""
+	Standalone user read/write demo execution
+	"""
+	# pylint: disable=import-outside-toplevel
+	import argparse
+
+	parser = argparse.ArgumentParser(description=__doc__)
+	parser.add_argument(
+		"port", metavar="Port", type=str, nargs=1, help="Your device serial port."
+	)
+	parser.add_argument(
+		"-b",
+		"--baud",
+		metavar="B",
+		dest="baud_rate",
+		type=int,
+		default=230400,
+		help="Serial communication baud rate.",
+	)
+	args = parser.parse_args()
+	user_rw(flex.FlexSEA(), args.port[0], args.baud_rate)
+
+
 if __name__ == "__main__":
-	baudRate = sys.argv[1]
-	ports = sys.argv[2:3]
-	try:
-		fxUserRW(ports, baudRate)
-	except Exception as e:
-		print("broke: " + str(e))
+	main()

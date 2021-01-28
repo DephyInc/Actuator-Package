@@ -1,97 +1,96 @@
-import os, sys
+#!/usr/bin/env python3
+
+"""
+FlexSEA Impedance Control Demo
+"""
 from time import sleep, time
 import matplotlib
 import matplotlib.pyplot as plt
-from flexseapython.fxUtil import *
+from flexsea import fxUtils as fxu
+from flexsea import fxEnums as fxe
+from flexsea import flexsea as flex
 
 matplotlib.use("WebAgg")
-if isPi():
+if fxu.is_pi():
 	matplotlib.rcParams.update({"webagg.address": "0.0.0.0"})
 
-pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(pardir)
-
 # Control gain constants
-kp = 200
-ki = 200
-K = 2000
-B = 0
-B_Increments = 350
-FF = 32
+GAINS = {"kp": 200, "ki": 200, "K": 200, "B": 200, "B_Increments": 350, "FF": 32}
 
 
-def fxImpedanceControl(
+def impedance_control(
+	fxs,
 	port,
-	baudRate,
-	expTime=10,
+	baud_rate,
+	exp_time=10,
 	time_step=0.02,
 	delta=7500,
 	transition_time=0.8,
 	resolution=500,
 ):
 	# Open device
-	devId = fxOpen(port, baudRate, logLevel=6)
-	fxStartStreaming(devId, resolution, shouldLog=False)
+	dev_id = fxs.open(port, baud_rate, log_level=6)
+	fxs.start_streaming(dev_id, resolution, log_en=False)
 	sleep(0.1)
 
 	# Read initial angle
-	data = fxReadDevice(devId)
-	initialAngle = data.mot_ang
+	data = fxs.read_device(dev_id)
+	initial_angle = data.mot_ang
 
 	result = True
 	transition_steps = int(transition_time / time_step)
 
-	# Initialize lists - matplotlib
+	# Initialize lists for matplotlib
 	requests = []
 	measurements = []
 	times = []
-	t0 = 0
 
 	# Setpoint = initial angle
-	fxSendMotorCommand(devId, FxImpedance, initialAngle)
+	fxs.send_motor_command(dev_id, fxe.FX_IMPEDANCE, initial_angle)
 	# Set gains
-	global B, K, kp, ki, FF
-	fxSetGains(devId, kp, ki, 0, K, B, FF)
+	fxs.set_gains(dev_id, GAINS["kp"], GAINS["ki"], 0, GAINS["K"], GAINS["B"], GAINS["FF"])
 
 	# Select transition rate and positions
-	currentPos = 0
-	num_time_steps = int(expTime / time_step)
-	positions = [initialAngle, initialAngle + delta]
+	current_pos = 0
+	num_time_steps = int(exp_time / time_step)
+	positions = [initial_angle, initial_angle + delta]
 	sleep(0.4)
 
 	# Record start time of experiment
-	t0 = time()
+	start_time = time()
 
 	# Run demo
 	loop_ctr = 0
-	B = -B_Increments  # We do that to make sure we start at 0
+	GAINS["B"] = -GAINS["B_Increments"]  # We do that to make sure we start at 0
 	print("")
 	for i in range(num_time_steps):
 		loop_ctr += 1
-		data = fxReadDevice(devId)
-		measuredPos = data.mot_ang
+		data = fxs.read_device(dev_id)
+		measured_pos = data.mot_ang
 		if i % transition_steps == 0:
-			B = B + B_Increments  # Increments every cycle
-			fxSetGains(devId, kp, ki, 0, K, B, FF)
-			delta = abs(positions[currentPos] - measuredPos)
+			GAINS["B"] += GAINS["B_Increments"]  # Increments every cycle
+			fxs.set_gains(
+				dev_id, GAINS["kp"], GAINS["ki"], 0, GAINS["K"], GAINS["B"], GAINS["FF"]
+			)
+			delta = abs(positions[current_pos] - measured_pos)
 			result &= delta < resolution
-			currentPos = (currentPos + 1) % 2
-			fxSendMotorCommand(devId, FxImpedance, positions[currentPos])
+			current_pos = (current_pos + 1) % 2
+			fxs.send_motor_command(dev_id, fxe.FX_IMPEDANCE, positions[current_pos])
 		sleep(time_step)
 		# We downsample the display refresh:
 		if i % 10 == 0:
-			clearTerminal()
-			print("Loop", loop_ctr, "of", num_time_steps)
-			print("Holding position:", positions[currentPos])
-			print("K =", K, "B =", B, "kp =", kp, "ki =", ki, "\n")
-			printDevice(data, FxActPack)
+			fxu.clear_terminal()
+			print(f"Loop {loop_ctr} of {num_time_steps}")
+			print(f"Holding position: {positions[current_pos]}")
+			print(GAINS)
+			fxu.print_device(data, fxe.FX_ACT_PACK)
 		# Plotting:
-		measurements.append(measuredPos)
-		times.append(time() - t0)
-		requests.append(positions[currentPos])
+		measurements.append(measured_pos)
+		times.append(time() - start_time)
+		requests.append(positions[current_pos])
 
 	# Disable the controller, send 0 PWM
-	fxSendMotorCommand(devId, FxVoltage, 0)
+	fxs.send_motor_command(dev_id, fxe.FX_VOLTAGE, 0)
 
 	# Plot before we exit:
 	title = "Impedance Control Demo"
@@ -101,21 +100,39 @@ def fxImpedanceControl(
 	plt.ylabel("Encoder position")
 	plt.title(title)
 	plt.legend(loc="upper right")
-	if os.name == "nt":
-		print("\nIn Windows, press Ctrl+BREAK to exit. Ctrl+C may not work...")
+	fxu.print_plot_exit()
 	plt.show()
 
 	# Close device
-	print("End of script, fxClose()")
-	fxClose(devId)
+	print("End of script, closing device.")
+	fxs.close(dev_id)
 
 	return True
 
 
+def main():
+	"""
+	Standalone impedance control execution
+	"""
+	# pylint: disable=import-outside-toplevel
+	import argparse
+
+	parser = argparse.ArgumentParser(description=__doc__)
+	parser.add_argument(
+		"port", metavar="Port", type=str, nargs=1, help="Your device serial port."
+	)
+	parser.add_argument(
+		"-b",
+		"--baud",
+		metavar="B",
+		dest="baud_rate",
+		type=int,
+		default=230400,
+		help="Serial communication baud rate.",
+	)
+	args = parser.parse_args()
+	impedance_control(flex.FlexSEA(), args.port[0], args.baud_rate)
+
+
 if __name__ == "__main__":
-	baudRate = sys.argv[1]
-	ports = sys.argv[2:3]
-	try:
-		fxImpedanceControl(ports, baudRate)
-	except Exception as e:
-		print("broke: " + str(e))
+	main()

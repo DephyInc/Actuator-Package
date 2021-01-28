@@ -1,26 +1,32 @@
-#!/usr/bin/python3
-"""'Performs high-stress test on ActuatorPackage.'"""
+#!/usr/bin/env python3
 
-import traceback
+"""
+Performs high-stress test on ActuatorPackage.
+"""
 from time import sleep, time
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
-from flexseapython import fxUtil as fx
-from flexseapython.fxPlotting import plotSetpointVsDesired
+from flexsea import fxUtils as fxu
+from flexsea import fxEnums as fxe
+from flexsea import fxPlotting as fxp
+from flexsea import flexsea as flex
+
 
 # Plot in a browser:
 matplotlib.use("WebAgg")
+if fxu.is_pi():
+	matplotlib.rcParams.update({"webagg.address": "0.0.0.0"})
 
 # Globals updated with every timestamp for plotting
 TIMESTAMPS = []  # Elapsed times since strart of run
 CYCLE_STOP_TIMES = []  # Timestamps for each loop end
 
 
-def fxHighStressTest(
-	port0,
+def high_stress_test(
+	fxs,
+	ports,
 	baudRate,
-	port1="",
 	commandFreq=1000,
 	positionAmplitude=10000,
 	currentAmplitude=1500,
@@ -49,9 +55,8 @@ def fxHighStressTest(
 	global CYCLE_STOP_TIMES  # Timestamps for each loop end
 
 	devices = []
-	devices.append({"port": port0})
-	if port1:
-		devices.append({"port": port1})
+	for port in ports:
+		devices.append({"port": port})
 
 	# Initialize devices
 	for dev in devices:
@@ -81,8 +86,8 @@ def fxHighStressTest(
 		print("Port: ", dev["port"])
 		print("BaudRate: ", baudRate)
 		print("Logging Level: ", debug_logging_level)
-		dev["id"] = fx.fxOpen(dev["port"], baudRate, debug_logging_level)
-		fx.fxStartStreaming(dev["id"], commandFreq, data_log)
+		dev["id"] = fxs.open(dev["port"], baudRate, debug_logging_level)
+		fxs.start_streaming(dev["id"], commandFreq, data_log)
 		print("Connected to device with Id: ", dev["id"])
 
 	# Get initial position:
@@ -91,23 +96,27 @@ def fxHighStressTest(
 	# Wait for device to consume the startStreaming command and start streaming
 	sleep(0.1)
 
+	# Gains are, in order: kp, ki, kd, K, B & ff
+	cur_gains = [250, 170, 0, 0, 0, 110]
+	pos_gains = [250, 200, 0, 0, 0, 128]
+
 	# Get initial position
 	for dev in devices:
-		dev["data"] = fx.fxReadDevice(dev["id"])
+		dev["data"] = fxs.read_device(dev["id"])
 		dev["initial_pos"] = dev["data"].mot_ang  # Used to offset readings
 		print("Initial Position: {}".format(dev["initial_pos"]))
 
 	# Generate control profiles
 	print("Generating three Command tables...")
-	position_samples = fx.sinGenerator(positionAmplitude, positionFreq, commandFreq)
-	current_samples = fx.sinGenerator(currentAmplitude, currentFreq, commandFreq)
-	current_samples_line = fx.lineGenerator(0, 0.15, commandFreq)
+	position_samples = fxu.sin_generator(positionAmplitude, positionFreq, commandFreq)
+	current_samples = fxu.sin_generator(currentAmplitude, currentFreq, commandFreq)
+	current_samples_line = fxu.line_generator(0, 0.15, commandFreq)
 
 	start_time = time()  # Record start time of experiment
 	cmd_count = 0
 	try:
 		for rep in range(0, numberOfLoops):
-			fx.printLoopCountAndTime(rep, numberOfLoops, time() - start_time)
+			fxu.print_loop_count_and_time(rep, numberOfLoops, time() - start_time)
 
 			# Step 0: set position controller
 			# -------------------------------
@@ -122,7 +131,7 @@ def fxHighStressTest(
 					initial_cmd = {"cur": 0, "pos": dev["initial_pos"]}
 				cmds.append(initial_cmd)
 
-			send_and_time_cmds(start_time, devices, cmds, fx.FxPosition, True)
+			send_and_time_cmds(fxs, start_time, devices, cmds, fxe.FX_POSITION, pos_gains, True)
 
 			# Step 1: go to initial position
 			# -------------------------------
@@ -132,14 +141,14 @@ def fxHighStressTest(
 				lin_samples = []
 				for dev in devices:
 					lin_samples.append(
-						fx.linearInterp(dev["data"].mot_ang - dev["initial_pos"], 0, 100)
+						fxu.linear_interp(dev["data"].mot_ang - dev["initial_pos"], 0, 100)
 					)
 
 				for samples in lin_samples:
 					for sample in samples:
 						cmds = [{"cur": 0, "pos": sample + dev["initial_pos"]} for dev in devices]
 						sleep(delay_time)
-						send_and_time_cmds(start_time, devices, cmds, fx.FxPosition, False)
+						send_and_time_cmds(fxs, start_time, devices, cmds, fxe.FX_POSITION, pos_gains, False)
 						cmd_count += 1
 			else:
 				# First time in loop
@@ -152,14 +161,14 @@ def fxHighStressTest(
 			for sample in position_samples:
 				cmds = [{"cur": 0, "pos": sample + dev["initial_pos"]} for dev in devices]
 				sleep(delay_time)
-				send_and_time_cmds(start_time, devices, cmds, fx.FxPosition, False)
+				send_and_time_cmds(fxs, start_time, devices, cmds, fxe.FX_POSITION, pos_gains, False)
 				cmd_count += 1
 
 			# Step 3: set current controller
 			# -------------------------------
 			print("Step 3: set current controller")
-			cmds = [{"cur": 0, "pos": 0} for dev in devices]
-			send_and_time_cmds(start_time, devices, cmds, fx.FxCurrent, True)
+			cmds = [{"cur": 0, "pos": dev["initial_pos"]} for dev in devices]
+			send_and_time_cmds(fxs, start_time, devices, cmds, fxe.FX_CURRENT, cur_gains, True)
 
 			# Step 4: current setpoint
 			# --------------------------
@@ -173,7 +182,7 @@ def fxHighStressTest(
 				cmds = [{"cur": sample, "pos": dev["initial_pos"]} for dev in devices]
 
 				sleep(delay_time)
-				send_and_time_cmds(start_time, devices, cmds, fx.FxCurrent, False)
+				send_and_time_cmds(fxs, start_time, devices, cmds, fxe.FX_CURRENT, cur_gains, True)
 				cmd_count += 1
 
 			# Step 5: short pause at 0 current to allow a slow-down
@@ -183,7 +192,7 @@ def fxHighStressTest(
 			for sample in current_samples_line:
 				cmds = [{"cur": sample, "pos": dev["initial_pos"]} for dev in devices]
 				sleep(delay_time)
-				send_and_time_cmds(start_time, devices, cmds, fx.FxCurrent, False)
+				send_and_time_cmds(fxs, start_time, devices, cmds, fxe.FX_CURRENT, cur_gains, False)
 				cmd_count += 1
 
 			# Draw a line at the end of every loop
@@ -196,7 +205,7 @@ def fxHighStressTest(
 
 	# Disable the controller, send 0 PWM
 	for dev in devices:
-		fx.fxSendMotorCommand(dev["id"], fx.FxVoltage, 0)
+		fxs.send_motor_command(dev["id"], fxe.FX_VOLTAGE, 0)
 	sleep(0.1)
 
 	######## Stats: #########
@@ -217,12 +226,18 @@ def fxHighStressTest(
 	print("")
 
 	plot_data(
-		devices, positionAmplitude, positionFreq, currentAmplitude, currentFreq, commandFreq
+		fxs,
+		devices,
+		positionAmplitude,
+		positionFreq,
+		currentAmplitude,
+		currentFreq,
+		commandFreq,
 	)
 
 
 def plot_data(
-	devices, pos_amp, pos_freq, curr_amp, curr_freq, cmd_freq, type_str="sine wave"
+	fxs, devices, pos_amp, pos_freq, curr_amp, curr_freq, cmd_freq, type_str="sine wave"
 ):
 	"""
 	Plots received data
@@ -234,10 +249,10 @@ def plot_data(
 	figure_ind = 1
 	for dev in devices:
 		# Current Plot:
-		figure_ind = plotSetpointVsDesired(
+		figure_ind = fxp.plot_setpoint_vs_desired(
 			dev["id"],
 			figure_ind,
-			fx.hssCurrent,
+			fxe.HSS_CURRENT,
 			curr_amp,
 			curr_freq,
 			type_str,
@@ -248,10 +263,10 @@ def plot_data(
 			CYCLE_STOP_TIMES,
 		)
 
-		figure_ind = plotSetpointVsDesired(
+		figure_ind = fxp.plot_setpoint_vs_desired(
 			dev["id"],
 			figure_ind,
-			fx.hssPosition,
+			fxe.HSS_POSITION,
 			pos_amp,
 			pos_freq,
 			type_str,
@@ -265,44 +280,44 @@ def plot_data(
 	print("Showing plots")
 	plt.show()
 	sleep(0.1)
-	fx.printPlotExit()
-	fx.fxCloseAll()
+	fxu.print_plot_exit()
+	fxs.close_all()
 	print("Communication closed")
 
 
-def send_and_time_cmds(start_time, devices, cmds, motor_cmd, set_gains: bool):
+def send_and_time_cmds(fxs, start_time, devices, cmds, motor_cmd, gains, set_gains: bool):
 	"""
 	Send FlexSEA commands and record their execution time.
 	start_time:	Timestamp for start of run. (Current time-start_time) = Elapsed time
 	devices:	Dictionary containing info on all connected devices
 	cmds:		Dictionary containing position and current commands e.g. {pos: 0, curr: 0}
-	motor_cmd:	An enum defined in flexseapython.py. Allowed values: FxPosition,, FxCurrent
+	motor_cmd:	An enum defined in flexseapython.py. Allowed values: FX_POSITION,, FX_CURRENT
 	"""
 	global TIMESTAMPS  # Elapsed times from start of run
 
 	assert motor_cmd in [
-		fx.FxPosition,
-		fx.FxCurrent,
-	], "Unexpected motor command, only FxPosition, FxCurrent allowed"
+		fxe.FX_POSITION,
+		fxe.FX_CURRENT,
+	], "Unexpected motor command, only FX_POSITION, FX_CURRENT allowed"
 
 	for dev, cmd in zip(devices, cmds):
 		tstart = time()
-		dev["data"] = fx.fxReadDevice(dev["id"])  # Get ActPackState
+		dev["data"] = fxs.read_device(dev["id"])  # Get ActPackState
 		dev["read_times"].append(time() - tstart)
 
 		if set_gains:
 			tstart = time()
 			# Gains are, in order: kp, ki, kd, K, B & ff
-			fx.fxSetGains(dev["id"], 250, 200, 0, 0, 0, 128)
+			fxs.set_gains(dev["id"], *gains)
 			dev["gains_times"].append(time() - tstart)
 		else:
 			dev["gains_times"].append(0)
 
 		# Select command value
-		cmd_val = cmd["cur"] if motor_cmd == fx.FxCurrent else cmd["pos"]
+		cmd_val = cmd["cur"] if motor_cmd == fxe.FX_CURRENT else cmd["pos"]
 		# Command motor
 		tstart = time()
-		fx.fxSendMotorCommand(dev["id"], motor_cmd, cmd_val)
+		fxs.send_motor_command(dev["id"], motor_cmd, cmd_val)
 		dev["motor_times"].append(time() - tstart)
 		dev["pos_requests"].append(cmd["pos"])
 		dev["pos_measurements"].append(dev["data"].mot_ang)
@@ -312,21 +327,29 @@ def send_and_time_cmds(start_time, devices, cmds, motor_cmd, set_gains: bool):
 	TIMESTAMPS.append(time() - start_time)
 
 
-# TODO: Support standalone execution
-if __name__ == "__main__":
+def main():
+	"""
+	Standalone high-stress test execution
+	"""
+	# pylint: disable=import-outside-toplevel
 	import argparse
 
 	parser = argparse.ArgumentParser(description=__doc__)
-	parser.add_argument("baudrate", type=int, help="Communication baudrate")
-	parser.add_argument("port", type=str, nargs="+", help="Ports for test devices")
+	parser.add_argument(
+		"ports", metavar="Ports", type=str, nargs="+", help="Your devices serial ports."
+	)
+	parser.add_argument(
+		"-b",
+		"--baud",
+		metavar="B",
+		dest="baud_rate",
+		type=int,
+		default=230400,
+		help="Serial communication baud rate.",
+	)
 	args = parser.parse_args()
+	high_stress_test(flex.FlexSEA(), args.ports, args.baud_rate)
 
-	try:
-		# TODO: Support more than 2 ports
-		if len(args.port) > 1:
-			fxHighStressTest(args.port[0], args.baudrate, args.port[1])
-		else:
-			fxHighStressTest(args.port[0], args.baudrate)
-	except Exception as err:
-		print("broke: {}".format(err))
-		traceback.print_exc()
+
+if __name__ == "__main__":
+	main()

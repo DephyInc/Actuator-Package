@@ -1,6 +1,6 @@
 # ports.yaml
 #
-# Adjust the baudrate if needed and uncomment/edit the port list.
+# Adjust the baudrate if needed and uncomment or edit the port list.
 # See the sample ports values below depending on platform
 baud_rate: 230400
 ports:

@@ -22,6 +22,7 @@ setuptools.setup(
 		"matplotlib==3.3.*",
 		"numpy==1.19.*",
 		"pillow==8.1.*",
+		"PyYAML==5.4.1",
 	],
 	classifiers=[
 		"Programming Language :: Python :: 3",

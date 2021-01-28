@@ -1,108 +1,112 @@
-import os
-import sys
+#!/usr/bin/env python3
+
+"""
+FlexSEA High Speed Test
+"""
 from time import sleep, time
-from enum import Enum
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
-from flexseapython.fxUtil import *
-from flexseapython.fxPlotting import *
+from flexsea import fxUtils as fxu
+from flexsea import fxEnums as fxe
+from flexsea import fxPlotting as fxp
+from flexsea import flexsea as flex
 
+
+# Plot in a browser:
 matplotlib.use("WebAgg")
+if fxu.is_pi():
+	matplotlib.rcParams.update({"webagg.address": "0.0.0.0"})
 
-pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-print(pardir)
-sys.path.append(pardir)
 
-# Signal type to send to controller
-class signal(Enum):
+class Signal:
+	"""Signal type to send to controller"""
+
 	sine = 1
 	line = 2
 
 
-def fxHighSpeedTest(
-	port0,
-	baudRate,
-	port1="",
-	controllerType=hssCurrent,
-	signalType=signal.sine,
-	commandFreq=1000,
-	signalAmplitude=1000,
-	numberOfLoops=4,
-	signalFreq=5,
-	cycleDelay=0.1,
-	requestJitter=False,
+def high_speed_test(
+	fxs,
+	ports,
+	baud_rate,
+	controller_type=fxe.HSS_CURRENT,
+	signal_type=Signal.sine,
+	command_freq=1000,
+	signal_amplitude=1000,
+	number_of_loops=4,
+	signal_freq=5,
+	cycle_delay=0.1,
+	request_jitter=False,
 	jitter=20,
 ):
 	"""
-	baudRate		Baud rate of outgoing serial connection to ActPack
-	portX			Port with outgoing serial connection to ActPack
-	controllerType	Position controller or current controller
-	signalType		Sine wave or line
-	commandFreq		Desired frequency of issuing commands to controller, actual
+	baud_rate		Baud rate of outgoing serial connection to ActPack
+	ports			List of ports with outgoing serial connection to ActPack
+	controller_type	Position controller or current controller
+	signal_type		Sine wave or line
+	command_freq		Desired frequency of issuing commands to controller, actual
 					command frequency will be slower due to OS overhead.
-	signalAmplitude	Amplitude of signal to send to controller. Encoder position
+	signal_amplitude	Amplitude of signal to send to controller. Encoder position
 					if position controller, current in mA if current controller
-	numberOfLoops	Number of times to send desired signal to controller
-	signalFreq		Frequency of sine wave if using sine wave signal
-	cycleDelay		Delay between signals sent to controller, use with sine wave only
-	requestJitter	Add jitter amount to every other sample sent to controller
+	number_of_loops	Number of times to send desired signal to controller
+	signal_freq		Frequency of sine wave if using sine wave signal
+	cycle_delay		Delay between signals sent to controller, use with sine wave only
+	request_jitter	Add jitter amount to every other sample sent to controller
 	jitter			Amount of jitter
 	"""
 
 	# One vs two devices
-	secondDevice = False
-	if port1 != "":
-		secondDevice = True
+	second_device = len(ports) > 1
 
-	if secondDevice:
+	if second_device:
 		print("Running High Speed Test with two devices")
 	else:
 		print("Running High Speed Test with one device")
 
 	# Debug & Data Logging
-	debugLoggingLevel = 6  # 6 is least verbose, 0 is most verbose
-	dataLog = False  # Data log logs device data
+	debug_logging_level = 6  # 6 is least verbose, 0 is most verbose
+	data_log = False  # Data log logs device data
 
-	delay_time = float(1 / (float(commandFreq)))
+	delay_time = 1.0 / (float(command_freq))
 	print(delay_time)
 
 	# Open the device and start streaming
-	devId0 = fxOpen(port0, baudRate, debugLoggingLevel)
-	fxStartStreaming(devId0, commandFreq, dataLog)
-	print("Connected to device 0 with ID", devId0)
+	dev_id0 = fxs.open(ports[0], baud_rate, debug_logging_level)
+	fxs.start_streaming(dev_id0, command_freq, data_log)
+	print("Connected to device 0 with ID", dev_id0)
 
-	devId1 = -1
-	if secondDevice:
-		devId1 = fxOpen(port1, baudRate, debugLoggingLevel)
-		fxStartStreaming(devId1, commandFreq, dataLog)
-		print("Connected to device 1 with ID", devId1)
+	dev_id1 = -1
+	if second_device:
+		dev_id1 = fxs.open(ports[1], baud_rate, debug_logging_level)
+		fxs.start_streaming(dev_id1, command_freq, data_log)
+		print("Connected to device 1 with ID", dev_id1)
 
 	# Get initial position:
-	if controllerType == hssPosition:
+	if controller_type == fxe.HSS_POSITION:
 		# Get initial position:
 		print("Reading initial position...")
 		# Give the device time to consume the startStreaming command and start streaming
 		sleep(0.1)
-		data = fxReadDevice(devId0)
-		initialPos0 = data.mot_ang
+		data = fxs.read_device(dev_id0)
+		initial_pos_0 = data.mot_ang
 
-		initialPos1 = 0
-		if secondDevice:
-			data = fxReadDevice(devId1)
-			initialPos1 = data.mot_ang
+		initial_pos_1 = 0
+		if second_device:
+			data = fxs.read_device(dev_id1)
+			initial_pos_1 = data.mot_ang
 	else:
-		initialPos0 = 0
-		initialPos1 = 0
+		initial_pos_0 = 0
+		initial_pos_1 = 0
 
 	# Generate a control profile
 	print("Command table:")
-	if signalType == signal.sine:
-		samples = sinGenerator(signalAmplitude, signalFreq, commandFreq)
-		signalTypeStr = "sine wave"
-	elif signalType == signal.line:
-		samples = lineGenerator(signalAmplitude, 1, commandFreq)
-		signalTypeStr = "line"
+	if signal_type == Signal.sine:
+		samples = fxu.sin_generator(signal_amplitude, signal_freq, command_freq)
+		signal_type_str = "sine wave"
+	elif signal_type == Signal.line:
+		samples = fxu.line_generator(signal_amplitude, 1, command_freq)
+		signal_type_str = "line"
 	else:
 		assert 0
 	print(np.int64(samples))
@@ -112,169 +116,188 @@ def fxHighSpeedTest(
 	measurements0 = []
 	measurements1 = []
 	times = []
-	cycleStopTimes = []
-	dev0WriteCommandTimes = []
-	dev1WriteCommandTimes = []
-	dev0ReadCommandTimes = []
-	dev1ReadCommandTimes = []
+	cycle_stop_times = []
+	dev0_write_command_times = []
+	dev1_write_command_times = []
+	dev0_read_command_times = []
+	dev1_read_command_times = []
 
 	# Prepare controller:
-	if controllerType == hssCurrent:
+	if controller_type == fxe.HSS_CURRENT:
 		print("Setting up current control demo. Low current, high frequency")
 		# Gains are, in order: kp, ki, kd, K, B & ff
-		fxSetGains(devId0, 250, 200, 128, 0, 0, 98)
-		if secondDevice:
-			fxSetGains(devId1, 250, 200, 128, 0, 0, 98)
+		fxs.set_gains(dev_id0, 250, 200, 128, 0, 0, 98)
+		if second_device:
+			fxs.set_gains(dev_id1, 250, 200, 128, 0, 0, 98)
 
-	elif controllerType == hssPosition:
+	elif controller_type == fxe.HSS_POSITION:
 		print("Setting up position control demo")
 		# Gains are, in order: kp, ki, kd, K, B & ff
-		fxSetGains(devId0, 300, 50, 0, 0, 0, 98)
-		if secondDevice:
-			fxSetGains(devId1, 300, 50, 0, 0, 0, 98)
+		fxs.set_gains(dev_id0, 300, 50, 0, 0, 0, 98)
+		if second_device:
+			fxs.set_gains(dev_id1, 300, 50, 0, 0, 0, 98)
 	else:
-		assert 0, "Invalid controllerType"
+		assert 0, "Invalid controller type"
 
 	# Record start time of experiment
 	i = 0
-	t0 = time()
-	loopCtr = 0
-	for reps in range(0, numberOfLoops):
-		loopCtr += 1
-		elapsedTime = time() - t0
-		printLoopCountAndTime(loopCtr, numberOfLoops, elapsedTime)
+	start_time = time()
+	loop_ctr = 0
+	for _reps in range(0, number_of_loops):
+		loop_ctr += 1
+		elapsed_time = time() - start_time
+		fxu.print_loop_count_and_time(loop_ctr, number_of_loops, elapsed_time)
 		for sample in samples:
-			if i % 2 == 0 and requestJitter:
+			if i % 2 == 0 and request_jitter:
 				sample = sample + jitter
 
 			sleep(delay_time)
 
 			# Read ActPack data
-			dev0ReadTimeBefore = time()
-			data0 = fxReadDevice(devId0)
-			dev0ReadTimeAfter = time()
-			if secondDevice:
-				dev1ReadTimeBefore = time()
-				data1 = fxReadDevice(devId1)
-				dev1ReadTimeAfter = time()
+			dev0_read_time_before = time()
+			data0 = fxs.read_device(dev_id0)
+			dev0_read_time_after = time()
+			if second_device:
+				dev1_read_time_before = time()
+				data1 = fxs.read_device(dev_id1)
+				dev1_read_time_after = time()
 
 			# Write setpoint
-			if controllerType == hssCurrent:
-				dev0WriteTimeBefore = time()
-				fxSendMotorCommand(devId0, FxCurrent, sample)
-				dev0WriteTimeAfter = time()
+			if controller_type == fxe.HSS_CURRENT:
+				dev0_write_time_before = time()
+				fxs.send_motor_command(dev_id0, fxe.FX_CURRENT, sample)
+				dev0_write_time_after = time()
 				measurements0.append(data0.mot_cur)
-				if secondDevice:
-					dev1WriteTimeBefore = time()
-					fxSendMotorCommand(devId1, FxCurrent, sample)
-					dev1WriteTimeAfter = time()
+				if second_device:
+					dev1_write_time_before = time()
+					fxs.send_motor_command(dev_id1, fxe.FX_CURRENT, sample)
+					dev1_write_time_after = time()
 					measurements1.append(data1.mot_cur)
 
-			elif controllerType == hssPosition:
-				dev0WriteTimeBefore = time()
-				fxSendMotorCommand(devId0, FxPosition, sample + initialPos0)
-				dev0WriteTimeAfter = time()
-				measurements0.append(data0.mot_ang - initialPos0)
-				if secondDevice:
-					dev1WriteTimeBefore = time()
-					fxSendMotorCommand(devId1, FxPosition, sample + initialPos1)
-					dev1WriteTimeAfter = time()
-					measurements1.append(data1.mot_ang - initialPos1)
+			elif controller_type == fxe.HSS_POSITION:
+				dev0_write_time_before = time()
+				fxs.send_motor_command(dev_id0, fxe.FX_POSITION, sample + initial_pos_0)
+				dev0_write_time_after = time()
+				measurements0.append(data0.mot_ang - initial_pos_0)
+				if second_device:
+					dev1_write_time_before = time()
+					fxs.send_motor_command(dev_id1, fxe.FX_POSITION, sample + initial_pos_1)
+					dev1_write_time_after = time()
+					measurements1.append(data1.mot_ang - initial_pos_1)
 
-			dev0ReadCommandTimes.append(dev0ReadTimeAfter - dev0ReadTimeBefore)
-			dev0WriteCommandTimes.append(dev0WriteTimeAfter - dev0WriteTimeBefore)
-			if secondDevice:
-				dev1ReadCommandTimes.append(dev1ReadTimeAfter - dev1ReadTimeBefore)
-				dev1WriteCommandTimes.append(dev1WriteTimeAfter - dev1WriteTimeBefore)
-			times.append(time() - t0)
+			dev0_read_command_times.append(dev0_read_time_after - dev0_read_time_before)
+			dev0_write_command_times.append(dev0_write_time_after - dev0_write_time_before)
+			if second_device:
+				dev1_read_command_times.append(dev1_read_time_after - dev1_read_time_before)
+				dev1_write_command_times.append(dev1_write_time_after - dev1_write_time_before)
+			times.append(time() - start_time)
 			requests.append(sample)
 			i = i + 1
 
-		# Delay between cycles (sine wave only)
-		if signalType == signal.sine:
-			for j in range(int(cycleDelay / delay_time)):
+			# Delay between cycles (sine wave only)
+			if signal_type == Signal.sine:
+				for _j in range(int(cycle_delay / delay_time)):
 
-				sleep(delay_time)
-				# Read data from ActPack
-				data0 = fxReadDevice(devId0)
-				if secondDevice:
-					data1 = fxReadDevice(devId1)
+					sleep(delay_time)
+					# Read data from ActPack
+					data0 = fxs.read_device(dev_id0)
+					if second_device:
+						data1 = fxs.read_device(dev_id1)
 
-				if controllerType == hssCurrent:
-					measurements0.append(data0.mot_cur)
-					if secondDevice:
-						measurements1.append(data1.mot_cur)
+					if controller_type == fxe.HSS_CURRENT:
+						measurements0.append(data0.mot_cur)
+						if second_device:
+							measurements1.append(data1.mot_cur)
 
-				elif controllerType == hssPosition:
-					measurements0.append(data0.mot_ang - initialPos0)
-					if secondDevice:
-						measurements1.append(data1.mot_ang - initialPos1)
+					elif controller_type == fxe.HSS_POSITION:
+						measurements0.append(data0.mot_ang - initial_pos_0)
+						if second_device:
+							measurements1.append(data1.mot_ang - initial_pos_1)
 
-				times.append(time() - t0)
-				requests.append(sample)
-				i = i + 1
+					times.append(time() - start_time)
+					requests.append(sample)
+					i = i + 1
 
 		# We'll draw a line at the end of every period
-		cycleStopTimes.append(time() - t0)
+		cycle_stop_times.append(time() - start_time)
 	# Disable the controller, send 0 PWM
-	fxSendMotorCommand(devId0, FxNone, 0)
-	fxSendMotorCommand(devId1, FxNone, 0)
+	fxs.send_motor_command(dev_id0, fxe.FX_NONE, 0)
+	fxs.send_motor_command(dev_id1, fxe.FX_NONE, 0)
 	sleep(0.1)
 
 	# End of Main Code - Start of plotting code
 
-	elapsedTime = time() - t0
-	actualPeriod = cycleStopTimes[0]
-	actualFrequency = 1 / actualPeriod
-	commandFrequency = i / elapsedTime
+	elapsed_time = time() - start_time
+	actual_period = cycle_stop_times[0]
+	actual_frequency = 1 / actual_period
+	command_frequency = i / elapsed_time
 
 	# Figure: setpoint, desired vs measured (1st device)
-	figureCounter = 1  # First time, functions will increment
-	figureCounter = plotSetpointVsDesired(
-		devId0,
-		figureCounter,
-		controllerType,
-		actualFrequency,
-		signalAmplitude,
-		signalTypeStr,
-		commandFrequency,
+	figure_counter = 1  # First time, functions will increment
+	figure_counter = fxp.plot_setpoint_vs_desired(
+		dev_id0,
+		figure_counter,
+		controller_type,
+		actual_frequency,
+		signal_amplitude,
+		signal_type_str,
+		command_frequency,
 		times,
 		requests,
 		measurements0,
-		cycleStopTimes,
+		cycle_stop_times,
 	)
-	figureCounter = plotExpStats(
-		devId0, figureCounter, dev0WriteCommandTimes, dev0ReadCommandTimes
+	figure_counter = fxp.plot_exp_stats(
+		dev_id0, figure_counter, dev0_write_command_times, dev0_read_command_times
 	)
 
 	# Figure: setpoint, desired vs measured (2nd device)
-	if secondDevice:
-		figureCounter = plotSetpointVsDesired(
-			devId1,
-			figureCounter,
-			controllerType,
-			actualFrequency,
-			signalAmplitude,
-			signalTypeStr,
-			commandFrequency,
+	if second_device:
+		figure_counter = fxp.plot_setpoint_vs_desired(
+			dev_id1,
+			figure_counter,
+			controller_type,
+			actual_frequency,
+			signal_amplitude,
+			signal_type_str,
+			command_frequency,
 			times,
 			requests,
 			measurements1,
-			cycleStopTimes,
+			cycle_stop_times,
 		)
-		figureCounter = plotExpStats(
-			devId1, figureCounter, dev1WriteCommandTimes, dev1ReadCommandTimes
+		figure_counter = fxp.plot_exp_stats(
+			dev_id1, figure_counter, dev1_write_command_times, dev1_read_command_times
 		)
 
-	printPlotExit()
+	fxu.print_plot_exit()
 	plt.show()
-	fxCloseAll()
+	fxs.close_all()
+
+
+def main():
+	"""
+	Standalone high speed test execution
+	"""
+	# pylint: disable=import-outside-toplevel
+	import argparse
+
+	parser = argparse.ArgumentParser(description=__doc__)
+	parser.add_argument(
+		"ports", metavar="Ports", type=str, nargs="+", help="Your devices' serial ports."
+	)
+	parser.add_argument(
+		"-b",
+		"--baud",
+		metavar="B",
+		dest="baud_rate",
+		type=int,
+		default=230400,
+		help="Serial communication baud rate.",
+	)
+	args = parser.parse_args()
+	high_speed_test(flex.FlexSEA(), args.ports, args.baud_rate)
 
 
 if __name__ == "__main__":
-	baudRate = sys.argv[1]
-	ports = sys.argv[2:3]
-	try:
-		fxHighSpeedTest(ports, baudRate)
-	except Exception as e:
-		print("broke: " + str(e))
+	main()

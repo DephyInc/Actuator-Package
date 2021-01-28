@@ -1,19 +1,23 @@
-import os, sys
+#!/usr/bin/env python3
+
+"""
+FlexSEA Two Position Control Demo
+"""
 from time import sleep, time
 import matplotlib
 import matplotlib.pyplot as plt
+from flexsea import fxUtils as fxu
+from flexsea import fxEnums as fxe
+from flexsea import flexsea as flex
+
 
 matplotlib.use("WebAgg")
-from flexseapython.fxUtil import *
-
-if isPi():
+if fxu.is_pi():
 	matplotlib.rcParams.update({"webagg.address": "0.0.0.0"})
 
-pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(pardir)
 
-
-def fxTwoPositionControl(
+def two_position_control(
+	fxs,
 	port,
 	baudRate,
 	expTime=13,
@@ -23,16 +27,16 @@ def fxTwoPositionControl(
 	resolution=100,
 ):
 	# Open device
-	devId = fxOpen(port, baudRate, 0)
-	fxStartStreaming(devId, resolution, shouldLog=True)
+	dev_id = fxs.open(port, baudRate, 0)
+	fxs.start_streaming(dev_id, resolution, log_en=True)
 	sleep(0.1)
 
 	# Setting initial angle and angle waypoints
-	actPackState = fxReadDevice(devId)
-	initialAngle = actPackState.mot_ang
+	act_pack_state = fxs.read_device(dev_id)
+	initial_angle = act_pack_state.mot_ang
 
 	# Setting angle waypoints
-	positions = [initialAngle, initialAngle + delta]
+	positions = [initial_angle, initial_angle + delta]
 	current_pos = 0
 	num_pos = 2
 
@@ -40,68 +44,80 @@ def fxTwoPositionControl(
 	num_time_steps = int(expTime / time_step)
 	transition_steps = int(transition_time / time_step)
 
-	# Setting gains (devId, kp, ki, kd, K, B, ff)
-	fxSetGains(devId, 150, 75, 0, 0, 0, 0)
+	# Setting gains (dev_id, kp, ki, kd, K, B, ff)
+	fxs.set_gains(dev_id, 150, 75, 0, 0, 0, 0)
 
 	# Setting position control at initial position
-	fxSendMotorCommand(devId, FxPosition, initialAngle)
+	fxs.send_motor_command(dev_id, fxe.FX_POSITION, initial_angle)
 
 	# Matplotlib - initialize lists
 	requests = []
 	measurements = []
 	times = []
 
-	i = 0
-	t0 = time()
+	start_time = time()
 	# Start two position control
 	for i in range(num_time_steps):
 		sleep(time_step)
-		actPackState = fxReadDevice(devId)
-		clearTerminal()
-		measuredPos = actPackState.mot_ang
-		print("Desired:              ", positions[current_pos])
-		print("Measured:             ", measuredPos)
-		print("Difference:           ", (measuredPos - positions[current_pos]), "\n")
-		printDevice(actPackState, FxActPack)
+		act_pack_state = fxs.read_device(dev_id)
+		fxu.clear_terminal()
+		measured_pos = act_pack_state.mot_ang
+		print(f"Desired:              {positions[current_pos]}")
+		print(f"Measured:             {measured_pos}")
+		print(f"Difference:           {(measured_pos - positions[current_pos])}\n")
+		fxu.print_device(act_pack_state, fxe.FX_ACT_PACK)
 
 		if i % transition_steps == 0:
 			current_pos = (current_pos + 1) % num_pos
-			fxSendMotorCommand(devId, FxPosition, positions[current_pos])
+			fxs.send_motor_command(dev_id, fxe.FX_POSITION, positions[current_pos])
 
 		# Plotting
-		times.append(time() - t0)
+		times.append(time() - start_time)
 		requests.append(positions[current_pos])
-		measurements.append(measuredPos)
-
-	# Close device and do device cleanup
-	# close_check = fxClose(devId)	#STACK-169
+		measurements.append(measured_pos)
 
 	# Disable the controller, send 0 PWM
-	fxSendMotorCommand(devId, FxVoltage, 0)
+	fxs.send_motor_command(dev_id, fxe.FX_VOLTAGE, 0)
 	sleep(0.1)
 
 	# Plot before exit:
-	title = "Two Position Control Demo"
+	plt.title("Two Position Control Demo")
 	plt.plot(times, requests, color="b", label="Desired position")
 	plt.plot(times, measurements, color="r", label="Measured position")
 	plt.xlabel("Time (s)")
 	plt.ylabel("Encoder position")
-	plt.title(title)
 	plt.legend(loc="upper right")
-	if os.name == "nt":
-		print("\nIn Windows, press Ctrl+BREAK to exit. Ctrl+C may not work.")
+	fxu.print_plot_exit()
 	plt.show()
 
 	# Close device and do device cleanup
-	close_check = fxClose(devId)
 
-	return close_check
+	return fxs.close(dev_id)
+
+
+def main():
+	"""
+	Standalone two position control execution
+	"""
+	# pylint: disable=import-outside-toplevel
+	import argparse
+
+	parser = argparse.ArgumentParser(description=__doc__)
+	parser.add_argument(
+		"port", metavar="Port", type=str, nargs=1, help="Your device serial port."
+	)
+	parser.add_argument(
+		"-b",
+		"--baud",
+		metavar="B",
+		dest="baud_rate",
+		type=int,
+		default=230400,
+		help="Serial communication baud rate.",
+	)
+	args = parser.parse_args()
+	two_position_control(flex.FlexSEA(), args.port[0], args.baud_rate)
 
 
 if __name__ == "__main__":
-	baudRate = sys.argv[1]
-	ports = sys.argv[2:3]
-	try:
-		fxPositionControl(ports, baudRate)
-	except Exception as e:
-		print("broke: " + str(e))
+	main()

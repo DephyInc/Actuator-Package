@@ -1,69 +1,93 @@
-import os, sys
-from time import sleep
-from flexseapython.fxUtil import *
+#!/usr/bin/env python3
+
+"""
+FlexSEA Two Devices Leader Follower demo
+"""
+
 import traceback
+from time import sleep
+from flexsea import fxUtils as fxu
+from flexsea import fxEnums as fxe
+from flexsea import flexsea as flex
 
-pardir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(pardir)
 
+def leader_follower(fxs, ports, baud_rate):
 
-def fxLeaderFollower(leaderPort, baudRate, followerPort):
+	dev_id_0 = fxs.open(ports[0], baud_rate, 6)  # leader
+	dev_id_1 = fxs.open(ports[1], baud_rate, 6)  # follower
 
-	devId0 = fxOpen(leaderPort, baudRate, 6)
-	devId1 = fxOpen(followerPort, baudRate, 6)
-
-	fxStartStreaming(devId0, 200, False)
-	fxStartStreaming(devId1, 200, False)
+	fxs.start_streaming(dev_id_0, 200, False)
+	fxs.start_streaming(dev_id_1, 200, False)
 
 	sleep(0.2)
 
-	actPackState0 = fxReadDevice(devId0)
-	actPackState1 = fxReadDevice(devId1)
+	act_pack_state_0 = fxs.read_device(dev_id_0)
+	act_pack_state_1 = fxs.read_device(dev_id_1)
 
-	initialAngle0 = actPackState0.mot_ang
-	initialAngle1 = actPackState1.mot_ang
+	initial_angle_0 = act_pack_state_0.mot_ang
+	initial_angle_1 = act_pack_state_1.mot_ang
 
 	# set first device to current controller with 0 current (0 torque)
-	fxSetGains(devId0, 100, 20, 0, 0, 0, 0)
-	fxSendMotorCommand(devId0, FxCurrent, 0)
+	fxs.set_gains(dev_id_0, 100, 20, 0, 0, 0, 0)
+	fxs.send_motor_command(dev_id_0, fxe.FX_CURRENT, 0)
 
 	# set position controller for second device
-	fxSetGains(devId1, 50, 3, 0, 0, 0, 0)
-	fxSendMotorCommand(devId1, FxPosition, initialAngle1)
+	fxs.set_gains(dev_id_1, 50, 3, 0, 0, 0, 0)
+	fxs.send_motor_command(dev_id_1, fxe.FX_POSITION, initial_angle_1)
 
-	loopCount = 200
+	loop_count = 200
 	try:
-		for i in range(loopCount):
+		for i in range(loop_count):
 			sleep(0.05)
-			clearTerminal()
-			leaderData = fxReadDevice(devId0)
-			followerData = fxReadDevice(devId1)
-			angle0 = leaderData.mot_ang
-			diff = angle0 - initialAngle0
-			fxSendMotorCommand(devId1, FxPosition, initialAngle1 + diff)
-			print("Device", devId1, "following device", devId0, "\n")
-			printDevice(followerData, FxActPack)
+			fxu.clear_terminal()
+			leader_data = fxs.read_device(dev_id_0)
+			follower_data = fxs.read_device(dev_id_1)
+			angle0 = leader_data.mot_ang
+			diff = angle0 - initial_angle_0
+			fxs.send_motor_command(dev_id_1, fxe.FX_POSITION, initial_angle_1 + diff)
+			print(f"Device {dev_id_1} following device {dev_id_0}\n")
+			fxu.print_device(follower_data, fxe.FX_ACT_PACK)
 			print("")  # Empty line
-			printDevice(leaderData, FxActPack)
-			printLoopCount(i, loopCount)
+			fxu.print_device(leader_data, fxe.FX_ACT_PACK)
+			fxu.print_loop_count(i, loop_count)
 
-	except Exception:
+	except Exception as err:
+		print(f"Problem encountred: {err}")
 		print(traceback.format_exc())
 
 	print("Turning off position control...")
-	fxSetGains(devId0, 0, 0, 0, 0, 0, 0)
-	fxSetGains(devId1, 0, 0, 0, 0, 0, 0)
-	fxSendMotorCommand(devId1, FxNone, 0)
-	fxSendMotorCommand(devId0, FxNone, 0)
+	fxs.set_gains(dev_id_0, 0, 0, 0, 0, 0, 0)
+	fxs.set_gains(dev_id_1, 0, 0, 0, 0, 0, 0)
+	fxs.send_motor_command(dev_id_1, fxe.FX_NONE, 0)
+	fxs.send_motor_command(dev_id_0, fxe.FX_NONE, 0)
 	sleep(0.5)
-	fxClose(devId0)
-	fxClose(devId1)
+	fxs.close(dev_id_0)
+	fxs.close(dev_id_1)
+
+
+def main():
+	"""
+	Standalone two-device position control execution
+	"""
+	# pylint: disable=import-outside-toplevel
+	import argparse
+
+	parser = argparse.ArgumentParser(description=__doc__)
+	parser.add_argument(
+		"ports", metavar="Ports", type=str, nargs="+", help="Your devices' serial ports."
+	)
+	parser.add_argument(
+		"-b",
+		"--baud",
+		metavar="B",
+		dest="baud_rate",
+		type=int,
+		default=230400,
+		help="Serial communication baud rate.",
+	)
+	args = parser.parse_args()
+	leader_follower(flex.FlexSEA(), args.ports, args.baud_rate)
 
 
 if __name__ == "__main__":
-	baudRate = sys.argv[1]
-	ports = sys.argv[2:4]
-	try:
-		fxLeaderFollower(ports[0], ports[1], baudRate)
-	except Exception as e:
-		print("broke: " + str(e))
+	main()
