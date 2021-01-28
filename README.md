@@ -9,9 +9,9 @@ You must use compatible firmware! Failure to do so will result in segmentation f
 
 The fx_plan_stack API is a suite of functions that configure and control FlexSEA devices. Detailed information can be found on the Dephy Wiki, which is included in the references below.
 
-The repo contains the FlexSEA-Rigid Actuator Package library and sample programs for C/C++, Python, MATLAB and SIMULINK. These scripts are accompanied by and are dependent upon C based libraries for both Windows (.dll) and Unix(.so).
+The repo contains the FlexSEA-Rigid Actuator Package library `flexsea` and sample programs for C/C++, Python, MATLAB and SIMULINK. These scripts are accompanied by and are dependent upon C based libraries for both Windows (.dll) and Unix(.so).
 
-### Python Dependencies
+### Install Python
 
 #### Linux
 Run this script to install the python dependencies before running the python scripts
@@ -25,8 +25,33 @@ On Windows, use [this installer](https://www.python.org/ftp/python/3.7.9/python-
 
 Then, to install the required Python dependencies, run the following command from the root directory of this repository using PowerShell:
 
+### Install FlexSEA Library
+
 ```bash
-pip install -r Python/requirements.txt
+# Define your own virtual environment
+# this is not required but it helps keeping your environment clean
+python3 -m virtualenv --python=/usr/bin/python3.7 actpack
+# Activae your venv
+source actpack/bin/activate
+# Once the environement is activated, install the package
+python3 -m pip install --upgrade pip 
+python3 -m pip install flexsea
+# Run your script that use flexsea
+# Once you want to stop using the flexsea library and go back to the regular shell
+deactivate 
+
+```
+
+If `flexsea` is already installed and you need to upgrade it, run this:
+```bash
+#activate your virtual environment if desired as shown above
+python3 -m pip install --upgrade flexsea
+```
+
+## Removal
+To uninstall `flexsea` from your computer, run this:
+```bash
+python3 -m pip uninstall flexsea
 ```
 
 ## Getting Started

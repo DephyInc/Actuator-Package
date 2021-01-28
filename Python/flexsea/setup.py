@@ -7,8 +7,8 @@ with open("README.md", "r", encoding="utf-8") as fh:
 	LONG_DESCRIPTION = fh.read()
 
 setuptools.setup(
-	name="flexsea",  # Replace with your own username
-	version="4.3.0",
+	name="flexsea",  # Replace casmat with other username if needed
+	version="5.0.0",
 	author="Dephy Inc.",
 	author_email="admin@dephy.com",
 	description="Dephy's Actuator Package API library",
