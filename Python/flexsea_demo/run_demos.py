@@ -52,34 +52,35 @@ def find_poles(port, baud_rate):
 # Format is: functionName, text string, min number of devices, max devices
 EXPERIMENTS = [
 	(read_only, "Read Only", 1, 1),
-	(bootloader, "Bootloader Check", 1, 1),
 	(open_control, "Open Control", 1, 1),
 	(current_control, "Current Control", 1, 1),
 	(position_control, "Position Control", 1, 1),
 	(impedance_control, "Impedance Control", 1, 1),
-	(find_poles, "Find Poles", 1, 1),
 	(two_position_control, "Two Positions Control", 1, 1),
 	(high_speed_test, "High Speed Test", 1, 2),
 	(high_stress_test, "High Stress Test", 1, 2),
 	(two_devices_position_control, "Two Devices Position Control", 2, 2),
 	(leader_follower, "Two Devices Leader Follower Control", 2, 2),
+	(bootloader, "Bootloader Check", 1, 1),
+	(find_poles, "Find Poles", 1, 1),
 ]
 
-MAX_EXPERIMENT = len(EXPERIMENTS) - 1
-MAX_EXPERIMENT_STR = str(MAX_EXPERIMENT)
-IDX_TWO_DEV_POS_CTRL = 9
-IDX_LDR_FLWR = 10
 
-
-def print_experiments():
+def print_demos():
 	"""
 	Print list of available experiments
 	"""
-	count = 0
-	print(">>> Actuator Package Python Demo Scripts <<<")
-	for exp in EXPERIMENTS:
-		print(f"[{count}] {exp[1]}")
-		count += 1
+	print("Actuator Package Demo Scripts:")
+	print("------------------------------")
+	for exp in EXPERIMENTS[:-2]:
+		print(f"[{EXPERIMENTS.index(exp)}] {exp[1]}")
+
+	print("\nAdvanced Utilities:")
+	print("------------------------------")
+
+	for exp in EXPERIMENTS[-2:]:
+		print(f"[{EXPERIMENTS.index(exp)}] {exp[1]}")
+	print("")
 
 
 def print_usage(prog_name: str):
@@ -91,8 +92,10 @@ def print_usage(prog_name: str):
 		f"Usage:\tPython {prog_name} [experiment_number (0 - {len(EXPERIMENTS) - 1 }) connected_devices (1 - N)]"
 	)
 	print(
-		'\t"connected_devices" ONLY required for some experiments\n'
-		+ "\tOther experiments use [1] device by default.\n"
+		"""
+		"connected_devices" is ONLY required for some experiments
+		 other experiments use [1] device by default.
+		"""
 	)
 
 
@@ -160,7 +163,7 @@ def main(argv):
 
 	# Handles command line arguments and experiment setup
 	if len(argv) <= 3:
-		print_experiments()
+		print_demos()
 		exp_ind = get_exp_ind(argv)
 		dev_num = get_dev_num(argv, exp_ind)
 	else:
@@ -168,15 +171,13 @@ def main(argv):
 		sys.exit("Too many command line arguments provided.")
 
 	print(
-		"\nRunning Experiment [{}] with [{}] connected device{}.".format(
-			exp_ind, dev_num, "s" if dev_num > 1 else ""
-		)
+		f"\nRunning Experiment [{exp_ind}] with [{dev_num}] connected device{'s' if dev_num > 1 else ''}."
 	)
 
 	port_cfg_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ports.yaml")
 	ports, baud_rate = fxu.load_ports_from_file(port_cfg_path)
-	print("Using ports:\t{}".format(ports))
-	print("Using baud rate:\t{}".format(baud_rate))
+	print(f"Using ports:\t{ports}")
+	print(f"Using baud rate:\t{baud_rate}")
 
 	# TODO (CA): add support for n ports and use argparser
 	# Call selected demo script:
@@ -189,7 +190,7 @@ def main(argv):
 		print("Problem encountered when running the demo: {}".format(err))
 		sys.exit(err)
 
-	print("\nExiting {} normally...\n".format(argv[0]))
+	print(f"\nExiting {argv[0]} normally...\n")
 	sys.exit(0)
 
 
