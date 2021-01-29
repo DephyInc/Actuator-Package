@@ -69,9 +69,11 @@ For your convenience, `run_demos.py` displays a menu of all available scripts.
 
 `run_demos.py` uses `ports.yaml` to configure the ports used to communicate with the ActPacks.
 
-Feel free to modify `ports.yaml` to suit your needs. In order to avoid git from tracking the changes to that file run the following command.
+Feel free to modify `ports.yaml` to suit your needs. By default this files contains the most common configuration along with examples for other platforms.
+
+Once you modify your copy of `ports.yaml`, use the following command to prevent git from tracking the changes.
 ```bash
-git --assume-unchanged Python/flexsea_demo/ports.yaml
+git update-index --assume-unchanged Python/flexsea_demo/ports.yaml
 ```
 
 License: CC BY-NC-SA 4.0
