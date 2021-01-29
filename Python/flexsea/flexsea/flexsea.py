@@ -134,11 +134,11 @@ class FlexSEA:
 
 		self.c_lib.fxGetAppType.argtypes = [c.c_uint]
 
-		self.c_lib.fxActivateBootloader.argtypes = [c_uint, c_uint8]
-		self.c_lib.fxActivateBootloader.restype = c_int
+		self.c_lib.fxActivateBootloader.argtypes = [c.c_uint, c.c_uint8]
+		self.c_lib.fxActivateBootloader.restype = c.c_int
 
-		self.c_lib.fxIsBootloaderActivated.argtypes = [c_uint]
-		self.c_lib.fxIsBootloaderActivated.restype = c_int
+		self.c_lib.fxIsBootloaderActivated.argtypes = [c.c_uint]
+		self.c_lib.fxIsBootloaderActivated.restype = c.c_int
 
 	def open(self, port, baud_rate, log_level=4):
 		"""
