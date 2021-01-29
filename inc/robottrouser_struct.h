@@ -15,12 +15,12 @@
  */
 
 #include "RobotTrouser_device_spec.h"
-#include <stdio.h>
-#include <time.h>
-#include <string.h>
-#include <stdint.h>
+#include <stdio.h> 
+#include <time.h> 
+#include <string.h> 
+#include <stdint.h> 
 
-#include <stdbool.h>
+#include <stdbool.h> 
 
 #define ROBOTTROUSER_SYSTEM_TIME_POS 53
 #define ROBOTTROUSER_STRUCT_DEVICE_FIELD_COUNT 54
@@ -112,7 +112,7 @@ void RobotTrouserSetData(struct RobotTrouserState *robottrouser, uint32_t _devic
 ///
 ///@param RobotTrouser is the struct with the data to be placed in the string
 ///
-///@param dataString is where the new string wll be placed
+///@param dataString is where the new string wll be placed 
 ///
 void RobotTrouserDataToString(struct RobotTrouserState *robottrouser, char dataString[ROBOTTROUSER_DATA_STRING_LENGTH]);
 
@@ -122,8 +122,8 @@ void RobotTrouserDataToString(struct RobotTrouserState *robottrouser, char dataS
 ///
 void RobotTrouserGetLabels(char labels[ROBOTTROUSER_STRUCT_DEVICE_FIELD_COUNT][ROBOTTROUSER_LABEL_MAX_CHAR_LENGTH]);
 
-/// \brief retrieves the string equivalent of parameter names starting with state time.  Parameters
-/// prior to state time, such as id,  are not included.
+/// \brief retrieves the string equivalent of parameter names starting with state time.  Parameters 
+/// prior to state time, such as id,  are not included. 
 ///
 ///@param labels is the array of labels containing the parameter names
 ///

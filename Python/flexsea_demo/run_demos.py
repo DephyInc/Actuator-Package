@@ -19,6 +19,7 @@ from high_speed_test import high_speed_test
 from high_stress_test import high_stress_test
 from two_devices_position_control import two_devices_position_control
 from two_devices_leader_follower import leader_follower
+from bootloader import bootloader
 
 
 if (sys.version_info[0] == 3) and (sys.version_info[1] == 8):
@@ -51,16 +52,17 @@ def find_poles(port, baud_rate):
 # Format is: functionName, text string, min number of devices, max devices
 EXPERIMENTS = [
 	(read_only, "Read Only", 1, 1),
+	(bootloader, "Bootloader Check", 1, 1),
 	(open_control, "Open Control", 1, 1),
 	(current_control, "Current Control", 1, 1),
 	(position_control, "Position Control", 1, 1),
 	(impedance_control, "Impedance Control", 1, 1),
 	(find_poles, "Find Poles", 1, 1),
-	(two_position_control, 'Two Positions Control', 1, 1),
-	(high_speed_test, 'High Speed Test', 1, 2),
-	(high_stress_test, 'High Stress Test', 1, 2),
-	(two_devices_position_control, 'Two Devices Position Control', 2, 2),
-	(leader_follower, 'Two Devices Leader Follower Control', 2, 2)
+	(two_position_control, "Two Positions Control", 1, 1),
+	(high_speed_test, "High Speed Test", 1, 2),
+	(high_stress_test, "High Stress Test", 1, 2),
+	(two_devices_position_control, "Two Devices Position Control", 2, 2),
+	(leader_follower, "Two Devices Leader Follower Control", 2, 2),
 ]
 
 MAX_EXPERIMENT = len(EXPERIMENTS) - 1

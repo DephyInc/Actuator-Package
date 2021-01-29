@@ -15,12 +15,12 @@
  */
 
 #include "CellScreener_device_spec.h"
-#include <stdio.h>
-#include <time.h>
-#include <string.h>
-#include <stdint.h>
+#include <stdio.h> 
+#include <time.h> 
+#include <string.h> 
+#include <stdint.h> 
 
-#include <stdbool.h>
+#include <stdbool.h> 
 
 #define CELLSCREENER_SYSTEM_TIME_POS 20
 #define CELLSCREENER_STRUCT_DEVICE_FIELD_COUNT 21
@@ -79,7 +79,7 @@ void CellScreenerSetData(struct CellScreenerState *cellscreener, uint32_t _devic
 ///
 ///@param CellScreener is the struct with the data to be placed in the string
 ///
-///@param dataString is where the new string wll be placed
+///@param dataString is where the new string wll be placed 
 ///
 void CellScreenerDataToString(struct CellScreenerState *cellscreener, char dataString[CELLSCREENER_DATA_STRING_LENGTH]);
 
@@ -89,8 +89,8 @@ void CellScreenerDataToString(struct CellScreenerState *cellscreener, char dataS
 ///
 void CellScreenerGetLabels(char labels[CELLSCREENER_STRUCT_DEVICE_FIELD_COUNT][CELLSCREENER_LABEL_MAX_CHAR_LENGTH]);
 
-/// \brief retrieves the string equivalent of parameter names starting with state time.  Parameters
-/// prior to state time, such as id,  are not included.
+/// \brief retrieves the string equivalent of parameter names starting with state time.  Parameters 
+/// prior to state time, such as id,  are not included. 
 ///
 ///@param labels is the array of labels containing the parameter names
 ///

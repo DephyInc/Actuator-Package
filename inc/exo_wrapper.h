@@ -1,5 +1,5 @@
 /************************************************************
-
+ 
 TOP-SECRET DEPHY EXO FUNCTIONS
 
 Do not send this to external clients
@@ -14,7 +14,7 @@ Do not send this to external clients
 #define TOTAL_DEFINED_MOVEMENTS 5 ///Total movements that can be defined by the exo such as walking, running etc.
 #ifdef __cplusplus
 
-extern "C"
+extern "C" 
 {
 #endif
 
@@ -114,7 +114,7 @@ static const int UTT_VAL_LIMITS[UTT_NUM_VALS][2] {{UTT_0_MIN,UTT_0_MAX},
 
 /// \brief Read the most recent data from a streaming FlexSEA Exo stream.
 /// Must call fxStartStreaming before calling this.
-///
+/// 
 /// @param deviceId is the device ID of the device to read from.
 ///
 /// @param readData contains the most recent data from the device
@@ -125,7 +125,7 @@ FxError fxReadExoDevice(const unsigned int deviceId, ExoState* readData);
 
 /// \brief Read all exo data from a streaming FlexSEA device stream.
 /// Must call fxStartStreaming before calling this.
-///
+/// 
 /// @param deviceId is the device ID of the device to read from.
 ///
 /// @param readData is an array of size n which contains read results
@@ -136,15 +136,15 @@ FxError fxReadExoDevice(const unsigned int deviceId, ExoState* readData);
 /// to use this number.
 ///
 /// @note Will only fill readData array up to read data queue size.
-int fxReadExoDeviceAll(const unsigned int deviceId,
-			ExoState* readData,
+int fxReadExoDeviceAll(const unsigned int deviceId, 
+			ExoState* readData, 
 			const unsigned int n);
 
 // \brief Get the Exo side (Left or Right). Only valid for an Exo device.
 ///
 /// @param deviceId is the device ID
 ///
-/// @returns FxExoSide defined at the top of the header. FxInvalidSide if
+/// @returns FxExoSide defined at the top of the header. FxInvalidSide if 
 /// not an Exo device or deviceId is invalid.
 FxExoSide fxGetSide(const unsigned int deviceId);
 
@@ -176,7 +176,7 @@ FxError fxDisableAugmentation(const unsigned int deviceId);
 /// \brief Set the UTT values to the desired values.
 ///
 /// @param deviceId is the device ID
-///
+/// 
 /// @param uttToSet is an array of UTT values to set. Up to UTT_NUM_VALS
 ///
 /// @param n is the size of the uttToSet array
@@ -190,7 +190,7 @@ FxError fxDisableAugmentation(const unsigned int deviceId);
 ///
 /// @note Only UTTs up to UTT_NUM_VALS will be set.
 ///
-FxError fxSetUTT(const unsigned int deviceId,
+FxError fxSetUTT(const unsigned int deviceId, 
 			const int* uttToSet,
 			const unsigned int n,
 			char singleUTTIndex);
@@ -199,7 +199,7 @@ FxError fxSetUTT(const unsigned int deviceId,
 /// to the device's non-volatile memory.
 ///
 /// @param deviceId is the device ID
-///
+/// 
 /// @param uttToSave is an array of UTT values to save. Up to UTT_NUM_VALS
 ///
 /// @param n is the size of the uttToSave array
@@ -211,26 +211,26 @@ FxError fxSetUTT(const unsigned int deviceId,
 ///
 /// @note Only UTTs up to UTT_NUM_VALS will be saved.
 ///
-FxError fxSaveUTT(const unsigned int deviceId,
+FxError fxSaveUTT(const unsigned int deviceId, 
 			const int* uttToSave,
 			const unsigned int n);
 
-/// \brief Send a UTT values request to the specified device. The value is
-/// retrieved asyncronously and must be checked by polling
+/// \brief Send a UTT values request to the specified device. The value is 
+/// retrieved asyncronously and must be checked by polling 
 /// fxGetLastReceivedUTT.
 ///
 /// @param deviceId is the device ID
-///
+/// 
 /// @returns FxInvalidDevice if deviceId does not correspond an exo device.
 ///          FxSuccess otherwise.
 ///
-/// @note The i2t values are retrieved asyncronously and must be checked by
+/// @note The i2t values are retrieved asyncronously and must be checked by 
 /// polling fxGetLastReceivedUTT.
 ///
 FxError fxRequestUTT(const unsigned int deviceId);
 
-/// \brief Check the last UTT values which were received from the device.
-/// These UTT values are updated asyncronously by making calls to
+/// \brief Check the last UTT values which were received from the device. 
+/// These UTT values are updated asyncronously by making calls to 
 /// fxRequestUTT.
 ///
 /// @param deviceId is the device ID
@@ -240,13 +240,13 @@ FxError fxRequestUTT(const unsigned int deviceId);
 ///
 /// @param n is the size of the uttToSave array. Ideally at least UTT_NUM_VALS.
 ///
-///
+/// 
 /// @returns FxInvalidDevice if deviceId does not correspond an exo device.
 ///          FxSuccess otherwise.
 ///
 /// @note Only UTTs up to UTT_NUM_VALS will be read.
 ///
-FxError fxGetLastReceivedUTT(const unsigned int deviceId,
+FxError fxGetLastReceivedUTT(const unsigned int deviceId, 
 				int* readUTTBuffer,
 				const unsigned int n);
 
@@ -345,8 +345,14 @@ FxError fxGetLastReceivedProgWalkParams(const unsigned int deviceId,
 /// \return The percentage of battery life remaining
 double fxGetBatteryLife(const unsigned int deviceId);
 
+///
+/// \param deviceId  is the device ID
+/// \return the current color code of the Exo
 fxBatteryColor fxGetBatteryColor(const unsigned int deviceId);
 
+///
+/// \param movement the movement parameter to translate
+/// \return the string corresponding to the movement enumeration
 const char* fxGetMovement(int movement);
 
 #ifdef __cplusplus

@@ -12,12 +12,12 @@
  */
 
 #include "CycleExo_device_spec.h"
-#include <stdio.h>
-#include <time.h>
-#include <string.h>
-#include <stdint.h>
+#include <stdio.h> 
+#include <time.h> 
+#include <string.h> 
+#include <stdint.h> 
 
-#include <stdbool.h>
+#include <stdbool.h> 
 
 #define CYCLEEXO_SYSTEM_TIME_POS 41
 #define CYCLEEXO_STRUCT_DEVICE_FIELD_COUNT 42
@@ -97,7 +97,7 @@ void CycleExoSetData(struct CycleExoState *cycleexo, uint32_t _deviceStateBuffer
 ///
 ///@param CycleExo is the struct with the data to be placed in the string
 ///
-///@param dataString is where the new string wll be placed
+///@param dataString is where the new string wll be placed 
 ///
 void CycleExoDataToString(struct CycleExoState *cycleexo, char dataString[CYCLEEXO_DATA_STRING_LENGTH]);
 
@@ -107,8 +107,8 @@ void CycleExoDataToString(struct CycleExoState *cycleexo, char dataString[CYCLEE
 ///
 void CycleExoGetLabels(char labels[CYCLEEXO_STRUCT_DEVICE_FIELD_COUNT][CYCLEEXO_LABEL_MAX_CHAR_LENGTH]);
 
-/// \brief retrieves the string equivalent of parameter names starting with state time.  Parameters
-/// prior to state time, such as id,  are not included.
+/// \brief retrieves the string equivalent of parameter names starting with state time.  Parameters 
+/// prior to state time, such as id,  are not included. 
 ///
 ///@param labels is the array of labels containing the parameter names
 ///

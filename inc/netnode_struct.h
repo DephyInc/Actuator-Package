@@ -15,12 +15,12 @@
  */
 
 #include "NetNode_device_spec.h"
-#include <stdio.h>
-#include <time.h>
-#include <string.h>
-#include <stdint.h>
+#include <stdio.h> 
+#include <time.h> 
+#include <string.h> 
+#include <stdint.h> 
 
-#include <stdbool.h>
+#include <stdbool.h> 
 
 #define NETNODE_SYSTEM_TIME_POS 8
 #define NETNODE_STRUCT_DEVICE_FIELD_COUNT 9
@@ -67,7 +67,7 @@ void NetNodeSetData(struct NetNodeState *netnode, uint32_t _deviceStateBuffer[],
 ///
 ///@param NetNode is the struct with the data to be placed in the string
 ///
-///@param dataString is where the new string wll be placed
+///@param dataString is where the new string wll be placed 
 ///
 void NetNodeDataToString(struct NetNodeState *netnode, char dataString[NETNODE_DATA_STRING_LENGTH]);
 
@@ -77,8 +77,8 @@ void NetNodeDataToString(struct NetNodeState *netnode, char dataString[NETNODE_D
 ///
 void NetNodeGetLabels(char labels[NETNODE_STRUCT_DEVICE_FIELD_COUNT][NETNODE_LABEL_MAX_CHAR_LENGTH]);
 
-/// \brief retrieves the string equivalent of parameter names starting with state time.  Parameters
-/// prior to state time, such as id,  are not included.
+/// \brief retrieves the string equivalent of parameter names starting with state time.  Parameters 
+/// prior to state time, such as id,  are not included. 
 ///
 ///@param labels is the array of labels containing the parameter names
 ///

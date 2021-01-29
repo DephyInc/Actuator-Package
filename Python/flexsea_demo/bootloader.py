@@ -104,7 +104,7 @@ def main():
 	parser.add_argument(
 		"-t",
 		"--target",
-		metavar="B",
+		metavar="T",
 		dest="target",
 		type=str,
 		default="Mn",

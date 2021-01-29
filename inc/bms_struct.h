@@ -15,12 +15,12 @@
  */
 
 #include "BMS_device_spec.h"
-#include <stdio.h>
-#include <time.h>
-#include <string.h>
-#include <stdint.h>
+#include <stdio.h> 
+#include <time.h> 
+#include <string.h> 
+#include <stdint.h> 
 
-#include <stdbool.h>
+#include <stdbool.h> 
 
 #define BMS_SYSTEM_TIME_POS 29
 #define BMS_STRUCT_DEVICE_FIELD_COUNT 30
@@ -88,7 +88,7 @@ void BMSSetData(struct BMSState *bms, uint32_t _deviceStateBuffer[], int systemS
 ///
 ///@param BMS is the struct with the data to be placed in the string
 ///
-///@param dataString is where the new string wll be placed
+///@param dataString is where the new string wll be placed 
 ///
 void BMSDataToString(struct BMSState *bms, char dataString[BMS_DATA_STRING_LENGTH]);
 
@@ -98,8 +98,8 @@ void BMSDataToString(struct BMSState *bms, char dataString[BMS_DATA_STRING_LENGT
 ///
 void BMSGetLabels(char labels[BMS_STRUCT_DEVICE_FIELD_COUNT][BMS_LABEL_MAX_CHAR_LENGTH]);
 
-/// \brief retrieves the string equivalent of parameter names starting with state time.  Parameters
-/// prior to state time, such as id,  are not included.
+/// \brief retrieves the string equivalent of parameter names starting with state time.  Parameters 
+/// prior to state time, such as id,  are not included. 
 ///
 ///@param labels is the array of labels containing the parameter names
 ///

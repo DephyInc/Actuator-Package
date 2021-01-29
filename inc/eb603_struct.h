@@ -15,12 +15,12 @@
  */
 
 #include "EB603_device_spec.h"
-#include <stdio.h>
-#include <time.h>
-#include <string.h>
-#include <stdint.h>
+#include <stdio.h> 
+#include <time.h> 
+#include <string.h> 
+#include <stdint.h> 
 
-#include <stdbool.h>
+#include <stdbool.h> 
 
 #define EB603_SYSTEM_TIME_POS 53
 #define EB603_STRUCT_DEVICE_FIELD_COUNT 54
@@ -112,7 +112,7 @@ void EB603SetData(struct EB603State *eb603, uint32_t _deviceStateBuffer[], int s
 ///
 ///@param EB603 is the struct with the data to be placed in the string
 ///
-///@param dataString is where the new string wll be placed
+///@param dataString is where the new string wll be placed 
 ///
 void EB603DataToString(struct EB603State *eb603, char dataString[EB603_DATA_STRING_LENGTH]);
 
@@ -122,8 +122,8 @@ void EB603DataToString(struct EB603State *eb603, char dataString[EB603_DATA_STRI
 ///
 void EB603GetLabels(char labels[EB603_STRUCT_DEVICE_FIELD_COUNT][EB603_LABEL_MAX_CHAR_LENGTH]);
 
-/// \brief retrieves the string equivalent of parameter names starting with state time.  Parameters
-/// prior to state time, such as id,  are not included.
+/// \brief retrieves the string equivalent of parameter names starting with state time.  Parameters 
+/// prior to state time, such as id,  are not included. 
 ///
 ///@param labels is the array of labels containing the parameter names
 ///

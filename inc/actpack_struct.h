@@ -15,12 +15,12 @@
  */
 
 #include "ActPack_device_spec.h"
-#include <stdio.h>
-#include <time.h>
-#include <string.h>
-#include <stdint.h>
+#include <stdio.h> 
+#include <time.h> 
+#include <string.h> 
+#include <stdint.h> 
 
-#include <stdbool.h>
+#include <stdbool.h> 
 
 #define ACTPACK_SYSTEM_TIME_POS 32
 #define ACTPACK_STRUCT_DEVICE_FIELD_COUNT 33
@@ -91,7 +91,7 @@ void ActPackSetData(struct ActPackState *actpack, uint32_t _deviceStateBuffer[],
 ///
 ///@param ActPack is the struct with the data to be placed in the string
 ///
-///@param dataString is where the new string wll be placed
+///@param dataString is where the new string wll be placed 
 ///
 void ActPackDataToString(struct ActPackState *actpack, char dataString[ACTPACK_DATA_STRING_LENGTH]);
 
@@ -101,8 +101,8 @@ void ActPackDataToString(struct ActPackState *actpack, char dataString[ACTPACK_D
 ///
 void ActPackGetLabels(char labels[ACTPACK_STRUCT_DEVICE_FIELD_COUNT][ACTPACK_LABEL_MAX_CHAR_LENGTH]);
 
-/// \brief retrieves the string equivalent of parameter names starting with state time.  Parameters
-/// prior to state time, such as id,  are not included.
+/// \brief retrieves the string equivalent of parameter names starting with state time.  Parameters 
+/// prior to state time, such as id,  are not included. 
 ///
 ///@param labels is the array of labels containing the parameter names
 ///
