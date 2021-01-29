@@ -462,6 +462,49 @@ def fxFindPoles(devId):
 		raise ValueError('fxFindPoles: invalid device ID')
 	elif (retCode == FxFailure):
 		raise ValueError('fxFindPoles: command failed')
+		
+def fxActivateBootloader(devId, target):
+	"""
+	Activate target bootloader
+	
+	Parameters:
+	devId (int): The device ID.
+	target (int): bootloader target
+	
+	Returns:
+	FxInvalidDevice if deviceId is invalid
+	FxFailure if command failed
+	FxSuccess otherwise
+	"""
+	global flexsea
+	retCode = flexsea.fxActivateBootloader(devId, target)
+
+	if (retCode == FxInvalidDevice):
+		raise ValueError('fxActivateBootloader: invalid device ID')
+	elif (retCode == FxFailure):
+		raise IOError('fxActivateBootloader: command failed')		
+
+def fxIsBootloaderActivated(devId):
+	"""
+	Get status of bootloader
+	
+	Parameters:
+	devId (int): The device ID.
+	
+	Returns:
+	FxInvalidDevice if deviceId is invalid
+	FxFailure if command failed or bootloader is not enabled
+	FxSuccess otherwise	
+	"""
+	global flexsea
+	retCode = flexsea.fxIsBootloaderActivated(devId)
+
+	if (retCode == FxInvalidDevice):
+		raise ValueError('fxIsBootloaderActivated: invalid device ID')
+	elif (retCode == FxFailure):
+		raise IOError('fxIsBootloaderActivated: command failed')	
+		
+	return retCode
 
 # Loads the library from the c lib
 def loadFlexsea():
@@ -501,7 +544,7 @@ def loadFlexsea():
 	loadingLogMessages = []
 	for librarypath in librarypaths:
 		try:
-			loadingLogMessages.append("loading... " + librarypath)
+			loadingLogMessages.append("Loading... " + librarypath)
 			flexsea = cdll.LoadLibrary(librarypath)
 		except OSError as arg:
 			loadingLogMessages.append("\n\nThere was a problem loading the library\n {0}\n".format(arg))
@@ -514,7 +557,7 @@ def loadFlexsea():
 		return False
 
 	#print("Loaded " + os.path.realpath(librarypath) + "!")
-	print('loaded!')
+	print('Loaded!')
 
 	# set arg types
 	flexsea.fxOpen.argtypes = [c_char_p, c_uint, c_uint]
@@ -563,6 +606,12 @@ def loadFlexsea():
 
 	flexsea.fxGetAppType.argtypes = [c_uint]
 	flexsea.fxGetAppType.restype = c_int
+	
+	flexsea.fxActivateBootloader.argtypes = [c_uint, c_uint8]
+	flexsea.fxActivateBootloader.restype = c_int
+	
+	flexsea.fxIsBootloaderActivated.argtypes = [c_uint]
+	flexsea.fxIsBootloaderActivated.restype = c_int
 
 	return True
 
