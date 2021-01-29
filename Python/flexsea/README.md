@@ -44,7 +44,7 @@ python3 -m pip install dist/flexsea-5.0.0-py3-none-any.whl  #replace the version
 Once the package is ready to publish and the version has been updated. Run this to upload it to PyPi to allow users to install it via `pip`
 See [these instructions](https://packaging.python.org/tutorials/packaging-projects/) in case you need to get a PyPi account or token.
 
-### Test upload
+### Test Upload
 Upload to test server
 ```bash
 python3 -m twine upload --repository testpypi dist/*
@@ -54,7 +54,7 @@ Install from test server
 python3 -m pip install --index-url https://test.pypi.org/simple/ --no-deps flexsea
 ```
 
-### Test upload
+### Final upload
 ```bash
-python3 -m twine upload --repository testpypi dist/*
+python3 -m twine upload dist/*
 ```
