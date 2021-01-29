@@ -52,6 +52,15 @@ typedef enum fxExoControllerMode
 
 } FxExoControllerMode;
 
+typedef enum fxBatteryColor
+{
+	fxNoColor = 	-1,
+	fxGreen=	0,
+	fxYellow=	1,
+	fxRed=		2
+
+} FxBatteryColor;
+
 struct ExoState;
 
 ////////////////////// For UTTs //////////////////////////////
@@ -331,7 +340,13 @@ FxError fxGetLastReceivedProgWalkParams(const unsigned int deviceId,
                                        FxExoTrainingType* exoTrainingType,
                                        FxExoControllerMode* exoControlMode);
 
+///
+/// \param deviceId is the device ID
+/// \return The percentage of battery life remaining
 double fxGetBatteryLife(const unsigned int deviceId);
+
+fxBatteryColor fxGetBatteryColor(const unsigned int deviceId);
+
 const char* fxGetMovement(int movement);
 
 #ifdef __cplusplus

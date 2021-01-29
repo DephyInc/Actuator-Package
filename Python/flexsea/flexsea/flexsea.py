@@ -134,6 +134,12 @@ class FlexSEA:
 
 		self.c_lib.fxGetAppType.argtypes = [c.c_uint]
 
+		self.c_lib.fxActivateBootloader.argtypes = [c_uint, c_uint8]
+		self.c_lib.fxActivateBootloader.restype = c_int
+
+		self.c_lib.fxIsBootloaderActivated.argtypes = [c_uint]
+		self.c_lib.fxIsBootloaderActivated.restype = c_int
+
 	def open(self, port, baud_rate, log_level=4):
 		"""
 		Establish a connection with a FlexSEA device.
@@ -496,7 +502,7 @@ class FlexSEA:
 
 		Returns:
 		FX_INVALID_DEVICE if deviceId is invalid
-		FxSuccess otherwise
+		FX_SUCCESS otherwise
 
 		DO NOT USE THIS FUNCTION UNLESS YOU KNOW WHAT YOU ARE DOING
 		"""
@@ -505,3 +511,44 @@ class FlexSEA:
 			raise ValueError("fxFindPoles: invalid device ID: {}".format(dev_id))
 		if ret_code == fxe.FX_FAILURE:
 			raise ValueError("fxFindPoles: command failed")
+
+	def activate_bootloader(self, dev_id, target):
+		"""
+		Activate target bootloader
+
+		Parameters:
+		dev_id (int): The device ID.
+		target (int): bootloader target
+
+		Returns:
+		FX_INVALID_DEVICE if deviceId is invalid
+		FX_FAILURE if command failed
+		FX_SUCCESS otherwise
+		"""
+		ret_code = self.c_lib.fxActivateBootloader(dev_id, target)
+
+		if ret_code == fxe.FX_INVALID_DEVICE:
+			raise ValueError("fxActivateBootloader: invalid device ID")
+		if ret_code == fxe.FX_FAILURE:
+			raise IOError("fxActivateBootloader: command failed")
+
+	def is_bootloader_activated(self, dev_id):
+		"""
+		Get status of bootloader
+
+		Parameters:
+		dev_id (int): The device ID.
+
+		Returns:
+		FX_INVALID_DEVICE if deviceId is invalid
+		FX_FAILURE if command failed or bootloader is not enabled
+		FX_SUCCESS otherwise
+		"""
+		ret_code = self.c_lib.fxIsBootloaderActivated(dev_id)
+
+		if ret_code == fxe.FX_INVALID_DEVICE:
+			raise ValueError("fxIsBootloaderActivated: invalid device ID")
+		if ret_code == fxe.FX_FAILURE:
+			raise IOError("fxIsBootloaderActivated: command failed")
+
+		return ret_code
