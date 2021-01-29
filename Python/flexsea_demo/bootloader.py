@@ -4,7 +4,6 @@
 FlexSEA Bootloader check demo
 """
 from time import sleep
-from flexsea import fxUtils as fxu
 from flexsea import fxEnums as fxe
 from flexsea import flexsea as flex
 
@@ -16,10 +15,6 @@ def bootloader(fxs, port, baud_rate, target):
 	app_type = fxs.get_app_type(dev_id)
 	result = False
 
-	app_types = {
-		fxe.FX_ACT_PACK: "ActPack",
-		fxe.FX_EXO: "Exo or ActPack Plus",
-	}
 	targets = {
 		"Habs": {"id": 0, "name": "Habsolute"},
 		"Reg": {"id": 1, "name": "Regulate"},
@@ -27,10 +22,14 @@ def bootloader(fxs, port, baud_rate, target):
 		"Mn": {"id": 3, "name": "Manage"},
 	}
 
-	try:
-		print(f"Your device is an {app_types[app_type]}", flush=True)
-	except KeyError:
-		raise RuntimeError(f"Unsupported application type: {app_type}")
+	if app_type.value == fxe.FX_ACT_PACK.value:
+		app_name = "ActPack"
+	elif app_type.value == fxe.FX_EXO.value:
+		app_name = "Exo or ActPack Plus"
+	else:
+		raise RuntimeError(f"Unsupported application type: {app_type.value}")
+
+	print(f"Your device is an {app_name}", flush=True)
 
 	try:
 		print(f"Activating {targets[target]['name']} bootloader", flush=True)
@@ -39,10 +38,10 @@ def bootloader(fxs, port, baud_rate, target):
 		fxs.activate_bootloader(dev_id, targets[target]["id"])
 		timeout = 60  # seconds
 		while timeout > 0:
-			print("Waiting for response from target", flush=True)
+			print(f"Waiting for response from target ({timeout}s)", flush=True)
 			sleep(1)
 			timeout -= 1
-			state = fxu.is_bootloader_activated(dev_id)
+			state = fxs.is_bootloader_activated(dev_id)
 			if state == 0:
 				break
 
@@ -51,31 +50,10 @@ def bootloader(fxs, port, baud_rate, target):
 			print(targets[target]["name"], "bootloader is activated", flush=True)
 		else:
 			result = False
-			print("Unable to activate ", targets[target]["name"], "bootloader", flush=True)
+			print(f"Unable to activate {targets[target]['name']} bootloader", flush=True)
 
-		fxs.close(dev_id)
-		return result
 	except KeyError:
 		raise RuntimeError(f"Unsupported bootloader target: {target}")
-
-	sleep(1)
-	print("Sending signal to target device", flush=True)
-	fxs.activate_bootloader(dev_id, targets[target]["id"])
-
-	for _tick in range(1, 60):  # 60 seconds timeout
-		print("Waiting for response from target", flush=True)
-		sleep(1)
-		state = fxs.is_bootloader_activated(dev_id)
-		if state == 0:
-			break
-
-	if state == 0:
-		result = True
-		print(f"{targets[target]['name']} bootloader is activated", flush=True)
-	else:
-		result = False
-		print(f"Unable to activate {targets[target]['name']} bootloader", flush=True)
-
 	fxs.close(dev_id)
 	return result
 
