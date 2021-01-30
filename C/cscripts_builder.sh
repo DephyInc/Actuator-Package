@@ -46,4 +46,3 @@ ninja
 cd ..
 
 exit 0
-

@@ -1,0 +1,2 @@
+recursive-include flexsea/libs *
+recursive-include flexsea/inc *

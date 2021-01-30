@@ -2,7 +2,7 @@
 
 void printDevice(struct ActPackState *actpack)
 {
-	cout<<"[ Printing Actpack ]\n";
+	cout<<"[ Printing ActPack ]\n";
 	cout<<"State time:           "<<actpack->state_time<<"\n";
 	cout<<"Accel X:              "<<actpack->accelx<<"\n";
 	cout<<"Accel Y:              "<<actpack->accely<<"\n";
@@ -19,7 +19,7 @@ void printDevice(struct ActPackState *actpack)
 
 void printDevice(struct ExoState *exoState)
 {
-	cout<<"[ Printing Exo/Actpack Plus ]\n";
+	cout<<"[ Printing Exo/ActPack Plus ]\n";
 	cout<<"State time:           "<<exoState->state_time<<"\n";
 	cout<<"Accel X:              "<<exoState->accelx<<"\n";
 	cout<<"Accel Y:              "<<exoState->accely<<"\n";
@@ -46,7 +46,7 @@ void printDevice(struct ExoState *exoState)
 
 void printDevice(struct NetMasterState *netMasterState)
 {
-	cout<<"[ Printing Exo/Actpack Plus ]\n";
+	cout<<"[ Printing Exo/ActPack Plus ]\n";
 	cout<<"State time:           "<<netMasterState->state_time<<"\n";
 	cout<<"GenVar[0]:            "<<netMasterState->genvar_0<<"\n";
 	cout<<"GenVar[1]:            "<<netMasterState->genvar_1<<"\n";

@@ -568,6 +568,33 @@ FxError fxReadAnkleTorquePoints(const unsigned int deviceId, const uint8_t point
 ///
 int16_t * fxGetLastReceivedAnkleTorquePoints(const unsigned int deviceId);
 
+/// \brief Activates target bootloader
+///
+/// @param
+/// deviceId - device ID
+/// target - target bootloader
+///
+/// @returns FxInvalidDevice if deviceId is invalid
+/////          FxSuccess otherwise
+///
+FxError fxActivateBootloader(const unsigned int deviceId, const uint8_t target);
+
+/// \brief Returns target bootloader status
+///
+/// @param
+/// deviceId - device ID
+///
+/// @returns true if activated, false if not.
+///
+FxError fxIsBootloaderActivated(const unsigned int deviceId);
+
+///
+/// \param deviceId The ID of the device
+/// \param isValid Will be true if the gain is valid
+/// \param highestTimingGain the highest gain recived since power on of device
+/// \return
+double fxGetTimingGain(const unsigned int deviceId, bool *isValid, double *highestTimingGain);
+
 #ifdef __cplusplus
 } // extern "C"
 #endif

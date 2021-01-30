@@ -345,8 +345,14 @@ FxError fxGetLastReceivedProgWalkParams(const unsigned int deviceId,
 /// \return The percentage of battery life remaining
 double fxGetBatteryLife(const unsigned int deviceId);
 
+///
+/// \param deviceId  is the device ID
+/// \return the current color code of the Exo
 fxBatteryColor fxGetBatteryColor(const unsigned int deviceId);
 
+///
+/// \param movement the movement parameter to translate
+/// \return the string corresponding to the movement enumeration
 const char* fxGetMovement(int movement);
 
 #ifdef __cplusplus
