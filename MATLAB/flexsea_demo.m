@@ -62,6 +62,7 @@ function test = displayMenu()
 % Display the test selection menu and wait for user to select one
 
 	clc;
+	disp( "Stop! Read our important safety information at https://dephy.com/start/ before running the scripts for the first time.\n\n");
 	disp( "0) Read only");
 	disp( "1) Open control");
 	disp( "2) Current Control");

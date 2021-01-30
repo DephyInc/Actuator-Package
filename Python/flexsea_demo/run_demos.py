@@ -70,6 +70,10 @@ def print_demos():
 	"""
 	Print list of available experiments
 	"""
+	print("STOP!")
+	print("Read our important safety information at https://dephy.com/start/")
+	print("before running the scripts for the first time.\n")
+
 	print("Actuator Package Demo Scripts:")
 	print("------------------------------")
 	for exp in EXPERIMENTS[:-2]:
