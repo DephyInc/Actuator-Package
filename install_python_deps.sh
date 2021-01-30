@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
+# Bash output colors for echo
 RED="\033[0;31m"
 GREEN="\033[0;32m"
-NC="\033[0m" # No Color
+NC="\033[0m" # Default Color
 BASE_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 # Ubuntu Dependencies
