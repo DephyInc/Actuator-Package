@@ -6,10 +6,18 @@ repos:
     rev: v3.4.0
     hooks:
     -   id: trailing-whitespace
+        exclude: |
+            (?x)^(
+                .*\.(ico|jpg|svg|png|user|xml|yaml|pro|pri|qrc|ui|dll|a|o|so|dll\.a|hex|mdl|slx)|
+                .*inc/.*|
+                .*libs/.*
+            )$
     -   id: end-of-file-fixer
         exclude: |
             (?x)^(
-                .*\.(ico|jpg|svg|png|user|xml|yaml|pro|pri|qrc|ui|dll|a|o|so|dll\.a|hex)
+                .*\.(ico|jpg|svg|png|user|xml|yaml|pro|pri|qrc|ui|dll|a|o|so|dll\.a|hex|mdl|slx)|
+                .*inc/.*|
+                .*libs/.*
             )$
     -   id: check-yaml
     -   id: check-added-large-files
@@ -28,10 +36,10 @@ repos:
     -   id: forbid-space-in-indent
         exclude: |
             (?x)^(
-                .*\.(ico|jpg|svg|png|user|xml|yaml|pro|pri|qrc|ui|dll|a|o|so|dll\.a|hex)|
+                .*\.(ico|jpg|svg|png|user|xml|yaml|pro|pri|qrc|ui|dll|a|o|so|dll\.a|hex|mdl|slx)|
                 .*/dev_spec/.*|
                 .*inc/.*|
-                LICENSE.*|
+                .*LICENSE.*|
                 doxyfile.txt
             )$
 -   repo: https://gitlab.com/sotilrac/black-but-with-tabs-pre-commit
