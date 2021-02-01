@@ -1,10 +1,10 @@
 # Description
 
-One paragraph that describes what this PR accomplishes. Also rename the PR to match this format "[XXX-###] Short PR Description"
+One paragraph that describes what this PR accomplishes. Also, rename the PR to match this format "[XXX-###] Short PR Description"
 
 # Changes
 
-* Add a list of major changes or aditional jira tickets covered using format "[XXX-###]" for autolinking to jira
+* Add a list of major changes or additional Jira tickets covered using the format "[XXX-###]" for auto-linking to jira
 
 # Test Plan
 
