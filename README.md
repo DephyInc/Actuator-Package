@@ -54,6 +54,14 @@ To uninstall `flexsea` from your computer, run this:
 python3 -m pip uninstall flexsea
 ```
 
+### Install Githooks
+
+If you're planning to cntribute to this repository, run this to install the automated checks.
+
+```bash
+./install_hooks.sh
+```
+
 ### Getting Started
 The latest instructions for working with the Actuatory Package and sample programs are located on Dephy's Wiki:
 
