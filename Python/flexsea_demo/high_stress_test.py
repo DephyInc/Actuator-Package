@@ -148,7 +148,9 @@ def high_stress_test(
 					for sample in samples:
 						cmds = [{"cur": 0, "pos": sample + dev["initial_pos"]} for dev in devices]
 						sleep(delay_time)
-						send_and_time_cmds(fxs, start_time, devices, cmds, fxe.FX_POSITION, pos_gains, False)
+						send_and_time_cmds(
+							fxs, start_time, devices, cmds, fxe.FX_POSITION, pos_gains, False
+						)
 						cmd_count += 1
 			else:
 				# First time in loop
@@ -161,7 +163,9 @@ def high_stress_test(
 			for sample in position_samples:
 				cmds = [{"cur": 0, "pos": sample + dev["initial_pos"]} for dev in devices]
 				sleep(delay_time)
-				send_and_time_cmds(fxs, start_time, devices, cmds, fxe.FX_POSITION, pos_gains, False)
+				send_and_time_cmds(
+					fxs, start_time, devices, cmds, fxe.FX_POSITION, pos_gains, False
+				)
 				cmd_count += 1
 
 			# Step 3: set current controller
@@ -285,7 +289,9 @@ def plot_data(
 	print("Communication closed")
 
 
-def send_and_time_cmds(fxs, start_time, devices, cmds, motor_cmd, gains, set_gains: bool):
+def send_and_time_cmds(
+	fxs, start_time, devices, cmds, motor_cmd, gains, set_gains: bool
+):
 	"""
 	Send FlexSEA commands and record their execution time.
 	start_time:	Timestamp for start of run. (Current time-start_time) = Elapsed time
