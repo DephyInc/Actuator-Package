@@ -56,11 +56,18 @@ python3 -m pip uninstall flexsea
 
 ### Install Githooks
 
-If you're planning to cntribute to this repository, run this to install the automated checks.
+If you're planning to cntribute to this repository, run this to install the automater and syntax checks.
 
 ```bash
 ./install_hooks.sh
 ```
+
+To run the checks manually, run this command:
+```bash
+pre-commit run --all-files
+```
+
+See more info on [pre-commit syntax](https://pre-commit.com).
 
 ### Getting Started
 The latest instructions for working with the Actuatory Package and sample programs are located on Dephy's Wiki:
