@@ -25,12 +25,12 @@ import time
 import getpass
 
 from email.mime.multipart import MIMEMultipart
-from email.mime.text      import MIMEText
+from email.mime.text import MIMEText
 
 # Update this section:
-sender = "senderEmail@gmail.com"                # Your throaway account
-senderPlainTextPw = "securityLevel0Password"    # and its non-critical, unique password
-recipients = "recipientEmail@theirDomain.com"   # Your "real" email account
+sender = "senderEmail@gmail.com"  # Your throaway account
+senderPlainTextPw = "securityLevel0Password"  # and its non-critical, unique password
+recipients = "recipientEmail@theirDomain.com"  # Your "real" email account
 
 # Get IP address:
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -43,25 +43,31 @@ s.close()
 userid = getpass.getuser()
 
 # Terminal output:
-print('User: ', userid)
-print('Hostname: ', hostname)
-print('IP Address: ', IPAddr)
+print("User: ", userid)
+print("Hostname: ", hostname)
+print("IP Address: ", IPAddr)
 
 # Generate and send email:
-body = 'This is an automated message from RPi4.\nUser: ' + userid + '\nHostname: ' + hostname +\
-		'\nIP address: ' + IPAddr
+body = (
+	"This is an automated message from RPi4.\nUser: "
+	+ userid
+	+ "\nHostname: "
+	+ hostname
+	+ "\nIP address: "
+	+ IPAddr
+)
 msg = MIMEMultipart()
 
-msg['From']    = sender
-msg['To']      = recipients
-msg['Subject'] = "RPi4 bootup message"
+msg["From"] = sender
+msg["To"] = recipients
+msg["Subject"] = "RPi4 bootup message"
 
-msg.attach(MIMEText(body, 'plain'))
+msg.attach(MIMEText(body, "plain"))
 
-server=smtplib.SMTP('smtp.gmail.com', 587)
-server.ehlo()		    # Say hello to server
-server.starttls()		# Start TLS encryption
-server.ehlo()			# Say hello to server
+server = smtplib.SMTP("smtp.gmail.com", 587)
+server.ehlo()  # Say hello to server
+server.starttls()  # Start TLS encryption
+server.ehlo()  # Say hello to server
 server.login(sender, senderPlainTextPw)
-server.sendmail(sender, recipients.split(','), msg.as_string())
+server.sendmail(sender, recipients.split(","), msg.as_string())
 server.quit()

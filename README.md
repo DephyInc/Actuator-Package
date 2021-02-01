@@ -34,11 +34,11 @@ python3 -m virtualenv --python=/usr/bin/python3.7 actpack
 # Activate your virtualenv
 source actpack/bin/activate
 # Once the environment is activated, install the package
-python3 -m pip install --upgrade pip 
+python3 -m pip install --upgrade pip
 python3 -m pip install flexsea
 # Run your script that uses flexsea
 # Once you want to stop using the flexsea library and go back to the regular shell
-deactivate 
+deactivate
 
 ```
 
@@ -53,6 +53,21 @@ To uninstall `flexsea` from your computer, run this:
 ```bash
 python3 -m pip uninstall flexsea
 ```
+
+### Install Githooks
+
+If you're planning to cntribute to this repository, run this to install the automater and syntax checks.
+
+```bash
+./install_hooks.sh
+```
+
+To run the checks manually, run this command:
+```bash
+pre-commit run --all-files
+```
+
+See more info on [pre-commit syntax](https://pre-commit.com).
 
 ### Getting Started
 The latest instructions for working with the Actuatory Package and sample programs are located on Dephy's Wiki:

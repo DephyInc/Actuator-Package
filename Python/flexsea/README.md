@@ -36,12 +36,12 @@ python3 setup.py bdist_wheel
 
 In your working virtual environment
 ```bash
-# Install the generated package from the local file 
+# Install the generated package from the local file
 python3 -m pip install dist/flexsea-5.0.0-py3-none-any.whl  #replace the version if needed
 ```
 
 ## Publish
-Once the package is ready to publish and the version has been updated. Run this to upload it to PyPi to allow users to install it via `pip`. 
+Once the package is ready to publish and the version has been updated. Run this to upload it to PyPi to allow users to install it via `pip`.
 
 See [these instructions](https://packaging.python.org/tutorials/packaging-projects/) in case you need to get a PyPi account or token.
 
