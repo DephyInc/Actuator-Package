@@ -34,11 +34,11 @@ python3 -m virtualenv --python=/usr/bin/python3.7 actpack
 # Activate your virtualenv
 source actpack/bin/activate
 # Once the environment is activated, install the package
-python3 -m pip install --upgrade pip 
+python3 -m pip install --upgrade pip
 python3 -m pip install flexsea
 # Run your script that uses flexsea
 # Once you want to stop using the flexsea library and go back to the regular shell
-deactivate 
+deactivate
 
 ```
 
