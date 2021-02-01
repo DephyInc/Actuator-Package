@@ -1,10 +1,10 @@
 # Description
 
-One paragraph that describes what this PR accomplishes. Also, rename the PR to match this format "[XXX-###] Short PR Description"
+One paragraph that describes what this PR accomplishes. Also, rename the PR to match this format "[XXX-###] Short PR Description".
 
 # Changes
 
-* Add a list of major changes or additional Jira tickets covered using the format "[XXX-###]" for auto-linking to jira
+* Add a list of major changes or additional Jira tickets covered using the format "[XXX-###]" for auto-linking to Jira.
 
 # Test Plan
 
@@ -12,11 +12,11 @@ One paragraph that describes what this PR accomplishes. Also, rename the PR to m
 
 # Expected Results
 
-* List expected results for the tests
+* List expected results for the tests.
 
 # Requirements
-Edit the list accordingly
-- [ ] Tested on Windows
-- [ ] Tested on Linux
-- [ ] Tested on RPi
-- [ ] Connected ActPack and runs scripts
+Edit the list accordingly.
+- [ ] Tested on Windows.
+- [ ] Tested on Linux.
+- [ ] Tested on RPi.
+- [ ] Connected ActPack and runs scripts.
