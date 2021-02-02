@@ -52,12 +52,13 @@ typedef enum fxExoControllerMode
 
 } FxExoControllerMode;
 
+///Enum to identify led  color on exo batter
 typedef enum fxBatteryColor
 {
-	fxNoColor = 	-1,
-	fxGreen=	0,
-	fxYellow=	1,
-	fxRed=		2
+	fxNoColor = 	-1,	///color unknown
+	fxGreen=	0,		///Green LED
+	fxYellow=	1,		///Yellow LED
+	fxRed=		2		///Red LED
 
 } FxBatteryColor;
 
