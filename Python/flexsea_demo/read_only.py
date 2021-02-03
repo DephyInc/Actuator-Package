@@ -8,7 +8,7 @@ from flexsea import fxUtils as fxu
 from flexsea import fxEnums as fxe
 from flexsea import flexsea as flex
 
-
+# TODO CA move to fxUtils
 def print_bms_state(fxs, dev_id):
 	"""
 	Read BMS info
@@ -22,7 +22,7 @@ def print_bms_state(fxs, dev_id):
 
 def read_only(fxs, port, baud_rate, run_time=8, time_step=0.1):
 	"""
-	Reads FlexSEA device and prins gathered data.
+	Reads FlexSEA device and prints gathered data.
 	"""
 	debug_logging_level = 0  # 6 is least verbose, 0 is most verbose
 	data_log = True  # False means no logs will be saved
