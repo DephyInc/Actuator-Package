@@ -9,9 +9,9 @@ You must use compatible firmware! Failure to do so will result in segmentation f
 
 The fx_plan_stack API is a suite of functions that configure and control FlexSEA devices. Detailed information can be found on the Dephy Wiki, which is included in the references below.
 
-The repo contains the FlexSEA-Rigid Actuator Package library and sample programs for C/C++, Python, MATLAB and SIMULINK. These scripts are accompanied by and are dependent upon C based libraries for both Windows (.dll) and Unix(.so).
+The repo contains the FlexSEA-Rigid Actuator Package library `flexsea` and sample programs for C/C++, Python, MATLAB and SIMULINK. These scripts are accompanied by and are dependent upon C based libraries for both Windows (.dll) and Unix(.so).
 
-### Python Dependencies
+### Install Python
 
 #### Linux
 Run this script to install the python dependencies before running the python scripts
@@ -25,16 +25,71 @@ On Windows, use [this installer](https://www.python.org/ftp/python/3.7.9/python-
 
 Then, to install the required Python dependencies, run the following command from the root directory of this repository using PowerShell:
 
+### Install FlexSEA Library
+
 ```bash
-pip install -r Python/requirements.txt
+# Define your own virtual environment
+# this is not required but it helps keeping your environment clean
+python3 -m virtualenv --python=/usr/bin/python3.7 actpack
+# Activate your virtualenv
+source actpack/bin/activate
+# Once the environment is activated, install the package
+python3 -m pip install --upgrade pip
+python3 -m pip install flexsea
+# Run your script that uses flexsea
+# Once you want to stop using the flexsea library and go back to the regular shell
+deactivate
+
 ```
 
-## Getting Started
+If `flexsea` is already installed and you need to upgrade it, run this:
+```bash
+#activate your virtual environment if desired as shown above
+python3 -m pip install --upgrade flexsea
+```
+
+### Removal
+To uninstall `flexsea` from your computer, run this:
+```bash
+python3 -m pip uninstall flexsea
+```
+
+### Install Githooks
+
+If you're planning to cntribute to this repository, run this to install the automater and syntax checks.
+
+```bash
+./install_hooks.sh
+```
+
+To run the checks manually, run this command:
+```bash
+pre-commit run --all-files
+```
+
+See more info on [pre-commit syntax](https://pre-commit.com).
+
+### Getting Started
 The latest instructions for working with the Actuatory Package and sample programs are located on Dephy's Wiki:
 
 [General information about the Dephy Actuator Package](http://dephy.com/wiki/flexsea/doku.php?id=dephyactpack)
 
 [Information about the scripts](http://dephy.com/wiki/flexsea/doku.php?id=scripts)
+
+### Runing The Demo Scripts
+
+All scripts can be run on their own. use `--help` to see the required command line arguments.
+
+For your convenience, `run_demos.py` displays a menu of all available scripts.
+
+`run_demos.py` uses `ports.yaml` to configure the ports used to communicate with the ActPacks.
+
+Feel free to modify `ports.yaml` to suit your needs. By default this files contains the most common configuration along with examples for other platforms.
+
+Once you modify your copy of `ports.yaml`, use the following command to prevent git from tracking the changes.
+```bash
+git update-index --assume-unchanged Python/flexsea_demo/ports.yaml
+```
 
 License: CC BY-NC-SA 4.0
 [![License: CC BY-NC-SA 4.0](https://licensebuttons.net/l/by-nc-sa/4.0/80x15.png)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
