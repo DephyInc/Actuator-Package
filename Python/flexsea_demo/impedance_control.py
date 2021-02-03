@@ -15,7 +15,7 @@ if fxu.is_pi():
 	matplotlib.rcParams.update({"webagg.address": "0.0.0.0"})
 
 # Control gain constants
-GAINS = {"kp": 200, "ki": 200, "K": 200, "B": 200, "B_Increments": 350, "FF": 32}
+GAINS = {"kp": 40, "ki": 400, "K": 600, "B": 300, "B_Increments": 150, "FF": 128}
 
 
 def impedance_control(
@@ -47,7 +47,7 @@ def impedance_control(
 
 	# Setpoint = initial angle
 	fxs.send_motor_command(dev_id, fxe.FX_IMPEDANCE, initial_angle)
-	# Set gains
+	# Set gains (in order: kp, ki, kd, K, B & ff)
 	fxs.set_gains(dev_id, GAINS["kp"], GAINS["ki"], 0, GAINS["K"], GAINS["B"], GAINS["FF"])
 
 	# Select transition rate and positions
@@ -61,7 +61,6 @@ def impedance_control(
 
 	# Run demo
 	loop_ctr = 0
-	GAINS["B"] = -GAINS["B_Increments"]  # We do that to make sure we start at 0
 	print("")
 	for i in range(num_time_steps):
 		loop_ctr += 1

@@ -14,24 +14,9 @@ def current_control(fxs, port, baud_rate, hold_current=[1000], time=6, time_step
 	fxs.start_streaming(dev_id, 100, log_en=False)
 	app_type = fxs.get_app_type(dev_id)
 
-	if app_type != fxe.FX_ACT_PACK:
-		print(
-			"\n Unless you are using an ActPackPlus or have a VERY SPECIFIC "
-			"reason to call this script, please exit.  "
-			"Ignoring this advice could result in BROKEN electronics, "
-			"ROBOTS, COMPUTERS, or in PHYSICAL INJURY. "
-			"\n \nWould you like to run the script?\n"
-		)
-		continue_running = input("Enter yes or no....  ")
-		if continue_running.lower() != "yes":
-			# button it up
-			print("quitting....")
-			fxs.close(dev_id)
-			return True
-
 	print("Setting controller to current...")
 	# Gains are, in order: kp, ki, kd, K, B & ff
-	fxs.set_gains(dev_id, 250, 200, 128, 0, 0, 0)
+	fxs.set_gains(dev_id, 40, 400, 0, 0, 0, 128)
 	sleep(0.5)
 	prev_current = hold_current[0]
 	num_time_steps = int(time / time_step)
@@ -45,8 +30,8 @@ def current_control(fxs, port, baud_rate, hold_current=[1000], time=6, time_step
 			sleep(time_step)
 			act_pack = fxs.read_device(dev_id)
 			fxu.clear_terminal()
-			print("Desired  (mA):        ", des_current)
-			print("Measured  (mA):       ", act_pack.mot_cur)
+			print("Desired (mA):         ", des_current)
+			print("Measured (mA):        ", act_pack.mot_cur)
 			print("Difference (mA):      ", (act_pack.mot_cur - des_current), "\n")
 
 			fxu.print_device(act_pack, app_type)
@@ -60,8 +45,8 @@ def current_control(fxs, port, baud_rate, hold_current=[1000], time=6, time_step
 		fxs.send_motor_command(dev_id, fxe.FX_CURRENT, des_current)
 		act_pack = fxs.read_device(dev_id)
 		fxu.clear_terminal()
-		print("Desired  (mA):        ", des_current)
-		print("Measured  (mA):       ", act_pack.mot_cur)
+		print("Desired (mA):         ", des_current)
+		print("Measured (mA):        ", act_pack.mot_cur)
 		print("Difference (mA):      ", (act_pack.mot_cur - des_current), "\n")
 		fxu.print_device(act_pack, app_type)
 		sleep(time_step)

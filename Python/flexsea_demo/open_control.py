@@ -19,7 +19,7 @@ def open_control(
 	max_voltage=3000,
 	sign=-1,
 ):
-	"""Implements iopen control for actpack"""
+	"""Implements open control for ActPack"""
 	dev_id = fxs.open(port, baud_rate, log_level=6)
 	fxs.start_streaming(dev_id, 100, log_en=False)
 	app_type = fxs.get_app_type(dev_id)
