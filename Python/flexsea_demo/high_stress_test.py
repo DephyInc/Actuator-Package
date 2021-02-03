@@ -27,7 +27,7 @@ def high_stress_test(
 	fxs,
 	ports,
 	baud_rate,
-	command_freq=1000,
+	cmd_freq=1000,
 	position_amplitude=10000,
 	current_amplitude=1500,
 	position_freq=1,
@@ -38,7 +38,7 @@ def high_stress_test(
 	"""
 	portX					port with outgoing serial connection to ActPack
 	baud_rate				baud rate of outgoing serial connection to ActPack
-	command_freq			Desired frequency of issuing commands to controller,
+	cmd_freq			Desired frequency of issuing commands to controller,
 							actual command frequency will be slower due to OS
 							overhead. On Windows, use 100Hz. On Unix you can go up to 1kHz.
 	position_amplitude		amplitude (in ticks), position controller
@@ -55,9 +55,9 @@ def high_stress_test(
 	global CYCLE_STOP_TIMES  # Timestamps for each loop end
 
 	win_max_freq = 100
-	if fxu.is_win() and command_freq > win_max_freq:
-		command_freq = win_max_freq
-		print(f"Capping the command frequency in Windows to {command_freq}")
+	if fxu.is_win() and cmd_freq > win_max_freq:
+		cmd_freq = win_max_freq
+		print(f"Capping the command frequency in Windows to {cmd_freq}")
 
 	devices = []
 	for port in ports:
@@ -83,7 +83,7 @@ def high_stress_test(
 	debug_logging_level = 6  # 6 is least verbose, 0 is most verbose
 	data_log = False  # Data log logs device data
 
-	delay_time = float(1 / (float(command_freq)))
+	delay_time = float(1 / (float(cmd_freq)))
 	print("Delay time: ", delay_time)
 
 	# Open the device and start streaming
@@ -92,7 +92,7 @@ def high_stress_test(
 		print("Baud rate: ", baud_rate)
 		print("Logging Level: ", debug_logging_level)
 		dev["id"] = fxs.open(dev["port"], baud_rate, debug_logging_level)
-		fxs.start_streaming(dev["id"], command_freq, data_log)
+		fxs.start_streaming(dev["id"], cmd_freq, data_log)
 		print("Connected to device with Id: ", dev["id"])
 
 	# Get initial position:
@@ -113,9 +113,9 @@ def high_stress_test(
 
 	# Generate control profiles
 	print("Generating three command tables...")
-	position_samples = fxu.sin_generator(position_amplitude, position_freq, command_freq)
-	current_samples = fxu.sin_generator(current_amplitude, current_freq, command_freq)
-	current_samples_line = fxu.line_generator(0, 0.5, command_freq)
+	position_samples = fxu.sin_generator(position_amplitude, position_freq, cmd_freq)
+	current_samples = fxu.sin_generator(current_amplitude, current_freq, cmd_freq)
+	current_samples_line = fxu.line_generator(0, 0.5, cmd_freq)
 
 	start_time = time()  # Record start time of experiment
 	cmd_count = 0
@@ -224,7 +224,7 @@ def high_stress_test(
 	print("------------")
 	print("Number of commands sent: {}".format(cmd_count))
 	print("Total time (s): {}".format(elapsed_time))
-	print("Requested command frequency: {:.2f}".format(command_freq))
+	print("Requested command frequency: {:.2f}".format(cmd_freq))
 	assert elapsed_time != 0, "Elapsed time is 0."
 	print("Actual command frequency (Hz): {:.2f}".format(cmd_count / elapsed_time))
 	print("")
@@ -242,7 +242,7 @@ def high_stress_test(
 		position_freq,
 		current_amplitude,
 		current_freq,
-		command_freq,
+		cmd_freq,
 	)
 
 

@@ -32,7 +32,7 @@ def high_speed_test(
 	baud_rate,
 	controller_type=fxe.HSS_CURRENT,
 	signal_type=Signal.sine,
-	command_freq=1000,
+	cmd_freq=1000,
 	signal_amplitude=500,
 	number_of_loops=4,
 	signal_freq=5,
@@ -45,7 +45,7 @@ def high_speed_test(
 	ports				List of ports with outgoing serial connection to ActPack
 	controller_type		Position controller or current controller
 	signal_type			Sine wave or line
-	command_freq		Desired frequency of issuing commands to controller, actual
+	cmd_freq		Desired frequency of issuing commands to controller, actual
 						command frequency will be slower due to OS overhead.
 	signal_amplitude	Amplitude of signal to send to controller. Encoder position
 						if position controller, current in mA if current controller
@@ -57,9 +57,9 @@ def high_speed_test(
 	"""
 
 	win_max_freq = 100
-	if fxu.is_win() and command_freq > win_max_freq:
-		command_freq = win_max_freq
-		print(f"Capping the command frequency in Windows to {command_freq}")
+	if fxu.is_win() and cmd_freq > win_max_freq:
+		cmd_freq = win_max_freq
+		print(f"Capping the command frequency in Windows to {cmd_freq}")
 
 	# One vs two devices
 	second_device = len(ports) > 1
@@ -73,18 +73,18 @@ def high_speed_test(
 	debug_logging_level = 6  # 6 is least verbose, 0 is most verbose
 	data_log = False  # Data log logs device data
 
-	delay_time = 1.0 / (float(command_freq))
+	delay_time = 1.0 / (float(cmd_freq))
 	print(delay_time)
 
 	# Open the device and start streaming
 	dev_id0 = fxs.open(ports[0], baud_rate, debug_logging_level)
-	fxs.start_streaming(dev_id0, command_freq, data_log)
+	fxs.start_streaming(dev_id0, cmd_freq, data_log)
 	print("Connected to device 0 with ID", dev_id0)
 
 	dev_id1 = -1
 	if second_device:
 		dev_id1 = fxs.open(ports[1], baud_rate, debug_logging_level)
-		fxs.start_streaming(dev_id1, command_freq, data_log)
+		fxs.start_streaming(dev_id1, cmd_freq, data_log)
 		print("Connected to device 1 with ID", dev_id1)
 
 	# Get initial position:
@@ -107,10 +107,10 @@ def high_speed_test(
 	# Generate a control profile
 	print("Command table:")
 	if signal_type == Signal.sine:
-		samples = fxu.sin_generator(signal_amplitude, signal_freq, command_freq)
+		samples = fxu.sin_generator(signal_amplitude, signal_freq, cmd_freq)
 		signal_type_str = "sine wave"
 	elif signal_type == Signal.line:
-		samples = fxu.line_generator(signal_amplitude, 1, command_freq)
+		samples = fxu.line_generator(signal_amplitude, 1, cmd_freq)
 		signal_type_str = "line"
 	else:
 		assert 0
@@ -235,7 +235,7 @@ def high_speed_test(
 	elapsed_time = time() - start_time
 	actual_period = cycle_stop_times[0]
 	actual_frequency = 1 / actual_period
-	command_frequency = i / elapsed_time
+	cmd_freq = i / elapsed_time
 
 	# Figure: setpoint, desired vs measured (1st device)
 	figure_counter = 1  # First time, functions will increment
@@ -246,7 +246,7 @@ def high_speed_test(
 		actual_frequency,
 		signal_amplitude,
 		signal_type_str,
-		command_frequency,
+		cmd_freq,
 		times,
 		requests,
 		measurements0,
@@ -265,7 +265,7 @@ def high_speed_test(
 			actual_frequency,
 			signal_amplitude,
 			signal_type_str,
-			command_frequency,
+			cmd_freq,
 			times,
 			requests,
 			measurements1,
