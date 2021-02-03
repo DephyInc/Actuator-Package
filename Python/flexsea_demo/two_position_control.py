@@ -45,7 +45,8 @@ def two_position_control(
 	transition_steps = int(transition_time / time_step)
 
 	# Setting gains (dev_id, kp, ki, kd, K, B, ff)
-	fxs.set_gains(dev_id, 150, 75, 0, 0, 0, 0)
+	fxs.set_gains(dev_id, 50, 0, 0, 0, 0, 0)
+	# kp=50 and ki=0 is a very soft controller, perfect for bench top experiments
 
 	# Setting position control at initial position
 	fxs.send_motor_command(dev_id, fxe.FX_POSITION, initial_angle)

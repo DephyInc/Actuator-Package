@@ -19,7 +19,7 @@ def position_control(fxs, port, baud_rate, time=8, time_step=0.1, resolution=100
 	initial_angle = act_pack_state.mot_ang
 
 	# Gains are, in order: kp, ki, kd, K, B & ff
-	fxs.set_gains(dev_id, 175, 50, 0, 0, 0, 0)
+	fxs.set_gains(dev_id, 400, 50, 0, 0, 0, 0)
 
 	fxs.send_motor_command(dev_id, fxe.FX_POSITION, initial_angle)
 

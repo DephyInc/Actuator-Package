@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-Performs high-stress test on ActuatorPackage.
+Performs high-stress test on Actuator Package.
 """
 from time import sleep, time
 import numpy as np
@@ -19,40 +19,45 @@ if fxu.is_pi():
 	matplotlib.rcParams.update({"webagg.address": "0.0.0.0"})
 
 # Globals updated with every timestamp for plotting
-TIMESTAMPS = []  # Elapsed times since strart of run
+TIMESTAMPS = []  # Elapsed times since start of run
 CYCLE_STOP_TIMES = []  # Timestamps for each loop end
 
 
 def high_stress_test(
 	fxs,
 	ports,
-	baudRate,
-	commandFreq=1000,
-	positionAmplitude=10000,
-	currentAmplitude=1500,
-	positionFreq=1,
-	currentFreq=5,
-	currentAsymmetricG=1.25,
-	numberOfLoops=3,
+	baud_rate,
+	cmd_freq=1000,
+	position_amplitude=10000,
+	current_amplitude=1500,
+	position_freq=1,
+	current_freq=5,
+	current_asymmetric_g=1.15,
+	number_of_loops=3,
 ):
 	"""
-	portX				port with outgoing serial connection to ActPack
-	baudRate			baud rate of outgoing serial connection to ActPack
-	commandFreq			Desired frequency of issuing commands to controller,
-						actual command frequency will be slower due to OS
-						overhead.
-	positionAmplitude	amplitude (in ticks), position controller
-	currentAmplitude	amplitude (in mA), current controller
-	positionFreq		frequency (Hz) of the sine wave, position controller
-	currentFreq			frequency (Hz) of the sine wave, current controller
-	currentAsymmetricG	we use more current on the "way back" to come back
-						closer to the staring point. Positive numbers only,
-						1-3 range.
-	numberOfLoops		Number of times to send desired signal to controller
+	portX					port with outgoing serial connection to ActPack
+	baud_rate				baud rate of outgoing serial connection to ActPack
+	cmd_freq			Desired frequency of issuing commands to controller,
+							actual command frequency will be slower due to OS
+							overhead. On Windows, use 100Hz. On Unix you can go up to 1kHz.
+	position_amplitude		amplitude (in ticks), position controller
+	current_amplitude		amplitude (in mA), current controller
+	position_freq			frequency (Hz) of the sine wave, position controller
+	current_freq			frequency (Hz) of the sine wave, current controller
+	current_asymmetric_g	we use more current on the "way back" to come back
+							closer to the staring point. Positive numbers only,
+							1-3 range.
+	number_of_loops			Number of times to send desired signal to controller
 	"""
 
 	global TIMESTAMPS  # Elapsed times since strart of run
 	global CYCLE_STOP_TIMES  # Timestamps for each loop end
+
+	win_max_freq = 100
+	if fxu.is_win() and cmd_freq > win_max_freq:
+		cmd_freq = win_max_freq
+		print(f"Capping the command frequency in Windows to {cmd_freq}")
 
 	devices = []
 	for port in ports:
@@ -69,7 +74,7 @@ def high_stress_test(
 		dev["curr_measurements"] = []
 
 	print(
-		"Running high stress test with {} device".format(len(devices)) + "s"
+		"Running High Stress Test with {} device".format(len(devices)) + "s"
 		if len(devices) > 1
 		else ""
 	)
@@ -78,16 +83,16 @@ def high_stress_test(
 	debug_logging_level = 6  # 6 is least verbose, 0 is most verbose
 	data_log = False  # Data log logs device data
 
-	delay_time = float(1 / (float(commandFreq)))
+	delay_time = float(1 / (float(cmd_freq)))
 	print("Delay time: ", delay_time)
 
 	# Open the device and start streaming
 	for dev in devices:
 		print("Port: ", dev["port"])
-		print("BaudRate: ", baudRate)
+		print("Baud rate: ", baud_rate)
 		print("Logging Level: ", debug_logging_level)
-		dev["id"] = fxs.open(dev["port"], baudRate, debug_logging_level)
-		fxs.start_streaming(dev["id"], commandFreq, data_log)
+		dev["id"] = fxs.open(dev["port"], baud_rate, debug_logging_level)
+		fxs.start_streaming(dev["id"], cmd_freq, data_log)
 		print("Connected to device with Id: ", dev["id"])
 
 	# Get initial position:
@@ -97,8 +102,8 @@ def high_stress_test(
 	sleep(0.1)
 
 	# Gains are, in order: kp, ki, kd, K, B & ff
-	cur_gains = [250, 170, 0, 0, 0, 110]
-	pos_gains = [250, 200, 0, 0, 0, 128]
+	cur_gains = [40, 400, 0, 0, 0, 128]
+	pos_gains = [100, 10, 0, 0, 0, 0]
 
 	# Get initial position
 	for dev in devices:
@@ -107,16 +112,16 @@ def high_stress_test(
 		print("Initial Position: {}".format(dev["initial_pos"]))
 
 	# Generate control profiles
-	print("Generating three Command tables...")
-	position_samples = fxu.sin_generator(positionAmplitude, positionFreq, commandFreq)
-	current_samples = fxu.sin_generator(currentAmplitude, currentFreq, commandFreq)
-	current_samples_line = fxu.line_generator(0, 0.15, commandFreq)
+	print("Generating three command tables...")
+	position_samples = fxu.sin_generator(position_amplitude, position_freq, cmd_freq)
+	current_samples = fxu.sin_generator(current_amplitude, current_freq, cmd_freq)
+	current_samples_line = fxu.line_generator(0, 0.5, cmd_freq)
 
 	start_time = time()  # Record start time of experiment
 	cmd_count = 0
 	try:
-		for rep in range(0, numberOfLoops):
-			fxu.print_loop_count_and_time(rep, numberOfLoops, time() - start_time)
+		for rep in range(0, number_of_loops):
+			fxu.print_loop_count_and_time(rep, number_of_loops, time() - start_time)
 
 			# Step 0: set position controller
 			# -------------------------------
@@ -141,7 +146,7 @@ def high_stress_test(
 				lin_samples = []
 				for dev in devices:
 					lin_samples.append(
-						fxu.linear_interp(dev["data"].mot_ang - dev["initial_pos"], 0, 100)
+						fxu.linear_interp(dev["data"].mot_ang - dev["initial_pos"], 0, 30)
 					)
 
 				for samples in lin_samples:
@@ -181,12 +186,13 @@ def high_stress_test(
 				sleep(delay_time)
 				# We use more current on the "way back" to come back closer to
 				# the staring point
+				sample = np.int64(sample)
 				if sample > 0:  # Apply gain
-					sample = np.int64(currentAsymmetricG * sample)
+					sample = np.int64(current_asymmetric_g * sample)
 				cmds = [{"cur": sample, "pos": dev["initial_pos"]} for dev in devices]
 
 				sleep(delay_time)
-				send_and_time_cmds(fxs, start_time, devices, cmds, fxe.FX_CURRENT, cur_gains, True)
+				send_and_time_cmds(fxs, start_time, devices, cmds, fxe.FX_CURRENT, cur_gains, False)
 				cmd_count += 1
 
 			# Step 5: short pause at 0 current to allow a slow-down
@@ -218,7 +224,7 @@ def high_stress_test(
 	print("------------")
 	print("Number of commands sent: {}".format(cmd_count))
 	print("Total time (s): {}".format(elapsed_time))
-	print("Requested command frequency: {:.2f}".format(commandFreq))
+	print("Requested command frequency: {:.2f}".format(cmd_freq))
 	assert elapsed_time != 0, "Elapsed time is 0."
 	print("Actual command frequency (Hz): {:.2f}".format(cmd_count / elapsed_time))
 	print("")
@@ -232,11 +238,11 @@ def high_stress_test(
 	plot_data(
 		fxs,
 		devices,
-		positionAmplitude,
-		positionFreq,
-		currentAmplitude,
-		currentFreq,
-		commandFreq,
+		position_amplitude,
+		position_freq,
+		current_amplitude,
+		current_freq,
+		cmd_freq,
 	)
 
 
@@ -245,9 +251,9 @@ def plot_data(
 ):
 	"""
 	Plots received data
-	devices:  Dictionarty containing iinfor foir ach connected device.
+	devices:  Dictionary containing info for each connected device.
 	"""
-	global TIMESTAMPS  # Elapsed times since strart of run
+	global TIMESTAMPS  # Elapsed times since start of run
 	global CYCLE_STOP_TIMES  # Timestamps for each loop end
 
 	figure_ind = 1
@@ -257,8 +263,8 @@ def plot_data(
 			dev["id"],
 			figure_ind,
 			fxe.HSS_CURRENT,
-			curr_amp,
 			curr_freq,
+			curr_amp,
 			type_str,
 			cmd_freq,
 			TIMESTAMPS,
@@ -271,8 +277,8 @@ def plot_data(
 			dev["id"],
 			figure_ind,
 			fxe.HSS_POSITION,
-			pos_amp,
 			pos_freq,
+			pos_amp,
 			type_str,
 			cmd_freq,
 			TIMESTAMPS,
@@ -335,7 +341,7 @@ def send_and_time_cmds(
 
 def main():
 	"""
-	Standalone high-stress test execution
+	Standalone High Stress Test execution
 	"""
 	# pylint: disable=import-outside-toplevel
 	import argparse

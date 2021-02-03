@@ -29,7 +29,7 @@ def plot_setpoint_vs_desired(
 	# Current controller:
 	if ctrl_type == en.HSS_CURRENT:
 		title_str = (
-			"Current control with {:.0f} Hz, {:.1f} mA {} and {:.0f} Hz commands (ID {})"
+			"Current control with {:.1f} Hz, {:.1f} mA {} and {:.0f} Hz commands (ID {})"
 		)
 		title = title_str.format(sig_freq, sig_amplitude, sig_type, cmd_freq, dev_id)
 		plt.ylabel("Motor current (mA)")
@@ -37,7 +37,7 @@ def plot_setpoint_vs_desired(
 	# Position controller:
 	elif ctrl_type == en.HSS_POSITION:
 		title_str = (
-			"Position control with {:.0f} Hz, {:.0f} tick{} {} and {:.0f} Hz commands (ID {})"
+			"Position control with {:.1f} Hz, {:.0f} tick{} {} and {:.0f} Hz commands (ID {})"
 		)
 		title = title_str.format(
 			sig_freq,
