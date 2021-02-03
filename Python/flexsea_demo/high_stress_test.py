@@ -69,7 +69,7 @@ def high_stress_test(
 		dev["curr_measurements"] = []
 
 	print(
-		"Running high stress test with {} device".format(len(devices)) + "s"
+		"Running High Stress Test with {} device".format(len(devices)) + "s"
 		if len(devices) > 1
 		else ""
 	)
@@ -97,8 +97,8 @@ def high_stress_test(
 	sleep(0.1)
 
 	# Gains are, in order: kp, ki, kd, K, B & ff
-	cur_gains = [250, 170, 0, 0, 0, 110]
-	pos_gains = [250, 200, 0, 0, 0, 128]
+	cur_gains = [40, 400, 0, 0, 0, 128]
+	pos_gains = [50, 0, 0, 0, 0, 0]
 
 	# Get initial position
 	for dev in devices:
@@ -107,7 +107,7 @@ def high_stress_test(
 		print("Initial Position: {}".format(dev["initial_pos"]))
 
 	# Generate control profiles
-	print("Generating three Command tables...")
+	print("Generating three command tables...")
 	position_samples = fxu.sin_generator(positionAmplitude, positionFreq, commandFreq)
 	current_samples = fxu.sin_generator(currentAmplitude, currentFreq, commandFreq)
 	current_samples_line = fxu.line_generator(0, 0.15, commandFreq)
@@ -181,12 +181,13 @@ def high_stress_test(
 				sleep(delay_time)
 				# We use more current on the "way back" to come back closer to
 				# the staring point
+				sample = np.int64(sample)
 				if sample > 0:  # Apply gain
 					sample = np.int64(currentAsymmetricG * sample)
 				cmds = [{"cur": sample, "pos": dev["initial_pos"]} for dev in devices]
 
 				sleep(delay_time)
-				send_and_time_cmds(fxs, start_time, devices, cmds, fxe.FX_CURRENT, cur_gains, True)
+				send_and_time_cmds(fxs, start_time, devices, cmds, fxe.FX_CURRENT, cur_gains, False)
 				cmd_count += 1
 
 			# Step 5: short pause at 0 current to allow a slow-down
@@ -245,9 +246,9 @@ def plot_data(
 ):
 	"""
 	Plots received data
-	devices:  Dictionarty containing iinfor foir ach connected device.
+	devices:  Dictionary containing info for each connected device.
 	"""
-	global TIMESTAMPS  # Elapsed times since strart of run
+	global TIMESTAMPS  # Elapsed times since start of run
 	global CYCLE_STOP_TIMES  # Timestamps for each loop end
 
 	figure_ind = 1
@@ -335,7 +336,7 @@ def send_and_time_cmds(
 
 def main():
 	"""
-	Standalone high-stress test execution
+	Standalone High Stress Test execution
 	"""
 	# pylint: disable=import-outside-toplevel
 	import argparse
