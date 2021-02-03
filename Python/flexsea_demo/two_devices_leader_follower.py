@@ -13,8 +13,8 @@ from flexsea import flexsea as flex
 
 def leader_follower(fxs, ports, baud_rate):
 
-	dev_id_0 = fxs.open(ports[0], baud_rate, 6)  # leader
-	dev_id_1 = fxs.open(ports[1], baud_rate, 6)  # follower
+	dev_id_0 = fxs.open(ports[0], baud_rate, 6)  # Leader
+	dev_id_1 = fxs.open(ports[1], baud_rate, 6)  # Follower
 
 	fxs.start_streaming(dev_id_0, 200, False)
 	fxs.start_streaming(dev_id_1, 200, False)
@@ -27,12 +27,12 @@ def leader_follower(fxs, ports, baud_rate):
 	initial_angle_0 = act_pack_state_0.mot_ang
 	initial_angle_1 = act_pack_state_1.mot_ang
 
-	# set first device to current controller with 0 current (0 torque)
-	fxs.set_gains(dev_id_0, 100, 20, 0, 0, 0, 0)
+	# Set first device to current controller with 0 current (0 torque)
+	fxs.set_gains(dev_id_0, 40, 400, 0, 0, 0, 128)
 	fxs.send_motor_command(dev_id_0, fxe.FX_CURRENT, 0)
 
-	# set position controller for second device
-	fxs.set_gains(dev_id_1, 50, 3, 0, 0, 0, 0)
+	# Set position controller for second device
+	fxs.set_gains(dev_id_1, 50, 10, 0, 0, 0, 0)
 	fxs.send_motor_command(dev_id_1, fxe.FX_POSITION, initial_angle_1)
 
 	loop_count = 200
@@ -52,7 +52,7 @@ def leader_follower(fxs, ports, baud_rate):
 			fxu.print_loop_count(i, loop_count)
 
 	except Exception as err:
-		print(f"Problem encountred: {err}")
+		print(f"Problem encountered: {err}")
 		print(traceback.format_exc())
 
 	print("Turning off position control...")

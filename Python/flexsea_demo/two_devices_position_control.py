@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-FlexSEA Leader-Follower demo
+FlexSEA Two Devices Position demo
 """
 from time import sleep
 from flexsea import fxUtils as fxu
@@ -71,7 +71,7 @@ def two_devices_position_control(fxs, ports, baud_rate):
 
 def main():
 	"""
-	Standalone leader-follower demo execution
+	Standalone two-device position control demo execution
 	"""
 	# pylint: disable=import-outside-toplevel
 	import argparse
