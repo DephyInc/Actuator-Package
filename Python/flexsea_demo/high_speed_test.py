@@ -41,20 +41,25 @@ def high_speed_test(
 	jitter=20,
 ):
 	"""
-	baud_rate		Baud rate of outgoing serial connection to ActPack
-	ports			List of ports with outgoing serial connection to ActPack
-	controller_type	Position controller or current controller
-	signal_type		Sine wave or line
+	baud_rate			Baud rate of outgoing serial connection to ActPack
+	ports				List of ports with outgoing serial connection to ActPack
+	controller_type		Position controller or current controller
+	signal_type			Sine wave or line
 	command_freq		Desired frequency of issuing commands to controller, actual
-					command frequency will be slower due to OS overhead.
+						command frequency will be slower due to OS overhead.
 	signal_amplitude	Amplitude of signal to send to controller. Encoder position
-					if position controller, current in mA if current controller
-	number_of_loops	Number of times to send desired signal to controller
-	signal_freq		Frequency of sine wave if using sine wave signal
-	cycle_delay		Delay between signals sent to controller, use with sine wave only
-	request_jitter	Add jitter amount to every other sample sent to controller
-	jitter			Amount of jitter
+						if position controller, current in mA if current controller
+	number_of_loops		Number of times to send desired signal to controller
+	signal_freq			Frequency of sine wave if using sine wave signal
+	cycle_delay			Delay between signals sent to controller, use with sine wave only
+	request_jitter		Add jitter amount to every other sample sent to controller
+	jitter				Amount of jitter
 	"""
+
+	win_max_freq = 100
+	if fxu.is_win() and command_freq > win_max_freq:
+		command_freq = win_max_freq
+		print(f"Capping the command frequency in Windows to {command_freq}")
 
 	# One vs two devices
 	second_device = len(ports) > 1
