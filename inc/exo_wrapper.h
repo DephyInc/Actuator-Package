@@ -52,12 +52,13 @@ typedef enum fxExoControllerMode
 
 } FxExoControllerMode;
 
+///Enum to identify led  color on exo batter
 typedef enum fxBatteryColor
 {
-	fxNoColor = 	-1,
-	fxGreen=	0,
-	fxYellow=	1,
-	fxRed=		2
+	fxNoColor = 	-1,	///color unknown
+	fxGreen=	0,		///Green LED
+	fxYellow=	1,		///Yellow LED
+	fxRed=		2		///Red LED
 
 } FxBatteryColor;
 
@@ -345,8 +346,14 @@ FxError fxGetLastReceivedProgWalkParams(const unsigned int deviceId,
 /// \return The percentage of battery life remaining
 double fxGetBatteryLife(const unsigned int deviceId);
 
+///
+/// \param deviceId  is the device ID
+/// \return the current color code of the Exo
 fxBatteryColor fxGetBatteryColor(const unsigned int deviceId);
 
+///
+/// \param movement the movement parameter to translate
+/// \return the string corresponding to the movement enumeration
 const char* fxGetMovement(int movement);
 
 #ifdef __cplusplus
