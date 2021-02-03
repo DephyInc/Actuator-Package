@@ -14,7 +14,7 @@ def current_control(fxs, port, baud_rate, hold_current=[1000], time=6, time_step
 	fxs.start_streaming(dev_id, 100, log_en=False)
 	app_type = fxs.get_app_type(dev_id)
 
-	if app_type != fxe.FX_ACT_PACK:
+	if app_type.value != fxe.FX_ACT_PACK.value:
 		print(
 			"\n Unless you are using an ActPackPlus or have a VERY SPECIFIC "
 			"reason to call this script, please exit.  "
