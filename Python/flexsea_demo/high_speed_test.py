@@ -33,7 +33,7 @@ def high_speed_test(
 	controller_type=fxe.HSS_CURRENT,
 	signal_type=Signal.sine,
 	command_freq=1000,
-	signal_amplitude=1000,
+	signal_amplitude=500,
 	number_of_loops=4,
 	signal_freq=5,
 	cycle_delay=0.1,
@@ -124,18 +124,18 @@ def high_speed_test(
 
 	# Prepare controller:
 	if controller_type == fxe.HSS_CURRENT:
-		print("Setting up current control demo. Low current, high frequency")
+		print("Setting up current control demo. Low current, high frequency.")
 		# Gains are, in order: kp, ki, kd, K, B & ff
-		fxs.set_gains(dev_id0, 250, 200, 128, 0, 0, 98)
+		fxs.set_gains(dev_id0, 40, 400, 0, 0, 0, 128)
 		if second_device:
-			fxs.set_gains(dev_id1, 250, 200, 128, 0, 0, 98)
+			fxs.set_gains(dev_id1, 40, 400, 0, 0, 0, 128)
 
 	elif controller_type == fxe.HSS_POSITION:
 		print("Setting up position control demo")
 		# Gains are, in order: kp, ki, kd, K, B & ff
-		fxs.set_gains(dev_id0, 300, 50, 0, 0, 0, 98)
+		fxs.set_gains(dev_id0, 300, 50, 0, 0, 0, 0)
 		if second_device:
-			fxs.set_gains(dev_id1, 300, 50, 0, 0, 0, 98)
+			fxs.set_gains(dev_id1, 300, 50, 0, 0, 0, 0)
 	else:
 		assert 0, "Invalid controller type"
 
@@ -277,7 +277,7 @@ def high_speed_test(
 
 def main():
 	"""
-	Standalone high speed test execution
+	Standalone High Speed Test execution
 	"""
 	# pylint: disable=import-outside-toplevel
 	import argparse
