@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-Performs high-stress test on ActuatorPackage.
+Performs high-stress test on Actuator Package.
 """
 from time import sleep, time
 import numpy as np
@@ -19,7 +19,7 @@ if fxu.is_pi():
 	matplotlib.rcParams.update({"webagg.address": "0.0.0.0"})
 
 # Globals updated with every timestamp for plotting
-TIMESTAMPS = []  # Elapsed times since strart of run
+TIMESTAMPS = []  # Elapsed times since start of run
 CYCLE_STOP_TIMES = []  # Timestamps for each loop end
 
 
@@ -27,12 +27,12 @@ def high_stress_test(
 	fxs,
 	ports,
 	baudRate,
-	commandFreq=1000,
+	commandFreq=100,
 	positionAmplitude=10000,
 	currentAmplitude=1500,
 	positionFreq=1,
 	currentFreq=5,
-	currentAsymmetricG=1.25,
+	currentAsymmetricG=1.15,
 	numberOfLoops=3,
 ):
 	"""
@@ -40,7 +40,7 @@ def high_stress_test(
 	baudRate			baud rate of outgoing serial connection to ActPack
 	commandFreq			Desired frequency of issuing commands to controller,
 						actual command frequency will be slower due to OS
-						overhead.
+						overhead. On Win, use 100Hz. On Unix you can go up to 1kHz.
 	positionAmplitude	amplitude (in ticks), position controller
 	currentAmplitude	amplitude (in mA), current controller
 	positionFreq		frequency (Hz) of the sine wave, position controller
@@ -98,7 +98,7 @@ def high_stress_test(
 
 	# Gains are, in order: kp, ki, kd, K, B & ff
 	cur_gains = [40, 400, 0, 0, 0, 128]
-	pos_gains = [50, 0, 0, 0, 0, 0]
+	pos_gains = [100, 10, 0, 0, 0, 0]
 
 	# Get initial position
 	for dev in devices:
@@ -110,7 +110,7 @@ def high_stress_test(
 	print("Generating three command tables...")
 	position_samples = fxu.sin_generator(positionAmplitude, positionFreq, commandFreq)
 	current_samples = fxu.sin_generator(currentAmplitude, currentFreq, commandFreq)
-	current_samples_line = fxu.line_generator(0, 0.15, commandFreq)
+	current_samples_line = fxu.line_generator(0, 0.5, commandFreq)
 
 	start_time = time()  # Record start time of experiment
 	cmd_count = 0
@@ -141,7 +141,7 @@ def high_stress_test(
 				lin_samples = []
 				for dev in devices:
 					lin_samples.append(
-						fxu.linear_interp(dev["data"].mot_ang - dev["initial_pos"], 0, 100)
+						fxu.linear_interp(dev["data"].mot_ang - dev["initial_pos"], 0, 30)
 					)
 
 				for samples in lin_samples:
