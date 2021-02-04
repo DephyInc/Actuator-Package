@@ -8,7 +8,7 @@ from flexsea import fxEnums as fxe
 from flexsea import flexsea as flex
 
 
-def bootloader(fxs, port, baud_rate, target):
+def bootloader(fxs, port, baud_rate, target="Mn"):
 	"""Check bootloader in target"""
 	debug_logging_level = 0  # 6 is least verbose, 0 is most verbose
 	dev_id = fxs.open(port, baud_rate, debug_logging_level)

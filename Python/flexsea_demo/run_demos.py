@@ -189,7 +189,7 @@ def main(argv):
 		if EXPERIMENTS[exp_ind][3] == 1:
 			EXPERIMENTS[exp_ind][0](flex.FlexSEA(), ports[0], baud_rate)
 		else:
-			EXPERIMENTS[exp_ind][0](flex.FlexSEA(), ports, baud_rate)
+			EXPERIMENTS[exp_ind][0](flex.FlexSEA(), ports[:dev_num], baud_rate)
 	except Exception as err:
 		print("Problem encountered when running the demo: {}".format(err))
 		sys.exit(err)

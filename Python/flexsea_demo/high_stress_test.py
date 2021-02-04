@@ -177,7 +177,11 @@ def high_stress_test(
 			# -------------------------------
 			print("Step 3: set current controller")
 			cmds = [{"cur": 0, "pos": dev["initial_pos"]} for dev in devices]
-			send_and_time_cmds(fxs, start_time, devices, cmds, fxe.FX_CURRENT, cur_gains, True)
+			# TODO(CA): Investigate this problam and remove the hack below
+			# Set gains several times since they might not get set when only set once.
+			for _ind in range(5):
+				send_and_time_cmds(fxs, start_time, devices, cmds, fxe.FX_CURRENT, cur_gains, True)
+				sleep(delay_time)
 
 			# Step 4: current setpoint
 			# --------------------------
