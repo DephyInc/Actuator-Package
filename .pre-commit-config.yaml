@@ -52,12 +52,11 @@ repos:
                 .*/dev_spec/.*|
                 .*/DeviceSpecs/.*|
             )$
-# TODO(CA): Use as local hook, remove exit-zero
 -   repo: https://github.com/PyCQA/pylint
     rev: pylint-2.6.0
     hooks:
     -   id: pylint
-        language_version: python3
+        language_version: python3.7
         exclude: |
             (?x)^(
                 .*/dev_spec/.*|
@@ -65,5 +64,12 @@ repos:
             )$
         args:
             - --indent-string='\t'
-            - --disable=C0330,R0801
+            - --disable=C0330, R0801
             - --exit-zero
+        additional_dependencies:
+            - flexsea
+            - numpy
+            - matplotlib
+            - pyclibrary
+        verbose: true
+        files:  "" # No files
