@@ -18,6 +18,7 @@ matplotlib.use("WebAgg")
 if fxu.is_pi():
 	matplotlib.rcParams.update({"webagg.address": "0.0.0.0"})
 
+# pylint: disable=global-statement
 # Globals updated with every timestamp for plotting
 TIMESTAMPS = []  # Elapsed times since start of run
 CYCLE_STOP_TIMES = []  # Timestamps for each loop end
@@ -120,7 +121,7 @@ def high_stress_test(
 	start_time = time()  # Record start time of experiment
 	cmd_count = 0
 	try:
-		for rep in range(0, number_of_loops):
+		for rep in range(number_of_loops):
 			fxu.print_loop_count_and_time(rep, number_of_loops, time() - start_time)
 
 			# Step 0: set position controller
@@ -177,7 +178,7 @@ def high_stress_test(
 			# -------------------------------
 			print("Step 3: set current controller")
 			cmds = [{"cur": 0, "pos": dev["initial_pos"]} for dev in devices]
-			# TODO(CA): Investigate this problam and remove the hack below
+			# TODO(CA): Investigate this problem and remove the hack below
 			# Set gains several times since they might not get set when only set once.
 			for _ind in range(5):
 				send_and_time_cmds(fxs, start_time, devices, cmds, fxe.FX_CURRENT, cur_gains, True)

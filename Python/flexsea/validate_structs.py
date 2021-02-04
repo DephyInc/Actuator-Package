@@ -14,7 +14,7 @@ COMPARE_FILE = os.path.join(os.getcwd(), "py-c-files.config")
 
 
 def sig_handler(_frame, _signal_received):
-
+	"""Handle keyboard interrupt"""
 	return sys.exit("\nCTRL-C or SIGINT detected\nExiting ...")
 
 
@@ -44,11 +44,11 @@ def extract_py_fields(ast_fields):
 	return fields
 
 
-def extract_py_node(classNode):
+def extract_py_node(class_node):
 	"""
 	extract nodes
 	"""
-	all_nodes = [node for node in ast.iter_child_nodes(classNode)]
+	all_nodes = [node for node in ast.iter_child_nodes(class_node)]
 	fields_extracted = []
 	if len(all_nodes) != 2:
 		print("ERR: Bad parsing in py files! Something has changed. Contact the developers!")

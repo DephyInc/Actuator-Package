@@ -32,7 +32,7 @@ def high_speed_test(
 	baud_rate,
 	controller_type=fxe.HSS_CURRENT,
 	signal_type=Signal.sine,
-	cmd_freq=1000,
+	cmd_freq=500,
 	signal_amplitude=500,
 	number_of_loops=4,
 	signal_freq=5,
@@ -147,11 +147,9 @@ def high_speed_test(
 	# Record start time of experiment
 	i = 0
 	start_time = time()
-	loop_ctr = 0
-	for _reps in range(0, number_of_loops):
-		loop_ctr += 1
+	for rep in range(number_of_loops):
 		elapsed_time = time() - start_time
-		fxu.print_loop_count_and_time(loop_ctr, number_of_loops, elapsed_time)
+		fxu.print_loop_count_and_time(rep, number_of_loops, elapsed_time)
 		for sample in samples:
 			if i % 2 == 0 and request_jitter:
 				sample = sample + jitter
