@@ -39,7 +39,7 @@ def is_pi():
 	Returns true if the OS is running on an arm. Used to detect Raspberry pi
 	"""
 	try:
-		return os.uname().startswith("arm")
+		return os.uname().machine.startswith("arm")
 	except AttributeError:
 		return False
 
