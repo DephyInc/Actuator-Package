@@ -20,7 +20,10 @@ def print_logo():
 	██░▀▀░██░▀▀▀██░█████░██░████░████
 	▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀\n\t          Beyond Nature™
 	"""
-	print(logo_str)
+	try:
+		print(logo_str)
+	except UnicodeEncodeError:
+		print("\tDephy\n\tBeyond Nature (TM)")
 
 
 def is_win():
