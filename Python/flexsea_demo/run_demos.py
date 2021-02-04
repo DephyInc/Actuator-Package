@@ -31,7 +31,7 @@ if (sys.version_info[0] == 3) and (sys.version_info[1] == 8):
 		asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 
-def sig_handler(*unused):
+def sig_handler(*_unused):
 	"""
 	Handle program exit via SIGINT
 	"""

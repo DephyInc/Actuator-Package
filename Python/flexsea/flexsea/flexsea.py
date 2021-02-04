@@ -48,6 +48,7 @@ class FlexSEA:
 			# be explicitly stated. Provide location of DLLs that
 			# libfx_plan_stack.dll depends on
 			if sys.version_info.minor >= 8:
+				# pylint: disable=no-member
 				os.add_dll_directory(os.path.join(path, "../"))
 		elif fxu.is_pi():
 			# Try to load the full linux lib first (that's x86_64), if that
@@ -417,6 +418,7 @@ class FlexSEA:
 			raise ValueError("fxGetReadDataQueueSize: Invalid device ID: {}".format(dev_id))
 		return ret_val
 
+	# pylint: disable=invalid-name
 	def set_gains(self, dev_id, kp, ki, kd, k_val, b_val, ff):
 		"""
 		Sets the gains used by PID controllers on the FlexSEA device.

@@ -1,6 +1,7 @@
 """
 Plotting Utilities
 """
+# pylint: disable=invalid-name
 import matplotlib
 import matplotlib.pyplot as plt
 from . import fxEnums as en

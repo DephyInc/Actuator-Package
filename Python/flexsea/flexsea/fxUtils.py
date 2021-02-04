@@ -1,6 +1,7 @@
 """
 General purpose utilities
 """
+# pylint: disable=invalid-name
 import os
 import platform
 import yaml

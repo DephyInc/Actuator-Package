@@ -1,6 +1,7 @@
 """
 Enum codes
 """
+# pylint: disable=invalid-name
 import ctypes as c
 
 # High Speed Stress/Test Experiments:

@@ -10,6 +10,9 @@ from flexsea import flexsea as flex
 
 
 def current_control(fxs, port, baud_rate, hold_current=[1000], time=6, time_step=0.1):
+	"""
+	demo current control
+	"""
 	dev_id = fxs.open(port, baud_rate, log_level=6)
 	fxs.start_streaming(dev_id, 100, log_en=False)
 	app_type = fxs.get_app_type(dev_id)

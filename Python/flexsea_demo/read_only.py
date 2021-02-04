@@ -8,7 +8,7 @@ from flexsea import fxUtils as fxu
 from flexsea import fxEnums as fxe
 from flexsea import flexsea as flex
 
-# TODO CA move to fxUtils
+# TODO(CA): move to fxUtils
 def print_bms_state(fxs, dev_id):
 	"""
 	Read BMS info

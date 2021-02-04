@@ -19,15 +19,18 @@ if fxu.is_pi():
 def two_position_control(
 	fxs,
 	port,
-	baudRate,
-	expTime=13,
+	baud_rate,
+	exp_time=13,
 	time_step=0.1,
 	delta=10000,
 	transition_time=1.5,
 	resolution=100,
 ):
+	"""
+	Send two positions commands to test the positionc controller
+	"""
 	# Open device
-	dev_id = fxs.open(port, baudRate, 0)
+	dev_id = fxs.open(port, baud_rate, 0)
 	fxs.start_streaming(dev_id, resolution, log_en=True)
 	sleep(0.1)
 
@@ -41,7 +44,7 @@ def two_position_control(
 	num_pos = 2
 
 	# Setting loop duration and transition rate
-	num_time_steps = int(expTime / time_step)
+	num_time_steps = int(exp_time / time_step)
 	transition_steps = int(transition_time / time_step)
 
 	# Setting gains (dev_id, kp, ki, kd, K, B, ff)

@@ -1,24 +1,26 @@
-# This script can be used to send an email with an IP address when your RPi boots
-# This is a convenient tool for headless applications
+"""
+This script can be used to send an email with an IP address when your RPi boots
 
-# Gmail uses 2FA (2 Factor Authentication). To enable RPi4 email via Gmail, I
-# reduced its security at the following location:
-# Google Appls > Account > # Security > Less secure app access
-#    > Turn-on access (not recommended).
-# Lowered security + plain-text password: use a dedicated, throwaway Gmail account!
+This is a convenient tool for headless applications
 
-# To send-out an email at RPi4 bootup, follow these steps:
-# 1] Make sure ssmtp is installed:
-#    sudo apt list --installed | grep ssmtp
-#    If needed, install it:
-#    sudo apt-get ssmtp
-# 2] Place this file at: /home/pi/Documents
-# 3] sudo crontab -e
-# 4] Add following command to the file:
-#    @reboot python3 /home/yourUserName/Documents/startup_email.py &
-# NOTE: For this script, it seems critical to delay for 15s+ before connecting
-# to socket.  This gives enough time for the OS to bootup.
+Gmail uses 2FA (2 Factor Authentication). To enable RPi4 email via Gmail, I
+reduced its security at the following location:
+Google Appls > Account > # Security > Less secure app access
+	> Turn-on access (not recommended).
+Lowered security + plain-text password: use a dedicated, throwaway Gmail account!
 
+To send-out an email at RPi4 bootup, follow these steps:
+1] Make sure ssmtp is installed:
+	sudo apt list --installed | grep ssmtp
+	If needed, install it:
+	sudo apt-get ssmtp
+2] Place this file at: /home/pi/Documents
+3] sudo crontab -e
+4] Add following command to the file:
+	@reboot python3 /home/yourUserName/Documents/startup_email.py &
+NOTE: For this script, it seems critical to delay for 15s+ before connecting
+to socket.  This gives enough time for the OS to bootup.
+"""
 import socket
 import smtplib
 import time
@@ -28,9 +30,9 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 # Update this section:
-sender = "senderEmail@gmail.com"  # Your throaway account
-senderPlainTextPw = "securityLevel0Password"  # and its non-critical, unique password
-recipients = "recipientEmail@theirDomain.com"  # Your "real" email account
+SENDER = "senderEmail@gmail.com"  # Your throaway account
+SENDER_PLAIN_TEXT_PW = "securityLevel0Password"  # and its non-critical, unique password
+RECIPIENTS = "recipientEmail@theirDomain.com"  # Your "real" email account
 
 # Get IP address:
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -58,8 +60,8 @@ body = (
 )
 msg = MIMEMultipart()
 
-msg["From"] = sender
-msg["To"] = recipients
+msg["From"] = SENDER
+msg["To"] = RECIPIENTS
 msg["Subject"] = "RPi4 bootup message"
 
 msg.attach(MIMEText(body, "plain"))
@@ -68,6 +70,6 @@ server = smtplib.SMTP("smtp.gmail.com", 587)
 server.ehlo()  # Say hello to server
 server.starttls()  # Start TLS encryption
 server.ehlo()  # Say hello to server
-server.login(sender, senderPlainTextPw)
-server.sendmail(sender, recipients.split(","), msg.as_string())
+server.login(SENDER, SENDER_PLAIN_TEXT_PW)
+server.sendmail(SENDER, RECIPIENTS.split(","), msg.as_string())
 server.quit()

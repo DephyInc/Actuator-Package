@@ -28,6 +28,9 @@ def impedance_control(
 	transition_time=0.8,
 	resolution=500,
 ):
+	"""
+	Implements impedance control
+	"""
 	# Open device
 	dev_id = fxs.open(port, baud_rate, log_level=6)
 	fxs.start_streaming(dev_id, resolution, log_en=False)

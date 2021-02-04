@@ -10,6 +10,9 @@ from flexsea import flexsea as flex
 
 
 def position_control(fxs, port, baud_rate, time=8, time_step=0.1, resolution=100):
+	"""
+	Implement position control
+	"""
 	dev_id = fxs.open(port, baud_rate, log_level=6)
 	fxs.start_streaming(dev_id, resolution, log_en=False)
 	sleep(0.1)

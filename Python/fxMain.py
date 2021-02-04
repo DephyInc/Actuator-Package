@@ -2,6 +2,7 @@
 """
 Legacy executable
 """
+# pylint: disable=invalid-name
 
 DICSLAIMER = """
 =====================================================================================

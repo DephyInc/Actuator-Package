@@ -12,6 +12,9 @@ from flexsea import flexsea as flex
 
 
 def leader_follower(fxs, ports, baud_rate):
+	"""
+	lead the motion of an ActPack by manually moving another one
+	"""
 
 	dev_id_0 = fxs.open(ports[0], baud_rate, 6)  # Leader
 	dev_id_1 = fxs.open(ports[1], baud_rate, 6)  # Follower
