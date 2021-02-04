@@ -53,10 +53,7 @@ class FlexSEA:
 		elif fxu.is_pi():
 			# Try to load the full linux lib first (that's x86_64), if that
 			# fails, fall back to the raspberryPi lib.
-			lib_paths = [
-				os.path.join(path, "raspberryPi", nix_lib),
-				os.path.join(path, "raspberryPi64", nix_lib),
-			]
+			lib_paths = [os.path.join(path, "raspberryPi", nix_lib)]
 		else:
 			lib_paths = [os.path.join(path, "linux", nix_lib)]
 
