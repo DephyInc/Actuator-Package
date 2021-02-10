@@ -1,0 +1,19 @@
+# ports.yaml
+#
+# Adjust the baudrate if needed and uncomment or edit the port list.
+#
+# Note that comented out lines start with a `#`
+# Also the ports list has dashes `-` before the values to signify a list
+#
+# See the sample ports values below depending on your platform
+baud_rate: 230400
+ports:
+# Windows
+  - COM3
+  # - COM4
+# Ubuntu WSL
+  # - /dev/ttyS3
+  # - /dev/ttyS4
+# Native Linux (e.g. Ubuntu or Raspbian)
+  # - /dev/ttyACM0
+  # - /dev/ttyACM1

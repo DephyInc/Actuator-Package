@@ -83,7 +83,7 @@ int main()
 		//
 		// Open the port
 		//
-	int devId = fxOpen((char *)portName[idx].c_str(), baudRate, 0); 
+	int devId = fxOpen((char *)portName[idx].c_str(), baudRate, 0);
 		if (devId != -1)
 	{
 		cout << "Connected to device: " << devId << endl;
@@ -140,6 +140,7 @@ int main()
 
 void printMenu(void)
 {
+	cout << endl<<endl<<"Stop! Read our important safety information at https://dephy.com/start/ before running the scripts for the first time."<<endl<<endl;
 	cout << "What demo would you like to try?" << endl << endl;
 	cout << "[0] Read-Only: no actuator, sensors only." << endl;
 	//cout << "[1] Open-Speed: PWM will ramp up, then down, then up..." << endl;

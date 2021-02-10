@@ -15,10 +15,10 @@ FX_RIGID_ENC_ANG = 9;
 FX_RIGID_MOT_VOLT = 13;
 
 labels = [  "State time", ...
-            "accel x", "accel y", "accel z", ...
-            "gyro x", "gyro y", "gyro z", 	 ...
-            "encoder angle",                ...
-            "motor voltage"					...
+			"accel x", "accel y", "accel z", ...
+			"gyro x", "gyro y", "gyro z", 	 ...
+			"encoder angle",                ...
+			"motor voltage"					...
 ];
 
 varsToStream = [ 							...
@@ -29,42 +29,41 @@ varsToStream = [ 							...
 	FX_RIGID_MOT_VOLT						...
 ];
 
-    outVars = [ 99, 99, 99, 99, 99, 99, 99, 99, 99 ];
-    
-    % Select the variables to stream
-    [retCode, outVars ] = calllib(libHandle, 'fxSetStreamVariables', devId,  varsToStream, 9 );
-    
-    % Start streaming
-    retCode = calllib(libHandle, 'fxStartStreaming', devId, 100, false, 0 );
-    if( ~retCode)
-        fprintf("Couldn't start streaming...\n");
-    else
-        % Determine the devices initial angle
-        retries = 100;
-        initialAngle = readDeviceVar( libHandle, devId, FX_RIGID_ENC_ANG);
-        while( retries && isnan( initialAngle ) )
-            pause(.100);
-            initialAngle = readDeviceVar( libHandle, devId, FX_RIGID_ENC_ANG);
-            retries = retries -1;
-        end
-        % Enable the controller 
-        calllib(libHandle, 'setPosition', devId, initialAngle);
-        calllib(libHandle, 'setControlMode', devId, CTRL_POSITION);
-        calllib(libHandle, 'setPosition', devId, initialAngle);
-        calllib(libHandle, 'setGains', devId, 50, 3, 0, 0);
-            
-        % Now, hold this poisition against user turn
-        for i = 100: -1: 0
-            pause(.250);
-            clc;
-            fprintf("Holding device %d at position %d (%d)\n", devId, initialAngle, i);
-            printDevice( libHandle, devId, varsToStream, labels, 9);
-        end
+	outVars = [ 99, 99, 99, 99, 99, 99, 99, 99, 99 ];
 
-        pause(.200);
-        calllib(libHandle, 'setControlMode', devId, CTRL_NONE);
-        pause(.200);
-        calllib(libHandle, 'fxStopStreaming', devId);
-    end
+	% Select the variables to stream
+	[retCode, outVars ] = calllib(libHandle, 'fxSetStreamVariables', devId,  varsToStream, 9 );
+
+	% Start streaming
+	retCode = calllib(libHandle, 'fxStartStreaming', devId, 100, false, 0 );
+	if( ~retCode)
+		fprintf("Couldn't start streaming...\n");
+	else
+		% Determine the devices initial angle
+		retries = 100;
+		initialAngle = readDeviceVar( libHandle, devId, FX_RIGID_ENC_ANG);
+		while( retries && isnan( initialAngle ) )
+			pause(.100);
+			initialAngle = readDeviceVar( libHandle, devId, FX_RIGID_ENC_ANG);
+			retries = retries -1;
+		end
+		% Enable the controller
+		calllib(libHandle, 'setPosition', devId, initialAngle);
+		calllib(libHandle, 'setControlMode', devId, CTRL_POSITION);
+		calllib(libHandle, 'setPosition', devId, initialAngle);
+		calllib(libHandle, 'setGains', devId, 50, 3, 0, 0);
+
+		% Now, hold this poisition against user turn
+		for i = 100: -1: 0
+			pause(.250);
+			clc;
+			fprintf("Holding device %d at position %d (%d)\n", devId, initialAngle, i);
+			printDevice( libHandle, devId, varsToStream, labels, 9);
+		end
+
+		pause(.200);
+		calllib(libHandle, 'setControlMode', devId, CTRL_NONE);
+		pause(.200);
+		calllib(libHandle, 'fxStopStreaming', devId);
+	end
 end
-
