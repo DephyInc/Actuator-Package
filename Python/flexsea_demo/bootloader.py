@@ -65,8 +65,6 @@ def main():
 	# pylint: disable=import-outside-toplevel
 	import argparse
 
-	result = False
-
 	parser = argparse.ArgumentParser(description=__doc__)
 	parser.add_argument(
 		"port", metavar="Port", type=str, nargs=1, help="Your device serial port."
@@ -92,8 +90,7 @@ def main():
 		help="Target microcontroller",
 	)
 	args = parser.parse_args()
-	result = bootloader(flex.FlexSEA(), args.port[0], args.baud_rate, args.target)
-	return result
+	return bootloader(flex.FlexSEA(), args.port[0], args.baud_rate, args.target)
 
 
 if __name__ == "__main__":
