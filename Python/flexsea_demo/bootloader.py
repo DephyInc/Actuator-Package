@@ -90,8 +90,8 @@ def main():
 		help="Target microcontroller",
 	)
 	args = parser.parse_args()
-	bootloader(flex.FlexSEA(), args.port[0], args.baud_rate, args.target)
+	return bootloader(flex.FlexSEA(), args.port[0], args.baud_rate, args.target)
 
 
 if __name__ == "__main__":
-	main()
+	exit(main())
