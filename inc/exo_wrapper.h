@@ -12,12 +12,11 @@ Do not send this to external clients
 #include "device_wrapper.h"
 
 #define TOTAL_DEFINED_MOVEMENTS 5 ///Total movements that can be defined by the exo such as walking, running etc.
-#ifdef __cplusplus
 
+#ifdef __cplusplus
 extern "C"
 {
 #endif
-
 
 typedef enum fxExoSide
 {
@@ -54,16 +53,17 @@ typedef enum fxExoControllerMode
 ///Enum to identify led  color on exo batter
 typedef enum fxBatteryColor
 {
-	fxNoColor 	= -1,  	///Color unknown
+	fxNoColor 	= -1,	///Color unknown
 	fxGreen 	= 0,	///Green LED
-	fxYellow 	= 1,  	///Yellow LED
-	fxRed 		= 2   	///Red LED
+	fxYellow 	= 1,	///Yellow LED
+	fxRed 		= 2		///Red LED
 
 } FxBatteryColor;
 
 struct ExoState;
 
 ////////////////////// For UTTs //////////////////////////////
+
 #define UTT_NUM_VALS 15
 
 #define UTT_0_MIN 42
@@ -96,6 +96,7 @@ struct ExoState;
 #define UTT_13_MAX 10000
 #define UTT_14_MIN -10000
 #define UTT_14_MAX 10000
+
 static const int UTT_VAL_LIMITS[UTT_NUM_VALS][2]{{UTT_0_MIN,  UTT_0_MAX},
 												 {UTT_1_MIN,  UTT_1_MAX},
 												 {UTT_2_MIN,  UTT_2_MAX},
@@ -120,7 +121,7 @@ static const int UTT_VAL_LIMITS[UTT_NUM_VALS][2]{{UTT_0_MIN,  UTT_0_MAX},
 /// @param readData contains the most recent data from the device
 ///
 /// @returns FxNotStreaming if device is not streaming when this is called.
-///          FxInvalidDevice if deviceId is invalid or is not an Exo device.
+///			FxInvalidDevice if deviceId is invalid or is not an Exo device.
 FxError fxReadExoDevice(unsigned int deviceId, ExoState *readData);
 
 /// \brief Read all exo data from a streaming FlexSEA device stream.
@@ -137,8 +138,8 @@ FxError fxReadExoDevice(unsigned int deviceId, ExoState *readData);
 ///
 /// @note Will only fill readData array up to read data queue size.
 int fxReadExoDeviceAll(unsigned int deviceId,
-					   ExoState *readData,
-					   unsigned int n);
+						ExoState *readData,
+						unsigned int n);
 
 // \brief Get the Exo side (Left or Right). Only valid for an Exo device.
 ///
@@ -153,7 +154,7 @@ FxExoSide fxGetSide(unsigned int deviceId);
 /// @param deviceId is the device ID
 ///
 /// @returns FxInvalidDevice if deviceId is invalid
-///          FxSuccess otherwise
+///			FxSuccess otherwise
 FxError fxRunBeltCalibration(unsigned int deviceId);
 
 /// \brief Enable augmentation in an exo device. Enabled by default.
@@ -161,7 +162,7 @@ FxError fxRunBeltCalibration(unsigned int deviceId);
 /// @param deviceId is the device ID
 ///
 /// @returns FxInvalidDevice if deviceId does not correspond an exo device.
-///          FxSuccess otherwise
+///			FxSuccess otherwise
 FxError fxEnableAugmentation(unsigned int deviceId);
 
 
@@ -170,7 +171,7 @@ FxError fxEnableAugmentation(unsigned int deviceId);
 /// @param deviceId is the device ID
 ///
 /// @returns FxInvalidDevice if deviceId does not correspond an exo device.
-///          FxSuccess otherwise
+///			FxSuccess otherwise
 FxError fxDisableAugmentation(unsigned int deviceId);
 
 /// \brief Set the UTT values to the desired values.
@@ -184,9 +185,9 @@ FxError fxDisableAugmentation(unsigned int deviceId);
 /// @param singleUTTIndex is the index for a single value write. -1 = full array.
 ///
 /// @returns FxInvalidDevice if deviceId does not correspond an exo device.
-///          FxInvalidParam if any UTTs exceed the thresholds defined at the
-///              top of this header.
-///          FxSuccess otherwise.
+///			FxInvalidParam if any UTTs exceed the thresholds defined at the
+///			top of this header.
+///			FxSuccess otherwise.
 ///
 /// @note Only UTTs up to UTT_NUM_VALS will be set.
 ///
@@ -205,9 +206,9 @@ FxError fxSetUTT(unsigned int deviceId,
 /// @param n is the size of the uttToSave array
 ///
 /// @returns FxInvalidDevice if deviceId does not correspond an exo device.
-///          FxInvalidParam if any UTTs exceed the thresholds defined at the
-///              top of this header.
-///          FxSuccess otherwise.
+///			FxInvalidParam if any UTTs exceed the thresholds defined at the
+///			top of this header.
+///			FxSuccess otherwise.
 ///
 /// @note Only UTTs up to UTT_NUM_VALS will be saved.
 ///
@@ -216,21 +217,21 @@ FxError fxSaveUTT(unsigned int deviceId,
 				  unsigned int n);
 
 /// \brief Send a UTT values request to the specified device. The value is
-/// retrieved asyncronously and must be checked by polling
+/// retrieved asynchronously and must be checked by polling
 /// fxGetLastReceivedUTT.
 ///
 /// @param deviceId is the device ID
 ///
 /// @returns FxInvalidDevice if deviceId does not correspond an exo device.
-///          FxSuccess otherwise.
+///			FxSuccess otherwise.
 ///
-/// @note The i2t values are retrieved asyncronously and must be checked by
+/// @note The i2t values are retrieved asynchronously and must be checked by
 /// polling fxGetLastReceivedUTT.
 ///
 FxError fxRequestUTT(unsigned int deviceId);
 
 /// \brief Check the last UTT values which were received from the device.
-/// These UTT values are updated asyncronously by making calls to
+/// These UTT values are updated asynchronously by making calls to
 /// fxRequestUTT.
 ///
 /// @param deviceId is the device ID
@@ -240,9 +241,8 @@ FxError fxRequestUTT(unsigned int deviceId);
 ///
 /// @param n is the size of the uttToSave array. Ideally at least UTT_NUM_VALS.
 ///
-///
 /// @returns FxInvalidDevice if deviceId does not correspond an exo device.
-///          FxSuccess otherwise.
+///			FxSuccess otherwise.
 ///
 /// @note Only UTTs up to UTT_NUM_VALS will be read.
 ///
@@ -255,7 +255,7 @@ FxError fxGetLastReceivedUTT(unsigned int deviceId,
 /// @param deviceId is the device ID
 ///
 /// @returns FxInvalidDevice if deviceId does not correspond an exo device.
-///          FxSuccess otherwise.
+///			FxSuccess otherwise.
 ///
 FxError fxStartTraining(unsigned int deviceId);
 
@@ -264,7 +264,7 @@ FxError fxStartTraining(unsigned int deviceId);
 /// @param deviceId is the device ID
 ///
 /// @returns FxInvalidDevice if deviceId does not correspond an exo device.
-///          FxSuccess otherwise.
+///			FxSuccess otherwise.
 ///
 FxError fxStopTraining(unsigned int deviceId);
 
@@ -273,7 +273,7 @@ FxError fxStopTraining(unsigned int deviceId);
 /// @param deviceId is the device ID
 ///
 /// @returns FxInvalidDevice if deviceId does not correspond an exo device.
-///          FxSuccess otherwise.
+///			FxSuccess otherwise.
 ///
 FxError fxStartSubTraining(unsigned int deviceId);
 
@@ -282,7 +282,7 @@ FxError fxStartSubTraining(unsigned int deviceId);
 /// @param deviceId is the device ID
 ///
 /// @returns FxInvalidDevice if deviceId does not correspond an exo device.
-///          FxSuccess otherwise.
+///			FxSuccess otherwise.
 ///
 FxError fxStopSubTraining(unsigned int deviceId);
 
@@ -297,8 +297,8 @@ FxError fxStopSubTraining(unsigned int deviceId);
 /// @param FxExoControllerMode defined at the top of the header
 ///
 /// @returns FxInvalidDevice if deviceId does not correspond an exo device.
-///          FxInvalidParam if any prog walk params are invalid
-///          FxSuccess otherwise.
+///			FxInvalidParam if any prog walk params are invalid
+///			FxSuccess otherwise.
 ///
 FxError fxSetProgWalkParams(unsigned int deviceId,
 							FxExoControllerType exoControllerType,
@@ -312,9 +312,9 @@ FxError fxSetProgWalkParams(unsigned int deviceId,
 /// @param deviceId is the device ID
 ///
 /// @returns FxInvalidDevice if deviceId does not correspond an exo device.
-///          FxSuccess otherwise.
+///			FxSuccess otherwise.
 ///
-/// @note The prog walk parameters are retrieved asyncronously and must be checked by
+/// @note The prog walk parameters are retrieved asynchronously and must be checked by
 /// polling fxGetLastReceivedProgWalkParams.
 ///
 FxError fxRequestProgWalkParams(unsigned int deviceId);
@@ -332,8 +332,8 @@ FxError fxRequestProgWalkParams(unsigned int deviceId);
 /// @param FxExoControllerMode defined at the top of the header
 ///
 /// @returns FxInvalidDevice if deviceId does not correspond an exo device.
-///          FxFailure if any of the prog walk params are invalid
-///          FxSuccess otherwise.
+///			FxFailure if any of the prog walk params are invalid
+///			FxSuccess otherwise.
 ///
 FxError fxGetLastReceivedProgWalkParams(unsigned int deviceId,
 										FxExoControllerType *exoControllerType,

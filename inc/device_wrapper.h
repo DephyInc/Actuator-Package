@@ -199,8 +199,8 @@ bool fxIsStreaming(unsigned int deviceId);
 /// @param readData contains the most recent data from the device
 ///
 /// @returns FxNotStreaming if device is not streaming when this is called.
-///          FxInvalidDevice if deviceId is invalid or is not an ActPack
-///          device.
+///			FxInvalidDevice if deviceId is invalid or is not an ActPack
+///			device.
 FxError fxReadDevice(unsigned int deviceId, ActPackState* readData);
 
 /// \brief Read the most recent data from a streaming FlexSEA NetMaster device.
@@ -211,8 +211,8 @@ FxError fxReadDevice(unsigned int deviceId, ActPackState* readData);
 /// @param readData contains the most recent data from the device
 ///
 /// @returns FxNotStreaming if device is not streaming when this is called.
-///          FxInvalidDevice if deviceId is invalid or is not a NetMaster
-///          device.
+///			FxInvalidDevice if deviceId is invalid or is not a NetMaster
+///			device.
 FxError fxReadNetMasterDevice(unsigned int deviceId, NetMasterState* readData);
 
 /// \brief Read the most recent data from a streaming FlexSEA BMS device.
@@ -223,7 +223,7 @@ FxError fxReadNetMasterDevice(unsigned int deviceId, NetMasterState* readData);
 /// @param readData contains the most recent data from the device
 ///
 /// @returns FxNotStreaming if device is not streaming when this is called.
-///          FxInvalidDevice if deviceId is invalid or is not a BMS device.
+///			FxInvalidDevice if deviceId is invalid or is not a BMS device.
 FxError fxReadBMSDevice(unsigned int deviceId, BMSState* readData);
 
 /// \brief Read the most recent data from a streaming FlexSEA Habsolute device.
@@ -234,7 +234,7 @@ FxError fxReadBMSDevice(unsigned int deviceId, BMSState* readData);
 /// @param readData contains the most recent data from the device
 ///
 /// @returns FxNotStreaming if device is not streaming when this is called.
-///          FxInvalidDevice if deviceId is invalid or is not a Habsolute device.
+///			FxInvalidDevice if deviceId is invalid or is not a Habsolute device.
 FxError fxReadHabsoluteDevice(unsigned int deviceId, HabsoluteState* readData);
 
 /// \brief Read the most recent data from a streaming FlexSEA CellScreener device.
@@ -245,7 +245,7 @@ FxError fxReadHabsoluteDevice(unsigned int deviceId, HabsoluteState* readData);
 /// @param readData contains the most recent data from the device
 ///
 /// @returns FxNotStreaming if device is not streaming when this is called.
-///          FxInvalidDevice if deviceId is invalid or is not a CellScreener device.
+///			FxInvalidDevice if deviceId is invalid or is not a CellScreener device.
 FxError fxReadCellScreenerDevice(unsigned int deviceId, CellScreenerState* readData);
 
 /// \brief Read the most recent data from a streaming FlexSEA BattCycler device.
@@ -256,7 +256,7 @@ FxError fxReadCellScreenerDevice(unsigned int deviceId, CellScreenerState* readD
 /// @param readData contains the most recent data from the device
 ///
 /// @returns FxNotStreaming if device is not streaming when this is called.
-///          FxInvalidDevice if deviceId is invalid or is not a BattCycler device.
+///			FxInvalidDevice if deviceId is invalid or is not a BattCycler device.
 FxError fxReadBattCyclerDevice(unsigned int deviceId, BattCyclerState* readData);
 
 /// \brief Set the maximum read data queue size of a device.
@@ -267,7 +267,7 @@ FxError fxReadBattCyclerDevice(unsigned int deviceId, BattCyclerState* readData)
 /// @param size is the size to set the read data queue size to.
 ///
 /// @returns FxInvalidDevice if invalid device.
-///		FxInvalidParam if size is invalid
+///			FxInvalidParam if size is invalid
 FxError fxSetReadDataQueueSize(unsigned int deviceId,
 				unsigned int size);
 
@@ -437,20 +437,20 @@ FxAppType fxGetAppType(unsigned int deviceId);
 /// @param mV is the desired UVLO in mV
 ///
 /// @returns FxInvalidDevice if deviceId does not correspond an exo device.
-///          FxInvalidParam if mV exceeds MIN_UVLO or MAX_UVLO
-///          FxSuccess otherwise.
+///			FxInvalidParam if mV exceeds MIN_UVLO or MAX_UVLO
+///			FxSuccess otherwise.
 ///
 FxError fxSetUVLO(unsigned int deviceId, unsigned int mV);
 
 /// \brief Send a UVLO request to the specified device. The value is retrieved
-/// asyncronously and must be checked by polling fxGetLastReceivedUVLO.
+/// asynchronously and must be checked by polling fxGetLastReceivedUVLO.
 ///
 /// @param deviceId is the device ID
 ///
 /// @returns FxInvalidDevice if deviceId does not correspond an exo device.
-///          FxSuccess otherwise.
+///			FxSuccess otherwise.
 ///
-/// @note The UVLO value is retrieved asyncronously and must be checked by
+/// @note The UVLO value is retrieved asynchronously and must be checked by
 /// polling fxGetLastReceivedUVLO.
 FxError fxRequestUVLO(unsigned int deviceId);
 
@@ -471,8 +471,8 @@ int fxGetLastReceivedUVLO(unsigned int deviceId);
 ///			the current deviceId will be replaced by the new Unique ID
 ///
 /// @returns FxInvalidDevice if deviceId does not correspond an exo device.
-///          FxInvalidParam if mV exceeds MIN or MAX values
-///          FxSuccess otherwise.
+///			FxInvalidParam if mV exceeds MIN or MAX values
+///			FxSuccess otherwise.
 ///
 FxError fxSetUniqueId(unsigned int deviceId, unsigned int uid);
 
@@ -483,20 +483,20 @@ FxError fxSetUniqueId(unsigned int deviceId, unsigned int uid);
 /// @param offset is the current offset. NOT in Amps.
 ///
 /// @returns FxInvalidDevice if deviceId does not correspond an exo device.
-///          FxInvalidParam if mV exceeds MIN_CURRENT_OFFSET or
-///          	MAX_CURRENT_OFFSET.
-///          FxSuccess otherwise.
+///			FxInvalidParam if mV exceeds MIN_CURRENT_OFFSET or
+///			MAX_CURRENT_OFFSET.
+///			FxSuccess otherwise.
 ///
 FxError fxSetCurrentOffset(unsigned int deviceId, int offset);
 
 /// \brief Send a current offset request to the specified device. The value is
-/// retrieved asyncronously and must be checked by polling
+/// retrieved asynchronously and must be checked by polling
 /// fxGetLastReceivedCurrentOffset.
 ///
 /// @param deviceId is the device ID
 ///
 /// @returns FxInvalidDevice if deviceId does not correspond an exo device.
-///          FxSuccess otherwise.
+///			FxSuccess otherwise.
 ///
 /// @note The current offset is retrieved asyncronously and must be checked by
 /// polling fxGetLastReceivedCurrentOffset.
@@ -523,7 +523,7 @@ int fxGetLastReceivedCurrentOffset(unsigned int deviceId);
 /// @param i2tValsToWrite is the i2tVals struct containing the values to write
 ///
 /// @returns FxInvalidDevice if deviceId does not correspond an exo device.
-///          FxSuccess otherwise.
+///			FxSuccess otherwise.
 ///
 FxError fxSetI2T(unsigned int deviceId, i2tVals i2tValsToWrite);
 
@@ -534,7 +534,7 @@ FxError fxSetI2T(unsigned int deviceId, i2tVals i2tValsToWrite);
 /// @param deviceId is the device ID
 ///
 /// @returns FxInvalidDevice if deviceId does not correspond an exo device.
-///          FxSuccess otherwise.
+///			FxSuccess otherwise.
 ///
 /// @note The i2t values are retrieved asyncronously and must be checked by
 /// polling fxGetLastReceivedI2T
@@ -566,7 +566,7 @@ FxError fxSendEventFlags(int flag, int time);
 /// @param deviceId is the device ID
 ///
 /// @returns FxInvalidDevice if deviceId is invalid
-///          FxSuccess otherwise
+///			FxSuccess otherwise
 ///
 /// @note DO NOT USE THIS FUNCTION UNLESS YOU KNOW WHAT YOU ARE DOING
 FxError fxFindPoles(unsigned int deviceId);
@@ -576,7 +576,7 @@ FxError fxFindPoles(unsigned int deviceId);
 /// @param deviceId is the device ID
 ///
 /// @returns FxInvalidDevice if deviceId is invalid
-/////          FxSuccess otherwise
+/////		FxSuccess otherwise
 ///
 FxError fxSetAnkleTorquePoints(unsigned int deviceId, int16_t *newAnkleTorque, uint8_t controller, uint8_t points);
 
@@ -585,7 +585,7 @@ FxError fxSetAnkleTorquePoints(unsigned int deviceId, int16_t *newAnkleTorque, u
 /// @param deviceId is the device ID
 ///
 /// @returns FxInvalidDevice if deviceId is invalid
-/////          FxSuccess otherwise
+/////		FxSuccess otherwise
 ///
 FxError fxReadAnkleTorquePoints(unsigned int deviceId, uint8_t points);
 
@@ -604,7 +604,7 @@ int16_t * fxGetLastReceivedAnkleTorquePoints(unsigned int deviceId);
 /// target - target bootloader
 ///
 /// @returns FxInvalidDevice if deviceId is invalid
-/////          FxSuccess otherwise
+/////		  FxSuccess otherwise
 ///
 FxError fxActivateBootloader(unsigned int deviceId, uint8_t target);
 
