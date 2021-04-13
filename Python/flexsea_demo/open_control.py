@@ -50,6 +50,8 @@ def open_control(
 			data0 = fxs.read_device(dev_id)
 			fxu.print_device(data0, app_type)
 
+	fxs.send_motor_command(dev_id, fxe.FX_NONE, 0)
+	sleep(0.1)
 	fxs.close(dev_id)
 	return True
 
