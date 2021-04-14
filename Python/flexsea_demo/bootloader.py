@@ -35,9 +35,10 @@ def bootloader(fxs, port, baud_rate, target="Mn"):
 		print(f"Activating {targets[target]['name']} bootloader", flush=True)
 		sleep(1)
 		print("Sending signal to target device", flush=True)
-		fxs.activate_bootloader(dev_id, targets[target]["id"])
 		timeout = 60  # seconds
 		while timeout > 0:
+			if timeout%5 == 0:
+				fxs.activate_bootloader(dev_id, targets[target]["id"])
 			print(f"Waiting for response from target ({timeout}s)", flush=True)
 			sleep(1)
 			timeout -= 1
