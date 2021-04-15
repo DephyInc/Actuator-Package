@@ -100,7 +100,9 @@ def main():
 		help="Timeout delay",
 	)
 	args = parser.parse_args()
-	return bootloader(flex.FlexSEA(), args.port[0], args.baud_rate, args.target)
+	return bootloader(
+		flex.FlexSEA(), args.port[0], args.baud_rate, args.target, timeout=args.delay
+	)
 
 
 if __name__ == "__main__":
