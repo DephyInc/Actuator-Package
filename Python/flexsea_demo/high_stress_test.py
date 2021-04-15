@@ -364,8 +364,19 @@ def main():
 		default=230400,
 		help="Serial communication baud rate.",
 	)
+	parser.add_argument(
+		"-l",
+		"--loops",
+		metavar="L",
+		dest="loops",
+		type=int,
+		default=3,
+		help="Serial communication baud rate.",
+	)
 	args = parser.parse_args()
-	high_stress_test(flex.FlexSEA(), args.ports, args.baud_rate)
+	high_stress_test(
+		flex.FlexSEA(), args.ports, args.baud_rate, number_of_loops=args.loops
+	)
 
 
 if __name__ == "__main__":
