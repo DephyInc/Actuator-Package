@@ -147,7 +147,7 @@ def high_stress_test(
 				lin_samples = []
 				for dev in devices:
 					lin_samples.append(
-						fxu.linear_interp(dev["data"].mot_ang - dev["initial_pos"], 0, 30)
+						fxu.linear_interp(dev["data"].mot_ang - dev["initial_pos"], 0, 360)
 					)
 
 				for samples in lin_samples:
