@@ -44,6 +44,16 @@ def is_pi():
 		return False
 
 
+def is_pi64():
+	"""
+	Returns true if the OS is running on an Ubuntu 64 for Arm. Used to detect Raspberry pi aarch64
+	"""
+	try:
+		return os.uname().machine.startswith("aarch64")
+	except AttributeError:
+		return False
+
+
 def clear_terminal():
 	"""
 	Clears the terminal - use before printing new values
