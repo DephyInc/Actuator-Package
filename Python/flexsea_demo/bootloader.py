@@ -97,8 +97,7 @@ def main():
 		dest="delay",
 		type=int,
 		default=60,
-		choices=["Habs", "Mn", "Reg", "Exe"],
-		help="Target microcontroller",
+		help="Timeout delay",
 	)
 	args = parser.parse_args()
 	return bootloader(flex.FlexSEA(), args.port[0], args.baud_rate, args.target)
