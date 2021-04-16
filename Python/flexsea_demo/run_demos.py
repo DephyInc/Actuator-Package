@@ -38,11 +38,10 @@ def sig_handler(*_unused):
 	return sys.exit("\nCTRL-C or SIGINT detected\nExiting ...")
 
 
-def find_poles(port, baud_rate):
+def find_poles(fxs, port, baud_rate):
 	"""
 	Find motor poles
 	"""
-	fxs = flex.FlexSEA()
 	dev_id = fxs.open(port, baud_rate, 0)
 	if fxs.find_poles(dev_id) == fxe.FX_INVALID_DEVICE:
 		raise ValueError("fxFindPoles: invalid device ID")

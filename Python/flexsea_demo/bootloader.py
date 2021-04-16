@@ -8,7 +8,7 @@ from flexsea import fxEnums as fxe
 from flexsea import flexsea as flex
 
 
-def bootloader(fxs, port, baud_rate, target="Mn"):
+def bootloader(fxs, port, baud_rate, target="Mn", timeout=60):
 	"""Check bootloader in target"""
 	debug_logging_level = 0  # 6 is least verbose, 0 is most verbose
 	dev_id = fxs.open(port, baud_rate, debug_logging_level)
@@ -34,9 +34,8 @@ def bootloader(fxs, port, baud_rate, target="Mn"):
 	try:
 		print(f"Activating {targets[target]['name']} bootloader", flush=True)
 		sleep(1)
-		timeout = 60  # seconds
 		while timeout > 0:
-			if timeout%5 == 0:
+			if timeout % 5 == 0:
 				print("Sending signal to target device", flush=True)
 				fxs.activate_bootloader(dev_id, targets[target]["id"])
 			print(f"Waiting for response from target ({timeout}s)", flush=True)
@@ -90,8 +89,20 @@ def main():
 		choices=["Habs", "Mn", "Reg", "Exe"],
 		help="Target microcontroller",
 	)
+
+	parser.add_argument(
+		"-d",
+		"--delay",
+		metavar="D",
+		dest="delay",
+		type=int,
+		default=60,
+		help="Timeout delay",
+	)
 	args = parser.parse_args()
-	return bootloader(flex.FlexSEA(), args.port[0], args.baud_rate, args.target)
+	return bootloader(
+		flex.FlexSEA(), args.port[0], args.baud_rate, args.target, timeout=args.delay
+	)
 
 
 if __name__ == "__main__":
