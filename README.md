@@ -51,7 +51,7 @@ $ deactivate
 
 If `flexsea` is already installed, and you need to upgrade it, run this:
 ```bash
-#activate your virtual environment if desired as shown above
+# activate your virtual environment if desired as shown above
 $ python3 -m pip install --upgrade flexsea
 ```
 
@@ -90,15 +90,15 @@ For your convenience, `run_demos.py` displays a menu of all available scripts.
 
 You'll need to modify `ports.yaml` to suit your needs. By default, this files contains the most common Windows configuration along with examples for other platforms.
 
- To use it, uncomment and/or modify the lines you need. Below is an example of that file used on Windows, with one port (COM3). 
+ To use it, uncomment and/or modify the lines you need. Below is an example of that file used on Windows, with one port (`COM3`). 
 
 ```yaml
 # ports.yaml
 #
 # Adjust the baudrate if needed and uncomment or edit the port list.
 #
-# Note that commented-out lines start with a `#`
-# Also the ports list has dashes `-` before the values to signify a list
+# Note that commented-out lines start with a "#"
+# Also the ports list has dashes "-" before the values to signify a list
 #
 # See the sample ports values below depending on your platform
 baud_rate: 230400
@@ -221,6 +221,19 @@ $ pre-commit run --all-files
 ```
 
 See more info on [pre-commit syntax](https://pre-commit.com).
+
+### Documentation
+
+To generate the automatic documentation for this repository, run the command below:
+```bash
+$ cd docs
+$ doxygen doxyfile.in
+```
+
+Then open the generated files:
+```bash
+sensible-browser html/index.html
+```
 
 ## Troubleshooting
 
