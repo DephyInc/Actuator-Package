@@ -46,6 +46,8 @@ setuptools.setup(
         "numpy==1.19.*",
         "pillow==8.1.*",
         "PyYAML==5.4.1",
+        "LinuxOnlyDependency ; platform_system=='Linux'",
+        "WindowsOnlyDependency ; platform_system=='Windows'"
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
