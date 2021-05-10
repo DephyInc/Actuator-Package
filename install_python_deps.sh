@@ -11,7 +11,7 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
 	sudo apt update &&
 	sudo apt install software-properties-common -y &&
 	sudo add-apt-repository ppa:deadsnakes/ppa &&
-	sudo apt install python3.7 -y &&
+	sudo apt install python3.9 -y &&
 	echo -e "${GREEN}Python dependencies installed.${NC}" && exit 0 ||
 	echo -e "${RED}An issue was encountered when installing the python dependencies.${NC}" &&
 	exit 1
