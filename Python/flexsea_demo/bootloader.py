@@ -88,7 +88,7 @@ def main():
 		dest="target",
 		type=str,
 		default="Mn",
-		choices=["Habs", "Mn", "Reg", "Exe"],
+		choices=["Habs", "Mn", "Reg", "Exe", "BT", "XBee"],
 		help="Target microcontroller",
 	)
 
