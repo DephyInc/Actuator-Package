@@ -20,7 +20,7 @@ def bootloader(fxs, port, baud_rate, target="Mn", timeout=60):
 		"Reg": {"id": 1, "name": "Regulate"},
 		"Exe": {"id": 2, "name": "Execute"},
 		"Mn": {"id": 3, "name": "Manage"},
-		"BT": {"id": 4, "name": "Bluetooth"},
+		"BT121": {"id": 4, "name": "Bluetooth"},
 		"XBee": {"id": 5, "name": "XBee"},
 	}
 
@@ -88,7 +88,7 @@ def main():
 		dest="target",
 		type=str,
 		default="Mn",
-		choices=["Habs", "Mn", "Reg", "Exe", "BT", "XBee"],
+		choices=["Habs", "Mn", "Reg", "Exe", "BT121", "XBee"],
 		help="Target microcontroller",
 	)
 
