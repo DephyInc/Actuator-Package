@@ -31,45 +31,45 @@ Then, to install the required Python dependencies, run the following command fro
 ```bash
 # Define your own virtual environment
 # this is not required but it helps keeping your environment clean
-#   In Windows:
-        python -m virtualenv actpack
-#   In Linux and RasberryPi systems:
-        python3 -m virtualenv --python=/usr/bin/python3.9 actpack
+#	In Windows:
+	python -m virtualenv actpack
+#	In Linux and RasberryPi systems:
+	python3 -m virtualenv --python=/usr/bin/python3.9 actpack
 # Activate your virtualenv
-#   On Windows:
-        actpack/Scripts/activate.ps1
-#   On Other OS:
-        actpack/bin/activate
+#	On Windows:
+	actpack/Scripts/activate.ps1
+#	On Other OS:
+	actpack/bin/activate
 # Once the environment is activated, install the package
-#   On Windows:
-        python -m pip install --upgrade pip
-        python -m pip install flexsea
-#   On Other OS:
-        python3 -m pip install --upgrade pip
-        python3 -m pip install flexsea
-    
+#	On Windows:
+	python -m pip install --upgrade pip
+	python -m pip install flexsea
+#	On Other OS:
+	python3 -m pip install --upgrade pip
+	python3 -m pip install flexsea
+
 # Run your script that uses flexsea
 # Once you want to stop using the flexsea library and go back to the regular shell
 deactivate
 ```
->Please Note to use the right symlink to `python` or `python3` in all the above commands based on your OS that you are running this on.<br>
+> Please Note to use the right symlink to `python` or `python3` in all the above commands based on your OS that you are running this on.<br>
 
 If `flexsea` is already installed and you need to upgrade it, run this:
 ```bash
 #activate your virtual environment if desired as shown above
-#   On a Windows system:
-        python -m pip install --upgrade flexsea
-#   On other OS:
-        python3 -m pip install --upgrade flexsea
+#	On a Windows system:
+	python -m pip install --upgrade flexsea
+#	On other OS:
+	python3 -m pip install --upgrade flexsea
 ```
 
 ### Removal
 To uninstall `flexsea` from your computer, run this:
 ```bash
-#   On a Windows system:
-        python -m pip uninstall flexsea
-#   On other OS:
-        python3 -m pip uninstall flexsea
+#	On a Windows system:
+	python -m pip uninstall flexsea
+#	On other OS:
+	python3 -m pip uninstall flexsea
 ```
 
 ### Install Githooks

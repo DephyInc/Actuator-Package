@@ -35,7 +35,7 @@ class FlexSEA:
 		"""Loads the library from the c lib"""
 		path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "libs")
 		lib_path = None
-		lib=None
+		lib = None
 		nix_lib = "libfx_plan_stack.so"
 		win_lib = "libfx_plan_stack.dll"
 		if fxu.is_win():
