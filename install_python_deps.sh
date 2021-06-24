@@ -8,7 +8,7 @@ NC="\033[0m" # Default Color
 # Ubuntu Dependencies
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
 	sudo apt-get update &&
-	sudo apt-get install python3 -y &&
+	sudo apt-get install python3.9 -y &&
 	echo -e "${GREEN}Python dependencies installed.${NC}" && exit 0 ||
 	echo -e "${RED}An issue was encountered when installing the python dependencies.${NC}" &&
 	exit 1
