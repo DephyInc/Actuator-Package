@@ -36,7 +36,7 @@ repos:
     -   id: forbid-space-in-indent
         exclude: |
             (?x)^(
-                .*\.(ico|jpg|svg|png|user|xml|yaml|pro|pri|qrc|ui|dll|a|o|so|dll\.a|hex|mdl|slx)|
+                .*\.(ico|jpg|svg|png|user|xml|yaml|yml|pro|pri|qrc|ui|dll|a|o|so|dll\.a|hex|mdl|slx)|
                 .*/dev_spec/.*|
                 .*inc/.*|
                 .*LICENSE.*|
