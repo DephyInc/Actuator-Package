@@ -39,6 +39,8 @@ def high_speed_test(
 	cycle_delay=0.1,
 	request_jitter=False,
 	jitter=20,
+	log_data=False,
+	debug_log_level=6,
 ):
 	"""
 	baud_rate			Baud rate of outgoing serial connection to ActPack
@@ -54,6 +56,8 @@ def high_speed_test(
 	cycle_delay			Delay between signals sent to controller, use with sine wave only
 	request_jitter		Add jitter amount to every other sample sent to controller
 	jitter				Amount of jitter
+	log_data			Enable data logging
+	debug_log_level     6 is least verbose, 0 is most verbose
 	"""
 
 	win_max_freq = 100
@@ -69,22 +73,18 @@ def high_speed_test(
 	else:
 		print("Running High Speed Test with one device")
 
-	# Debug & Data Logging
-	debug_logging_level = 6  # 6 is least verbose, 0 is most verbose
-	data_log = False  # Data log logs device data
-
 	delay_time = 1.0 / (float(cmd_freq))
 	print(delay_time)
 
 	# Open the device and start streaming
-	dev_id0 = fxs.open(ports[0], baud_rate, debug_logging_level)
-	fxs.start_streaming(dev_id0, cmd_freq, data_log)
+	dev_id0 = fxs.open(ports[0], baud_rate, debug_log_level)
+	fxs.start_streaming(dev_id0, cmd_freq, log_data)
 	print("Connected to device 0 with ID", dev_id0)
 
 	dev_id1 = -1
 	if second_device:
-		dev_id1 = fxs.open(ports[1], baud_rate, debug_logging_level)
-		fxs.start_streaming(dev_id1, cmd_freq, data_log)
+		dev_id1 = fxs.open(ports[1], baud_rate, debug_log_level)
+		fxs.start_streaming(dev_id1, cmd_freq, log_data)
 		print("Connected to device 1 with ID", dev_id1)
 
 	# Get initial position:
@@ -298,8 +298,27 @@ def main():
 		default=230400,
 		help="Serial communication baud rate.",
 	)
+	parser.add_argument(
+		"-l",
+		"--loops",
+		metavar="L",
+		dest="loops",
+		type=int,
+		default=4,
+		help="Number of loops to run.",
+	)
+	parser.add_argument(
+		"-d", "--log_data", dest="log_data", action="store_true", help="Enable data logging",
+	)
 	args = parser.parse_args()
-	high_speed_test(flex.FlexSEA(), args.ports, args.baud_rate)
+	print(args.log_data)
+	high_speed_test(
+		flex.FlexSEA(),
+		args.ports,
+		args.baud_rate,
+		number_of_loops=args.loops,
+		log_data=args.log_data,
+	)
 
 
 if __name__ == "__main__":

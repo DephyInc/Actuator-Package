@@ -38,7 +38,9 @@ Note: On Windows, replace `python3` with `python`
 ```bash
 # Define your own virtual environment
 # this is not required but it helps keeping your environment clean
-$ python3 -m virtualenv --python=/usr/bin/python3.7 actpack
+python3 -m pip install --upgrade pip
+python3 -m pip install virtualenv
+python3 -m virtualenv --python=/usr/bin/python3.7 actpack
 # Activate your virtualenv
 $ source actpack/bin/activate
 # Once the environment is activated, install the package
@@ -49,7 +51,9 @@ $ python3 -m pip install flexsea
 $ deactivate
 ```
 
-If `flexsea` is already installed, and you need to upgrade it, run this:
+If you're using the [fish shell](https://fishshell.com/), use this command to activate the virtualenv: `. actpack/bin/activate.fish`
+
+If `flexsea` is already installed and you need to upgrade it, run this:
 ```bash
 # activate your virtual environment if desired as shown above
 $ python3 -m pip install --upgrade flexsea
