@@ -20,6 +20,8 @@ def bootloader(fxs, port, baud_rate, target="Mn", timeout=60):
 		"Reg": {"id": 1, "name": "Regulate"},
 		"Exe": {"id": 2, "name": "Execute"},
 		"Mn": {"id": 3, "name": "Manage"},
+		"BT121": {"id": 4, "name": "Bluetooth"},
+		"XBee": {"id": 5, "name": "XBee"},
 	}
 
 	if app_type.value == fxe.FX_ACT_PACK.value:
@@ -86,7 +88,7 @@ def main():
 		dest="target",
 		type=str,
 		default="Mn",
-		choices=["Habs", "Mn", "Reg", "Exe"],
+		choices=["Habs", "Mn", "Reg", "Exe", "BT121", "XBee"],
 		help="Target microcontroller",
 	)
 
