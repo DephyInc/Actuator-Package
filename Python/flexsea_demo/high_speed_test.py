@@ -308,15 +308,17 @@ def main():
 		help="Number of loops to run.",
 	)
 	parser.add_argument(
-		"-d",
-		"--log_data",
-		dest="log_data",
-		action='store_true',
-		help="Enable data logging",
+		"-d", "--log_data", dest="log_data", action="store_true", help="Enable data logging",
 	)
 	args = parser.parse_args()
 	print(args.log_data)
-	high_speed_test(flex.FlexSEA(), args.ports, args.baud_rate, number_of_loops=args.loops, log_data=args.log_data)
+	high_speed_test(
+		flex.FlexSEA(),
+		args.ports,
+		args.baud_rate,
+		number_of_loops=args.loops,
+		log_data=args.log_data,
+	)
 
 
 if __name__ == "__main__":
