@@ -21,6 +21,8 @@ Simulink/OpenControl/logFolderConfigFile.txt
 Python/flexseapython/com_local\.txt
 Python/logFolderConfigFile.txt
 Python/flexseapython/com.txt
+Python/flexsea/libs
+Python/flexsea/inc
 dist
 *.egg-info
 build
