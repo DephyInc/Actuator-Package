@@ -24,3 +24,4 @@ Python/flexseapython/com.txt
 dist
 *.egg-info
 build
+docs/html

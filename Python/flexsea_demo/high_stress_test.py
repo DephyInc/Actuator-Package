@@ -371,7 +371,7 @@ def main():
 		dest="loops",
 		type=int,
 		default=3,
-		help="Serial communication baud rate.",
+		help="Number of loops to run.",
 	)
 	args = parser.parse_args()
 	high_stress_test(
