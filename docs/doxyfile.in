@@ -1,0 +1,22 @@
+OUTPUT_DIRECTORY		= ../docs/
+INPUT					= ../Python/flexsea/flexsea ../Python/flexsea/README.md ../Python/flexsea_demo ../C/inc/ ../C/src/ ../docs/ ../README.md
+GENERATE_LATEX			= NO
+
+PROJECT_NAME 			= "Actuator Package"
+PROJECT_LOGO			= ../docs/dephy.png
+HTML_HEADER				= ../docs/header.html
+HTML_FOOTER				= ../docs/footer.html
+HTML_EXTRA_STYLESHEET	= ../docs/style.css
+USE_MDFILE_AS_MAINPAGE	= ../README.md
+HTML_TIMESTAMP			= YES
+HTML_COLORSTYLE_SAT		= 0
+SHOW_INCLUDE_FILES		= YES
+DISABLE_INDEX			= NO
+EXTRACT_ALL				= YES
+EXTRACT_PRIVATE 		= YES
+HIDE_UNDOC_MEMBERS 		= YES
+MARKDOWN_SUPPORT		= YES
+
+HAVE_DOT 				= YES
+INTERACTIVE_SVG			= YES
+DOT_IMAGE_FORMAT		= svg
