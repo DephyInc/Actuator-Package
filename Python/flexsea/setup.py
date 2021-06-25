@@ -4,15 +4,13 @@ FlexSEA package setup info
 import os
 import setuptools
 
+PKG_NAME = "flexsea"
+
 with open("README.md", "r", encoding="utf-8") as fh:
 	LONG_DESCRIPTION = fh.read()
 
-lib_files_location = os.path.join(
-	os.path.dirname(os.path.realpath(__file__)), "..", "..", "libs"
-)
-inc_files_location = os.path.join(
-	os.path.dirname(os.path.realpath(__file__)), "..", "..", "inc"
-)
+lib_files_location = os.path.join("..", "..", "libs")
+inc_files_location = os.path.join("..", "..", "inc")
 
 
 def package_files(directory):
@@ -20,7 +18,7 @@ def package_files(directory):
 	paths = []
 	for (path, _directories, filenames) in os.walk(directory):
 		for filename in filenames:
-			paths.append(os.path.join("..", path, filename))
+			paths.append((os.path.join("..", path, filename)))
 	return paths
 
 
@@ -33,8 +31,14 @@ if not os.path.exists(inc_files_location):
 libs = package_files(lib_files_location)
 inc = package_files(inc_files_location)
 
+for p in [*libs, *inc]:
+	print(p)
+
+print(setuptools.find_packages())
+
+
 setuptools.setup(
-	name="flexsea",  # Replace casmat with other username if needed
+	name=PKG_NAME,
 	version="7.0.0",
 	author="Dephy Inc.",
 	author_email="admin@dephy.com",
@@ -60,5 +64,8 @@ setuptools.setup(
 	],
 	python_requires=">= 3.8.*",
 	include_package_data=True,
-	package_data={"libs": libs, "inc": inc},
+	# data_files=[('lib', libs), ('inc', inc)],
+	# package_data={"flexsea.libs": libs, "flexsea.inc": inc},
+	# package_dir={f"{PKG_NAME}/libs" : '../../libs'},
+	# package_data={"flexsea.libs": [*libs, *inc]},
 )
