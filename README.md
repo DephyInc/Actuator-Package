@@ -90,7 +90,7 @@ For your convenience, `run_demos.py` displays a menu of all available scripts.
 
 You'll need to modify `ports.yaml` to suit your needs. By default, this files contains the most common Windows configuration along with examples for other platforms.
 
- To use it, uncomment and/or modify the lines you need. Below is an example of that file used on Windows, with one port (`COM3`). 
+To use it, uncomment and/or modify the lines you need. Below is an example of that file used on Windows, with one port (`COM3`).
 
 ```yaml
 # ports.yaml
@@ -104,14 +104,14 @@ You'll need to modify `ports.yaml` to suit your needs. By default, this files co
 baud_rate: 230400
 ports:
 # Windows
-  - COM3
-  # - COM4
+	- COM3
+	# - COM4
 # Ubuntu WSL
-  # - /dev/ttyS3
-  # - /dev/ttyS4
+	# - /dev/ttyS3
+	# - /dev/ttyS4
 # Native Linux (e.g. Ubuntu or Raspbian)
-  # - /dev/ttyACM0
-  # - /dev/ttyACM1
+	# - /dev/ttyACM0
+	# - /dev/ttyACM1
 ```
 
 Once you modify your copy of `ports.yaml`, use the following command to prevent git from tracking the changes.
@@ -133,18 +133,18 @@ $ ./run_demos.py
 3. Notice the menu that displays
 ```bash
 (actpack) ubuntu@PC:~/Actuator-Package/Python/flexsea_demo $ ./run_demos.py
- 
+
 	▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 	██░▄▄▀██░▄▄▄██░▄▄░██░██░██░███░██
 	██░██░██░▄▄▄██░▀▀░██░▄▄░██▄▀▀▀▄██
 	██░▀▀░██░▀▀▀██░█████░██░████░████
 	▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
-	          Beyond Nature™          
- 
+			Beyond Nature™
+
 STOP!
 Read our important safety information at https://dephy.com/start/
 before running the scripts for the first time.
- 
+
 Actuator Package Demo Scripts:
 ------------------------------
 [0] Read Only
@@ -157,12 +157,12 @@ Actuator Package Demo Scripts:
 [7] High Stress Test
 [8] Two Devices Position Control
 [9] Two Devices Leader Follower Control
- 
+
 Advanced Utilities:
 ------------------------------
 [10] Bootloader Check
 [11] Find Poles
- 
+
 Choose experiment number [q to quit]:
 ```
 4. Enter the experiment number. Be careful, most of them will make the motor move!
@@ -179,20 +179,20 @@ $ ./run_demos.py 9 2
 ```
 
 #### Launching the Demos Directly
-All scripts can be run individually by calling them and passing arguments. Use –help to see usage information. See the example below using `high_speed_test.py`. 
+All scripts can be run individually by calling them and passing arguments. Use –help to see usage information. See the example below using `high_speed_test.py`.
 
 ```bash
 $ ./high_speed_test.py --help
 usage: high_speed_test.py [-h] [-b B] Ports [Ports ...]
- 
+
 FlexSEA High Speed Test
- 
+
 positional arguments:
-  Ports           Your devices' serial ports.
- 
+	Ports           Your devices' serial ports.
+
 optional arguments:
-  -h, --help      show this help message and exit
-  -b B, --baud B  Serial communication baud rate.
+	-h, --help      show this help message and exit
+	-b B, --baud B  Serial communication baud rate.
 ```
 
 If your ActPAck is on port `COM3` you can run the script depicted above like this:
@@ -238,7 +238,7 @@ sensible-browser html/index.html
 ## Troubleshooting
 
 * On Windows, if flexsea can't install, or it can't load the libraries, make sure only once version of git and Python are installed as specified ins the installation section.
-*  If your device has never had poles configured, you should run “find poles” from the demo script before trying other demos. This is not typical!
+* If your device has never had poles configured, you should run “find poles” from the demo script before trying other demos. This is not typical!
 * The leading cause of segmentation faults is a Device Spec mismatch between the embedded system and the scripts. This happens when you use old firmware with new scripts.
 
 License: CC BY-NC-SA 4.0
