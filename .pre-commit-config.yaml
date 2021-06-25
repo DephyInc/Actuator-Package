@@ -3,7 +3,7 @@
 
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.4.0
+    rev: v4.0.1
     hooks:
     -   id: trailing-whitespace
         exclude: |
@@ -27,16 +27,16 @@ repos:
     -   id: check-docstring-first
     -   id: check-case-conflict
 -   repo: https://github.com/alan-turing-institute/CleverCSV-pre-commit
-    rev: v0.6.7
+    rev: v0.6.8
     hooks:
     -   id: clevercsv-standardize
 -   repo: https://github.com/jumanjihouse/pre-commit-hooks
-    rev: 2.1.4
+    rev: 2.1.5
     hooks:
     -   id: forbid-space-in-indent
         exclude: |
             (?x)^(
-                .*\.(ico|jpg|svg|png|user|xml|yaml|pro|pri|qrc|ui|dll|a|o|so|dll\.a|hex|mdl|slx)|
+                .*\.(ico|jpg|svg|png|user|xml|yaml|yml|pro|pri|qrc|ui|dll|a|o|so|dll\.a|hex|mdl|slx)|
                 .*/dev_spec/.*|
                 .*inc/.*|
                 .*LICENSE.*|
@@ -53,7 +53,7 @@ repos:
                 .*/DeviceSpecs/.*|
             )$
 -   repo: https://github.com/PyCQA/pylint
-    rev: pylint-2.6.0
+    rev: v2.8.3
     hooks:
     -   id: pylint
         language_version: python3.7
