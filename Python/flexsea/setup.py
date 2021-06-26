@@ -17,6 +17,12 @@ inc_files_location = os.path.join("..", "..", "inc")
 lib_files_dest = os.path.join("flexsea","libs")
 inc_files_dest = os.path.join("flexsea","inc")
 
+if not os.path.exists(lib_files_location):
+    raise FileNotFoundError("Required libraries for the build was not found!")
+
+if not os.path.exists(inc_files_location):
+    raise FileNotFoundError("Required source for the build was not found!")
+
 #Clean old library and include files
 rmtree(lib_files_dest)
 rmtree(inc_files_dest)
@@ -34,11 +40,6 @@ def get_files(location):
     return paths
 
 
-if not os.path.exists(lib_files_location):
-    raise FileNotFoundError("Required libraries for the build was not found!")
-
-if not os.path.exists(inc_files_location):
-    raise FileNotFoundError("Required source for the build was not found!")
 
 print("Libs locaiton: {0}\nInc location: {1}".format(lib_files_location, inc_files_location))
 
