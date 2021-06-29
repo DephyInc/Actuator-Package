@@ -10,8 +10,6 @@ PKG_NAME = "flexsea"
 with open("README.md", "r", encoding="utf-8") as fh:
 	LONG_DESCRIPTION = fh.read()
 
-# lib_files_location = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "..", "libs"))
-# inc_files_location = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "..", "inc"))
 lib_files_location = os.path.join("..", "..", "libs")
 inc_files_location = os.path.join("..", "..", "inc")
 lib_files_dest = os.path.join("flexsea", "libs")
