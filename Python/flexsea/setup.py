@@ -75,6 +75,6 @@ setuptools.setup(
         "Development Status :: 5 - Production/Stable",
     ],
     python_requires=">= 3.8.*",
-    package_data={"libs": lib_files, "inc": inc_files},
     include_package_data=True,
+    data_files=[("libs", lib_files), ("inc", inc_files)]
 )
