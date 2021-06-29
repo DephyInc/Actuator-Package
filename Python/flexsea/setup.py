@@ -2,8 +2,8 @@
 FlexSEA package setup info
 """
 import os
-import setuptools
 from shutil import copytree, rmtree
+import setuptools
 
 PKG_NAME = "flexsea"
 
@@ -36,10 +36,12 @@ copytree(inc_files_location, inc_files_dest)
 
 
 def get_files(location):
+	"""Find lib file locations"""
 	paths = []
-	for (path, directories, filenames) in os.walk(location):
+	for (path, _directories, filenames) in os.walk(location):
 		for filename in filenames:
-			# Constraint of new setuptools which require forward slash to resolve path separator. No matter what OS
+			# Constraint of new setuptools which require forward slash to resolve path separator.
+			# No matter what OS
 			paths.append(os.path.join(path, filename).replace("\\", "/"))
 	return paths
 
