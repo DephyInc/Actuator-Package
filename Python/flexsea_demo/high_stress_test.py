@@ -146,18 +146,15 @@ def high_stress_test(
 				# Create interpolation angles for each device
 				lin_samples = []
 				for dev in devices:
-					lin_samples.append(
-						fxu.linear_interp(dev["data"].mot_ang - dev["initial_pos"], 0, 360)
-					)
+					lin_samples.append(fxu.linear_interp(dev["data"].mot_ang, dev["initial_pos"], 360))
 
-				for samples in lin_samples:
-					for sample in samples:
-						cmds = [{"cur": 0, "pos": sample + dev["initial_pos"]} for dev in devices]
-						sleep(delay_time)
-						send_and_time_cmds(
-							fxs, start_time, devices, cmds, fxe.FX_POSITION, pos_gains, False
-						)
-						cmd_count += 1
+				for samples in np.array(lin_samples).transpose():
+					cmds = [{"cur": 0, "pos": sample} for sample in samples]
+					sleep(delay_time)
+					send_and_time_cmds(
+						fxs, start_time, devices, cmds, fxe.FX_POSITION, pos_gains, False
+					)
+					cmd_count += 1
 			else:
 				# First time in loop
 				print("Step 1: skipped, first round")
