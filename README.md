@@ -27,42 +27,57 @@ Run this script to install the python dependencies before running the python scr
 
 ### Windows 10
 
-On Windows, use [this installer](https://www.python.org/ftp/python/3.7.9/python-3.7.9.exe) to install Python 3.7 and [this one](https://github.com/git-for-windows/git/releases/download/v2.31.1.windows.1/Git-2.31.1-32-bit.exe) to install Git 32-bit. When installing git, select setting the PATH variables, otherwise you'll need to set them manually.
+On Windows, use [this installer](https://www.python.org/ftp/python/3.9.5/python-3.9.5.exe) to install Python 3.9.
+> The downloadable link is that of a 32 bit Python version You would need to use a 32 bit version. <br>
 
-Then, to install the required Python dependencies, run the following command from the root directory of this repository using gitbash:
+Then, to install the required Python dependencies, run the following command from the root directory of this repository using ___PowerShell___:
 
 ### Install FlexSEA Library
-
-Note: On Windows, replace `python3` with `python`
 
 ```bash
 # Define your own virtual environment
 # this is not required but it helps keeping your environment clean
-python3 -m pip install --upgrade pip
-python3 -m pip install virtualenv
-python3 -m virtualenv --python=/usr/bin/python3.7 actpack
+#	In Windows:
+	python -m virtualenv actpack
+#	In Linux and RasberryPi systems:
+	python3 -m virtualenv --python=/usr/bin/python3.9 actpack
 # Activate your virtualenv
-$ source actpack/bin/activate
+#	On Windows:
+	actpack/Scripts/activate.ps1
+#	On Other OS:
+	actpack/bin/activate
 # Once the environment is activated, install the package
-$ python3 -m pip install --upgrade pip
-$ python3 -m pip install flexsea
+#	On Windows:
+	python -m pip install --upgrade pip
+	python -m pip install flexsea
+#	On Other OS:
+	python3 -m pip install --upgrade pip
+	python3 -m pip install flexsea
+
 # Run your script that uses flexsea
 # Once you want to stop using the flexsea library and go back to the regular shell
-$ deactivate
+deactivate
 ```
+> Please Note to use the right symlink to `python` or `python3` in all the above commands based on your OS that you are running this on.<br>
 
 If you're using the [fish shell](https://fishshell.com/), use this command to activate the virtualenv: `. actpack/bin/activate.fish`
 
 If `flexsea` is already installed and you need to upgrade it, run this:
 ```bash
-# activate your virtual environment if desired as shown above
-$ python3 -m pip install --upgrade flexsea
+#activate your virtual environment if desired as shown above
+#	On a Windows system:
+	python -m pip install --upgrade flexsea
+#	On other OS:
+	python3 -m pip install --upgrade flexsea
 ```
 
 #### Removal
 To uninstall `flexsea` from your computer, run this:
 ```bash
-$ python3 -m pip uninstall flexsea
+#	On a Windows system:
+	python -m pip uninstall flexsea
+#	On other OS:
+	python3 -m pip uninstall flexsea
 ```
 
 ## Getting Started
@@ -123,6 +138,14 @@ Once you modify your copy of `ports.yaml`, use the following command to prevent 
 ```bash
 $ git update-index --assume-unchanged Python/flexsea_demo/ports.yaml
 ```
+
+### Getting Started
+The latest instructions for working with the Actuatory Package and sample programs are located on Dephy's Wiki:
+
+[General information about the Dephy Actuator Package](http://dephy.com/wiki/flexsea/doku.php?id=dephyactpack)
+
+[Information about the scripts](http://dephy.com/wiki/flexsea/doku.php?id=scripts)
+
 
 ### Running Demo Scripts
 

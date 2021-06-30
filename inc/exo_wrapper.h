@@ -50,15 +50,24 @@ typedef enum fxExoControllerMode
 
 } FxExoControllerMode;
 
-///Enum to identify led  color on exo batter
+///Enum to identify led color on exo battery
 typedef enum fxBatteryColor
 {
-	fxNoColor 	= -1,	///Color unknown
-	fxGreen 	= 0,	///Green LED
-	fxYellow 	= 1,	///Yellow LED
-	fxRed 		= 2		///Red LED
+	fxNoColor = -1,   ///Color unknown
+	fxGreen = 0,    ///Green LED
+	fxYellow = 1,    ///Yellow LED
+	fxRed = 2        ///Red LED
 
 } FxBatteryColor;
+
+typedef enum fxTrainingState
+{
+	fxLoadTrainingData = 0,    ///Training data is loading
+	fxRunTrainings = 1,    ///Training is currently running
+	fxSaveTrainingData = 2,    ///Training data is being saved
+	fxFinishedTraining = 3        ///Training is complete
+
+} FxTrainingState;
 
 struct ExoState;
 
@@ -68,33 +77,33 @@ struct ExoState;
 
 #define UTT_0_MIN 42
 #define UTT_0_MAX 42
-#define UTT_1_MIN -10000
+#define UTT_1_MIN (-10000)
 #define UTT_1_MAX 10000
-#define UTT_2_MIN -10000
+#define UTT_2_MIN (-10000)
 #define UTT_2_MAX 10000
-#define UTT_3_MIN -10000
+#define UTT_3_MIN (-10000)
 #define UTT_3_MAX 10000
-#define UTT_4_MIN -10000
+#define UTT_4_MIN (-10000)
 #define UTT_4_MAX 10000
-#define UTT_5_MIN -10000
+#define UTT_5_MIN (-10000)
 #define UTT_5_MAX 10000
-#define UTT_6_MIN -10000
+#define UTT_6_MIN (-10000)
 #define UTT_6_MAX 10000
-#define UTT_7_MIN -10000
+#define UTT_7_MIN (-10000)
 #define UTT_7_MAX 10000
-#define UTT_8_MIN -10000
+#define UTT_8_MIN (-10000)
 #define UTT_8_MAX 10000
-#define UTT_9_MIN -10000
+#define UTT_9_MIN (-10000)
 #define UTT_9_MAX 10000
-#define UTT_10_MIN -10000
+#define UTT_10_MIN (-10000)
 #define UTT_10_MAX 10000
-#define UTT_11_MIN -10000
+#define UTT_11_MIN (-10000)
 #define UTT_11_MAX 10000
-#define UTT_12_MIN -10000
+#define UTT_12_MIN (-10000)
 #define UTT_12_MAX 10000
-#define UTT_13_MIN -10000
+#define UTT_13_MIN (-10000)
 #define UTT_13_MAX 10000
-#define UTT_14_MIN -10000
+#define UTT_14_MIN (-10000)
 #define UTT_14_MAX 10000
 
 static const int UTT_VAL_LIMITS[UTT_NUM_VALS][2]{{UTT_0_MIN,  UTT_0_MAX},
@@ -116,80 +125,63 @@ static const int UTT_VAL_LIMITS[UTT_NUM_VALS][2]{{UTT_0_MIN,  UTT_0_MAX},
 /// \brief Read the most recent data from a streaming FlexSEA Exo stream.
 /// Must call fxStartStreaming before calling this.
 ///
-/// @param deviceId is the device ID of the device to read from.
+/// \param deviceId is the device ID of the device to read from.
 ///
-/// @param readData contains the most recent data from the device
+/// \param readData contains the most recent data from the device
 ///
-/// @returns FxNotStreaming if device is not streaming when this is called.
+/// \returns FxNotStreaming if device is not streaming when this is called.
 ///			FxInvalidDevice if deviceId is invalid or is not an Exo device.
 FxError fxReadExoDevice(unsigned int deviceId, ExoState *readData);
 
 /// \brief Read all exo data from a streaming FlexSEA device stream.
 /// Must call fxStartStreaming before calling this.
 ///
-/// @param deviceId is the device ID of the device to read from.
+/// \param deviceId is the device ID of the device to read from.
 ///
-/// @param readData is an array of size n which contains read results
+/// \param readData is an array of size n which contains read results
 ///
-/// @param n is the size of the readData y
+/// \param n is the size of the readData y
 ///
-/// @returns The actual number of entries read. You will probably need
+/// \returns The actual number of entries read. You will probably need
 /// to use this number.
 ///
-/// @note Will only fill readData array up to read data queue size.
+/// \note Will only fill readData array up to read data queue size.
 int fxReadExoDeviceAll(unsigned int deviceId,
-						ExoState *readData,
-						unsigned int n);
+					   ExoState *readData,
+					   unsigned int n);
 
 // \brief Get the Exo side (Left or Right). Only valid for an Exo device.
 ///
-/// @param deviceId is the device ID
+/// \param deviceId is the device ID
 ///
-/// @returns FxExoSide defined at the top of the header. FxInvalidSide if
+/// \returns FxExoSide defined at the top of the header. FxInvalidSide if
 /// not an Exo device or deviceId is invalid.
 FxExoSide fxGetSide(unsigned int deviceId);
 
 /// \brief Run the belt calibration routine
 ///
-/// @param deviceId is the device ID
+/// \param deviceId is the device ID
 ///
-/// @returns FxInvalidDevice if deviceId is invalid
+/// \returns FxInvalidDevice if deviceId is invalid
 ///			FxSuccess otherwise
 FxError fxRunBeltCalibration(unsigned int deviceId);
 
-/// \brief Enable augmentation in an exo device. Enabled by default.
-///
-/// @param deviceId is the device ID
-///
-/// @returns FxInvalidDevice if deviceId does not correspond an exo device.
-///			FxSuccess otherwise
-FxError fxEnableAugmentation(unsigned int deviceId);
-
-
-/// \brief Disable augmentation in an exo device. Enabled by default.
-///
-/// @param deviceId is the device ID
-///
-/// @returns FxInvalidDevice if deviceId does not correspond an exo device.
-///			FxSuccess otherwise
-FxError fxDisableAugmentation(unsigned int deviceId);
-
 /// \brief Set the UTT values to the desired values.
 ///
-/// @param deviceId is the device ID
+/// \param deviceId is the device ID
 ///
-/// @param uttToSet is an array of UTT values to set. Up to UTT_NUM_VALS
+/// \param uttToSet is an array of UTT values to set. Up to UTT_NUM_VALS
 ///
-/// @param n is the size of the uttToSet array
+/// \param n is the size of the uttToSet array
 ///
-/// @param singleUTTIndex is the index for a single value write. -1 = full array.
+/// \param singleUTTIndex is the index for a single value write. -1 = full array.
 ///
-/// @returns FxInvalidDevice if deviceId does not correspond an exo device.
+/// \returns FxInvalidDevice if deviceId does not correspond an exo device.
 ///			FxInvalidParam if any UTTs exceed the thresholds defined at the
 ///			top of this header.
 ///			FxSuccess otherwise.
 ///
-/// @note Only UTTs up to UTT_NUM_VALS will be set.
+/// \note Only UTTs up to UTT_NUM_VALS will be set.
 ///
 FxError fxSetUTT(unsigned int deviceId,
 				 int *uttToSet,
@@ -199,33 +191,41 @@ FxError fxSetUTT(unsigned int deviceId,
 /// \brief Save the UTT values to the desired values. This involves writing
 /// to the device's non-volatile memory.
 ///
-/// @param deviceId is the device ID
+/// \param deviceId is the device ID
 ///
-/// @param uttToSave is an array of UTT values to save. Up to UTT_NUM_VALS
+/// \param uttToSave is an array of UTT values to save. Up to UTT_NUM_VALS
 ///
-/// @param n is the size of the uttToSave array
+/// \param n is the size of the uttToSave array
 ///
-/// @returns FxInvalidDevice if deviceId does not correspond an exo device.
+/// \returns FxInvalidDevice if deviceId does not correspond an exo device.
 ///			FxInvalidParam if any UTTs exceed the thresholds defined at the
 ///			top of this header.
 ///			FxSuccess otherwise.
 ///
-/// @note Only UTTs up to UTT_NUM_VALS will be saved.
+/// \note Only UTTs up to UTT_NUM_VALS will be saved.
 ///
 FxError fxSaveUTT(unsigned int deviceId,
 				  const int *uttToSave,
 				  unsigned int n);
 
+/// @brief Saves the UTT's currently on the device to EEPROM
+/// @param deviceId the ID of the device
+/// @return FxInvalidDevice if deviceId does not correspond an exo device.
+///			FxInvalidParam if any UTTs exceed the thresholds defined at the
+///			top of this header.
+///			FxSuccess otherwise.
+FxError fxSaveUTTToMemory(const unsigned int deviceId);
+
 /// \brief Send a UTT values request to the specified device. The value is
 /// retrieved asynchronously and must be checked by polling
 /// fxGetLastReceivedUTT.
 ///
-/// @param deviceId is the device ID
+/// \param deviceId is the device ID
 ///
-/// @returns FxInvalidDevice if deviceId does not correspond an exo device.
+/// \returns FxInvalidDevice if deviceId does not correspond an exo device.
 ///			FxSuccess otherwise.
 ///
-/// @note The i2t values are retrieved asynchronously and must be checked by
+/// \note The i2t values are retrieved asynchronously and must be checked by
 /// polling fxGetLastReceivedUTT.
 ///
 FxError fxRequestUTT(unsigned int deviceId);
@@ -234,17 +234,17 @@ FxError fxRequestUTT(unsigned int deviceId);
 /// These UTT values are updated asynchronously by making calls to
 /// fxRequestUTT.
 ///
-/// @param deviceId is the device ID
+/// \param deviceId is the device ID
 ///
-/// @param readUTTBuffer is an array of UTT values to save. Ideally at least
+/// \param readUTTBuffer is an array of UTT values to save. Ideally at least
 /// UTT_NUM_VALS in size.
 ///
-/// @param n is the size of the uttToSave array. Ideally at least UTT_NUM_VALS.
+/// \param n is the size of the uttToSave array. Ideally at least UTT_NUM_VALS.
 ///
-/// @returns FxInvalidDevice if deviceId does not correspond an exo device.
+/// \returns FxInvalidDevice if deviceId does not correspond an exo device.
 ///			FxSuccess otherwise.
 ///
-/// @note Only UTTs up to UTT_NUM_VALS will be read.
+/// \note Only UTTs up to UTT_NUM_VALS will be read.
 ///
 FxError fxGetLastReceivedUTT(unsigned int deviceId,
 							 int *readUTTBuffer,
@@ -252,86 +252,70 @@ FxError fxGetLastReceivedUTT(unsigned int deviceId,
 
 /// \brief Send a start training command to the specified exo device.
 ///
-/// @param deviceId is the device ID
+/// \param deviceId is the device ID
 ///
-/// @returns FxInvalidDevice if deviceId does not correspond an exo device.
+/// \returns FxInvalidDevice if deviceId does not correspond an exo device.
 ///			FxSuccess otherwise.
 ///
 FxError fxStartTraining(unsigned int deviceId);
 
-/// \brief Send a stop training command to the specified exo device.
-///
-/// @param deviceId is the device ID
-///
-/// @returns FxInvalidDevice if deviceId does not correspond an exo device.
+/// \brief Request device use saved training data.  When this is set, boots will not train at
+/// startup.
+/// \param deviceId the ID of the device
+/// \returns FxInvalidDevice if deviceId does not correspond an exo device.
 ///			FxSuccess otherwise.
-///
-FxError fxStopTraining(unsigned int deviceId);
+FxError fxUseSavedTraining(unsigned int deviceId);
 
-/// \brief Send a start substate training command to the specified exo device.
-///
-/// @param deviceId is the device ID
-///
-/// @returns FxInvalidDevice if deviceId does not correspond an exo device.
+/// \brief Request device NOT use saved training data.  When this is set, boots will train at
+/// startup.
+/// \param deviceId The ID of the device
+/// \returns FxInvalidDevice if deviceId does not correspond an exo device.
 ///			FxSuccess otherwise.
-///
-FxError fxStartSubTraining(unsigned int deviceId);
+FxError fxDoNotUseSaveTraining(unsigned int deviceId);
 
-/// \brief Send a stop substate training command to the specified exo device.
-///
-/// @param deviceId is the device ID
-///
-/// @returns FxInvalidDevice if deviceId does not correspond an exo device.
+/// \brief Get the total steps remaining until training is complete.  -1 if data incomplete.
+/// \param deviceId The ID of the device
+/// \param trainingStepsRemaining
+/// \returns FxInvalidDevice if deviceId does not correspond an exo device.
 ///			FxSuccess otherwise.
-///
-FxError fxStopSubTraining(unsigned int deviceId);
+FxError fxGetStepsRemaining(unsigned int deviceId, int *trainingStepsRemaining);
 
-/// \brief Set the prog walk params to the requested values
-///
-/// @param deviceId is the device ID
-///
-/// @param FxExoControllerType defined at the top of the header
-///
-/// @param FxExoTrainingType defined at the top of the header
-///
-/// @param FxExoControllerMode defined at the top of the header
-///
-/// @returns FxInvalidDevice if deviceId does not correspond an exo device.
-///			FxInvalidParam if any prog walk params are invalid
-///			FxSuccess otherwise.
-///
-FxError fxSetProgWalkParams(unsigned int deviceId,
-							FxExoControllerType exoControllerType,
-							FxExoTrainingType exoTrainingType,
-							FxExoControllerMode exoControlMode);
 
-/// \brief Send a prog walk parameters request to the specified device. The
-/// parameters are retrieved asyncronously and must be checked by polling
-/// fxGetLastReceivedProgWalkParams.
-///
-/// @param deviceId is the device ID
-///
-/// @returns FxInvalidDevice if deviceId does not correspond an exo device.
+/// \brief Check if device is currently using saved training data.  If true, device
+/// will not run training at startup.
+/// \param deviceId The ID of the device
+/// \param usingSavedTrainingData will be true of saved training data will be used on startup.
+/// \returns FxInvalidDevice if deviceId does not correspond an exo device.
 ///			FxSuccess otherwise.
-///
-/// @note The prog walk parameters are retrieved asynchronously and must be checked by
-/// polling fxGetLastReceivedProgWalkParams.
-///
-FxError fxRequestProgWalkParams(unsigned int deviceId);
+FxError fxIsUsingSavedTrainingData(unsigned int deviceId, bool *usingSavedTrainingData);
+
+/// \brief Request updated training data from the device.  Training data is asynchronous
+/// and will only update on request.
+/// \param deviceId the ID of the device
+/// \returns FxInvalidDevice if deviceId does not correspond an exo device.
+///			FxSuccess otherwise.
+FxError fxUpdateTrainingData(unsigned int deviceId);
+
+/// \brief Get the last state of training sent by the device
+/// \param deviceId the ID of the device
+/// \param trainingState the last training state transmitted by the device
+/// \returns FxInvalidDevice if deviceId does not correspond an exo device.
+///			FxSuccess otherwise.
+FxError fxGetTrainingState(unsigned int deviceId, fxTrainingState *trainingState);
 
 /// \brief Check the last prog walk parameters which were received from the
 /// device. These parameters are updated asyncronously by making calls to
 /// fxRequestProgWalkParams.
 ///
-/// @param deviceId is the device ID
+/// \param deviceId is the device ID
 ///
-/// @param FxExoControllerType defined at the top of the header
+/// \param FxExoControllerType defined at the top of the header
 ///
-/// @param FxExoTrainingType defined at the top of the header
+/// \param FxExoTrainingType defined at the top of the header
 ///
-/// @param FxExoControllerMode defined at the top of the header
+/// \param FxExoControllerMode defined at the top of the header
 ///
-/// @returns FxInvalidDevice if deviceId does not correspond an exo device.
+/// \returns FxInvalidDevice if deviceId does not correspond an exo device.
 ///			FxFailure if any of the prog walk params are invalid
 ///			FxSuccess otherwise.
 ///
@@ -354,6 +338,81 @@ fxBatteryColor fxGetBatteryColor(unsigned int deviceId);
 /// \param movement the movement parameter to translate
 /// \return the string corresponding to the movement enumeration
 const char *fxGetMovement(int movement);
+
+/// \brief Send a Exo Control Read request to the specified device. The value is
+/// retrieved asynchronously and must be checked by polling
+/// fxGetLastReceivedExoControl.
+///
+/// \param deviceId is the device ID
+///
+/// \returns FxInvalidDevice if deviceId does not correspond to a connected device.
+///			FxSuccess otherwise.
+///
+/// \note The values are retrieved asynchronously and must be checked by
+/// polling fxGetLastReceivedExoControl
+///
+FxError fxRequestExoControl(unsigned int deviceId);
+
+/// \brief Send a Exo Control Power On Write to the specified device. The device will
+/// reply, and the value is retrieved asynchronously and must be checked by polling
+/// fxGetLastReceivedExoControl (if desired)
+///
+/// \param deviceId is the device ID
+///
+/// \returns FxInvalidDevice if deviceId does not correspond to a connected device.
+///			FxSuccess otherwise.
+///
+/// \note The values are retrieved asynchronously and must be checked by
+/// polling fxGetLastReceivedExoControl
+///
+FxError fxSetExoControlPowerOn(unsigned int deviceId);
+
+/// \brief Send a Exo Control Power Off Write to the specified device. The device will
+/// reply, and the value is retrieved asynchronously and must be checked by polling
+/// fxGetLastReceivedExoControl (if desired)
+///
+/// \param deviceId is the device ID
+///
+/// \returns FxInvalidDevice if deviceId does not correspond to a connected device.
+///			FxSuccess otherwise.
+///
+/// \note The values are retrieved asynchronously and must be checked by
+/// polling fxGetLastReceivedExoControl
+///
+FxError fxSetExoControlPowerOff(unsigned int deviceId);
+
+/// \brief Send a Exo Control Trial Start Write to the specified device. The device will
+/// reply, and the value is retrieved asynchronously and must be checked by polling
+/// fxGetLastReceivedExoControl (if desired)
+///
+/// \param deviceId is the device ID
+///
+/// \returns FxInvalidDevice if deviceId does not correspond to a connected device.
+///			FxSuccess otherwise.
+///
+/// \note The values are retrieved asynchronously and must be checked by
+/// polling fxGetLastReceivedExoControl
+///
+FxError fxSetExoControlTrialStart(unsigned int deviceId);
+
+/// \brief Send a Exo Control Trial Stop Write to the specified device. The device will
+/// reply, and the value is retrieved asynchronously and must be checked by polling
+/// fxGetLastReceivedExoControl (if desired)
+///
+/// \param deviceId is the device ID
+///
+/// \returns FxInvalidDevice if deviceId does not correspond to a connected device.
+///			FxSuccess otherwise.
+///
+/// \note The values are retrieved asynchronously and must be checked by
+/// polling fxGetLastReceivedExoControl
+///
+FxError fxSetExoControlTrialStop(unsigned int deviceId);
+
+/// \brief Get the last Exo Control data read from the device
+/// \param deviceId The ID of the device
+/// \returns struct exoCommandStruct
+struct exoCommandStruct fxGetLastReceivedExoControl(const unsigned int deviceId);
 
 #ifdef __cplusplus
 } // extern "C"
