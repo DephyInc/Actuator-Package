@@ -34,7 +34,8 @@ class FlexSEA:
 	def load_c_libs(self):
 		"""Loads the library from the c lib"""
 		path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "libs")
-		lib_paths = []
+		lib_path = None
+		lib = None
 		nix_lib = "libfx_plan_stack.so"
 		win_lib = "libfx_plan_stack.dll"
 		if fxu.is_win():
@@ -43,31 +44,39 @@ class FlexSEA:
 				path_base = os.path.join(path, "win32")
 			else:
 				path_base = os.path.join(path, "win64")
-			lib_paths = [os.path.join(path_base, win_lib)]
+			lib_path = os.path.join(path_base, win_lib)
+			lib = win_lib
 			# Python 3.8+ requires location of all DLLs AND their dependencies
 			# be explicitly stated. Provide location of DLLs that
 			# libfx_plan_stack.dll depends on
 			if sys.version_info.minor >= 8:
 				# pylint: disable=no-member
-				os.add_dll_directory(os.path.join(path, "../"))
+				os.add_dll_directory(path)
+				os.add_dll_directory(path_base)
 		elif fxu.is_pi():
 			# Try to load the full linux lib first (that's x86_64), if that
 			# fails, fall back to the raspberryPi lib.
-			lib_paths = [os.path.join(path, "raspberryPi", nix_lib)]
+			lib_path = os.path.join(path, "raspberryPi", nix_lib)
+			lib = nix_lib
 		elif fxu.is_pi64():
-			lib_paths = [os.path.join(path, "raspberryPi64", nix_lib)]
+			lib_path = os.path.join(path, "raspberryPi64", nix_lib)
+			lib = nix_lib
 		else:
-			lib_paths = [os.path.join(path, "linux", nix_lib)]
+			lib_path = os.path.join(path, "linux", nix_lib)
+			lib = nix_lib
 
 		loading_log_messages = []
-		for path in lib_paths:
-			try:
-				loading_log_messages.append("loading... " + path)
-				self.c_lib = c.cdll.LoadLibrary(path)
-			except OSError as err:
-				loading_log_messages.append("Problem loading the library\n {}\n".format(err))
-				print("\n".join(loading_log_messages))
-				raise err
+		try:
+			if fxu.is_win() and sys.version_info.minor >= 8:
+				loading_log_messages.append("loading " + lib + "on a newage win system... ")
+				self.c_lib = c.cdll.LoadLibrary(lib)
+			else:
+				loading_log_messages.append("loading... " + lib_path)
+				self.c_lib = c.cdll.LoadLibrary(lib_path)
+		except OSError as err:
+			loading_log_messages.append("Problem loading the library\n {}\n".format(err))
+			print("\n".join(loading_log_messages))
+			raise err
 
 		print("FlexSEA libraries loaded")
 

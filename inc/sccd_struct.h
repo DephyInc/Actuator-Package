@@ -12,12 +12,12 @@
  */
 
 #include "SCCD_device_spec.h"
-#include <stdio.h> 
-#include <time.h> 
-#include <string.h> 
-#include <stdint.h> 
+#include <stdio.h>
+#include <time.h>
+#include <string.h>
+#include <stdint.h>
 
-#include <stdbool.h> 
+#include <stdbool.h>
 
 #define SCCD_SYSTEM_TIME_POS 24
 #define SCCD_STRUCT_DEVICE_FIELD_COUNT 25
@@ -80,7 +80,7 @@ void SCCDSetData(struct SCCDState *sccd, uint32_t _deviceStateBuffer[], int syst
 ///
 ///@param SCCD is the struct with the data to be placed in the string
 ///
-///@param dataString is where the new string wll be placed 
+///@param dataString is where the new string wll be placed
 ///
 void SCCDDataToString(struct SCCDState *sccd, char dataString[SCCD_DATA_STRING_LENGTH]);
 
@@ -90,8 +90,8 @@ void SCCDDataToString(struct SCCDState *sccd, char dataString[SCCD_DATA_STRING_L
 ///
 void SCCDGetLabels(char labels[SCCD_STRUCT_DEVICE_FIELD_COUNT][SCCD_LABEL_MAX_CHAR_LENGTH]);
 
-/// \brief retrieves the string equivalent of parameter names starting with state time.  Parameters 
-/// prior to state time, such as id,  are not included. 
+/// \brief retrieves the string equivalent of parameter names starting with state time.  Parameters
+/// prior to state time, such as id,  are not included.
 ///
 ///@param labels is the array of labels containing the parameter names
 ///

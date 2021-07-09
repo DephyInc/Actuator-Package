@@ -8,16 +8,16 @@
 
 struct i2tVals
 {
-	//Variables exchanged during calibration:	
+	//Variables exchanged during calibration:
 	uint16_t leak;
 	uint32_t limit;
-	uint16_t nonLinThreshold;	
+	uint16_t nonLinThreshold;
 	uint8_t config;	//Contains shift and UseNL
-	
+
 	//Generated from above:
-	uint8_t shift;	
+	uint8_t shift;
 	uint8_t useNL;
-	uint32_t warning;	
+	uint32_t warning;
 };
 
 #endif // I2T_STRUCT_H
