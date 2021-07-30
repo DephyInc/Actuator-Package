@@ -64,7 +64,7 @@ struct CellScreenerState;
 struct BattCyclerState;
 
 /// Valid streaming frequencies
-#define NUM_TIMER_FREQS		11
+#define NUM_TIMER_FREQS		10
 
 /// Max size of array returned by fxNumDevices
 #define FX_MAX_DEVICES		10

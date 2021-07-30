@@ -69,7 +69,7 @@ typedef enum fxTrainingState
 
 } FxTrainingState;
 
-struct ExoState;
+struct EB5xState;
 
 ////////////////////// For UTTs //////////////////////////////
 
@@ -131,7 +131,7 @@ static const int UTT_VAL_LIMITS[UTT_NUM_VALS][2]{{UTT_0_MIN,  UTT_0_MAX},
 ///
 /// \returns FxNotStreaming if device is not streaming when this is called.
 ///			FxInvalidDevice if deviceId is invalid or is not an Exo device.
-FxError fxReadExoDevice(unsigned int deviceId, ExoState *readData);
+FxError fxReadExoDevice(unsigned int deviceId, EB5xState *readData);
 
 /// \brief Read all exo data from a streaming FlexSEA device stream.
 /// Must call fxStartStreaming before calling this.
@@ -147,7 +147,7 @@ FxError fxReadExoDevice(unsigned int deviceId, ExoState *readData);
 ///
 /// \note Will only fill readData array up to read data queue size.
 int fxReadExoDeviceAll(unsigned int deviceId,
-					   ExoState *readData,
+					   EB5xState *readData,
 					   unsigned int n);
 
 // \brief Get the Exo side (Left or Right). Only valid for an Exo device.
