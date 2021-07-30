@@ -39,7 +39,7 @@ def read_only(fxs, port, baud_rate, run_time=8, time_step=0.1):
 	elif app_type.value == fxe.FX_BMS.value:
 		print("\nYour device is a BMS.\n")
 		input("Press Enter to continue...")
-	elif app_type.value == fxe.FX_EXO.value:
+	elif app_type.value == fxe.FX_EB5X.value:
 		print("\nYour device is an Exo or ActPack Plus.\n")
 		input("Press Enter to continue...")
 	else:

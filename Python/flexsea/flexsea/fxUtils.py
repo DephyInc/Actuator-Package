@@ -83,42 +83,42 @@ def print_device(dev_id, app_type):
 		print_net_master(dev_id)
 	elif app_type.value == en.FX_BMS.value:
 		print_bms(dev_id)
-	elif app_type.value == en.FX_EXO.value:
-		print_exo(dev_id)
+	elif app_type.value == en.FX_EB5X.value:
+		print_eb5x(dev_id)
 	else:
 		raise RuntimeError("Unsupported application type: ", app_type)
 
 
-def print_exo(exo_state: fx_devs.ExoState):
+def print_eb5x(eb5x_state: fx_devs.EB5xState):
 	"""
-	Print Exo info
+	Print eb5x info
 	"""
-	print("[ Printing Exo/ActPack Plus ]\n")
-	print("State time:           ", exo_state.state_time)
-	print("Accel X:              ", exo_state.accelx)
-	print("Accel Y:              ", exo_state.accely)
-	print("Accel Z:              ", exo_state.accelz)
-	print("Gyro X:               ", exo_state.gyrox)
-	print("Gyro Y:               ", exo_state.gyroy)
-	print("Gyro Z:               ", exo_state.gyroz)
-	print("Motor angle:          ", exo_state.mot_ang)
-	print("Motor voltage (mV):   ", exo_state.mot_volt)
-	print("Motor current (mA):   ", exo_state.mot_cur)
-	print("Battery Current (mA): ", exo_state.batt_volt)
-	print("Battery Voltage (mV): ", exo_state.batt_curr)
-	print("Battery Temp (C):     ", exo_state.temperature)
-	print("genVar[0]:            ", exo_state.genvar_0)
-	print("genVar[1]:            ", exo_state.genvar_1)
-	print("genVar[2]:            ", exo_state.genvar_2)
-	print("genVar[3]:            ", exo_state.genvar_3)
-	print("genVar[4]:            ", exo_state.genvar_4)
-	print("genVar[5]:            ", exo_state.genvar_5)
-	print("genVar[6]:            ", exo_state.genvar_6)
-	print("genVar[7]:            ", exo_state.genvar_7)
-	print("genVar[8]:            ", exo_state.genvar_8)
-	print("genVar[9]:            ", exo_state.genvar_9)
-	print("Ankle angle:          ", exo_state.ank_ang)
-	print("Ankle velocity:       ", exo_state.ank_vel)
+	print("[ Printing EB5x/ActPack Plus ]\n")
+	print("State time:           ", eb5x_state.state_time)
+	print("Accel X:              ", eb5x_state.accelx)
+	print("Accel Y:              ", eb5x_state.accely)
+	print("Accel Z:              ", eb5x_state.accelz)
+	print("Gyro X:               ", eb5x_state.gyrox)
+	print("Gyro Y:               ", eb5x_state.gyroy)
+	print("Gyro Z:               ", eb5x_state.gyroz)
+	print("Motor angle:          ", eb5x_state.mot_ang)
+	print("Motor voltage (mV):   ", eb5x_state.mot_volt)
+	print("Motor current (mA):   ", eb5x_state.mot_cur)
+	print("Battery Current (mA): ", eb5x_state.batt_volt)
+	print("Battery Voltage (mV): ", eb5x_state.batt_curr)
+	print("Battery Temp (C):     ", eb5x_state.temperature)
+	print("genVar[0]:            ", eb5x_state.genvar_0)
+	print("genVar[1]:            ", eb5x_state.genvar_1)
+	print("genVar[2]:            ", eb5x_state.genvar_2)
+	print("genVar[3]:            ", eb5x_state.genvar_3)
+	print("genVar[4]:            ", eb5x_state.genvar_4)
+	print("genVar[5]:            ", eb5x_state.genvar_5)
+	print("genVar[6]:            ", eb5x_state.genvar_6)
+	print("genVar[7]:            ", eb5x_state.genvar_7)
+	print("genVar[8]:            ", eb5x_state.genvar_8)
+	print("genVar[9]:            ", eb5x_state.genvar_9)
+	print("Ankle angle:          ", eb5x_state.ank_ang)
+	print("Ankle velocity:       ", eb5x_state.ank_vel)
 
 
 def print_act_pack(act_pack_state: fx_devs.ActPackState):

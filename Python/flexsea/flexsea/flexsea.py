@@ -10,10 +10,6 @@ from . import fxUtils as fxu
 from .dev_spec import AllDevices as fxd
 
 
-# TODO (CA): make Flexsea devices into objets that can be instantiated and keep
-# track of their state
-
-
 class FlexSEA:
 	"""
 	Implements FlexSEA Actuator Package API
@@ -68,86 +64,107 @@ class FlexSEA:
 		loading_log_messages = []
 		try:
 			if fxu.is_win() and sys.version_info.minor >= 8:
-				loading_log_messages.append("loading " + lib + "on a newage win system... ")
+				loading_log_messages.append("loading " + lib + "on a Windows system... ")
 				self.c_lib = c.cdll.LoadLibrary(lib)
 			else:
 				loading_log_messages.append("loading... " + lib_path)
 				self.c_lib = c.cdll.LoadLibrary(lib_path)
 		except OSError as err:
-			loading_log_messages.append("Problem loading the library\n {}\n".format(err))
+			loading_log_messages.append(
+				"\n[!] Error encountered when loading the {} precompiled libraries".format(
+					self.__class__.__name__
+				)
+			)
+			if fxu.is_win():
+				loading_log_messages.append(
+					"The most likely cause is a mismatch between the Python, pip and shell architectures."
+				)
+				loading_log_messages.append(
+					"To solve this, use consistently 32bit or 64bit versions of all those tools."
+				)
+				loading_log_messages.append(
+					"If you need several architectures of shells and Python installed, use venv to separate them."
+				)
+				loading_log_messages.append(
+					"For additional help, follow the installation instructions here:"
+				)
+				loading_log_messages.append("https://github.com/DephyInc/Actuator-Package")
+				loading_log_messages.append("--------------------------------------------")
+			loading_log_messages.append(
+				"Detailed error message for debugging: \n {}\n".format(err)
+			)
 			print("\n".join(loading_log_messages))
-			raise err
 
-		print("FlexSEA libraries loaded")
+		if self.c_lib:
+			print("{} libraries loaded".format(self.__class__.__name__))
+			# set arg types
+			self.c_lib.fxOpen.argtypes = [c.c_char_p, c.c_uint, c.c_uint]
+			self.c_lib.fxOpen.restype = c.c_int
 
-		# set arg types
-		self.c_lib.fxOpen.argtypes = [c.c_char_p, c.c_uint, c.c_uint]
-		self.c_lib.fxOpen.restype = c.c_int
+			self.c_lib.fxIsOpen.argtypes = [c.c_uint]
+			self.c_lib.fxIsOpen.restype = c.c_bool
 
-		self.c_lib.fxIsOpen.argtypes = [c.c_uint]
-		self.c_lib.fxIsOpen.restype = c.c_bool
+			self.c_lib.fxClose.argtypes = [c.c_uint]
+			self.c_lib.fxClose.restype = c.c_int
 
-		self.c_lib.fxClose.argtypes = [c.c_uint]
-		self.c_lib.fxClose.restype = c.c_int
+			self.c_lib.fxCloseAll.argtypes = []
+			self.c_lib.fxCloseAll.resType = []
 
-		self.c_lib.fxCloseAll.argtypes = []
-		self.c_lib.fxCloseAll.resType = []
+			self.c_lib.fxGetDeviceIds.argtypes = [c.POINTER(c.c_int), c.c_uint]
 
-		self.c_lib.fxGetDeviceIds.argtypes = [c.POINTER(c.c_int), c.c_uint]
+			self.c_lib.fxStartStreaming.argtypes = [c.c_uint, c.c_uint, c.c_bool]
+			self.c_lib.fxStartStreaming.restype = c.c_int
 
-		self.c_lib.fxStartStreaming.argtypes = [c.c_uint, c.c_uint, c.c_bool]
-		self.c_lib.fxStartStreaming.restype = c.c_int
+			self.c_lib.fxStopStreaming.argtypes = [c.c_uint]
+			self.c_lib.fxStopStreaming.restype = c.c_int
 
-		self.c_lib.fxStopStreaming.argtypes = [c.c_uint]
-		self.c_lib.fxStopStreaming.restype = c.c_int
+			self.c_lib.fxReadDevice.argtypes = [c.c_uint, c.POINTER(fxd.ActPackState)]
+			self.c_lib.fxReadDevice.restype = c.c_int
 
-		self.c_lib.fxReadDevice.argtypes = [c.c_uint, c.POINTER(fxd.ActPackState)]
-		self.c_lib.fxReadDevice.restype = c.c_int
+			self.c_lib.fxReadDeviceAll.argtypes = [
+				c.c_uint,
+				c.POINTER(fxd.ActPackState),
+				c.c_uint,
+			]
+			self.c_lib.fxReadDeviceAll.restype = c.c_int
 
-		self.c_lib.fxReadDeviceAll.argtypes = [
-			c.c_uint,
-			c.POINTER(fxd.ActPackState),
-			c.c_uint,
-		]
-		self.c_lib.fxReadDeviceAll.restype = c.c_int
+			self.c_lib.fxReadNetMasterDevice.argtypes = [c.c_uint, c.POINTER(fxd.NetMasterState)]
+			self.c_lib.fxReadDevice.restype = c.c_int
 
-		self.c_lib.fxReadNetMasterDevice.argtypes = [c.c_uint, c.POINTER(fxd.NetMasterState)]
-		self.c_lib.fxReadDevice.restype = c.c_int
+			self.c_lib.fxReadNetMasterDeviceAll.argtypes = [
+				c.c_uint,
+				c.POINTER(fxd.NetMasterState),
+				c.c_uint,
+			]
+			self.c_lib.fxReadNetMasterDeviceAll.restype = c.c_int
 
-		self.c_lib.fxReadNetMasterDeviceAll.argtypes = [
-			c.c_uint,
-			c.POINTER(fxd.NetMasterState),
-			c.c_uint,
-		]
-		self.c_lib.fxReadNetMasterDeviceAll.restype = c.c_int
+			self.c_lib.fxSetReadDataQueueSize.argtypes = [c.c_uint, c.c_uint]
+			self.c_lib.fxSetReadDataQueueSize.restype = c.c_uint
 
-		self.c_lib.fxSetReadDataQueueSize.argtypes = [c.c_uint, c.c_uint]
-		self.c_lib.fxSetReadDataQueueSize.restype = c.c_uint
+			self.c_lib.fxGetReadDataQueueSize.argtypes = [c.c_uint]
+			self.c_lib.fxGetReadDataQueueSize.restype = c.c_int
 
-		self.c_lib.fxGetReadDataQueueSize.argtypes = [c.c_uint]
-		self.c_lib.fxGetReadDataQueueSize.restype = c.c_int
+			self.c_lib.fxSetGains.argtypes = [
+				c.c_uint,
+				c.c_uint,
+				c.c_uint,
+				c.c_uint,
+				c.c_uint,
+				c.c_uint,
+				c.c_uint,
+			]
+			self.c_lib.fxSetGains.restype = c.c_int
 
-		self.c_lib.fxSetGains.argtypes = [
-			c.c_uint,
-			c.c_uint,
-			c.c_uint,
-			c.c_uint,
-			c.c_uint,
-			c.c_uint,
-			c.c_uint,
-		]
-		self.c_lib.fxSetGains.restype = c.c_int
+			self.c_lib.fxSendMotorCommand.argtypes = [c.c_uint, c.c_int, c.c_int]
+			self.c_lib.fxSendMotorCommand.restype = c.c_int
 
-		self.c_lib.fxSendMotorCommand.argtypes = [c.c_uint, c.c_int, c.c_int]
-		self.c_lib.fxSendMotorCommand.restype = c.c_int
+			self.c_lib.fxGetAppType.argtypes = [c.c_uint]
 
-		self.c_lib.fxGetAppType.argtypes = [c.c_uint]
+			self.c_lib.fxActivateBootloader.argtypes = [c.c_uint, c.c_uint8]
+			self.c_lib.fxActivateBootloader.restype = c.c_int
 
-		self.c_lib.fxActivateBootloader.argtypes = [c.c_uint, c.c_uint8]
-		self.c_lib.fxActivateBootloader.restype = c.c_int
-
-		self.c_lib.fxIsBootloaderActivated.argtypes = [c.c_uint]
-		self.c_lib.fxIsBootloaderActivated.restype = c.c_int
+			self.c_lib.fxIsBootloaderActivated.argtypes = [c.c_uint]
+			self.c_lib.fxIsBootloaderActivated.restype = c.c_int
 
 	def open(self, port, baud_rate, log_level=4):
 		"""
@@ -189,7 +206,10 @@ class FlexSEA:
 		"""
 		Disconnect from all FlexSEA devices
 		"""
-		self.c_lib.fxCloseAll()
+		try:
+			self.c_lib.fxCloseAll()
+		except AttributeError:
+			pass
 
 	def get_ids(self):
 		"""
@@ -251,7 +271,6 @@ class FlexSEA:
 		if ret_code == fxe.FX_FAILURE:
 			raise RuntimeError("fxStopStreaming: stream failed")
 
-	# TODO (CA): Check device is streaming in all read functions.
 	def read_device(self, dev_id):
 		"""
 		Read the most recent data from a streaming FlexSEA device stream.
@@ -279,8 +298,8 @@ class FlexSEA:
 		elif app_type.value == fxe.FX_BMS.value:
 			device_state = fxd.BMSState()
 			ret_code = self.c_lib.fxReadBMSDevice(dev_id, c.byref(device_state))
-		elif app_type.value == fxe.FX_EXO.value:
-			device_state = fxd.ExoState()
+		elif app_type.value == fxe.FX_EB5X.value:
+			device_state = fxd.EB5xState()
 			ret_code = self.c_lib.fxReadExoDevice(dev_id, c.byref(device_state))
 		else:
 			raise RuntimeError("Unsupported application type: ", app_type)
@@ -303,13 +322,13 @@ class FlexSEA:
 		dev_id (int): The device ID of the device to read from.
 
 		Returns:
-		(ExoState): Contains the most recent data from the device
+		(EB5xState): Contains the most recent data from the device
 
 		Raises:
 		ValueError if invalid device ID
 		RuntimeError if no read data
 		"""
-		exo_state = fxd.ExoState()
+		exo_state = fxd.EB5xState()
 		ret_code = self.c_lib.fxReadExoDevice(dev_id, c.byref(exo_state))
 
 		if ret_code == fxe.FX_INVALID_DEVICE:
