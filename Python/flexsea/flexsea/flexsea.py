@@ -2,10 +2,8 @@
 Dephy's FlexSEA Python API
 """
 import os
-import sys
 import platform
 import ctypes as c
-from ctypes import util as cu
 from . import fxEnums as fxe
 from . import fxUtils as fxu
 from .dev_spec import AllDevices as fxd
@@ -23,12 +21,12 @@ class FlexSEA:
 	def __init__(self):
 		self.ids = []
 		self.c_lib = None
-		self.load_c_libs()
+		self.__load_c_libs()
 
 	def __del__(self):
 		self.close_all()
 
-	def load_c_libs(self):
+	def __load_c_libs(self):
 		"""Loads the library from the c lib"""
 		path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "libs")
 		lib_path = None
@@ -64,7 +62,9 @@ class FlexSEA:
 			if hasattr(os, "add_dll_directory"):
 				for extra_path in os.environ["PATH"].split(";"):
 					if os.path.exists(extra_path) and "mingw" in extra_path:
+						# pylint: disable=no-member
 						os.add_dll_directory(extra_path)
+				# pylint: disable=no-member
 				os.add_dll_directory(path_base)
 				lib = win_lib
 			else:
@@ -93,6 +93,10 @@ class FlexSEA:
 			loading_log_messages.append(f"Detailed error message for debugging: \n {err}\n")
 			print("\n".join(loading_log_messages))
 
+		self.__define_c_args()
+
+	def __define_c_args(self):
+		"""Defines data types for all C functions"""
 		if self.c_lib:
 			print(f"{self.__class__.__name__} libraries loaded")
 			# set arg types
