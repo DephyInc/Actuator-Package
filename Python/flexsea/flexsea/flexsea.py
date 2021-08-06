@@ -31,7 +31,6 @@ class FlexSEA:
 	def load_c_libs(self):
 		"""Loads the library from the c lib"""
 		path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "libs")
-		inc_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "inc")
 		lib_path = None
 		lib = None
 		nix_lib = "libfx_plan_stack.so"
@@ -43,7 +42,7 @@ class FlexSEA:
 			else:
 				path_base = os.path.join(path, "win64")
 			lib_path = os.path.join(path_base, win_lib)
-			lib = win_lib
+			lib = win_lib.split(".")[0]
 		elif fxu.is_pi():
 			# Try to load the full linux lib first (that's x86_64), if that
 			# fails, fall back to the raspberryPi lib.
@@ -67,7 +66,7 @@ class FlexSEA:
 					if os.path.exists(extra_path) and "mingw" in extra_path:
 						os.add_dll_directory(extra_path)
 				os.add_dll_directory(path_base)
-				lib = win_lib.split(".")[0]
+				lib = win_lib
 			else:
 				lib = lib_path
 			loading_log_messages.append(f"Loading {lib}")
