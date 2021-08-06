@@ -69,11 +69,11 @@ class FlexSEA:
 			# libfx_plan_stack.dll depends on
 			if fxu.is_win() and sys.version_info.minor >= 8:
 				os.add_dll_directory(inc_path)
-				os.add_dll_directory(path_base)
-				print(cu.find_library(lib))
-				print(cu.find_library(lib_path))
-				loading_log_messages.append(f"Loading {lib_path} on a Windows system...")
-				self.c_lib = c.windll.LoadLibrary(lib_path)
+				with os.add_dll_directory(path_base):
+					print(cu.find_library(lib))
+					print(cu.find_library(lib_path))
+					loading_log_messages.append(f"Loading {lib_path} on a Windows system...")
+					self.c_lib = c.windll.LoadLibrary(lib_path)
 			else:
 				loading_log_messages.append(f"Loading {lib_path}")
 				self.c_lib = c.cdll.LoadLibrary(lib_path)
