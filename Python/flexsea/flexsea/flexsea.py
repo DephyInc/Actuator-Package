@@ -30,6 +30,7 @@ class FlexSEA:
 	def load_c_libs(self):
 		"""Loads the library from the c lib"""
 		path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "libs")
+		inc_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "inc")
 		lib_path = None
 		lib = None
 		nix_lib = "libfx_plan_stack.so"
@@ -42,13 +43,6 @@ class FlexSEA:
 				path_base = os.path.join(path, "win64")
 			lib_path = os.path.join(path_base, win_lib)
 			lib = win_lib
-			# Python 3.8+ requires location of all DLLs AND their dependencies
-			# be explicitly stated. Provide location of DLLs that
-			# libfx_plan_stack.dll depends on
-			if sys.version_info.minor >= 8:
-				# pylint: disable=no-member
-				os.add_dll_directory(path)
-				os.add_dll_directory(path_base)
 		elif fxu.is_pi():
 			# Try to load the full linux lib first (that's x86_64), if that
 			# fails, fall back to the raspberryPi lib.
@@ -63,17 +57,23 @@ class FlexSEA:
 
 		print(path)
 		print(path_base)
+		print(inc_path)
 		print(lib)
 		print(lib_path)
 
 		loading_log_messages = []
 		try:
-			# if fxu.is_win() and sys.version_info.minor >= 8:
-			# 	loading_log_messages.append(f"Loading {lib} on a Windows system...")
-			# 	self.c_lib = c.cdll.LoadLibrary(lib)
-			# else:
-			loading_log_messages.append(f"Loading {lib_path}")
-			self.c_lib = c.cdll.LoadLibrary(lib_path)
+			# Python 3.8+ requires location of all DLLs AND their dependencies
+			# be explicitly stated. Provide location of DLLs that
+			# libfx_plan_stack.dll depends on
+			if fxu.is_win() and sys.version_info.minor >= 8:
+				os.add_dll_directory(inc_path)
+				os.add_dll_directory(path_base)
+				loading_log_messages.append(f"Loading {lib} on a Windows system...")
+				self.c_lib = c.cdll.LoadLibrary(lib)
+			else:
+				loading_log_messages.append(f"Loading {lib_path}")
+				self.c_lib = c.cdll.LoadLibrary(lib_path)
 		except OSError as err:
 			loading_log_messages.append(
 				f"\n[!] Error encountered when loading the {self.__class__.__name__} precompiled libraries"
