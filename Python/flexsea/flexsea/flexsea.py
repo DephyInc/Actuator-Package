@@ -448,6 +448,7 @@ class FlexSEA:
 		return ret_val
 
 	# pylint: disable=invalid-name
+	# pylint: disable=too-many-arguments
 	def set_gains(self, dev_id, kp, ki, kd, k_val, b_val, ff):
 		"""
 		Sets the gains used by PID controllers on the FlexSEA device.
