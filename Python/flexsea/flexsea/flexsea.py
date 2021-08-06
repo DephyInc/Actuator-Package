@@ -61,10 +61,13 @@ class FlexSEA:
 			# Python 3.8+ requires location of all DLLs AND their dependencies
 			# be explicitly stated. Provide location of DLLs that
 			# libfx_plan_stack.dll depends on
-			os.environ["PATH"] += lib_path
+			os.environ["PATH"] += path
 			if hasattr(os, "add_dll_directory"):
-				os.add_dll_directory(os.path.dirname(__file__))
-				lib = win_lib
+				for extra_path in os.environ["PATH"].split(";"):
+					if os.path.exists(extra_path) and "mingw" in extra_path:
+						os.add_dll_directory(extra_path)
+				os.add_dll_directory(path_base)
+				lib = win_lib.split(".")[0]
 			else:
 				lib = lib_path
 			loading_log_messages.append(f"Loading {lib}")
