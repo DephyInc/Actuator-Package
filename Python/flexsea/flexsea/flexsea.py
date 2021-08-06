@@ -5,6 +5,7 @@ import os
 import sys
 import platform
 import ctypes as c
+from ctypes import util as cu
 from . import fxEnums as fxe
 from . import fxUtils as fxu
 from .dev_spec import AllDevices as fxd
@@ -69,7 +70,7 @@ class FlexSEA:
 			if fxu.is_win() and sys.version_info.minor >= 8:
 				os.add_dll_directory(inc_path)
 				os.add_dll_directory(path_base)
-				print(c.util.find_library(lib))
+				print(cu.find_library(lib))
 				loading_log_messages.append(f"Loading {lib} on a Windows system...")
 				self.c_lib = c.cdll.LoadLibrary(lib)
 			else:
