@@ -44,7 +44,7 @@ Then, to install the required Python dependencies, run the following command fro
 	python3 -m pip install virtualenv
 	python3 -m virtualenv actpack --python=/usr/bin/python3.9
 # Activate your virtualenv
-#	On Windows (PowerShel):
+#	On Windows (PowerShell):
 	actpack/Scripts/activate.ps1
 #	On other shells:
 	actpack/bin/activate
