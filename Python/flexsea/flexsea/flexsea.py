@@ -71,6 +71,7 @@ class FlexSEA:
 				os.add_dll_directory(inc_path)
 				os.add_dll_directory(path_base)
 				print(cu.find_library(lib))
+				print(cu.find_library(lib_path))
 				loading_log_messages.append(f"Loading {lib} on a Windows system...")
 				self.c_lib = c.cdll.LoadLibrary(lib)
 			else:
