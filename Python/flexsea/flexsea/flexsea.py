@@ -61,19 +61,21 @@ class FlexSEA:
 			lib_path = os.path.join(path, "linux", nix_lib)
 			lib = nix_lib
 
+		print(path)
+		print(path_base)
+		print(lib)
+
 		loading_log_messages = []
 		try:
 			if fxu.is_win() and sys.version_info.minor >= 8:
-				loading_log_messages.append("loading " + lib + "on a Windows system... ")
+				loading_log_messages.append(f"Loading {lib} on a Windows system...")
 				self.c_lib = c.cdll.LoadLibrary(lib)
 			else:
-				loading_log_messages.append("loading... " + lib_path)
+				loading_log_messages.append(f"Loading {lib_path}")
 				self.c_lib = c.cdll.LoadLibrary(lib_path)
 		except OSError as err:
 			loading_log_messages.append(
-				"\n[!] Error encountered when loading the {} precompiled libraries".format(
-					self.__class__.__name__
-				)
+				f"\n[!] Error encountered when loading the {self.__class__.__name__} precompiled libraries"
 			)
 			if fxu.is_win():
 				loading_log_messages.append(
@@ -90,13 +92,11 @@ class FlexSEA:
 				)
 				loading_log_messages.append("https://github.com/DephyInc/Actuator-Package")
 				loading_log_messages.append("--------------------------------------------")
-			loading_log_messages.append(
-				"Detailed error message for debugging: \n {}\n".format(err)
-			)
+			loading_log_messages.append(f"Detailed error message for debugging: \n {err}\n")
 			print("\n".join(loading_log_messages))
 
 		if self.c_lib:
-			print("{} libraries loaded".format(self.__class__.__name__))
+			print(f"{self.__class__.__name__} libraries loaded")
 			# set arg types
 			self.c_lib.fxOpen.argtypes = [c.c_char_p, c.c_uint, c.c_uint]
 			self.c_lib.fxOpen.restype = c.c_int
