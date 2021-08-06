@@ -56,28 +56,19 @@ class FlexSEA:
 			lib_path = os.path.join(path, "linux", nix_lib)
 			lib = nix_lib
 
-		print(path)
-		print(path_base)
-		print(inc_path)
-		print(lib)
-		print(lib_path)
-
 		loading_log_messages = []
 		try:
 			# Python 3.8+ requires location of all DLLs AND their dependencies
 			# be explicitly stated. Provide location of DLLs that
 			# libfx_plan_stack.dll depends on
-			if fxu.is_win() and sys.version_info.minor >= 8:
-				os.add_dll_directory(inc_path)
-				with os.add_dll_directory(path_base):
-					print(cu.find_library(lib))
-					print(cu.find_library(lib_path))
-					loading_log_messages.append(f"Loading {lib_path} on a Windows system...")
-					# self.c_lib = c.windll.LoadLibrary(lib_path)
-					self.c_lib = c.CDLL(lib_path, winmode=0x00000008)
+			os.environ["PATH"] += lib_path
+			if hasattr(os, "add_dll_directory"):
+				os.add_dll_directory(os.path.dirname(__file__))
+				lib = win_lib
 			else:
-				loading_log_messages.append(f"Loading {lib_path}")
-				self.c_lib = c.cdll.LoadLibrary(lib_path)
+				lib = lib_path
+			loading_log_messages.append(f"Loading {lib}")
+			self.c_lib = c.cdll.LoadLibrary(lib)
 		except OSError as err:
 			loading_log_messages.append(
 				f"\n[!] Error encountered when loading the {self.__class__.__name__} precompiled libraries"
