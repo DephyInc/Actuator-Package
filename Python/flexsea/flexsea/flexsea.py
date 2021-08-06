@@ -68,12 +68,12 @@ class FlexSEA:
 
 		loading_log_messages = []
 		try:
-			if fxu.is_win() and sys.version_info.minor >= 8:
-				loading_log_messages.append(f"Loading {lib} on a Windows system...")
-				self.c_lib = c.cdll.LoadLibrary(lib)
-			else:
-				loading_log_messages.append(f"Loading {lib_path}")
-				self.c_lib = c.cdll.LoadLibrary(lib_path)
+			# if fxu.is_win() and sys.version_info.minor >= 8:
+			# 	loading_log_messages.append(f"Loading {lib} on a Windows system...")
+			# 	self.c_lib = c.cdll.LoadLibrary(lib)
+			# else:
+			loading_log_messages.append(f"Loading {lib_path}")
+			self.c_lib = c.cdll.LoadLibrary(lib_path)
 		except OSError as err:
 			loading_log_messages.append(
 				f"\n[!] Error encountered when loading the {self.__class__.__name__} precompiled libraries"
