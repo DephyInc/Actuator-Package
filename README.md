@@ -38,13 +38,15 @@ Then, to install the required Python dependencies, run the following command fro
 # Define your own virtual environment
 # this is not required but it helps keeping your environment clean
 #	In Windows:
-	python -m virtualenv actpack
+	python -m pip install virtualenv
+	python -m virtualenv actpack --python=python3.9
 #	In Linux and RasberryPi systems:
-	python3 -m virtualenv --python=/usr/bin/python3.9 actpack
+	python3 -m pip install virtualenv
+	python3 -m virtualenv actpack --python=/usr/bin/python3.9
 # Activate your virtualenv
-#	On Windows:
+#	On Windows (PowerShell):
 	actpack/Scripts/activate.ps1
-#	On Other OS:
+#	On other shells:
 	actpack/bin/activate
 # Once the environment is activated, install the package
 #	On Windows:
