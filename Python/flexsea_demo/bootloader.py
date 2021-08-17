@@ -54,7 +54,9 @@ def bootloader(fxs, port, baud_rate, target="Mn", timeout=60):
 		else:
 			print(f"Unable to activate {targets[target]['name']} bootloader", flush=True)
 
-	except (KeyError, IOError, ValueError) as err:
+	except (IOError, ValueError) as err:
+		raise RuntimeError(f"Failed to communicate with device {target}:\n{err}") from err
+	except KeyError as err:
 		raise RuntimeError(f"Unsupported bootloader target: {target}") from err
 	fxs.close(dev_id)
 	return result
@@ -108,7 +110,7 @@ def main():
 		)
 	except RuntimeError as err:
 		print(f"Problem encountered when  bootloading: {err}")
-		return False
+		return 1
 
 
 if __name__ == "__main__":
