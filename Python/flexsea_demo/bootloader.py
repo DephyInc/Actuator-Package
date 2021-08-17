@@ -35,7 +35,7 @@ def bootloader(fxs, port, baud_rate, target="Mn", timeout=60):
 	print(f"Your device is an {app_name}", flush=True)
 
 	try:
-		print(f"Activating {targets[target]['name']} bootloader", flush=True)
+		print(f"Activating {targets[target].name} bootloader", flush=True)
 		sleep(1)
 		state = fxe.FX_FAILURE
 		while timeout > 0 and state != fxe.FX_SUCCESS:
@@ -49,11 +49,13 @@ def bootloader(fxs, port, baud_rate, target="Mn", timeout=60):
 
 		if state == fxe.FX_SUCCESS:
 			result = 0
-			print(targets[target]["name"], "bootloader is activated", flush=True)
+			print(targets[target].name, "bootloader is activated", flush=True)
 		else:
-			print(f"Unable to activate {targets[target]['name']} bootloader", flush=True)
+			print(f"Unable to activate {targets[target].name} bootloader", flush=True)
 
-	except (IOError, ValueError) as err:
+	except IOError:
+		pass
+	except ValueError as err:
 		raise RuntimeError(f"Failed to communicate with device {target}:\n{err}") from err
 	except KeyError as err:
 		raise RuntimeError(f"Unsupported bootloader target: {target}") from err
