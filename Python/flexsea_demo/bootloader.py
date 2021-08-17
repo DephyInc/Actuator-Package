@@ -54,8 +54,8 @@ def bootloader(fxs, port, baud_rate, target="Mn", timeout=60):
 			result = False
 			print(f"Unable to activate {targets[target]['name']} bootloader", flush=True)
 
-	except KeyError:
-		raise RuntimeError(f"Unsupported bootloader target: {target}")
+	except (KeyError, IOError, ValueError) as err:
+		raise RuntimeError(f"Unsupported bootloader target: {target}") from err
 	fxs.close(dev_id)
 	return result
 
@@ -102,9 +102,13 @@ def main():
 		help="Timeout delay",
 	)
 	args = parser.parse_args()
-	return bootloader(
-		flex.FlexSEA(), args.port[0], args.baud_rate, args.target, timeout=args.delay
-	)
+	try:
+		return bootloader(
+			flex.FlexSEA(), args.port[0], args.baud_rate, args.target, timeout=args.delay
+		)
+	except RuntimeError as err:
+		print(f"Problem encountered when  bootloading: {err}")
+		return False
 
 
 if __name__ == "__main__":
