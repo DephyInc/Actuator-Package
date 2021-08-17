@@ -3,6 +3,7 @@
 """
 FlexSEA Bootloader check demo
 """
+import sys
 from time import sleep
 from flexsea import fxEnums as fxe
 from flexsea import flexsea as flex
@@ -13,7 +14,7 @@ def bootloader(fxs, port, baud_rate, target="Mn", timeout=60):
 	debug_logging_level = 0  # 6 is least verbose, 0 is most verbose
 	dev_id = fxs.open(port, baud_rate, debug_logging_level)
 	app_type = fxs.get_app_type(dev_id)
-	result = False
+	result = 1
 
 	targets = {
 		"Habs": {"id": 0, "name": "Habsolute"},
@@ -48,10 +49,9 @@ def bootloader(fxs, port, baud_rate, target="Mn", timeout=60):
 				break
 
 		if state == 0:
-			result = True
+			result = 0
 			print(targets[target]["name"], "bootloader is activated", flush=True)
 		else:
-			result = False
 			print(f"Unable to activate {targets[target]['name']} bootloader", flush=True)
 
 	except (KeyError, IOError, ValueError) as err:
@@ -112,4 +112,4 @@ def main():
 
 
 if __name__ == "__main__":
-	exit(main())
+	sys.exit(main())
