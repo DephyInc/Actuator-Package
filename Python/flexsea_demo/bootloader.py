@@ -59,6 +59,9 @@ def bootloader(fxs, port, baud_rate, target="Mn", timeout=60):
 		raise RuntimeError(f"Failed to communicate with device {target}:\n{err}") from err
 	except KeyError as err:
 		raise RuntimeError(f"Unsupported bootloader target: {target}") from err
+	except Exception as err:
+		raise RuntimeError(f"unexpected error of type {type(err).__name__}: {err}")
+
 	fxs.close(dev_id)
 	return result
 
