@@ -37,7 +37,8 @@ def bootloader(fxs, port, baud_rate, target="Mn", timeout=60):
 	try:
 		print(f"Activating {targets[target]['name']} bootloader", flush=True)
 		sleep(1)
-		while timeout > 0:
+		state = fxe.FX_FAILURE
+		while timeout > 0 and state != fxe.FX_SUCCESS:
 			if timeout % 5 == 0:
 				print("Sending signal to target device", flush=True)
 				fxs.activate_bootloader(dev_id, targets[target]["id"])
@@ -45,10 +46,8 @@ def bootloader(fxs, port, baud_rate, target="Mn", timeout=60):
 			sleep(1)
 			timeout -= 1
 			state = fxs.is_bootloader_activated(dev_id)
-			if state == 0:
-				break
 
-		if state == 0:
+		if state == fxe.FX_SUCCESS:
 			result = 0
 			print(targets[target]["name"], "bootloader is activated", flush=True)
 		else:
@@ -109,7 +108,7 @@ def main():
 			flex.FlexSEA(), args.port[0], args.baud_rate, args.target, timeout=args.delay
 		)
 	except RuntimeError as err:
-		print(f"Problem encountered when  bootloading: {err}")
+		print(f"Problem encountered when bootloading: {err}")
 		return 1
 
 
