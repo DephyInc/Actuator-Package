@@ -8,7 +8,6 @@ from . import fxEnums as fxe
 from . import fxUtils as fxu
 from .dev_spec import AllDevices as fxd
 
-
 class FlexSEA:
 	"""
 	Implements FlexSEA Actuator Package API
@@ -167,6 +166,12 @@ class FlexSEA:
 
 			self.c_lib.fxIsBootloaderActivated.argtypes = [c.c_uint]
 			self.c_lib.fxIsBootloaderActivated.restype = c.c_int
+
+			self.c_lib.fxRequestFirmwareVersion.argtypes = [c.c_uint]
+			self.c_lib.fxRequestFirmwareVersion.restype = c.c_int
+
+			self.c_lib.fxGetLastReceivedFirmwareVersion.argtypes = [c.c_uint]
+			self.c_lib.fxGetLastReceivedFirmwareVersion.restype = fxe.FW
 
 	def open(self, port, baud_rate, log_level=4):
 		"""
@@ -584,3 +589,39 @@ class FlexSEA:
 			raise IOError("fxIsBootloaderActivated: command failed")
 
 		return ret_code
+
+	def request_firmware_version(self, dev_id):
+		"""
+		Request version of on board MCUs
+
+		Parameters:
+		dev_id (int): The device ID.
+
+		Returns:
+		FX_INVALID_DEVICE if deviceId is invalid
+		FX_FAILURE if command failed or bootloader is not enabled
+		FX_SUCCESS otherwise
+		"""
+		ret_code = self.c_lib.fxRequestFirmwareVersion(dev_id)
+
+		if ret_code == fxe.FX_INVALID_DEVICE:
+			raise ValueError("fxRequestFirmwareVersion: invalid device ID")
+		if ret_code == fxe.FX_FAILURE:
+			raise IOError("fxRequestFirmwareVersion: command failed")
+
+		return ret_code
+
+	def get_last_received_firmware_version(self, dev_id):
+		"""
+		Request version of on board MCUs
+
+		Parameters:
+		dev_id (int): The device ID.
+
+		Returns:
+		FX_INVALID_DEVICE if deviceId is invalid
+		FX_FAILURE if command failed or bootloader is not enabled
+		FX_SUCCESS otherwise
+		"""
+
+		return self.c_lib.fxGetLastReceivedFirmwareVersion(dev_id)
