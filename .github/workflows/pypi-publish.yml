@@ -1,0 +1,9 @@
+name: Publish to PyPI
+on:
+  push:
+    branches: [master, develop]
+uses: pypa/gh-action-pypi-publish@release/v1
+with:
+  user: __token__
+  password: ${{ secrets.PYPI_API_TOKEN }}
+  packages_dir: Python/flexsea/
