@@ -57,7 +57,6 @@ repos:
     rev: v2.8.3
     hooks:
     -   id: pylint
-        language_version: python3.9
         exclude: |
             (?x)^(
                 .*/dev_spec/.*|
