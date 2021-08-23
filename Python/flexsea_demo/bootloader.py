@@ -46,7 +46,7 @@ def bootloader(fxs, port, baud_rate, target="Mn", timeout=60):
 			print("Sending signal to target device", flush=True)
 			try:
 				fxs.activate_bootloader(dev_id, TARGETS[target]["id"])
-			except (IOError, ValueError) as err:
+			except (IOError, ValueError):
 				pass
 		print(f"Waiting for response from target ({timeout}s)", flush=True)
 		sleep(wait_step)
