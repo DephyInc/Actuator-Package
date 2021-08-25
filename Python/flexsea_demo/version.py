@@ -10,17 +10,17 @@ import ctypes as c
 
 def decode(val):
 	x = y = z = 0
-	
+
 	if (val > 0):
-		while (val%2 == 0):
+		while val % 2 == 0:
 			x += 1 
 			val /= 2
 
-		while (val%3 == 0):
+		while val % 3 == 0:
 			y += 1 
-			val /= 3		
+			val /= 3
 
-		while (val%5 == 0):
+		while val % 5 == 0:
 			z += 1 
 			val /= 5
 		
@@ -64,7 +64,14 @@ def get_version(fxs, port, baud_rate):
 	print(f"\t Habs: v{fw_Habs}", flush=True)
 
 	fxs.close(dev_id)
-	return str(fw_array.Mn) + "." + str(fw_array.Ex) + "." + str(fw_array.Re) + "." +str(fw_array.Habs)
+	return (
+			str(fw_array.Mn) 
+			+ "." 
+			+ str(fw_array.Ex) 
+			+ "." 
+			+ str(fw_array.Re) 
+			+ "." +str(fw_array.Habs)
+	)
 
 
 def main():

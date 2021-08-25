@@ -30,4 +30,9 @@ import ctypes as c
 )
 
 class FW(c.Structure):
-	_fields_ = [("Mn", c.c_uint32), ("Ex", c.c_uint32), ("Re", c.c_uint32), ("Habs", c.c_uint32)]
+	_fields_ = [
+			("Mn", c.c_uint32),
+			("Ex", c.c_uint32),
+			("Re", c.c_uint32),
+			("Habs", c.c_uint32)
+	]
