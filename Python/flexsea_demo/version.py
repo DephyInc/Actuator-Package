@@ -6,28 +6,12 @@ FlexSEA version number demo
 from time import sleep
 from flexsea import fxEnums as fxe
 from flexsea import flexsea as flex
+from flexsea import fxUtils as fxu
 import ctypes as c
 
-def decode(val):
-	x = y = z = 0
-
-	if (val > 0):
-		while val % 2 == 0:
-			x += 1 
-			val /= 2
-
-		while val % 3 == 0:
-			y += 1 
-			val /= 3
-
-		while val % 5 == 0:
-			z += 1 
-			val /= 5
-		
-	return str(x) + "." + str(y) + "." + str(z)	
 
 def get_version(fxs, port, baud_rate):
-	"""Check bootloader in target"""
+	"""Check version of onboard MCUs"""
 	debug_logging_level = 0  # 6 is least verbose, 0 is most verbose
 	dev_id = fxs.open(port, baud_rate, debug_logging_level)
 	app_type = fxs.get_app_type(dev_id)
@@ -51,32 +35,14 @@ def get_version(fxs, port, baud_rate):
 
 	fw_array = fxe.FW()
 	fw_array = fxs.get_last_received_firmware_version(dev_id)
-
-	fw_Mn = decode(fw_array.Mn)
-	fw_Ex = decode(fw_array.Ex)
-	fw_Re = decode(fw_array.Re)
-	fw_Habs = decode(fw_array.Habs)
-
-	print(f"Firmware version ", flush=True)
-	print(f"\t Mn  : v{fw_Mn}", flush=True)
-	print(f"\t Ex  : v{fw_Ex}", flush=True)
-	print(f"\t Re  : v{fw_Re}", flush=True)
-	print(f"\t Habs: v{fw_Habs}", flush=True)
-
 	fxs.close(dev_id)
-	return (
-			str(fw_array.Mn) 
-			+ "." 
-			+ str(fw_array.Ex) 
-			+ "." 
-			+ str(fw_array.Re) 
-			+ "." +str(fw_array.Habs)
-	)
+
+	return fw_array
 
 
 def main():
 	"""
-	Standalone bootloader check execution
+	Standalone version checking
 	"""
 	# pylint: disable=import-outside-toplevel
 	import argparse
@@ -96,7 +62,23 @@ def main():
 	)
 
 	args = parser.parse_args()
-	return get_version(flex.FlexSEA(), args.port[0], args.baud_rate)
+	fw_array = fxe.FW()
+	fw_array = get_version(flex.FlexSEA(), args.port[0], args.baud_rate)
+
+	fw_Mn = fxu.decode(fw_array.Mn)
+	fw_Ex = fxu.decode(fw_array.Ex)
+	fw_Re = fxu.decode(fw_array.Re)
+	fw_Habs = fxu.decode(fw_array.Habs)
+
+	print(f"Firmware version ", flush=True)
+	print(f"\t Mn  : v{fw_Mn}", flush=True)
+	print(f"\t Ex  : v{fw_Ex}", flush=True)
+	print(f"\t Re  : v{fw_Re}", flush=True)
+	print(f"\t Habs: v{fw_Habs}", flush=True)
+
+	return (
+		f"{fw_array.Mn}.{fw_array.Ex}.{fw_array.Re}.{fw_array.Habs}"
+	)
 
 
 if __name__ == "__main__":

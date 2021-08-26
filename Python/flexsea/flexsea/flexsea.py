@@ -597,16 +597,15 @@ class FlexSEA:
 		Parameters:
 		dev_id (int): The device ID.
 
-		Returns:
-		FX_INVALID_DEVICE if deviceId is invalid
-		FX_FAILURE if command failed or bootloader is not enabled
-		FX_SUCCESS otherwise
+		Raises:
+		FX_INVALID_DEVICE if invalid device.
+		FX_FAILURE if command fails
 		"""
 		ret_code = self.c_lib.fxRequestFirmwareVersion(dev_id)
 
-		if ret_code == fxe.FX_INVALID_DEVICE:
+		if ret_code == fxe.FX_INVALID_DEVICE.value:
 			raise ValueError("fxRequestFirmwareVersion: invalid device ID")
-		if ret_code == fxe.FX_FAILURE:
+		if ret_code == fxe.FX_FAILURE.value:
 			raise IOError("fxRequestFirmwareVersion: command failed")
 
 		return ret_code
