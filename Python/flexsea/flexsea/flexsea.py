@@ -39,7 +39,7 @@ class FlexSEA:
 			else:
 				path_base = os.path.join(path, "win64")
 			lib_path = os.path.join(path_base, win_lib)
-			lib = win_lib.split(".")[0]
+			lib = win_lib.split(".", maxsplit=1)[0]
 		elif fxu.is_pi():
 			# Try to load the full linux lib first (that's x86_64), if that
 			# fails, fall back to the raspberryPi lib.
@@ -89,7 +89,7 @@ class FlexSEA:
 				)
 				loading_log_messages.append("https://github.com/DephyInc/Actuator-Package")
 				loading_log_messages.append("--------------------------------------------")
-			loading_log_messages.append(f"Detailed error message for debugging: \n {err}\n")
+			loading_log_messages.append(f"Detailed error message for debugging:\n{err}\n")
 			print("\n".join(loading_log_messages))
 
 		self.__define_c_args()
