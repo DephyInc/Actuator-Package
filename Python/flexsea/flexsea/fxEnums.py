@@ -28,3 +28,12 @@ import ctypes as c
 (FX_INVALID_APP, FX_ACT_PACK, FX_EB5X, FX_NET_MASTER, FX_BMS) = map(
 	c.c_int, range(-1, 4)
 )
+
+
+class FW(c.Structure):
+	_fields_ = [
+		("Mn", c.c_uint32),
+		("Ex", c.c_uint32),
+		("Re", c.c_uint32),
+		("Habs", c.c_uint32),
+	]

@@ -54,6 +54,28 @@ def is_pi64():
 		return False
 
 
+def decode(val):
+	"""
+	Returns decoded version number formatted as x.y.z
+	"""
+	x = y = z = 0
+
+	if val > 0:
+		while val % 2 == 0:
+			x += 1
+			val /= 2
+
+		while val % 3 == 0:
+			y += 1
+			val /= 3
+
+		while val % 5 == 0:
+			z += 1
+			val /= 5
+
+	return f"{x}.{y}.{z}"
+
+
 def clear_terminal():
 	"""
 	Clears the terminal - use before printing new values
