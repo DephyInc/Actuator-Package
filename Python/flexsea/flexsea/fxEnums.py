@@ -29,6 +29,7 @@ import ctypes as c
 	c.c_int, range(-1, 4)
 )
 
+
 class FW(c.Structure):
 	_fields_ = [
 		("Mn", c.c_uint32),

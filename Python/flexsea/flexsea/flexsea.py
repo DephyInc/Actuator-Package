@@ -8,6 +8,7 @@ from . import fxEnums as fxe
 from . import fxUtils as fxu
 from .dev_spec import AllDevices as fxd
 
+
 class FlexSEA:
 	"""
 	Implements FlexSEA Actuator Package API
