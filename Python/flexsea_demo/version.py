@@ -76,9 +76,7 @@ def main():
 	print(f"\t Re  : v{fw_Re}", flush=True)
 	print(f"\t Habs: v{fw_Habs}", flush=True)
 
-	return (
-		f"{fw_array.Mn}.{fw_array.Ex}.{fw_array.Re}.{fw_array.Habs}"
-	)
+	return f"{fw_array.Mn}.{fw_array.Ex}.{fw_array.Re}.{fw_array.Habs}"
 
 
 if __name__ == "__main__":

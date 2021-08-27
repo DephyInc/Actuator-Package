@@ -60,7 +60,7 @@ def decode(val):
 	"""
 	x = y = z = 0
 
-	if (val > 0):
+	if val > 0:
 		while val % 2 == 0:
 			x += 1
 			val /= 2
