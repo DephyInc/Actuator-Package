@@ -34,5 +34,5 @@ class FW(c.Structure):
 		("Mn", c.c_uint32),
 		("Ex", c.c_uint32),
 		("Re", c.c_uint32),
-		("Habs", c.c_uint32)
+		("Habs", c.c_uint32),
 	]
