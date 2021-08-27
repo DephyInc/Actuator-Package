@@ -2,7 +2,6 @@
 Dephy's FlexSEA Python API
 """
 import os
-import sys
 import platform
 import ctypes as c
 from . import fxEnums as fxe
@@ -22,12 +21,12 @@ class FlexSEA:
 	def __init__(self):
 		self.ids = []
 		self.c_lib = None
-		self.load_c_libs()
+		self.__load_c_libs()
 
 	def __del__(self):
 		self.close_all()
 
-	def load_c_libs(self):
+	def __load_c_libs(self):
 		"""Loads the library from the c lib"""
 		path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "libs")
 		lib_path = None
@@ -41,14 +40,7 @@ class FlexSEA:
 			else:
 				path_base = os.path.join(path, "win64")
 			lib_path = os.path.join(path_base, win_lib)
-			lib = win_lib
-			# Python 3.8+ requires location of all DLLs AND their dependencies
-			# be explicitly stated. Provide location of DLLs that
-			# libfx_plan_stack.dll depends on
-			if sys.version_info.minor >= 8:
-				# pylint: disable=no-member
-				os.add_dll_directory(path)
-				os.add_dll_directory(path_base)
+			lib = win_lib.split(".", maxsplit=1)[0]
 		elif fxu.is_pi():
 			# Try to load the full linux lib first (that's x86_64), if that
 			# fails, fall back to the raspberryPi lib.
@@ -63,17 +55,25 @@ class FlexSEA:
 
 		loading_log_messages = []
 		try:
-			if fxu.is_win() and sys.version_info.minor >= 8:
-				loading_log_messages.append("loading " + lib + "on a Windows system... ")
-				self.c_lib = c.cdll.LoadLibrary(lib)
+			# Python 3.8+ requires location of all DLLs AND their dependencies
+			# be explicitly stated. Provide location of DLLs that
+			# libfx_plan_stack.dll depends on
+			os.environ["PATH"] += path
+			if hasattr(os, "add_dll_directory"):
+				for extra_path in os.environ["PATH"].split(";"):
+					if os.path.exists(extra_path) and "mingw" in extra_path:
+						# pylint: disable=no-member
+						os.add_dll_directory(extra_path)
+				# pylint: disable=no-member
+				os.add_dll_directory(path_base)
+				lib = win_lib
 			else:
-				loading_log_messages.append("loading... " + lib_path)
-				self.c_lib = c.cdll.LoadLibrary(lib_path)
+				lib = lib_path
+			loading_log_messages.append(f"Loading {lib}")
+			self.c_lib = c.cdll.LoadLibrary(lib)
 		except OSError as err:
 			loading_log_messages.append(
-				"\n[!] Error encountered when loading the {} precompiled libraries".format(
-					self.__class__.__name__
-				)
+				f"\n[!] Error encountered when loading the {self.__class__.__name__} precompiled libraries"
 			)
 			if fxu.is_win():
 				loading_log_messages.append(
@@ -90,13 +90,15 @@ class FlexSEA:
 				)
 				loading_log_messages.append("https://github.com/DephyInc/Actuator-Package")
 				loading_log_messages.append("--------------------------------------------")
-			loading_log_messages.append(
-				"Detailed error message for debugging: \n {}\n".format(err)
-			)
+			loading_log_messages.append(f"Detailed error message for debugging:\n{err}\n")
 			print("\n".join(loading_log_messages))
 
+		self.__define_c_args()
+
+	def __define_c_args(self):
+		"""Defines data types for all C functions"""
 		if self.c_lib:
-			print("{} libraries loaded".format(self.__class__.__name__))
+			print(f"{self.__class__.__name__} libraries loaded")
 			# set arg types
 			self.c_lib.fxOpen.argtypes = [c.c_char_p, c.c_uint, c.c_uint]
 			self.c_lib.fxOpen.restype = c.c_int
@@ -199,7 +201,7 @@ class FlexSEA:
 		ValueError if the device ID is invalid
 		"""
 		self.ids.remove(dev_id)
-		if self.c_lib.fxClose(dev_id) == fxe.FX_INVALID_DEVICE:
+		if self.c_lib.fxClose(dev_id) == fxe.FX_INVALID_DEVICE.value:
 			raise ValueError("fxClose: invalid device ID")
 
 	def close_all(self):
@@ -253,9 +255,9 @@ class FlexSEA:
 
 		ret_code = self.c_lib.fxStartStreaming(dev_id, freq, 1 if log_en else 0)
 
-		if ret_code == fxe.FX_INVALID_DEVICE:
+		if ret_code == fxe.FX_INVALID_DEVICE.value:
 			raise ValueError("fxStartStreaming: invalid device ID")
-		if ret_code == fxe.FX_FAILURE:
+		if ret_code == fxe.FX_FAILURE.value:
 			raise RuntimeError("fxStartStreaming: stream failed")
 
 	def stop_streaming(self, dev_id):
@@ -266,9 +268,9 @@ class FlexSEA:
 		dev_id (int): Is the device ID
 		"""
 		ret_code = self.c_lib.fxStopStreaming(dev_id)
-		if ret_code == fxe.FX_INVALID_DEVICE:
+		if ret_code == fxe.FX_INVALID_DEVICE.value:
 			raise ValueError("fxStopStreaming: invalid device ID")
-		if ret_code == fxe.FX_FAILURE:
+		if ret_code == fxe.FX_FAILURE.value:
 			raise RuntimeError("fxStopStreaming: stream failed")
 
 	def read_device(self, dev_id):
@@ -302,13 +304,13 @@ class FlexSEA:
 			device_state = fxd.EB5xState()
 			ret_code = self.c_lib.fxReadExoDevice(dev_id, c.byref(device_state))
 		else:
-			raise RuntimeError("Unsupported application type: ", app_type)
+			raise RuntimeError(f"Unsupported application type: {app_type}")
 
-		if ret_code == fxe.FX_INVALID_DEVICE:
-			raise ValueError("fxReadDevice: invalid device ID: {}".format(dev_id))
-		if ret_code == fxe.FX_NOT_STREAMING:
+		if ret_code == fxe.FX_INVALID_DEVICE.value:
+			raise ValueError(f"fxReadDevice: invalid device ID: {dev_id}")
+		if ret_code == fxe.FX_NOT_STREAMING.value:
 			raise RuntimeError("fxReadDevice: no read data")
-		if ret_code == fxe.FX_FAILURE:
+		if ret_code == fxe.FX_FAILURE.value:
 			raise IOError("fxReadDevice: command failed")
 
 		return device_state
@@ -331,9 +333,9 @@ class FlexSEA:
 		exo_state = fxd.EB5xState()
 		ret_code = self.c_lib.fxReadExoDevice(dev_id, c.byref(exo_state))
 
-		if ret_code == fxe.FX_INVALID_DEVICE:
-			raise ValueError("fxReadDevice: invalid device ID: {}".format(dev_id))
-		if ret_code == fxe.FX_NOT_STREAMING:
+		if ret_code == fxe.FX_INVALID_DEVICE.value:
+			raise ValueError(f"fxReadDevice: invalid device ID: {dev_id}")
+		if ret_code == fxe.FX_NOT_STREAMING.value:
 			raise RuntimeError("fxReadDevice: no read data")
 
 		return exo_state
@@ -358,7 +360,7 @@ class FlexSEA:
 
 		items_read = self.c_lib.fxReadDeviceAll(dev_id, c.byref(data), data_size)
 		if items_read == -1:
-			raise ValueError("fxGetReadDataQueueSize: Invalid device ID: {}".format(dev_id))
+			raise ValueError(f"fxGetReadDataQueueSize: Invalid device ID: {dev_id}")
 		return items_read
 
 	def read_net_master_device_all(self, dev_id, data_size):
@@ -381,7 +383,7 @@ class FlexSEA:
 
 		items_read = self.c_lib.fxReadNetMasterDeviceAll(dev_id, c.byref(data), data_size)
 		if items_read == -1:
-			raise ValueError("fxReadNetMasterDeviceAll: Invalid device ID {}".format(dev_id))
+			raise ValueError(f"fxReadNetMasterDeviceAll: Invalid device ID {dev_id}")
 		return items_read
 
 	def read_bms_device_all(self, dev_id, data_size):
@@ -422,11 +424,11 @@ class FlexSEA:
 		"""
 		ret_code = self.c_lib.fxSetReadDataQueueSize(dev_id, data_size)
 
-		if ret_code == fxe.FX_INVALID_DEVICE:
-			raise ValueError("fxSetReadDataQueueSize: Invalid device ID: {}".format(dev_id))
-		if ret_code == fxe.FX_INVALID_PARAM:
-			raise ValueError("fxSetReadDataQueueSize: Invalid data_size: {}".format(data_size))
-		if ret_code == fxe.FX_FAILURE:
+		if ret_code == fxe.FX_INVALID_DEVICE.value:
+			raise ValueError(f"fxSetReadDataQueueSize: Invalid device ID: {dev_id}")
+		if ret_code == fxe.FX_INVALID_PARAM.value:
+			raise ValueError(f"fxSetReadDataQueueSize: Invalid data_size: {data_size}")
+		if ret_code == fxe.FX_FAILURE.value:
 			raise IOError("fxSetReadDataQueueSize: command failed")
 
 	def get_read_data_queue_size(self, dev_id):
@@ -442,10 +444,11 @@ class FlexSEA:
 
 		ret_val = self.c_lib.fxGetReadDataQueueSize(dev_id)
 		if ret_val == -1:
-			raise ValueError("fxGetReadDataQueueSize: Invalid device ID: {}".format(dev_id))
+			raise ValueError(f"fxGetReadDataQueueSize: Invalid device ID: {dev_id}")
 		return ret_val
 
 	# pylint: disable=invalid-name
+	# pylint: disable=too-many-arguments
 	def set_gains(self, dev_id, kp, ki, kd, k_val, b_val, ff):
 		"""
 		Sets the gains used by PID controllers on the FlexSEA device.
@@ -470,9 +473,9 @@ class FlexSEA:
 		"""
 		ret_code = self.c_lib.fxSetGains(dev_id, kp, ki, kd, k_val, b_val, ff)
 
-		if ret_code == fxe.FX_INVALID_DEVICE:
-			raise ValueError("fxSetGains: invalid device ID: {}".format(dev_id))
-		if ret_code == fxe.FX_FAILURE:
+		if ret_code == fxe.FX_INVALID_DEVICE.value:
+			raise ValueError(f"fxSetGains: invalid device ID: {dev_id}")
+		if ret_code == fxe.FX_FAILURE.value:
 			raise IOError("fxSetGains: command failed")
 
 	def send_motor_command(self, dev_id, ctrl_mode, value):
@@ -497,12 +500,12 @@ class FlexSEA:
 		"""
 		ret_code = self.c_lib.fxSendMotorCommand(dev_id, ctrl_mode, c.c_int(int(value)))
 
-		if ret_code == fxe.FX_INVALID_DEVICE:
-			raise ValueError("fxSendMotorCommand: invalid device ID: {}".format(dev_id))
-		if ret_code == fxe.FX_FAILURE:
+		if ret_code == fxe.FX_INVALID_DEVICE.value:
+			raise ValueError(f"fxSendMotorCommand: invalid device ID: {dev_id}")
+		if ret_code == fxe.FX_FAILURE.value:
 			raise IOError("fxSendMotorCommand failed.")
-		if ret_code == fxe.FX_INVALID_PARAM:
-			raise ValueError("fxSendMotorCommand: Invalid control mode: {}".format(ctrl_mode))
+		if ret_code == fxe.FX_INVALID_PARAM.value:
+			raise ValueError(f"fxSendMotorCommand: Invalid control mode: {ctrl_mode}")
 
 	def get_app_type(self, dev_id):
 		"""
@@ -536,9 +539,9 @@ class FlexSEA:
 		DO NOT USE THIS FUNCTION UNLESS YOU KNOW WHAT YOU ARE DOING
 		"""
 		ret_code = self.c_lib.fxFindPoles(dev_id)
-		if ret_code == fxe.FX_INVALID_DEVICE:
-			raise ValueError("fxFindPoles: invalid device ID: {}".format(dev_id))
-		if ret_code == fxe.FX_FAILURE:
+		if ret_code == fxe.FX_INVALID_DEVICE.value:
+			raise ValueError(f"fxFindPoles: invalid device ID: {dev_id}")
+		if ret_code == fxe.FX_FAILURE.value:
 			raise ValueError("fxFindPoles: command failed")
 
 	def activate_bootloader(self, dev_id, target):
@@ -556,9 +559,9 @@ class FlexSEA:
 		"""
 		ret_code = self.c_lib.fxActivateBootloader(dev_id, target)
 
-		if ret_code == fxe.FX_INVALID_DEVICE:
-			raise ValueError("fxActivateBootloader: invalid device ID")
-		if ret_code == fxe.FX_FAILURE:
+		if ret_code == fxe.FX_INVALID_DEVICE.value:
+			raise ValueError(f"fxActivateBootloader: invalid device ID {dev_id}")
+		if ret_code == fxe.FX_FAILURE.value:
 			raise IOError("fxActivateBootloader: command failed")
 
 	def is_bootloader_activated(self, dev_id):
@@ -575,9 +578,9 @@ class FlexSEA:
 		"""
 		ret_code = self.c_lib.fxIsBootloaderActivated(dev_id)
 
-		if ret_code == fxe.FX_INVALID_DEVICE:
-			raise ValueError("fxIsBootloaderActivated: invalid device ID")
-		if ret_code == fxe.FX_FAILURE:
+		if ret_code == fxe.FX_INVALID_DEVICE.value:
+			raise ValueError(f"fxIsBootloaderActivated: invalid device ID {dev_id}")
+		if ret_code == fxe.FX_FAILURE.value:
 			raise IOError("fxIsBootloaderActivated: command failed")
 
 		return ret_code

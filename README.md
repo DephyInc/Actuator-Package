@@ -27,10 +27,11 @@ Run this script to install the python dependencies before running the python scr
 
 ### Windows 10
 
-On Windows, use [this installer](https://www.python.org/ftp/python/3.9.5/python-3.9.5.exe) to install Python 3.9.
-> The downloadable link is that of a 32 bit Python version You would need to use a 32 bit version. <br>
+1. On Windows, download [Python 3.9](https://www.python.org/downloads/) and install it.
+2. Note which architecture you download (32 or 64 bits) and use the matching [git shell](https://git-scm.com/download/win).
+3. Install [MinGW](https://sourceforge.net/projects/mingw-w64/) select the matching the matchin arhcitecture in the installer. Make sure MinGW gets added to your Path variable.
 
-Then, to install the required Python dependencies, run the following command from the root directory of this repository using ___PowerShell___:
+Then, install the required Python environment using using ___PowerShell___ or __gitbash__:
 
 ### Install FlexSEA Library
 
@@ -38,13 +39,18 @@ Then, to install the required Python dependencies, run the following command fro
 # Define your own virtual environment
 # this is not required but it helps keeping your environment clean
 #	In Windows:
-	python -m virtualenv actpack
+	python -m pip install --upgrade pip
+	python -m pip install virtualenv
+	python -m virtualenv actpack --python=python3.9
 #	In Linux and RasberryPi systems:
-	python3 -m virtualenv --python=/usr/bin/python3.9 actpack
+	python3 -m pip install --upgrade pip
+	python3 -m pip install virtualenv
+	python3 -m virtualenv actpack --python=/usr/bin/python3.9
+	sudo apt install libc6 libgcc-s1 -y
 # Activate your virtualenv
-#	On Windows:
+#	On Windows (PowerShell):
 	actpack/Scripts/activate.ps1
-#	On Other OS:
+#	On other shells:
 	actpack/bin/activate
 # Once the environment is activated, install the package
 #	On Windows:

@@ -55,7 +55,7 @@ print("inc files:\n{}".format(inc_files))
 
 setuptools.setup(
 	name="flexsea",
-	version="7.1.0",
+	version="7.2.0",
 	author="Dephy Inc.",
 	author_email="admin@dephy.com",
 	description="Dephy's Actuator Package API library",
@@ -79,7 +79,7 @@ setuptools.setup(
 		"Operating System :: Microsoft :: Windows :: Windows 10",
 		"Development Status :: 5 - Production/Stable",
 	],
-	python_requires=">= 3.8.*",
+	python_requires=">= 3.7.*",
 	include_package_data=True,
 	data_files=[("libs", lib_files), ("inc", inc_files)],
 )
