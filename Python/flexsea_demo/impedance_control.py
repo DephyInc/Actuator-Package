@@ -6,8 +6,8 @@ FlexSEA Impedance Control Demo
 from time import sleep, time
 import matplotlib
 import matplotlib.pyplot as plt
-from flexsea import fxUtils as fxu
-from flexsea import fxEnums as fxe
+from flexsea import fxUtils as fxu  # pylint: disable=no-name-in-module
+from flexsea import fxEnums as fxe  # pylint: disable=no-name-in-module
 from flexsea import flexsea as flex
 
 matplotlib.use("WebAgg")
@@ -18,7 +18,7 @@ if fxu.is_pi():
 GAINS = {"kp": 40, "ki": 400, "K": 600, "B": 300, "B_Increments": 150, "FF": 128}
 
 
-def impedance_control(
+def impedance_control(  # pylint: disable=too-many-arguments too-many-statements too-many-locals
 	fxs,
 	port,
 	baud_rate,

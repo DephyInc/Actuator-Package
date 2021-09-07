@@ -5,7 +5,7 @@ FlexSEA Bootloader check demo
 """
 import sys
 from time import sleep
-from flexsea import fxEnums as fxe
+from flexsea import fxEnums as fxe  # pylint: disable=no-name-in-module
 from flexsea import flexsea as flex
 
 TARGETS = {

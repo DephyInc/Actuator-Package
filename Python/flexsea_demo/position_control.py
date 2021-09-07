@@ -4,11 +4,11 @@
 FlexSEA Position Control Demo
 """
 from time import sleep
-from flexsea import fxUtils as fxu
-from flexsea import fxEnums as fxe
+from flexsea import fxUtils as fxu  # pylint: disable=no-name-in-module
+from flexsea import fxEnums as fxe  # pylint: disable=no-name-in-module
 from flexsea import flexsea as flex
 
-
+# pylint: disable=too-many-arguments
 def position_control(fxs, port, baud_rate, time=8, time_step=0.1, resolution=100):
 	"""
 	Implement position control

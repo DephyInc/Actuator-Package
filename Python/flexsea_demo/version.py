@@ -3,11 +3,11 @@
 """
 FlexSEA version number demo
 """
+import sys
 from time import sleep
-from flexsea import fxEnums as fxe
+from flexsea import fxEnums as fxe  # pylint: disable=no-name-in-module
 from flexsea import flexsea as flex
-from flexsea import fxUtils as fxu
-import ctypes as c
+from flexsea import fxUtils as fxu  # pylint: disable=no-name-in-module
 
 
 def get_version(fxs, port, baud_rate):
@@ -27,9 +27,9 @@ def get_version(fxs, port, baud_rate):
 
 	request = fxs.request_firmware_version(dev_id)
 	if request == fxe.FX_SUCCESS.value:
-		print(f"Collecting version information. Please wait...", flush=True)
+		print("Collecting version information. Please wait...", flush=True)
 	else:
-		print(f"Firware version request failed", flush=True)
+		print("Firware version request failed", flush=True)
 
 	sleep(5)
 
@@ -65,19 +65,19 @@ def main():
 	fw_array = fxe.FW()
 	fw_array = get_version(flex.FlexSEA(), args.port[0], args.baud_rate)
 
-	fw_Mn = fxu.decode(fw_array.Mn)
-	fw_Ex = fxu.decode(fw_array.Ex)
-	fw_Re = fxu.decode(fw_array.Re)
-	fw_Habs = fxu.decode(fw_array.Habs)
+	fw_mn = fxu.decode(fw_array.Mn)
+	fw_ex = fxu.decode(fw_array.Ex)
+	fw_re = fxu.decode(fw_array.Re)
+	fw_habs = fxu.decode(fw_array.Habs)
 
-	print(f"Firmware version ", flush=True)
-	print(f"\t Mn  : v{fw_Mn}", flush=True)
-	print(f"\t Ex  : v{fw_Ex}", flush=True)
-	print(f"\t Re  : v{fw_Re}", flush=True)
-	print(f"\t Habs: v{fw_Habs}", flush=True)
+	print("Firmware version ", flush=True)
+	print(f"\t Mn  : v{fw_mn}", flush=True)
+	print(f"\t Ex  : v{fw_ex}", flush=True)
+	print(f"\t Re  : v{fw_re}", flush=True)
+	print(f"\t Habs: v{fw_habs}", flush=True)
 
 	return f"{fw_array.Mn}.{fw_array.Ex}.{fw_array.Re}.{fw_array.Habs}"
 
 
 if __name__ == "__main__":
-	exit(main())
+	sys.exit(main())

@@ -357,7 +357,7 @@ def load_ports_from_file(file_name):
 	Loads baud_rate and ports serial ports list from a yaml file.
 	"""
 	try:
-		with open(file_name, "r") as com_file:
+		with open(file_name, "r", encoding="utf-8") as com_file:
 			vals = yaml.load(com_file, Loader=yaml.FullLoader)
 			return vals["ports"], int(vals["baud_rate"])
 

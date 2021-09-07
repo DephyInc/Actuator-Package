@@ -48,7 +48,7 @@ def extract_py_node(class_node):
 	"""
 	extract nodes
 	"""
-	all_nodes = [node for node in ast.iter_child_nodes(class_node)]
+	all_nodes = list(ast.iter_child_nodes(class_node))
 	fields_extracted = []
 	if len(all_nodes) != 2:
 		print("ERR: Bad parsing in py files! Something has changed. Contact the developers!")
@@ -61,7 +61,7 @@ def extract_py_node(class_node):
 		print("ERR - Bad parsing in py files! Something has changed. Contact the developers!")
 		return fields_extracted
 
-	fields = [e for e in all_nodes[1].elts]
+	fields = list(all_nodes[1].elts)
 	fields_extracted = extract_py_fields(fields)
 	return fields_extracted
 
@@ -73,7 +73,7 @@ def get_py_fields(filename):
 
 	filename = os.path.join(PYTHON_DIR, filename)
 	try:
-		with open(filename) as py_file:
+		with open(filename, "r", encoding="utf-8") as py_file:
 			node = ast.parse(py_file.read())
 	except FileNotFoundError:
 		sys.exit(
@@ -141,8 +141,8 @@ def get_c_fields(name):
 		parser.preprocess(filename)
 		parser.parse_defs(filename)
 		structs = parser.defs["structs"]
-	except:
-		print("ERR - File not found")
+	except Exception as err:  # pylint: disable=broad-except
+		print(f"ERR - File not found: {err}")
 		return []
 
 	return extract_c_fields(structs)
@@ -193,7 +193,7 @@ def main():
 	if len(sys.argv) == 1 or sys.argv[1] == "all":
 		try:
 			# read fields
-			with open(COMPARE_FILE, "r") as compare_file:
+			with open(COMPARE_FILE, "r", encoding="utf-8") as compare_file:
 				lines = compare_file.readlines()
 			for line in lines:
 				py_file = line.split(",")[0].strip()
