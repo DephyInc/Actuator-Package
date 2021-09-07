@@ -6,8 +6,8 @@ FlexSEA Two Position Control Demo
 from time import sleep, time
 import matplotlib
 import matplotlib.pyplot as plt
-from flexsea import fxUtils as fxu
-from flexsea import fxEnums as fxe
+from flexsea import fxUtils as fxu  # pylint: disable=no-name-in-module
+from flexsea import fxEnums as fxe  # pylint: disable=no-name-in-module
 from flexsea import flexsea as flex
 
 
@@ -16,7 +16,7 @@ if fxu.is_pi():
 	matplotlib.rcParams.update({"webagg.address": "0.0.0.0"})
 
 
-def two_position_control(
+def two_position_control(  # pylint: disable=too-many-arguments too-many-locals
 	fxs,
 	port,
 	baud_rate,

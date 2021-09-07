@@ -9,8 +9,8 @@ More information at https://dephy.com/faster
 You can use the `flexsea` library in your code as follows:
 
 ```python
-from flexsea import fxUtils as fxu
-from flexsea import fxEnums as fxe
+from flexsea import fxUtils as fxu # pylint: disable=no-name-in-module
+from flexsea import fxEnums as fxe # pylint: disable=no-name-in-module
 from flexsea import flexsea as flex
 
 fxs = flex.FlexSEA()

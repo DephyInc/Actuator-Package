@@ -7,9 +7,9 @@ from time import sleep, time
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
-from flexsea import fxUtils as fxu
-from flexsea import fxEnums as fxe
-from flexsea import fxPlotting as fxp
+from flexsea import fxUtils as fxu  # pylint: disable=no-name-in-module
+from flexsea import fxEnums as fxe  # pylint: disable=no-name-in-module
+from flexsea import fxPlotting as fxp  # pylint: disable=no-name-in-module
 from flexsea import flexsea as flex
 
 
@@ -24,7 +24,7 @@ TIMESTAMPS = []  # Elapsed times since start of run
 CYCLE_STOP_TIMES = []  # Timestamps for each loop end
 
 
-def high_stress_test(
+def high_stress_test(  # pylint: disable=too-many-arguments too-many-statements too-many-locals too-many-branches
 	fxs,
 	ports,
 	baud_rate,
@@ -248,7 +248,7 @@ def high_stress_test(
 	)
 
 
-def plot_data(
+def plot_data(  # pylint: disable=too-many-arguments
 	fxs, devices, pos_amp, pos_freq, curr_amp, curr_freq, cmd_freq, type_str="sine wave"
 ):
 	"""
@@ -297,7 +297,7 @@ def plot_data(
 	print("Communication closed")
 
 
-def send_and_time_cmds(
+def send_and_time_cmds(  # pylint: disable=too-many-arguments
 	fxs, start_time, devices, cmds, motor_cmd, gains, set_gains: bool
 ):
 	"""

@@ -7,9 +7,9 @@ from time import sleep, time
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
-from flexsea import fxUtils as fxu
-from flexsea import fxEnums as fxe
-from flexsea import fxPlotting as fxp
+from flexsea import fxUtils as fxu  # pylint: disable=no-name-in-module
+from flexsea import fxEnums as fxe  # pylint: disable=no-name-in-module
+from flexsea import fxPlotting as fxp  # pylint: disable=no-name-in-module
 from flexsea import flexsea as flex
 
 
@@ -19,6 +19,7 @@ if fxu.is_pi():
 	matplotlib.rcParams.update({"webagg.address": "0.0.0.0"})
 
 
+# pylint: disable=too-few-public-methods
 class Signal:
 	"""Signal type to send to controller"""
 
@@ -26,7 +27,7 @@ class Signal:
 	line = 2
 
 
-def high_speed_test(
+def high_speed_test(  # pylint: disable=too-many-arguments too-many-statements too-many-locals too-many-branches
 	fxs,
 	ports,
 	baud_rate,
@@ -147,6 +148,7 @@ def high_speed_test(
 	# Record start time of experiment
 	i = 0
 	start_time = time()
+	# pylint: disable=too-many-nested-blocks
 	for rep in range(number_of_loops):
 		elapsed_time = time() - start_time
 		fxu.print_loop_count_and_time(rep, number_of_loops, elapsed_time)

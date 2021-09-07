@@ -6,12 +6,12 @@ FlexSEA Two Devices Leader Follower demo
 
 import traceback
 from time import sleep
-from flexsea import fxUtils as fxu
-from flexsea import fxEnums as fxe
+from flexsea import fxUtils as fxu  # pylint: disable=no-name-in-module
+from flexsea import fxEnums as fxe  # pylint: disable=no-name-in-module
 from flexsea import flexsea as flex
 
 
-def leader_follower(fxs, ports, baud_rate):
+def leader_follower(fxs, ports, baud_rate):  # pylint: disable=too-many-locals
 	"""
 	lead the motion of an ActPack by manually moving another one
 	"""
@@ -54,7 +54,7 @@ def leader_follower(fxs, ports, baud_rate):
 			fxu.print_device(leader_data, fxe.FX_ACT_PACK)
 			fxu.print_loop_count(i, loop_count)
 
-	except Exception as err:
+	except Exception as err:  # pylint: disable=broad-except
 		print(f"Problem encountered: {err}")
 		print(traceback.format_exc())
 

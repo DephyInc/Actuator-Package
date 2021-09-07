@@ -8,7 +8,7 @@ from . import fxEnums as en
 from . import fxUtils as fxu
 
 
-def plot_setpoint_vs_desired(
+def plot_setpoint_vs_desired(  # pylint: disable=too-many-arguments
 	dev_id,
 	fig,
 	ctrl_type,

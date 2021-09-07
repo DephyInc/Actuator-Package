@@ -9,7 +9,7 @@ from . import fxUtils as fxu
 from .dev_spec import AllDevices as fxd
 
 
-class FlexSEA:
+class FlexSEA:  # pylint: disable=too-many-public-methods
 	"""
 	Implements FlexSEA Actuator Package API
 	Device ID is an alphanumeric ID used to refer to a specific FlexSEA device.

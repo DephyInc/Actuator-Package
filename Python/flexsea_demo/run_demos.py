@@ -7,8 +7,10 @@ import os
 import sys
 from signal import signal, SIGINT
 from flexsea import flexsea as flex
-from flexsea import fxUtils as fxu
-from flexsea import fxEnums as fxe
+from flexsea import fxUtils as fxu  # pylint: disable=no-name-in-module
+from flexsea import fxEnums as fxe  # pylint: disable=no-name-in-module
+
+# pylint: disable=import-error
 from read_only import read_only
 from open_control import open_control
 from current_control import current_control
@@ -20,6 +22,7 @@ from high_stress_test import high_stress_test
 from two_devices_position_control import two_devices_position_control
 from two_devices_leader_follower import leader_follower
 from bootloader import bootloader
+from version import get_version
 
 
 if (sys.version_info[0] == 3) and (sys.version_info[1] == 8):
@@ -62,7 +65,10 @@ EXPERIMENTS = [
 	(leader_follower, "Two Devices Leader Follower Control", 2, 2),
 	(bootloader, "Bootloader Check", 1, 1),
 	(find_poles, "Find Poles", 1, 1),
+	(get_version, "Read Firmware Version", 1, 1),
 ]
+
+TOOL_SLICE = -3  # The last three experiments are to be listed as utilities
 
 
 def print_demos():
@@ -75,13 +81,13 @@ def print_demos():
 
 	print("Actuator Package Demo Scripts:")
 	print("------------------------------")
-	for exp in EXPERIMENTS[:-2]:
+	for exp in EXPERIMENTS[:TOOL_SLICE]:
 		print(f"[{EXPERIMENTS.index(exp)}] {exp[1]}")
 
 	print("\nAdvanced Utilities:")
 	print("------------------------------")
 
-	for exp in EXPERIMENTS[-2:]:
+	for exp in EXPERIMENTS[TOOL_SLICE:]:
 		print(f"[{EXPERIMENTS.index(exp)}] {exp[1]}")
 	print("")
 
@@ -90,7 +96,7 @@ def print_usage(prog_name: str):
 	"""
 	Some error occurred. Print help message and exit.
 	"""
-	# TODO (CA): use argparse for all arguments and usage
+	# pylint: disable=line-too-long
 	print(
 		f"Usage:\tPython {prog_name} [experiment_number (0 - {len(EXPERIMENTS) - 1 }) connected_devices (1 - N)]"
 	)
@@ -189,7 +195,7 @@ def main(argv):
 			EXPERIMENTS[exp_ind][0](flex.FlexSEA(), ports[0], baud_rate)
 		else:
 			EXPERIMENTS[exp_ind][0](flex.FlexSEA(), ports[:dev_num], baud_rate)
-	except Exception as err:
+	except Exception as err:  # pylint: disable=broad-except
 		print("Problem encountered when running the demo: {}".format(err))
 		sys.exit(err)
 

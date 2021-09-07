@@ -64,8 +64,7 @@ repos:
             )$
         args:
             - --indent-string='\t'
-            - --disable=C0330, R0801
-            - --exit-zero
+            - --disable=C0330, R0801, W0511
         additional_dependencies:
             - flexsea
             - numpy

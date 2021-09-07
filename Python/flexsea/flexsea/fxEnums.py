@@ -30,7 +30,9 @@ import ctypes as c
 )
 
 
-class FW(c.Structure):
+class FW(c.Structure):  # pylint: disable=too-few-public-methods
+	"""Firmware version"""
+
 	_fields_ = [
 		("Mn", c.c_uint32),
 		("Ex", c.c_uint32),
