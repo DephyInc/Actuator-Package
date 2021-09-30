@@ -14,10 +14,11 @@ function add_user_to_dialout() {
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
 	sudo apt-get update &&
 	sudo apt-get install python3.9 -y &&
-	echo -e "${GREEN}Python dependencies installed.${NC}" && exit 0 ||
+	add_user_to_dialout &&
+	echo -e "${GREEN}Python dependencies installed.${NC}" &&
+	exit 0 ||
 	echo -e "${RED}An issue was encountered when installing the python dependencies.${NC}" &&
 	exit 1
-	add_user_to_dialout
 # Raspberry Pi Dependencies
 elif [[ "$OSTYPE" == "linux-gnueabihf" ]]; then
 	sudo apt-get update &&
@@ -33,10 +34,11 @@ elif [[ "$OSTYPE" == "linux-gnueabihf" ]]; then
 	sudo update-alternatives --config python
 	sudo apt-get install ufw python-scipy libatlas-base-dev -y &&
 	sudo ufw enable && sudo ufw allow 8988 && sudo ufw allow 22 && # Open port for graph display
-	echo -e "${GREEN}Python dependencies installed.${NC}" && exit 0 ||
+	add_user_to_dialout &&
+	echo -e "${GREEN}Python dependencies installed.${NC}" &&
+	exit 0 ||
 	echo -e "${RED}An issue was encountered when installing the python dependencies.${NC}" &&
 	exit 1
-	add_user_to_dialout
 else
 	echo -e "${RED}Unsuported OS $OSTYPE. Nothing was installed.${NC}" &&
 	exit 1
