@@ -5,6 +5,11 @@ RED="\033[0;31m"
 GREEN="\033[0;32m"
 NC="\033[0m" # Default Color
 
+function add_user_to_dialout() {
+	echo "Adding $USER to dialout" &&
+	sudo usermod -a -G dialout "$USER"
+}
+
 # Ubuntu Dependencies
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
 	sudo apt-get update &&
@@ -12,6 +17,7 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
 	echo -e "${GREEN}Python dependencies installed.${NC}" && exit 0 ||
 	echo -e "${RED}An issue was encountered when installing the python dependencies.${NC}" &&
 	exit 1
+	add_user_to_dialout
 # Raspberry Pi Dependencies
 elif [[ "$OSTYPE" == "linux-gnueabihf" ]]; then
 	sudo apt-get update &&
@@ -30,6 +36,7 @@ elif [[ "$OSTYPE" == "linux-gnueabihf" ]]; then
 	echo -e "${GREEN}Python dependencies installed.${NC}" && exit 0 ||
 	echo -e "${RED}An issue was encountered when installing the python dependencies.${NC}" &&
 	exit 1
+	add_user_to_dialout
 else
 	echo -e "${RED}Unsuported OS $OSTYPE. Nothing was installed.${NC}" &&
 	exit 1
