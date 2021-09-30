@@ -29,7 +29,6 @@ If choose to install Python manyually, make sure to add the current user to the 
 
 ```bash
 sudo usermod -a -G dialout "$USER"
-
 ```
 
 ### Windows 10
