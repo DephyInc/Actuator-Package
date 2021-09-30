@@ -5,11 +5,18 @@ RED="\033[0;31m"
 GREEN="\033[0;32m"
 NC="\033[0m" # Default Color
 
+function add_user_to_dialout() {
+	echo "Adding $USER to dialout" &&
+	sudo usermod -a -G dialout "$USER"
+}
+
 # Ubuntu Dependencies
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
 	sudo apt-get update &&
 	sudo apt-get install python3.9 -y &&
-	echo -e "${GREEN}Python dependencies installed.${NC}" && exit 0 ||
+	add_user_to_dialout &&
+	echo -e "${GREEN}Python dependencies installed.${NC}" &&
+	exit 0 ||
 	echo -e "${RED}An issue was encountered when installing the python dependencies.${NC}" &&
 	exit 1
 # Raspberry Pi Dependencies
@@ -27,7 +34,9 @@ elif [[ "$OSTYPE" == "linux-gnueabihf" ]]; then
 	sudo update-alternatives --config python
 	sudo apt-get install ufw python-scipy libatlas-base-dev -y &&
 	sudo ufw enable && sudo ufw allow 8988 && sudo ufw allow 22 && # Open port for graph display
-	echo -e "${GREEN}Python dependencies installed.${NC}" && exit 0 ||
+	add_user_to_dialout &&
+	echo -e "${GREEN}Python dependencies installed.${NC}" &&
+	exit 0 ||
 	echo -e "${RED}An issue was encountered when installing the python dependencies.${NC}" &&
 	exit 1
 else
