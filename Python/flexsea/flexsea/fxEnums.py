@@ -25,7 +25,7 @@ import ctypes as c
 )
 
 # App Type
-(FX_INVALID_APP, FX_ACT_PACK, FX_EB5X, FX_NET_MASTER, FX_BMS) = map(
+(FX_INVALID_APP, FX_ACT_PACK, FX_EB5X, FX_MD, FX_NET_MASTER, FX_BMS) = map(
 	c.c_int, range(-1, 4)
 )
 
