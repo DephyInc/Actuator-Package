@@ -309,6 +309,9 @@ class FlexSEA:  # pylint: disable=too-many-public-methods
 		elif app_type.value == fxe.FX_EB5X.value:
 			device_state = fxd.EB5xState()
 			ret_code = self.c_lib.fxReadExoDevice(dev_id, c.byref(device_state))
+		elif app_type.value == fxe.FX_MD.value:
+			device_state = fxd.MD10State()
+			ret_code = self.c_lib.fxReadMdDevice(dev_id, c.byref(device_state))
 		else:
 			raise RuntimeError(f"Unsupported application type: {app_type}")
 

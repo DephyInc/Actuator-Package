@@ -33,6 +33,8 @@ def bootloader(fxs, port, baud_rate, target="Mn", timeout=60):
 		app_name = "ActPack"
 	elif app_type.value == fxe.FX_EB5X.value:
 		app_name = "Exo or ActPack Plus"
+	elif app_type.value == fxe.FX_MD.value:
+		app_name = "Medical Device"
 	else:
 		app_name = "Unknown"
 		print(f"Unknown application type: {app_type.value}")

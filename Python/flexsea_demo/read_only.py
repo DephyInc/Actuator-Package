@@ -49,6 +49,10 @@ def read_only(fxs, port, baud_rate, run_time=8, user_input=True):
 		print("\nYour device is an Exo or ActPack Plus.\n")
 		if user_input:
 			input("Press Enter to continue...")
+	elif app_type.value == fxe.FX_MD.value:
+		print("\nYour device is a Medical Device.\n")
+		if user_input:
+			input("Press Enter to continue...")
 	else:
 		raise RuntimeError(f"Unsupported application type: {app_type}")
 

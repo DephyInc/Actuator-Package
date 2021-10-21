@@ -107,6 +107,8 @@ def print_device(dev_id, app_type):
 		print_bms(dev_id)
 	elif app_type.value == en.FX_EB5X.value:
 		print_eb5x(dev_id)
+	elif app_type.value == en.FX_MD.value:
+		print_fxmd(dev_id)
 	else:
 		raise RuntimeError("Unsupported application type: ", app_type)
 
