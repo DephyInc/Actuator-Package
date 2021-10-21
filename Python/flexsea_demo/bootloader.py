@@ -34,7 +34,8 @@ def bootloader(fxs, port, baud_rate, target="Mn", timeout=60):
 	elif app_type.value == fxe.FX_EB5X.value:
 		app_name = "Exo or ActPack Plus"
 	else:
-		raise RuntimeError(f"Unsupported application type: {app_type.value}")
+		app_name = "Unknown"
+		print(f"Unknown application type: {app_type.value}")
 
 	print(f"Your device is an {app_name}", flush=True)
 
