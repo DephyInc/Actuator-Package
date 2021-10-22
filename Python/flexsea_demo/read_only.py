@@ -30,8 +30,8 @@ def read_only(fxs, port, baud_rate, run_time=8, user_input=True):
 	debug_logging_level = 0  # 6 is least verbose, 0 is most verbose
 	data_log = True  # False means no logs will be saved
 	dev_id = fxs.open(port, baud_rate, debug_logging_level)
-	fxs.start_streaming(dev_id, freq=100, log_en=data_log)
 	app_type = fxs.get_app_type(dev_id)
+	fxs.start_streaming(dev_id, freq=100, log_en=data_log)
 
 	if app_type.value == fxe.FX_ACT_PACK.value:
 		print("\nYour device is an ActPack.\n")

@@ -36,8 +36,7 @@ def bootloader(fxs, port, baud_rate, target="Mn", timeout=60):
 	elif app_type.value == fxe.FX_MD.value:
 		app_name = "Medical Device"
 	else:
-		app_name = "Unknown"
-		print(f"Unknown application type: {app_type.value}")
+		raise RuntimeError(f"Unknown application type: {app_type.value}")
 
 	print(f"Your device is an {app_name}", flush=True)
 

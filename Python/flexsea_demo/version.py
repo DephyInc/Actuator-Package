@@ -20,6 +20,8 @@ def get_version(fxs, port, baud_rate):
 		app_name = "ActPack"
 	elif app_type.value == fxe.FX_EB5X.value:
 		app_name = "Exo or ActPack Plus"
+	elif app_type.value == fxe.FX_MD.value:
+		app_name = "Medical Device"
 	else:
 		raise RuntimeError(f"Unsupported application type: {app_type.value}")
 
