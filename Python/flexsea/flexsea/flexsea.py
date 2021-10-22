@@ -563,7 +563,8 @@ class FlexSEA:  # pylint: disable=too-many-public-methods
 		-1 if invalid
 		0 if ActPack
 		1 if Exo
-		2 if NetMaster
+		2 if MD
+		3 if NetMaster
 		"""
 		return c.c_int(self.c_lib.fxGetAppType(dev_id))
 
