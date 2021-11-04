@@ -12,7 +12,7 @@ from flexsea import flexsea as flex
 
 
 def leader_follower(
-	fxs, ports, baud_rate, loops=200
+	fxs, ports, baud_rate, timeout=10
 ):  # pylint: disable=too-many-locals
 	"""
 	lead the motion of an ActPack by manually moving another one
@@ -40,10 +40,12 @@ def leader_follower(
 	fxs.set_gains(dev_id_1, 50, 10, 0, 0, 0, 0)
 	fxs.send_motor_command(dev_id_1, fxe.FX_POSITION, initial_angle_1)
 
-	loop_count = loops
+	loop_delay = 0.5  # second
+	loop_count = timeout / loop_delay
+
 	try:
 		for i in range(loop_count):
-			sleep(0.05)
+			sleep(loop_delay)
 			fxu.clear_terminal()
 			leader_data = fxs.read_device(dev_id_0)
 			follower_data = fxs.read_device(dev_id_1)
@@ -91,16 +93,16 @@ def main():
 		help="Serial communication baud rate.",
 	)
 	parser.add_argument(
-		"-l",
-		"--loops",
-		metavar="L",
-		dest="loops",
+		"-t",
+		"--timeout",
+		metavar="T",
+		dest="timeout",
 		type=int,
-		default=200,
-		help="How many loops to run",
+		default=10,
+		help="How many seconds to run for",
 	)
 	args = parser.parse_args()
-	leader_follower(flex.FlexSEA(), args.ports, args.baud_rate, args.loops)
+	leader_follower(flex.FlexSEA(), args.ports, args.baud_rate, args.timeout)
 
 
 if __name__ == "__main__":
