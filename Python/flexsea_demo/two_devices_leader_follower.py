@@ -37,7 +37,7 @@ def leader_follower(
 	fxs.send_motor_command(leader_id, fxe.FX_CURRENT, 0)
 
 	# Set position controller for second device
-	fxs.set_gains(follower_id, 400, 50, 0, 0, 0, 0)
+	fxs.set_gains(follower_id, 100, 1, 0, 0, 0, 0)
 	fxs.send_motor_command(follower_id, fxe.FX_POSITION, initial_angle_1)
 
 	loop_delay = 0.05  # second
