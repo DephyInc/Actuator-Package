@@ -41,7 +41,7 @@ def leader_follower(
 	fxs.send_motor_command(dev_id_1, fxe.FX_POSITION, initial_angle_1)
 
 	loop_delay = 0.5  # second
-	loop_count = timeout / loop_delay
+	loop_count = int(timeout / loop_delay)
 
 	try:
 		for i in range(loop_count):
