@@ -11,7 +11,9 @@ from flexsea import fxEnums as fxe  # pylint: disable=no-name-in-module
 from flexsea import flexsea as flex
 
 
-def leader_follower(fxs, ports, baud_rate):  # pylint: disable=too-many-locals
+def leader_follower(
+	fxs, ports, baud_rate, loops=200
+):  # pylint: disable=too-many-locals
 	"""
 	lead the motion of an ActPack by manually moving another one
 	"""
@@ -38,7 +40,7 @@ def leader_follower(fxs, ports, baud_rate):  # pylint: disable=too-many-locals
 	fxs.set_gains(dev_id_1, 50, 10, 0, 0, 0, 0)
 	fxs.send_motor_command(dev_id_1, fxe.FX_POSITION, initial_angle_1)
 
-	loop_count = 200
+	loop_count = loops
 	try:
 		for i in range(loop_count):
 			sleep(0.05)
@@ -88,8 +90,17 @@ def main():
 		default=230400,
 		help="Serial communication baud rate.",
 	)
+	parser.add_argument(
+		"-l",
+		"--loops",
+		metavar="L",
+		dest="loops",
+		type=int,
+		default=200,
+		help="How many loops to run",
+	)
 	args = parser.parse_args()
-	leader_follower(flex.FlexSEA(), args.ports, args.baud_rate)
+	leader_follower(flex.FlexSEA(), args.ports, args.baud_rate, args.loops)
 
 
 if __name__ == "__main__":
