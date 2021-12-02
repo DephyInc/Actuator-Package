@@ -17,11 +17,17 @@ TARGETS = {
 	"XBee": {"id": 5, "name": "XBee"},
 }
 
+APP_NAMES = {
+	fxe.FX_ACT_PACK.value: "ActPack",
+	fxe.FX_EB5X.value: "EBx or ActPack Plus",
+	fxe.FX_MD.value: "Medical Device",
+}
 
 def bootloader(fxs, port, baud_rate, target="Mn", timeout=60):
 	"""Activate bootloader in target and wait until it's active."""
 	debug_logging_level = 0  # 6 is least verbose, 0 is most verbose
 	result = 1
+
 
 	try:
 		dev_id = fxs.open(port, baud_rate, debug_logging_level)
@@ -29,16 +35,11 @@ def bootloader(fxs, port, baud_rate, target="Mn", timeout=60):
 	except IOError as err:
 		raise RuntimeError(f"Failed to open device at {port}") from err
 
-	if app_type.value == fxe.FX_ACT_PACK.value:
-		app_name = "ActPack"
-	elif app_type.value == fxe.FX_EB5X.value:
-		app_name = "Exo or ActPack Plus"
-	elif app_type.value == fxe.FX_MD.value:
-		app_name = "Medical Device"
-	else:
-		raise RuntimeError(f"Unknown application type: {app_type.value}")
-
-	print(f"Your device is an {app_name}", flush=True)
+	try:
+		app_name = APP_NAMES[app_type.value]
+		print(f"Your device is an {app_name}", flush=True)
+	except KeyError as err:
+		raise RuntimeError(f"Unknown application type: {app_type.value}") from err
 
 	print(f"Activating {TARGETS[target]['name']} bootloader", flush=True)
 	wait_step = 1
