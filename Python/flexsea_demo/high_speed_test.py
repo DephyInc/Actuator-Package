@@ -227,7 +227,8 @@ def high_speed_test(  # pylint: disable=too-many-arguments too-many-statements t
 		cycle_stop_times.append(time() - start_time)
 	# Disable the controller, send 0 PWM
 	fxs.send_motor_command(dev_id0, fxe.FX_NONE, 0)
-	fxs.send_motor_command(dev_id1, fxe.FX_NONE, 0)
+	if second_device:
+		fxs.send_motor_command(dev_id1, fxe.FX_NONE, 0)
 	sleep(0.1)
 
 	# End of Main Code - Start of plotting code

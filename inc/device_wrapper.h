@@ -8,6 +8,7 @@
 
 #include <stdbool.h>
 #include <string>
+#include "md10_struct.h"
 #include "actpack_struct.h"
 #include "netmaster_struct.h"
 #include "cellscreener_struct.h"
@@ -48,6 +49,7 @@ typedef enum fxAppType
 	FxInvalidApp = -1,
 	FxActPack = 0,
 	FxExo,
+	FxMd,
 	FxNetMaster,
 	FxBMS,
 	FxHabsolute,

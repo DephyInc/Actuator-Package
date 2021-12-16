@@ -16,17 +16,13 @@ def get_version(fxs, port, baud_rate):
 	dev_id = fxs.open(port, baud_rate, debug_logging_level)
 	app_type = fxs.get_app_type(dev_id)
 
-	if app_type.value == fxe.FX_ACT_PACK.value:
-		app_name = "ActPack"
-	elif app_type.value == fxe.FX_EB5X.value:
-		app_name = "Exo or ActPack Plus"
-	else:
-		raise RuntimeError(f"Unsupported application type: {app_type.value}")
+	try:
+		app_name = fxe.APP_NAMES[app_type.value]
+		print(f"Your device is an {app_name}", flush=True)
+	except KeyError as err:
+		raise RuntimeError(f"Unsupported application type: {app_type.value}") from err
 
-	print(f"Your device is an {app_name}", flush=True)
-
-	request = fxs.request_firmware_version(dev_id)
-	if request == fxe.FX_SUCCESS.value:
+	if fxs.request_firmware_version(dev_id) == fxe.FX_SUCCESS.value:
 		print("Collecting version information. Please wait...", flush=True)
 	else:
 		print("Firware version request failed", flush=True)

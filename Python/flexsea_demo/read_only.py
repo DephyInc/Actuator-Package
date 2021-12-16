@@ -5,10 +5,8 @@ FlexSEA Read Only Demo
 """
 from time import sleep
 from flexsea import fxUtils as fxu  # pylint: disable=no-name-in-module
-from flexsea import (
-	fxEnums as fxe,
-)  # pylint: disable=no-name-in-module # pylint: disable=no-name-in-module
-from flexsea import flexsea as flex
+from flexsea import fxEnums as fxe  # pylint: disable=no-name-in-module
+from flexsea import flexsea as flex  # pylint: disable=no-name-in-module
 
 # TODO(CA): move to fxUtils
 def print_bms_state(fxs, dev_id):
@@ -28,29 +26,18 @@ def read_only(fxs, port, baud_rate, run_time=8, user_input=True):
 	"""
 	time_step = 0.1
 	debug_logging_level = 0  # 6 is least verbose, 0 is most verbose
-	data_log = True  # False means no logs will be saved
 	dev_id = fxs.open(port, baud_rate, debug_logging_level)
-	fxs.start_streaming(dev_id, freq=100, log_en=data_log)
 	app_type = fxs.get_app_type(dev_id)
+	fxs.start_streaming(dev_id, freq=100, log_en=True)
 
-	if app_type.value == fxe.FX_ACT_PACK.value:
-		print("\nYour device is an ActPack.\n")
+	try:
+		print(f"Your device is an {fxe.APP_NAMES[app_type.value]}", flush=True)
+		if app_type.value == fxe.FX_INVALID_APP.value:
+			raise KeyError(app_type.value)
 		if user_input:
 			input("Press Enter to continue...")
-	elif app_type.value == fxe.FX_NET_MASTER.value:
-		print("\nYour device is a NetMaster.\n")
-		if user_input:
-			input("Press Enter to continue...")
-	elif app_type.value == fxe.FX_BMS.value:
-		print("\nYour device is a BMS.\n")
-		if user_input:
-			input("Press Enter to continue...")
-	elif app_type.value == fxe.FX_EB5X.value:
-		print("\nYour device is an Exo or ActPack Plus.\n")
-		if user_input:
-			input("Press Enter to continue...")
-	else:
-		raise RuntimeError(f"Unsupported application type: {app_type}")
+	except KeyError as err:
+		raise RuntimeError(f"Unsupported application type: {app_type.value}") from err
 
 	total_loop_count = int(run_time / time_step)
 	for i in range(total_loop_count):

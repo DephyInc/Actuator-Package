@@ -29,14 +29,10 @@ def bootloader(fxs, port, baud_rate, target="Mn", timeout=60):
 	except IOError as err:
 		raise RuntimeError(f"Failed to open device at {port}") from err
 
-	if app_type.value == fxe.FX_ACT_PACK.value:
-		app_name = "ActPack"
-	elif app_type.value == fxe.FX_EB5X.value:
-		app_name = "Exo or ActPack Plus"
-	else:
-		raise RuntimeError(f"Unsupported application type: {app_type.value}")
-
-	print(f"Your device is an {app_name}", flush=True)
+	try:
+		print(f"Your device is an {fxe.APP_NAMES[app_type.value]}", flush=True)
+	except KeyError as err:
+		raise RuntimeError(f"Unknown application type: {app_type.value}") from err
 
 	print(f"Activating {TARGETS[target]['name']} bootloader", flush=True)
 	wait_step = 1

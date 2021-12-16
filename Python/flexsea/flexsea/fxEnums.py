@@ -25,9 +25,18 @@ import ctypes as c
 )
 
 # App Type
-(FX_INVALID_APP, FX_ACT_PACK, FX_EB5X, FX_NET_MASTER, FX_BMS) = map(
-	c.c_int, range(-1, 4)
+(FX_INVALID_APP, FX_ACT_PACK, FX_EB5X, FX_MD, FX_NET_MASTER, FX_BMS) = map(
+	c.c_int, range(-1, 5)
 )
+
+APP_NAMES = {
+	FX_INVALID_APP.value: "Invalid",
+	FX_ACT_PACK.value: "ActPack",
+	FX_EB5X.value: "EBx or ActPack Plus",
+	FX_MD.value: "Medical Device",
+	FX_NET_MASTER.value: "NetMaster",
+	FX_BMS.value: "BMS",
+}
 
 
 class FW(c.Structure):  # pylint: disable=too-few-public-methods

@@ -130,6 +130,15 @@ class FlexSEA:  # pylint: disable=too-many-public-methods
 			]
 			self.c_lib.fxReadDeviceAll.restype = c.c_int
 
+			self.c_lib.fxReadMdDeviceAll.argtypes = [
+				c.c_uint,
+				c.POINTER(fxd.MD10State),
+				c.c_uint,
+			]
+			self.c_lib.fxReadMdDeviceAll.restype = c.c_int
+			self.c_lib.fxReadMdDevice.argtypes = [c.c_uint, c.POINTER(fxd.MD10State)]
+			self.c_lib.fxReadMdDeviceAll.restype = c.c_int
+
 			self.c_lib.fxReadNetMasterDevice.argtypes = [c.c_uint, c.POINTER(fxd.NetMasterState)]
 			self.c_lib.fxReadDevice.restype = c.c_int
 
@@ -309,6 +318,9 @@ class FlexSEA:  # pylint: disable=too-many-public-methods
 		elif app_type.value == fxe.FX_EB5X.value:
 			device_state = fxd.EB5xState()
 			ret_code = self.c_lib.fxReadExoDevice(dev_id, c.byref(device_state))
+		elif app_type.value == fxe.FX_MD.value:
+			device_state = fxd.MD10State()
+			ret_code = self.c_lib.fxReadMdDevice(dev_id, c.byref(device_state))
 		else:
 			raise RuntimeError(f"Unsupported application type: {app_type}")
 
@@ -320,6 +332,31 @@ class FlexSEA:  # pylint: disable=too-many-public-methods
 			raise IOError("fxReadDevice: command failed")
 
 		return device_state
+
+	def read_md_device(self, dev_id):
+		"""
+		Read the most recent data from a streaming FlexSEA device stream.
+		IMPORTANT! Must call fxStartStreaming before calling this.
+
+		Parameters:
+		dev_id (int): The device ID of the device to read from.
+
+		Returns:
+		(MD10State): Contains the most recent data from the device
+
+		Raises:
+		ValueError if invalid device ID
+		RuntimeError if no read data
+		"""
+		md_state = fxd.MD10State()
+		ret_code = self.c_lib.fxReadMdDevice(dev_id, c.byref(md_state))
+
+		if ret_code == fxe.FX_INVALID_DEVICE.value:
+			raise ValueError(f"fxReadDevice: invalid device ID: {dev_id}")
+		if ret_code == fxe.FX_NOT_STREAMING.value:
+			raise RuntimeError("fxReadDevice: no read data")
+
+		return md_state
 
 	def read_exo_device(self, dev_id):
 		"""
@@ -526,7 +563,8 @@ class FlexSEA:  # pylint: disable=too-many-public-methods
 		-1 if invalid
 		0 if ActPack
 		1 if Exo
-		2 if NetMaster
+		2 if MD
+		3 if NetMaster
 		"""
 		return c.c_int(self.c_lib.fxGetAppType(dev_id))
 
