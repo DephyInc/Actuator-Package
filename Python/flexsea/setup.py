@@ -3,6 +3,7 @@ FlexSEA package setup info
 """
 import os
 from shutil import copytree, rmtree
+
 import setuptools
 
 PKG_NAME = "flexsea"
@@ -69,7 +70,7 @@ setuptools.setup(
 		"tornado==6.*",
 		"matplotlib==3.*",
 		"numpy==1.*",
-		"pillow==8.*",
+		"pillow>=9.*",
 		"PyYAML==5.*",
 	],
 	classifiers=[
