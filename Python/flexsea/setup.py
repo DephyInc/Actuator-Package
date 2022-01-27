@@ -56,7 +56,7 @@ print("inc files:\n{}".format(inc_files))
 
 setuptools.setup(
 	name="flexsea",
-	version="7.2.5",
+	version="7.2.6",
 	author="Dephy Inc.",
 	author_email="admin@dephy.com",
 	description="Dephy's Actuator Package API library",
