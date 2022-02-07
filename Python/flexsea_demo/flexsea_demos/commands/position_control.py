@@ -69,10 +69,7 @@ class PositionControlCommand(Command):
 			print("Desired:              ", initial_angle)
 			print("Measured:             ", current_angle)
 			print(
-				"Difference:           ",
-				current_angle - initial_angle,
-				"\n",
-				flush=True,
+				"Difference:           ", current_angle - initial_angle, "\n", flush=True,
 			)
 			device.print(data)
 			fxu.print_loop_count(i, self.nLoops)

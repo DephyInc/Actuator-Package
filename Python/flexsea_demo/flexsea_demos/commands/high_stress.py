@@ -147,9 +147,7 @@ class HighStressCommand(Command):
 			# Create interpolation angles for each device
 			lin_samples = []
 			for dev in self.devices:
-				lin_samples.append(
-					fxu.linear_interp(dev["data"].mot_ang, dev["initial_pos"], 360)
-				)
+				lin_samples.append(fxu.linear_interp(dev["data"].mot_ang, dev["initial_pos"], 360))
 
 			for samples in np.array(lin_samples).transpose():
 				cmds = [{"cur": 0, "pos": sample} for sample in samples]
@@ -267,9 +265,7 @@ class HighStressCommand(Command):
 		print(f"\ncurrent_samples_line: {len(self.samples['current_samples_line'])}")
 		print(f"size(TIMESTAMPS): {len(self.timestamps)}")
 		print(f"size(currentRequests): {len(self.devices[0]['curr_requests'])}")
-		print(
-			f"size(currentMeasurements0): {len(self.devices[0]['curr_measurements'])}"
-		)
+		print(f"size(currentMeasurements0): {len(self.devices[0]['curr_measurements'])}")
 		print(f"size(SET_GAINS_TIMES): {len(self.devices[0]['gains_times'])}\n")
 
 	# -----

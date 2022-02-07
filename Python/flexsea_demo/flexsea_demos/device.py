@@ -37,9 +37,7 @@ class Device:
 		try:
 			app_name = fxe.APP_NAMES[self.app_type.value]
 		except KeyError as err:
-			raise RuntimeError(
-				f"Unsupported application type: {self.app_type.value}"
-			) from err
+			raise RuntimeError(f"Unsupported application type: {self.app_type.value}") from err
 
 		print(f"Your device is an '{app_name}'", flush=True)
 

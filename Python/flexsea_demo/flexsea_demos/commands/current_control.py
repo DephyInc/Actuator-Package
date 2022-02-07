@@ -70,9 +70,7 @@ class CurrentControlCommand(Command):
 		for _ in range(self.nLoops):
 			self._ramp(device, self.hold_current)
 		for i in range(self.ramp_down_steps):
-			current = (
-				self.hold_current * (self.ramp_down_steps - i) / self.ramp_down_steps
-			)
+			current = self.hold_current * (self.ramp_down_steps - i) / self.ramp_down_steps
 			self._ramp(device, current)
 		device.motor(fxe.FX_NONE, 0)
 		sleep(0.5)

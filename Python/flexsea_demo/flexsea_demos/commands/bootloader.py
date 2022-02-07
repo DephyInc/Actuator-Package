@@ -87,10 +87,6 @@ class BootloaderCommand(Command):
 				pass
 
 		if state == fxe.FX_SUCCESS.value:
-			print(
-				f"{self.targets[self.target]['name']} bootloader activated", flush=True
-			)
+			print(f"{self.targets[self.target]['name']} bootloader activated", flush=True)
 		else:
-			print(
-				f"{self.targets[self.target]['name']} bootloader not active", flush=True
-			)
+			print(f"{self.targets[self.target]['name']} bootloader not active", flush=True)

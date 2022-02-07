@@ -92,9 +92,7 @@ def validate(schema, data):
 		try:
 			assert isinstance(data[required_param], required_param_type)
 		except AssertionError as err:
-			msg = (
-				f"'{required_param_type}' isn't the right type for '{required_param}'."
-			)
+			msg = f"'{required_param_type}' isn't the right type for '{required_param}'."
 			raise AssertionError(msg) from err
 	return data
 
