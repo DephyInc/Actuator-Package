@@ -3,11 +3,18 @@
 """
 FlexSEA version number demo
 """
+import signal
 import sys
 from time import sleep
-from flexsea import fxEnums as fxe  # pylint: disable=no-name-in-module
+
 from flexsea import flexsea as flex
+from flexsea import fxEnums as fxe  # pylint: disable=no-name-in-module
 from flexsea import fxUtils as fxu  # pylint: disable=no-name-in-module
+
+
+def timeout_handler(signum, frame):
+	"""Raises exception if there's a timeout"""
+	raise RuntimeError("Function call timeout")
 
 
 def get_version(fxs, port, baud_rate):
@@ -22,14 +29,24 @@ def get_version(fxs, port, baud_rate):
 	except KeyError as err:
 		raise RuntimeError(f"Unsupported application type: {app_type.value}") from err
 
-	if fxs.request_firmware_version(dev_id) == fxe.FX_SUCCESS.value:
+	signal.signal(signal.SIGALRM, timeout_handler)
+	signal.alarm(5)  # set timeout for 30s
+	try:
+		fw_version_status = fxs.request_firmware_version(dev_id)
+	except (RuntimeError, ValueError, IOError) as err:
+		fw_version_status = fxs.FX_FAILURE.value
+		print(
+			f"[WARNING]: Error encountered when getting firmware version: {err}", flush=True
+		)
+	signal.alarm(0)
+
+	if fw_version_status == fxe.FX_SUCCESS.value:
 		print("Collecting version information. Please wait...", flush=True)
 	else:
-		print("Firware version request failed", flush=True)
+		print("[WARNING]: Firmware version request failed", flush=True)
 
 	sleep(5)
 
-	fw_array = fxe.FW()
 	fw_array = fxs.get_last_received_firmware_version(dev_id)
 	fxs.close(dev_id)
 
