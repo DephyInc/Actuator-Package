@@ -3,6 +3,7 @@ FlexSEA package setup info
 """
 import os
 from shutil import copytree, rmtree
+
 import setuptools
 
 PKG_NAME = "flexsea"
@@ -55,7 +56,7 @@ print("inc files:\n{}".format(inc_files))
 
 setuptools.setup(
 	name="flexsea",
-	version="7.2.3",
+	version="7.2.6",
 	author="Dephy Inc.",
 	author_email="admin@dephy.com",
 	description="Dephy's Actuator Package API library",
@@ -69,7 +70,7 @@ setuptools.setup(
 		"tornado==6.*",
 		"matplotlib==3.*",
 		"numpy==1.*",
-		"pillow==8.*",
+		"pillow>=9.*",
 		"PyYAML==5.*",
 	],
 	classifiers=[
