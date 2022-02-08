@@ -8,14 +8,14 @@ repos:
     -   id: trailing-whitespace
         exclude: |
             (?x)^(
-                .*\.(ico|jpg|svg|png|user|xml|yaml|pro|pri|qrc|ui|dll|a|o|so|dll\.a|hex|mdl|slx)|
+                .*\.(ico|jpg|svg|png|user|xml|yaml|pro|pri|qrc|ui|dll|a|o|so|dll\.a|hex|mdl|slx|lock)|
                 .*inc/.*|
                 .*libs/.*
             )$
     -   id: end-of-file-fixer
         exclude: |
             (?x)^(
-                .*\.(ico|jpg|svg|png|user|xml|yaml|pro|pri|qrc|ui|dll|a|o|so|dll\.a|hex|mdl|slx)|
+                .*\.(ico|jpg|svg|png|user|xml|yaml|pro|pri|qrc|ui|dll|a|o|so|dll\.a|hex|mdl|slx|lock)|
                 .*inc/.*|
                 .*libs/.*
             )$
@@ -36,12 +36,12 @@ repos:
     -   id: forbid-space-in-indent
         exclude: |
             (?x)^(
-                .*\.(ico|jpg|svg|png|user|xml|yaml|yml|pro|pri|qrc|ui|dll|a|o|so|dll\.a|hex|mdl|slx)|
+                .*\.(ico|jpg|svg|png|user|xml|yaml|yml|pro|pri|qrc|ui|dll|a|o|so|dll\.a|hex|mdl|slx|lock)|
                 .*/dev_spec/.*|
                 .*docs/.*|
                 .*inc/.*|
                 .*LICENSE.*|
-                doxyfile.txt
+                doxyfile.txt|
             )$
 -   repo: https://gitlab.com/sotilrac/black-but-with-tabs-pre-commit
     rev: v0.5
@@ -70,5 +70,6 @@ repos:
             - numpy
             - matplotlib
             - pyclibrary
+            - cleo
         verbose: true
         files:  "" # No files
