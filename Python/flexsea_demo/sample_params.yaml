@@ -29,6 +29,7 @@ bootloader:
     # Habs for Habsolute, Reg for Regulate, Exe for Execute, Mn for Manage,
     # BT121 for Bluetooth, or XBee
     target : Mn
+    run_time : 10
 
 
 # ============================================

@@ -1,3 +1,8 @@
+"""
+device.py
+
+Contains the device class.
+"""
 from time import sleep
 
 from flexsea import fxEnums as fxe
@@ -11,6 +16,8 @@ class Device:
 	"""
 	Contains and manages the actpack/exoboot information and state.
 	"""
+
+	# pylint: disable=too-many-instance-attributes
 
 	# -----
 	# constructor

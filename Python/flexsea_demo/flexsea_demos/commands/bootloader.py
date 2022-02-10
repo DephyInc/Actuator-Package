@@ -1,3 +1,8 @@
+"""
+bootloader.py
+
+Implements the bootloader tool/demo.
+"""
 from time import sleep
 from typing import List
 
@@ -24,6 +29,7 @@ class BootloaderCommand(Command):
 		"ports": List,
 		"baud_rate": int,
 		"target": str,
+		"run_time": int,
 	}
 
 	__name__ = "bootloader"
@@ -36,6 +42,7 @@ class BootloaderCommand(Command):
 		self.ports = []
 		self.baud_rate = 0
 		self.target = ""
+		self.run_time = 0
 		self.fxs = None
 
 		self.targets = {
@@ -81,8 +88,8 @@ class BootloaderCommand(Command):
 			timeout -= wait_step
 			try:
 				state = device.is_bootloader_activated()
-			except ValueError:
-				raise RuntimeError
+			except ValueError as err:
+				raise RuntimeError from err
 			except IOError:
 				pass
 

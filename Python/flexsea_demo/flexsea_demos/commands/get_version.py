@@ -1,3 +1,8 @@
+"""
+get_version.py
+
+Implements the get_version tool/demo.
+"""
 from time import sleep
 from typing import List
 
@@ -47,31 +52,25 @@ class VersionCommand(Command):
 		setup(self, self.required, self.argument("paramFile"), self.__name__)
 		for port in self.ports:
 			device = Device(self.fxs, port, self.baud_rate)
-			self._get_version(device)
+			if device.request_firmware_version() == fxe.FX_SUCCESS.value:
+				print("Collecting version information. Please wait...", flush=True)
+			else:
+				print("Firware version request failed", flush=True)
+				device.close()
+				raise ValueError
+
+			sleep(5)
+
+			fw_array = fxe.FW()
+			fw_array = device.get_last_received_firmware_version()
+			fw_mn = fxu.decode(fw_array.Mn)
+			fw_ex = fxu.decode(fw_array.Ex)
+			fw_re = fxu.decode(fw_array.Re)
+			fw_habs = fxu.decode(fw_array.Habs)
+
+			print(f"Firmware version for device {device.dev_id}:", flush=True)
+			print(f"\t Mn  : v{fw_mn}", flush=True)
+			print(f"\t Ex  : v{fw_ex}", flush=True)
+			print(f"\t Re  : v{fw_re}", flush=True)
+			print(f"\t Habs: v{fw_habs}", flush=True)
 			device.close()
-
-	# -----
-	# _get_version
-	# -----
-	def _get_version(self, device):
-		if device.request_firmware_version() == fxe.FX_SUCCESS.value:
-			print("Collecting version information. Please wait...", flush=True)
-		else:
-			print("Firware version request failed", flush=True)
-			device.close()
-			raise ValueError
-
-		sleep(5)
-
-		fw_array = fxe.FW()
-		fw_array = device.get_last_received_firmware_version()
-		fw_mn = fxu.decode(fw_array.Mn)
-		fw_ex = fxu.decode(fw_array.Ex)
-		fw_re = fxu.decode(fw_array.Re)
-		fw_habs = fxu.decode(fw_array.Habs)
-
-		print(f"Firmware version for device {device.dev_id}:", flush=True)
-		print(f"\t Mn  : v{fw_mn}", flush=True)
-		print(f"\t Ex  : v{fw_ex}", flush=True)
-		print(f"\t Re  : v{fw_re}", flush=True)
-		print(f"\t Habs: v{fw_habs}", flush=True)

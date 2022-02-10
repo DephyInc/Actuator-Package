@@ -1,3 +1,8 @@
+"""
+position_control.py
+
+Implements the position control demo.
+"""
 from time import sleep
 from typing import Dict
 from typing import List
@@ -35,7 +40,7 @@ class PositionControlCommand(Command):
 		self.baud_rate = 0
 		self.run_time = 0
 		self.gains = {}
-		self.nLoops = 0
+		self.n_loops = 0
 		self.fxs = None
 
 	# -----
@@ -46,7 +51,7 @@ class PositionControlCommand(Command):
 		Position control demo.
 		"""
 		setup(self, self.required, self.argument("paramFile"), self.__name__)
-		self.nLoops = int(self.run_time / 0.1)
+		self.n_loops = int(self.run_time / 0.1)
 		for port in self.ports:
 			input("Press 'ENTER' to continue...")
 			device = Device(self.fxs, port, self.baud_rate)
@@ -61,7 +66,7 @@ class PositionControlCommand(Command):
 		initial_angle = data.mot_ang
 		device.set_gains(self.gains)
 		device.motor(fxe.FX_POSITION, initial_angle)
-		for i in range(self.nLoops):
+		for i in range(self.n_loops):
 			sleep(0.1)
 			fxu.clear_terminal()
 			data = device.read()
@@ -72,7 +77,7 @@ class PositionControlCommand(Command):
 				"Difference:           ", current_angle - initial_angle, "\n", flush=True,
 			)
 			device.print(data)
-			fxu.print_loop_count(i, self.nLoops)
+			fxu.print_loop_count(i, self.n_loops)
 		device.motor(fxe.FX_NONE, 0)
 		sleep(0.5)
 		device.close()

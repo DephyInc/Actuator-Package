@@ -1,3 +1,8 @@
+"""
+read_only.py
+
+Implements the read only demo.
+"""
 from time import sleep
 from typing import List
 
@@ -32,7 +37,7 @@ class ReadOnlyCommand(Command):
 		self.ports = []
 		self.baud_rate = 0
 		self.run_time = 0
-		self.nLoops = 0
+		self.n_loops = 0
 		self.fxs = None
 
 	# -----
@@ -43,7 +48,7 @@ class ReadOnlyCommand(Command):
 		Runs the read_only demo.
 		"""
 		setup(self, self.required, self.argument("paramFile"), self.__name__)
-		self.nLoops = int(self.run_time / 0.1)
+		self.n_loops = int(self.run_time / 0.1)
 		for port in self.ports:
 			input("Press 'ENTER' to continue...")
 			device = Device(self.fxs, port, self.baud_rate)
@@ -61,8 +66,8 @@ class ReadOnlyCommand(Command):
 		device : flexsea_demos.device.Device
 			Object that manages the device information and state.
 		"""
-		for i in range(self.nLoops):
-			fxu.print_loop_count(i, self.nLoops)
+		for i in range(self.n_loops):
+			fxu.print_loop_count(i, self.n_loops)
 			sleep(0.1)
 			fxu.clear_terminal()
 			device.print()

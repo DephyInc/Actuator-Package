@@ -1,3 +1,8 @@
+"""
+two_position_control.py
+
+Implements the two-position control demo.
+"""
 from time import sleep
 from time import time
 from typing import Dict
@@ -24,6 +29,8 @@ class TwoPositionCommand(Command):
 		{paramFile : Yaml file containing the parameters for the demo.}
 	"""
 
+	# pylint: disable=too-many-instance-attributes
+
 	# Schema of parameters required by the demo
 	required = {
 		"ports": List,
@@ -48,7 +55,7 @@ class TwoPositionCommand(Command):
 		self.transition_time = 0.0
 		self.gains = {}
 		self.plot_data = {"times": [], "requests": [], "measurements": []}
-		self.nLoops = 0
+		self.n_loops = 0
 		self.transition_steps = 0
 		self.start_time = 0
 		self.fxs = None
@@ -65,7 +72,7 @@ class TwoPositionCommand(Command):
 		Runs the two position control demo.
 		"""
 		setup(self, self.required, self.argument("paramFile"), self.__name__)
-		self.nLoops = int(self.run_time / 0.1)
+		self.n_loops = int(self.run_time / 0.1)
 		self.transition_steps = int(self.transition_time / 0.1)
 
 		for port in self.ports:
@@ -90,7 +97,7 @@ class TwoPositionCommand(Command):
 		device.motor(fxe.FX_POSITION, initial_angle)
 		self.start_time = time()
 
-		for i in range(self.nLoops):
+		for i in range(self.n_loops):
 			sleep(0.1)
 			data = device.read()
 			fxu.clear_terminal()

@@ -1,3 +1,8 @@
+"""
+utils.py
+
+Contains utility functions used by the demos.
+"""
 import os
 
 from cleo.config import ApplicationConfig as BaseApplicationConfig
@@ -175,6 +180,10 @@ def sanitize_path(path):
 #              ApplicationConfig
 # ============================================
 class ApplicationConfig(BaseApplicationConfig):
+	"""
+	Handles configuration of the CLI.
+	"""
+
 	def configure(self):
 		super().configure()
 		self.add_style(Style("info").fg("cyan"))

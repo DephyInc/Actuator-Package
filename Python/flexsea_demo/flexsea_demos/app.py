@@ -1,3 +1,8 @@
+"""
+app.py
+
+Contains the CLI Application class.
+"""
 from cleo import Application
 
 from flexsea_demos.commands.bootloader import BootloaderCommand

@@ -1,3 +1,8 @@
+"""
+high_speed.py
+
+Implements the high speed demo.
+"""
 from time import sleep
 from time import time
 from typing import List
@@ -25,6 +30,8 @@ class HighSpeedCommand(Command):
 		{paramFile : Yaml file with demo parameters.}
 	"""
 
+	# pylint: disable=too-many-instance-attributes
+
 	# Schema of parameters required by the demo
 	required = {
 		"ports": List,
@@ -33,7 +40,7 @@ class HighSpeedCommand(Command):
 		"signal_type": int,
 		"cmd_freq": int,
 		"signal_amplitude": int,
-		"nLoops": int,
+		"n_loops": int,
 		"signal_freq": int,
 		"cycle_delay": float,
 		"request_jitter": bool,
@@ -54,13 +61,14 @@ class HighSpeedCommand(Command):
 		self.signal_type = 0
 		self.cmd_freq = 0
 		self.signal_amplitude = 0
-		self.nLoops = 0
+		self.n_loops = 0
 		self.signal_freq = 0
 		self.cycle_delay = 0
 		self.request_jitter = False
 		self.jitter = 0
 
 		self.fxs = None
+		# pylint: disable=C0103
 		self.dt = 0.0
 		self.start_time = None
 		self.samples = []
@@ -125,9 +133,10 @@ class HighSpeedCommand(Command):
 		if self.signal_type not in self.signal.values():
 			raise ValueError(f"Unsupported signal type: `{self.signal_type}`")
 		if self.signal_type == self.signal["sine"]:
+			# pylint: disable=C0103
 			f = self.signal_freq
 		else:
-			f = 1
+			f = 1  # pylint: disable=C0103
 		self.samples = fxu.sin_generator(self.signal_amplitude, f, self.cmd_freq)
 		if self.request_jitter:
 			self.samples = self.samples + np.random.normal(
@@ -149,10 +158,11 @@ class HighSpeedCommand(Command):
 			pos0 = 0
 
 		self.i = 0
-		for rep in range(self.nLoops):
+		for rep in range(self.n_loops):
 			elapsed_time = time() - self.start_time
-			fxu.print_loop_count_and_time(rep, self.nLoops, elapsed_time)
+			fxu.print_loop_count_and_time(rep, self.n_loops, elapsed_time)
 
+			# pylint: disable=W0631
 			for sample in self.samples:
 				sleep(self.dt)
 				if device.controller_type != fxe.HSS_CURRENT:

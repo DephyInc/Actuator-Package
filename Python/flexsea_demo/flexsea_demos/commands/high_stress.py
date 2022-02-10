@@ -1,3 +1,8 @@
+"""
+high_stress.py
+
+Implements the high stress demo.
+"""
 from time import sleep
 from time import time
 from typing import List
@@ -25,6 +30,8 @@ class HighStressCommand(Command):
 		{paramFile : Yaml file with demo parameters.}
 	"""
 
+	# pylint: disable=too-many-instance-attributes
+
 	# Schema of parameters required by the demo
 	required = {
 		"ports": List,
@@ -35,7 +42,7 @@ class HighStressCommand(Command):
 		"position_freq": int,
 		"current_freq": int,
 		"current_asymmetric_g": float,
-		"nLoops": int,
+		"n_loops": int,
 	}
 
 	__name__ = "high_stress"
@@ -53,8 +60,10 @@ class HighStressCommand(Command):
 		self.position_freq = 0
 		self.current_freq = 0
 		self.current_asymmetric_g = 0.0
-		self.nLoops = 0
+		self.n_loops = 0
+		self.fxs = None
 
+		# pylint: disable=C0103
 		self.dt = 0
 		self.devices = []
 		self.cur_gains = {"KP": 40, "KI": 400, "KD": 0, "K": 0, "B": 0, "FF": 128}
@@ -104,8 +113,8 @@ class HighStressCommand(Command):
 	# _high_stress
 	# -----
 	def _high_stress(self):
-		for rep in range(self.nLoops):
-			fxu.print_loop_count_and_time(rep, self.nLoops, time() - self.start_time)
+		for rep in range(self.n_loops):
+			fxu.print_loop_count_and_time(rep, self.n_loops, time() - self.start_time)
 			self._step0(rep)
 			self._step1(rep)
 			self._step2()
@@ -223,9 +232,9 @@ class HighStressCommand(Command):
 	def _send_and_time_cmds(self, cmds, motor_cmd, gains, set_gains):
 		try:
 			assert motor_cmd in [fxe.FX_POSITION, fxe.FX_CURRENT]
-		except AssertionError:
+		except AssertionError as err:
 			msg = "Unexpected motor command, only FX_POSITION, FX_CURRENT allowed"
-			raise AssertionError(msg)
+			raise AssertionError(msg) from err
 
 		for dev, cmd in zip(self.devices, cmds):
 			tstart = time()

@@ -1,3 +1,8 @@
+"""
+open_control.py
+
+Implements the open control demo.
+"""
 from time import sleep
 from typing import List
 
@@ -7,6 +12,27 @@ from flexsea import fxUtils as fxu
 
 from flexsea_demos.device import Device
 from flexsea_demos.utils import setup
+
+
+# ============================================
+#                _ramp_device
+# ============================================
+def _ramp_device(device, voltage):
+	"""
+	Boilerplate for stepping through voltages.
+
+	Parameters
+	----------
+	device : flexsea_demos.device.Device
+		Object that manages the device information and state.
+
+	voltage : float
+		The voltage to set.
+	"""
+	sleep(0.1)
+	device.motor(fxe.FX_VOLTAGE, voltage)
+	fxu.clear_terminal()
+	device.print()
 
 
 # ============================================
@@ -67,6 +93,7 @@ class OpenControlCommand(Command):
 		"""
 		cycle_time = self.run_time / float(self.n_cycles)
 		step_count = int((cycle_time / 2) / 0.1)
+		# pylint: disable=C0103
 		for s in range(step_count):
 			self.voltages.append(-1 * self.max_voltage * (s * 1.0 / step_count))
 
@@ -82,32 +109,12 @@ class OpenControlCommand(Command):
 			# Ramp-up
 			print(f"Ramping up motor voltage {rep}...\n")
 			for voltage in self.voltages:
-				self._ramp_device(device, voltage)
+				_ramp_device(device, voltage)
 			# Ramp-down
 			print(f"Ramping down motor voltage {rep}...\n")
 			for voltage in self.voltages[-1::-1]:
-				self._ramp_device(device, voltage)
+				_ramp_device(device, voltage)
 
 		device.motor(fxe.FX_NONE, 0)
 		sleep(0.1)
 		device.close()
-
-	# -----
-	# _ramp_device
-	# -----
-	def _ramp_device(self, device, voltage):
-		"""
-		Boilerplate for stepping through voltages.
-
-		Parameters
-		----------
-		device : flexsea_demos.device.Device
-			Object that manages the device information and state.
-
-		voltage : float
-			The voltage to set.
-		"""
-		sleep(0.1)
-		device.motor(fxe.FX_VOLTAGE, voltage)
-		fxu.clear_terminal()
-		device.print()

@@ -1,3 +1,8 @@
+"""
+find_poles.py
+
+Implements the pole-finding tool.
+"""
 from typing import List
 
 from cleo import Command

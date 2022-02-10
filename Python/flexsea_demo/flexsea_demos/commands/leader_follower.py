@@ -1,3 +1,8 @@
+"""
+leader_follower.py
+
+Implements the leader-follower demo.
+"""
 from time import sleep
 from typing import List
 
@@ -20,6 +25,8 @@ class LeaderFollowerCommand(Command):
 		{paramFile : Yaml file with demo parameters.}
 	"""
 
+	# pylint: disable=too-many-instance-attributes
+
 	# Schema of parameters required by the demo
 	required = {"ports": List, "baud_rate": int, "run_time": int}
 
@@ -33,7 +40,7 @@ class LeaderFollowerCommand(Command):
 		self.ports = []
 		self.baud_rate = 0
 		self.run_time = 0
-		self.nLoops = 0
+		self.n_loops = 0
 		self.devices = []
 		self.loop_delay = 0.05
 		self.fxs = None
@@ -49,12 +56,12 @@ class LeaderFollowerCommand(Command):
 		Runs the read_only demo.
 		"""
 		setup(self, self.required, self.argument("paramFile"), self.__name__)
-		self.nLoops = int(self.run_time / self.loop_delay)
+		self.n_loops = int(self.run_time / self.loop_delay)
 
 		try:
 			assert len(self.ports) == 2
-		except AssertionError:
-			raise AssertionError(f"Need two devices. Got: '{len(self.ports)}'")
+		except AssertionError as err:
+			raise AssertionError(f"Need two devices. Got: '{len(self.ports)}'") from err
 
 		for i in range(2):
 			self.devices.append(Device(self.fxs, self.ports[i], self.baud_rate))
@@ -86,7 +93,7 @@ class LeaderFollowerCommand(Command):
 		leader_id = self.devices[0].dev_id
 		follower_id = self.devices[1].dev_id
 
-		for i in range(self.nLoops):
+		for i in range(self.n_loops):
 			sleep(self.loop_delay)
 			fxu.clear_terminal()
 
@@ -100,4 +107,4 @@ class LeaderFollowerCommand(Command):
 			self.devices[1].print()
 			print("")
 			self.devices[0].print()
-			fxu.print_loop_count(i, self.nLoops)
+			fxu.print_loop_count(i, self.n_loops)

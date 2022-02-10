@@ -1,3 +1,8 @@
+"""
+current_control.py
+
+Implements the current control demo.
+"""
 from time import sleep
 from typing import Dict
 from typing import List
@@ -11,6 +16,24 @@ from flexsea_demos.utils import setup
 
 
 # ============================================
+#                  _ramp
+# ============================================
+def _ramp(device, current):
+	"""
+	Adjusts the device's current and print's the actual measured
+	value for comparison.
+	"""
+	device.motor(fxe.FX_CURRENT, current)
+	sleep(0.1)
+	data = device.read()
+	fxu.clear_terminal()
+	print("Desired (mA):         ", current)
+	print("Measured (mA):        ", data.mot_cur)
+	print("Difference (mA):      ", (data.mot_cur - current), "\n")
+	device.print(data)
+
+
+# ============================================
 #           CurrentControlCommand
 # ============================================
 class CurrentControlCommand(Command):
@@ -20,6 +43,8 @@ class CurrentControlCommand(Command):
 	current_control
 		{paramFile : Yaml file with demo parameters.}
 	"""
+
+	# pylint: disable=too-many-instance-attributes
 
 	# Schema of parameters required by the demo
 	required = {
@@ -44,7 +69,7 @@ class CurrentControlCommand(Command):
 		self.gains = {}
 		self.hold_current = 0
 		self.ramp_down_steps = 0
-		self.nLoops = 0
+		self.n_loops = 0
 		self.fxs = None
 
 	# -----
@@ -55,7 +80,7 @@ class CurrentControlCommand(Command):
 		Current control demo.
 		"""
 		setup(self, self.required, self.argument("paramFile"), self.__name__)
-		self.nLoops = int(self.run_time / 0.1)
+		self.n_loops = int(self.run_time / 0.1)
 		for port in self.ports:
 			input("Press 'ENTER' to continue...")
 			device = Device(self.fxs, port, self.baud_rate)
@@ -67,28 +92,11 @@ class CurrentControlCommand(Command):
 	# _current_control
 	# -----
 	def _current_control(self, device):
-		for _ in range(self.nLoops):
-			self._ramp(device, self.hold_current)
+		for _ in range(self.n_loops):
+			_ramp(device, self.hold_current)
 		for i in range(self.ramp_down_steps):
 			current = self.hold_current * (self.ramp_down_steps - i) / self.ramp_down_steps
-			self._ramp(device, current)
+			_ramp(device, current)
 		device.motor(fxe.FX_NONE, 0)
 		sleep(0.5)
 		device.close()
-
-	# -----
-	# _ramp
-	# -----
-	def _ramp(self, device, current):
-		"""
-		Adjusts the device's current and print's the actual measured
-		value for comparison.
-		"""
-		device.motor(fxe.FX_CURRENT, current)
-		sleep(0.1)
-		data = device.read()
-		fxu.clear_terminal()
-		print("Desired (mA):         ", current)
-		print("Measured (mA):        ", data.mot_cur)
-		print("Difference (mA):      ", (data.mot_cur - current), "\n")
-		device.print(data)

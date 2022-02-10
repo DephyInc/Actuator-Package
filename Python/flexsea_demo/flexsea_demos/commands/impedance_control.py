@@ -1,3 +1,8 @@
+"""
+impedance_control.py
+
+Implements the impedance control demo.
+"""
 from time import sleep
 from time import time
 from typing import Dict
@@ -24,6 +29,8 @@ class ImpedanceControlCommand(Command):
 		{paramFile : Yaml file with demo parameters.}
 	"""
 
+	# pylint: disable=too-many-instance-attributes
+
 	# Schema of parameters required by the demo
 	required = {
 		"ports": List,
@@ -49,7 +56,7 @@ class ImpedanceControlCommand(Command):
 		self.transition_time = 0.0
 		self.delta = 0
 		self.b_increments = 0
-		self.nLoops = 0
+		self.n_loops = 0
 		self.transition_steps = 0
 		self.start_time = 0.0
 		self.fxs = None
@@ -67,7 +74,7 @@ class ImpedanceControlCommand(Command):
 		Impedance control demo.
 		"""
 		setup(self, self.required, self.argument("paramFile"), self.__name__)
-		self.nLoops = int(self.run_time / 0.02)
+		self.n_loops = int(self.run_time / 0.02)
 		self.transition_steps = int(self.transition_time / 0.02)
 
 		for port in self.ports:
@@ -95,7 +102,7 @@ class ImpedanceControlCommand(Command):
 		self.start_time = time()
 		print("")
 
-		for i in range(self.nLoops):
+		for i in range(self.n_loops):
 			data = device.read()
 			measured_pos = data.mot_ang
 
@@ -109,7 +116,7 @@ class ImpedanceControlCommand(Command):
 
 			if i % 10 == 0:
 				fxu.clear_terminal()
-				print(f"Loop {i} of {self.nLoops}")
+				print(f"Loop {i} of {self.n_loops}")
 				print(f"Holding position: {positions[current_pos]}")
 				print(self.gains)
 				device.print(data)
