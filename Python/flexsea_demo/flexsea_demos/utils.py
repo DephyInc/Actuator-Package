@@ -3,7 +3,15 @@ utils.py
 
 Contains utility functions used by the demos.
 """
-import os
+from os import chmod
+from os.path import abspath
+from os.path import dirname
+from os.path import expanduser
+from os.path import expandvars
+from os.path import isfile
+from os.path import join
+import shutil
+import stat as st
 
 from cleo.config import ApplicationConfig as BaseApplicationConfig
 from clikit.api.formatter import Style
@@ -33,11 +41,119 @@ def setup(cls, schema, param_file, demo_name):
 	demo_name : str
 		Name of the demo being run (e.g., read_only).
 	"""
-	all_params = read_yaml(param_file)
-	demo_params = get_demo_params(all_params, demo_name)
-	demo_params = validate(schema, demo_params)
-	assign_params(cls, demo_params)
-	setattr(cls, "fxs", flex.FlexSEA())
+    demo_params = {}
+    # Read parameter file, if given
+    if param_file:
+        demo_params = read_param_file(param_file, demo_name)
+    # Check for command-line option overrides
+    demo_params = get_cli_overrides(cls._args.options(), schema, demo_params)
+    # Validate and assign
+    demo_params = validate(schema, demo_params)
+    assign_params(cls, demo_params)
+    setattr(cls, "fxs", flex.FlexSEA())
+
+
+# ============================================
+#              read_param_file
+# ============================================
+def read_param_file(param_file, demo_name):
+    """
+    Reads the parameters for the desired demo from the parameter file.
+    If the given parameter file is read-only, we make a copy of it and
+    work with the copy.
+
+    Parameters
+    ----------
+    param_file : str
+        Name of the parameter file to read.
+
+    demo_name : str
+        The desired demo to be run.
+
+    Returns
+    -------
+    dict
+        Demo-specific parameters read from the given file.
+    """
+    if is_lock_file(param_file):
+        param_file = copy_param_file(param_file)
+    all_params = read_yaml(param_file)
+    return get_demo_params(all_params, demo_name)
+
+
+# ============================================
+#              get_cli_overrides
+# ============================================
+def get_cli_overrides(opts, schema, demo_params): 
+    """
+    Checks to see if any of the demo's parameters from the parameter
+    file have been overridden on the command-line.
+
+    Parameters
+    ----------
+    opts : dict
+        Contains all available command-line options for the given demo.
+        If the option isn't set, it will be None if the option needs a
+        value and False if it's a flag.
+
+    schema : dict
+        Contains the names and data types for the parameters required
+        by the demo.
+
+    demo_params : dict
+        Contains the parameters read in from the parameter file. If
+        one wasn't passed, then it's an empty dictionary.
+
+    Returns
+    -------
+    dict
+        `demo_params` but updated to reflect the command-line values.
+    """
+    for key, data_type in schema.items():
+        if opts[key] is not None:
+            # Ports and gains are two special cases
+            if key == "ports":
+                demo_params[key] = [int(p) for p in opts[key][0].split(",")]
+            elif key == "gains":
+                names = ["KP", "KI", "KD", "K", "B", "FF"]
+                vals = [int(g) for g in opts[key][0].split(",")]
+                demo_params[key] = {name : val for (name, val) in zip(names, vals)}
+            else:
+                demo_params[key] = cast(opts[key], data_type)
+
+
+# ============================================
+#                   cast
+# ============================================
+def cast(value, data_type):
+    """
+    Cleo reads all command-line options as strings, but the demos
+    require some of them to be converted to other types, as specified
+    in schema for that demo. This function handles that conversion.
+
+    Note that boolean options, i.e. those passed without a value, are
+    already stored as a bool by cleo. As such, for those values whose
+    data type is str or bool, nothing needs to be done, as they are
+    already the correct type.
+
+    Parameters
+    ----------
+    value : str
+        The value of the parameter read from the command-line.
+
+    data_type : Union[int, float, str, bool]
+        The data type of `value` as specified by the demo's schema.
+
+    Returns
+    -------
+    Union[int, float, str, bool]
+        `value` as `data_type`.
+    """
+    if data_type == int:
+        value = int(value)
+    elif data_type == float:
+        value = float(value)
+    return value
 
 
 # ============================================
@@ -168,12 +284,42 @@ def sanitize_path(path):
 	str
 		The expanded path.
 	"""
-	path = os.path.expandvars(path)
-	path = os.path.expanduser(path)
-	path = os.path.abspath(path)
-	if not os.path.isfile(path):
+	path = expandvars(path)
+	path = expanduser(path)
+	path = abspath(path)
+	if not isfile(path):
 		raise FileNotFoundError(f"Could not file parameter file: '{path}'")
 	return path
+
+
+# ============================================
+#                 is_lock_file
+# ============================================
+def is_lock_file(param_file):
+    """
+    In the case that we're given a locked file as the parameter file,
+    we make a copy of the file, give that copy read and write
+    permissions, and then return the name of the copied file to be
+    read.
+
+    Parameters
+    ----------
+    param_file : str
+        The name (and path) of the locked parameter file.
+
+    Returns
+    -------
+    copied_file : str
+        A file named 'params_copy.yaml' that lives alongside
+        `param_file`, has the same contents, but has read and write
+        permissions.
+    """
+    path = dirname(abspath(param_file))
+    copied_file = join(path, "params_copy.yaml")
+    shutil.copy(param_file, copied_file)
+    mode = st.IRUSR | st.IWUSR | st.IRGRP | st.IWGRP | st.IROTH | st.IWOTH
+    chmod(copied_file, mode)
+    return copied_file
 
 
 # ============================================
