@@ -44,7 +44,7 @@ def setup(cls, schema, param_file, demo_name):
 	demo_params = {}
 	# Read parameter file, if given
 	if param_file:
-			demo_params = read_param_file(param_file, demo_name)
+		demo_params = read_param_file(param_file, demo_name, cls)
 	# Check for command-line option overrides
 	# pylint: disable=protected-access
 	demo_params = get_cli_overrides(cls._args.options(), schema, demo_params)
@@ -57,7 +57,7 @@ def setup(cls, schema, param_file, demo_name):
 # ============================================
 #              read_param_file
 # ============================================
-def read_param_file(param_file, demo_name):
+def read_param_file(param_file, demo_name, cls):
 	"""
 	Reads the parameters for the desired demo from the parameter file.
 	If the given parameter file is read-only, we make a copy of it and
@@ -77,6 +77,10 @@ def read_param_file(param_file, demo_name):
 		Demo-specific parameters read from the given file.
 	"""
 	if is_lock_file(param_file):
+		msg = "<warning>Detected a read-only parameter file. For your safety "
+		msg += "we've made a copy. Going forward, please edit the copy and not "
+		msg += "the lock file.</warning>"
+		cls.line(msg)
 		param_file = copy_param_file(param_file)
 	all_params = read_yaml(param_file)
 	return get_demo_params(all_params, demo_name)
@@ -121,7 +125,7 @@ def get_cli_overrides(opts, schema, demo_params):
 			# value is [] when nothing is passed to it, not None
 			if key == "ports":
 				if len(opts[cli_key]) > 0:
-					demo_params[key] = [p for p in opts[cli_key][0].split(",")]
+					demo_params[key] = opts[cli_key][0].split(",")
 			elif key == "gains":
 				if len(opts[cli_key]) > 0:
 					names = ["KP", "KI", "KD", "K", "B", "FF"]
