@@ -121,7 +121,7 @@ def get_cli_overrides(opts, schema, demo_params):
 			# value is [] when nothing is passed to it, not None
 			if key == "ports":
 				if len(opts[cli_key]) > 0:
-					demo_params[key] = [int(p) for p in opts[cli_key][0].split(",")]
+					demo_params[key] = [p for p in opts[cli_key][0].split(",")]
 			elif key == "gains":
 				if len(opts[cli_key]) > 0:
 					names = ["KP", "KI", "KD", "K", "B", "FF"]
