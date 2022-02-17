@@ -28,17 +28,17 @@ class HighSpeedCommand(Command):
 
 	high_speed
 		{paramFile? : Yaml file with demo parameters.}
-        {--ports=* : List of device ports. Comma separated. Overrides parameter file.}
-        {--baud_rate= : USB baud rate. Overrides parameter file.}
-        {--controller_type= : See flexsea.fxEnums. Overrides parameter file.} 
-        {--signal_type= : 1 is sine, 2 is line. Overrides parameter file.}
-        {--cmd_freq= : Device streaming frequency (Hz). Overrides parameter file.}
-        {--signal_amplitude= : Encoder position or current. Overrides parameter file.}
-        {--n_loops= : Proxy for run time. Overrides parameter file.}
-        {--signal_freq= : Frequency of sine wave. Overrides parameter file.} 
-        {--cycle_delay= : Time between signals to controller. Overrides parameter file.}
-        {--request_jitter : Adds noise to signal. Overrides parameter file.}
-        {--jitter= : Size of the noise added to signal. Overrides parameter file.}
+		{--ports=* : List of device ports. Comma separated. Overrides parameter file.}
+		{--baud_rate= : USB baud rate. Overrides parameter file.}
+		{--controller_type= : See flexsea.fxEnums. Overrides parameter file.}
+		{--signal_type= : 1 is sine, 2 is line. Overrides parameter file.}
+		{--cmd_freq= : Device streaming frequency (Hz). Overrides parameter file.}
+		{--signal_amplitude= : Encoder position or current. Overrides parameter file.}
+		{--n_loops= : Proxy for run time. Overrides parameter file.}
+		{--signal_freq= : Frequency of sine wave. Overrides parameter file.}
+		{--cycle_delay= : Time between signals to controller. Overrides parameter file.}
+		{--request_jitter : Adds noise to signal. Overrides parameter file.}
+		{--jitter= : Size of the noise added to signal. Overrides parameter file.}
 	"""
 
 	# pylint: disable=too-many-instance-attributes

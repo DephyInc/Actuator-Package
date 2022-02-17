@@ -27,13 +27,13 @@ class ImpedanceControlCommand(Command):
 
 	impedance_control
 		{paramFile? : Yaml file with demo parameters.}
-        {--ports=* : List of device ports. Comma separated. Overrides parameter file.}
-        {--baud_rate= : USB baud rate. Overrides parameter file.}
-        {--run_time= : Time (s) to run each device. Overrides parameter file.}
-        {--gains= : Order: KP,KI,KD,K,B,FF. Comma separated. Overrides parameter file.}
-        {--transition_time= : Time (s) between gain changes. Overrides parameter file.}
-        {--delta= : Offset from initial position. Overrides parameter file.}
-        {--b_increments= : Amount B gain is increased. Overrides parameter file.}
+		{--ports=* : List of device ports. Comma separated. Overrides parameter file.}
+		{--baud_rate= : USB baud rate. Overrides parameter file.}
+		{--run_time= : Time (s) to run each device. Overrides parameter file.}
+		{--gains= : Order: KP,KI,KD,K,B,FF. Comma separated. Overrides parameter file.}
+		{--transition_time= : Time (s) between gain changes. Overrides parameter file.}
+		{--delta= : Offset from initial position. Overrides parameter file.}
+		{--b_increments= : Amount B gain is increased. Overrides parameter file.}
 	"""
 
 	# pylint: disable=too-many-instance-attributes

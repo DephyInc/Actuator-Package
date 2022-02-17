@@ -39,16 +39,16 @@ class FlexseaDemoApplication(Application):
 	# -----
 	def _get_commands(self):
 		command_list = [
-            CurrentControlCommand,
-            FindPolesCommand,
-            HighSpeedCommand,
-            HighStressCommand,
-            ImpedanceControlCommand,
-            LeaderFollowerCommand,
-            OpenControlCommand,
-            PositionControlCommand,
-            ReadOnlyCommand,
-            TwoPositionCommand,
+			CurrentControlCommand,
+			FindPolesCommand,
+			HighSpeedCommand,
+			HighStressCommand,
+			ImpedanceControlCommand,
+			LeaderFollowerCommand,
+			OpenControlCommand,
+			PositionControlCommand,
+			ReadOnlyCommand,
+			TwoPositionCommand,
 		]
 		for command in command_list:
 			self.add(command())

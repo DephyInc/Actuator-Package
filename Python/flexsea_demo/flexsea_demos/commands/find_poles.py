@@ -20,8 +20,8 @@ class FindPolesCommand(Command):
 
 	find_poles
 		{paramFile? : Yaml file with demo parameters.}
-        {ports=*? : List of device ports. Overrides parameter file.}
-        {--baud_rate= : USB baud rate. Overrides parameter file.}
+		{ports=*? : List of device ports. Overrides parameter file.}
+		{--baud_rate= : USB baud rate. Overrides parameter file.}
 	"""
 
 	# Schema of parameters required by the demo

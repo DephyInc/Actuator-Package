@@ -23,9 +23,9 @@ class LeaderFollowerCommand(Command):
 
 	leader_follower
 		{paramFile? : Yaml file with demo parameters.}
-        {--ports=* : List of device ports. Comma separated. Overrides parameter file.}
-        {--baud_rate= : USB baud rate. Overrides parameter file.}
-        {--run_time= : Time (s) to run each device. Overrides parameter file.}
+		{--ports=* : List of device ports. Comma separated. Overrides parameter file.}
+		{--baud_rate= : USB baud rate. Overrides parameter file.}
+		{--run_time= : Time (s) to run each device. Overrides parameter file.}
 	"""
 
 	# pylint: disable=too-many-instance-attributes
