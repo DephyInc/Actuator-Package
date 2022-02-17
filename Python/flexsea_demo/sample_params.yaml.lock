@@ -212,14 +212,6 @@ read_only:
 
 
 # ============================================
-#        two_devices_position_control
-# ============================================
-two_devices_position_control:
-    # Run time. Time (in seconds) to run
-    run_time : 10
-
-
-# ============================================
 #            two_position_control
 # ============================================
 two_position_control:
