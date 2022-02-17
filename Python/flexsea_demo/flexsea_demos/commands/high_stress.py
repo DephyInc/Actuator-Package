@@ -29,14 +29,14 @@ class HighStressCommand(Command):
 	high_stress
 		{paramFile? : Yaml file with demo parameters.}
 		{--ports=* : List of device ports. Comma separated. Overrides parameter file.}
-		{--baud_rate= : USB baud rate. Overrides parameter file.}
-		{--cmd_freq= : Device streaming frequency (Hz). Overrides parameter file.}
-		{--position_amplitude= : Amplitude in ticks. Overrides parameter file.}
-		{--current_amplitude= : Current in mA. Overrides parameter file.}
-		{--position_freq= : Position sine frequency in Hz. Overrides parameter file.}
-		{--current_freq= : Current sine frequency in Hz. Overrides parameter file.}
-		{--current_asymmetric-g= : Current cooldown factor. Overrides parameter file.}
-		{--n_loops= : Proxy for run time. Overrides parameter file.}
+		{--baud-rate= : USB baud rate. Overrides parameter file.}
+		{--cmd-freq= : Device streaming frequency (Hz). Overrides parameter file.}
+		{--position-amplitude= : Amplitude in ticks. Overrides parameter file.}
+		{--current-amplitude= : Current in mA. Overrides parameter file.}
+		{--position-freq= : Position sine frequency in Hz. Overrides parameter file.}
+		{--current-freq= : Current sine frequency in Hz. Overrides parameter file.}
+		{--current-asymmetric-g= : Current cooldown factor. Overrides parameter file.}
+		{--n-loops= : Proxy for run time. Overrides parameter file.}
 	"""
 
 	# pylint: disable=too-many-instance-attributes

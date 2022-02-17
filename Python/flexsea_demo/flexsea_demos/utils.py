@@ -3,8 +3,7 @@ utils.py
 
 Contains utility functions used by the demos.
 """
-from os import chmod
-from os import stat
+import os
 from os.path import abspath
 from os.path import dirname
 from os.path import expanduser
@@ -45,7 +44,7 @@ def setup(cls, schema, param_file, demo_name):
 	demo_params = {}
 	# Read parameter file, if given
 	if param_file:
-		demo_params = read_param_file(param_file, demo_name)
+			demo_params = read_param_file(param_file, demo_name)
 	# Check for command-line option overrides
 	# pylint: disable=protected-access
 	demo_params = get_cli_overrides(cls._args.options(), schema, demo_params)
@@ -112,16 +111,24 @@ def get_cli_overrides(opts, schema, demo_params):
 		`demo_params` but updated to reflect the command-line values.
 	"""
 	for key, data_type in schema.items():
-		if opts[key] is not None:
+		# Cleo requires that options only contain letters, numbers, and hyphens,
+		# so in order to match the underscore version used in the code we need
+		# to replace
+		cli_key = key.replace("_", "-")
+		if opts[cli_key] is not None:
 			# Ports and gains are two special cases
+			# Since ports and gains are multi-valued option, their default
+			# value is [] when nothing is passed to it, not None
 			if key == "ports":
-				demo_params[key] = [int(p) for p in opts[key][0].split(",")]
+				if len(opts[cli_key]) > 0:
+					demo_params[key] = [int(p) for p in opts[cli_key][0].split(",")]
 			elif key == "gains":
-				names = ["KP", "KI", "KD", "K", "B", "FF"]
-				vals = [int(g) for g in opts[key][0].split(",")]
-				demo_params[key] = dict(zip(names, vals))
+				if len(opts[cli_key]) > 0:
+					names = ["KP", "KI", "KD", "K", "B", "FF"]
+					vals = [int(g) for g in opts[cli_key][0].split(",")]
+					demo_params[key] = dict(zip(names, vals))
 			else:
-				demo_params[key] = cast(opts[key], data_type)
+				demo_params[key] = cast(opts[cli_key], data_type)
 	return demo_params
 
 
@@ -315,8 +322,8 @@ def is_lock_file(param_file):
 	"""
 	if param_file.endswith(".lock"):
 		return True
-	info = stat(param_file)
-	return not bool(info.st_mode & stat.S_IWUSR)
+	info = os.stat(param_file)
+	return not bool(info.st_mode & st.S_IWUSR)
 
 
 # ============================================
@@ -345,7 +352,7 @@ def copy_param_file(param_file):
 	copied_file = join(path, "params_copy.yaml")
 	shutil.copy(param_file, copied_file)
 	mode = st.S_IRUSR | st.S_IWUSR | st.S_IRGRP | st.S_IWGRP | st.S_IROTH | st.S_IWOTH
-	chmod(copied_file, mode)
+	os.chmod(copied_file, mode)
 	return copied_file
 
 
