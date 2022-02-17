@@ -23,6 +23,7 @@ Python/logFolderConfigFile.txt
 Python/flexseapython/com.txt
 Python/flexsea/flexsea/libs
 Python/flexsea/flexsea/inc
+Python/flexsea_demo/*.yaml
 dist
 *.egg-info
 build
