@@ -14,7 +14,7 @@ from flexsea import fxUtils as fxu
 # ============================================
 class Device:
 	"""
-	Contains and manages the actpack/exoboot information and state.
+	Contains and manages the information and state of Dephy's devices.
 	"""
 
 	# pylint: disable=too-many-instance-attributes
@@ -23,7 +23,6 @@ class Device:
 	# constructor
 	# -----
 	def __init__(self, fxs, port, baud_rate, **kwargs):
-		# NOTE: Can fxs be passed around like this?
 		self.fxs = fxs
 		self.port = port
 		self.baud_rate = baud_rate
