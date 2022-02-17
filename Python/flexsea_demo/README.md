@@ -1,26 +1,25 @@
 # FlexSEA Demos
-This repo contains demo scripts for the open-source [flexSEA library](https://pypi.org/project/flexsea/). The idea is for these demos to serve as both sanity checks for making sure flexSEA is working correctly as well as blueprints for how certain tasks can be accomplished with the library.
+This package contains demosfor the open-source [flexSEA library](https://pypi.org/project/flexsea/). The idea is for these demos to serve as both sanity checks for making sure flexSEA is working correctly as well as blueprints for how certain tasks can be accomplished with the library.
 
 
 ## Requirements
-* `Python >= 3.8`.
-* [Virtualenv](https://virtualenv.pypa.io/en/latest/installation.html)
+* `Python >= 3.8`
+* `git`
 
 
-## Installation
-First clone the repository:
+## Installation on Linux
+
+Install the dependencies:
 
 ```bash
-git clone https://github.com/jcoughlin11/flexsea_demos
-cd flexsea_demos
+sudo apt install python3 python3-pip git
 ```
 
-
-Now create a virtual environment:
+Create a virtual environment:
 
 ```bash
 mkdir ~/.venvs
-virtualenv ~/.venvs/flexsea_demos_env
+python3 -m venv ~/.venvs/flexsea_demos_env
 ```
 
 Activate the newly created virtual environment:
@@ -29,17 +28,59 @@ Activate the newly created virtual environment:
 source ~/.venvs/flexsea_demos_env/bin/activate
 ```
 
-and install with `pip`:
+Clone the repo:
 
-### On Windows
 ```bash
-python -m pip install .
+git clone https://github.com/DephyInc/Actuator-Package.git
 ```
 
-### On Linux
+Change into the demos directory:
+
+```bash
+cd Actuator-Package/Python/flexsea_demo
+```
+
+and install the demos with `pip`:
 
 ```bash
 pip3 install .
+```
+
+
+### Installation on Windows
+Install the appropriate version of Python for Windows from [here](https://www.python.org/downloads/windows/) and get the Git for Windows client [here](https://gitforwindows.org/) here.
+
+:warning: During the installation process, make sure you check the box that adds Python and Git to your Path.
+
+Now, open the git bash terminal included with git for windows and create a virtual environment:
+
+```bash
+mkdir ~/.venvs
+python -m venv ~/.venvs/flexsea_demos_env
+```
+
+Activate the newly created virtual environment:
+
+```bash
+source ~/.venvs/flexsea_demos_env/bin/activate
+```
+
+Clone the repo:
+
+```bash
+git clone https://github.com/DephyInc/Actuator-Package.git
+```
+
+Change into the demos directory:
+
+```bash
+cd Actuator-Package/Python/flexsea_demo
+```
+
+and install the demos with `pip`:
+
+```bash
+pip install .
 ```
 
 
@@ -59,14 +100,11 @@ To see a list of the available demo names:
 flexsea_demos -h
 ```
 
-Each demo is fully configurable via the parameter file. A sample parameter file -- `sample_params.yaml` -- is included and utilizes the [yaml](https://en.wikipedia.org/wiki/YAML) format.
+Each demo is fully configurable via the parameter file. A sample parameter file -- `sample_params.yaml.lock` -- is included and utilizes the [yaml](https://en.wikipedia.org/wiki/YAML) format.
 
-The parameter file is source controlled, so you can feel free to make changes to it directly and then, should you desire to get back to the original version, simply check it out:
+If you want to tweak the default parameters, you can do so by making a copy of the sample parameter file and then editing the copied file.
 
-```bash
-git checkout <parameter_file>
-```
-
+Additionally, rather than using the parameter file (or in addition to it), you can override the value of a parameter by passing it as a command-line argument.
 
 ### Example
 As an example we'll run the `read_only` demo. The first step is to create a space from which the demos will be run:
@@ -78,7 +116,7 @@ mkdir -p ~/code/sandbox/python/flexsea_demos
 copy the parameter file:
 
 ```bash
-cp sample_params.yaml ~/code/sandbox/python/flexsea_demos/params.yaml
+flexsea_demos unlock sample_params.yaml.lock ~/code/sandbox/python/flexsea_demos/params.yaml
 ```
 
 and switch to the newly created directory:
