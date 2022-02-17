@@ -22,7 +22,10 @@ class LeaderFollowerCommand(Command):
 	Runs the leader follower demo.
 
 	leader_follower
-		{paramFile : Yaml file with demo parameters.}
+		{paramFile? : Yaml file with demo parameters.}
+        {--ports=* : List of device ports. Comma separated. Overrides parameter file.}
+        {--baud_rate= : USB baud rate. Overrides parameter file.}
+        {--run_time= : Time (s) to run each device. Overrides parameter file.}
 	"""
 
 	# pylint: disable=too-many-instance-attributes
@@ -53,7 +56,7 @@ class LeaderFollowerCommand(Command):
 	# -----
 	def handle(self):
 		"""
-		Runs the read_only demo.
+		Runs the read_only demo. The first port given is the leader.
 		"""
 		setup(self, self.required, self.argument("paramFile"), self.__name__)
 		self.n_loops = int(self.run_time / self.loop_delay)

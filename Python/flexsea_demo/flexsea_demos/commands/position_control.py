@@ -23,7 +23,11 @@ class PositionControlCommand(Command):
 	Runs the position control demo.
 
 	position_control
-		{paramFile : Yaml file with demo parameters.}
+		{paramFile? : Yaml file with demo parameters.}
+        {--ports=* : List of device ports. Comma separated. Overrides parameter file.}
+        {--baud_rate= : USB baud rate. Overrides parameter file.}
+        {--run_time= : Time (s) to run each device. Overrides parameter file.}
+        {--gains= : Order: KP,KI,KD,K,B,FF. Comma separated. Overrides parameter file.}
 	"""
 
 	# Schema of parameters required by the demo

@@ -43,7 +43,12 @@ class OpenControlCommand(Command):
 	Implements the open control demo.
 
 	open_control
-		{paramFile : Yaml file with demo parameters.}
+		{paramFile? : Yaml file with demo parameters.}
+        {--ports=* : List of device ports. Comma separated. Overrides parameter file.}
+        {--baud_rate= : USB baud rate. Overrides parameter file.}
+        {--run_time= : Time (s) to run each device. Overrides parameter file.}
+        {--n_cycles= : Number of times to ramp each device. Overrides parameter file.}
+        {--max_voltage= : Peak voltage to use (mV). Overrides parameter file.}
 	"""
 
 	# Schema of parameters required by the demo

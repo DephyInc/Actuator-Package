@@ -26,7 +26,13 @@ class TwoPositionCommand(Command):
 	Runs the two position control demo.
 
 	two_position_control
-		{paramFile : Yaml file containing the parameters for the demo.}
+		{paramFile? : Yaml file containing the parameters for the demo.}
+        {--ports=* : List of device ports. Comma separated. Overrides parameter file.}
+        {--baud_rate= : USB baud rate. Overrides parameter file.}
+        {--run_time= : Time (s) to run each device. Overrides parameter file.}
+        {--delta= : Offset from initial position. Overrides parameter file.}
+        {--transition_time= : Time (s) between positions. Overrides parameter file.}
+        {--gains= : Order: KP,KI,KD,K,B,FF. Comma separated. Overrides parameter file.}
 	"""
 
 	# pylint: disable=too-many-instance-attributes
