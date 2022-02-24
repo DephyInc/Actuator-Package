@@ -87,9 +87,9 @@ high_speed:
     # position. If the controller is current, it's the current in mA
     signal_amplitude : 500
 
-    # nLoops. The number of times to send the desired signal to the
+    # n_loops. The number of times to send the desired signal to the
     # controller. Proxy for run time.
-    nLoops : 4
+    n_loops : 4
 
     # Signal frequency. Only applies if the signal type is a sine wave.
     # This is the frequency of that sine wave.
@@ -133,9 +133,9 @@ high_stress:
     # on the "way back" to the starting point. Should be between 1-3.
     current_asymmetric_g : 1.15
 
-    # nLoops. Number of times to send the desired signal to the controller.
+    # n_loops. Number of times to send the desired signal to the controller.
     # Proxy for run time.
-    nLoops : 3
+    n_loops : 3
 
 
 # ============================================
