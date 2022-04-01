@@ -25,6 +25,12 @@ Run this script to install the python dependencies before running the python scr
 ./install_python_deps.sh
 ```
 
+If choose to install Python manyually, make sure to add the current user to the `dialout` group so it can access serial ports.
+
+```bash
+sudo usermod -a -G dialout "$USER"
+```
+
 ### Windows 10
 
 1. On Windows, download [Python 3.9](https://www.python.org/downloads/) and install it.

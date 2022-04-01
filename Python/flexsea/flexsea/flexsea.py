@@ -9,7 +9,7 @@ from . import fxUtils as fxu
 from .dev_spec import AllDevices as fxd
 
 
-class FlexSEA:
+class FlexSEA:  # pylint: disable=too-many-public-methods
 	"""
 	Implements FlexSEA Actuator Package API
 	Device ID is an alphanumeric ID used to refer to a specific FlexSEA device.
@@ -130,6 +130,15 @@ class FlexSEA:
 			]
 			self.c_lib.fxReadDeviceAll.restype = c.c_int
 
+			self.c_lib.fxReadMdDeviceAll.argtypes = [
+				c.c_uint,
+				c.POINTER(fxd.MD10State),
+				c.c_uint,
+			]
+			self.c_lib.fxReadMdDeviceAll.restype = c.c_int
+			self.c_lib.fxReadMdDevice.argtypes = [c.c_uint, c.POINTER(fxd.MD10State)]
+			self.c_lib.fxReadMdDeviceAll.restype = c.c_int
+
 			self.c_lib.fxReadNetMasterDevice.argtypes = [c.c_uint, c.POINTER(fxd.NetMasterState)]
 			self.c_lib.fxReadDevice.restype = c.c_int
 
@@ -167,6 +176,12 @@ class FlexSEA:
 
 			self.c_lib.fxIsBootloaderActivated.argtypes = [c.c_uint]
 			self.c_lib.fxIsBootloaderActivated.restype = c.c_int
+
+			self.c_lib.fxRequestFirmwareVersion.argtypes = [c.c_uint]
+			self.c_lib.fxRequestFirmwareVersion.restype = c.c_int
+
+			self.c_lib.fxGetLastReceivedFirmwareVersion.argtypes = [c.c_uint]
+			self.c_lib.fxGetLastReceivedFirmwareVersion.restype = fxe.FW
 
 	def open(self, port, baud_rate, log_level=4):
 		"""
@@ -303,6 +318,9 @@ class FlexSEA:
 		elif app_type.value == fxe.FX_EB5X.value:
 			device_state = fxd.EB5xState()
 			ret_code = self.c_lib.fxReadExoDevice(dev_id, c.byref(device_state))
+		elif app_type.value == fxe.FX_MD.value:
+			device_state = fxd.MD10State()
+			ret_code = self.c_lib.fxReadMdDevice(dev_id, c.byref(device_state))
 		else:
 			raise RuntimeError(f"Unsupported application type: {app_type}")
 
@@ -314,6 +332,31 @@ class FlexSEA:
 			raise IOError("fxReadDevice: command failed")
 
 		return device_state
+
+	def read_md_device(self, dev_id):
+		"""
+		Read the most recent data from a streaming FlexSEA device stream.
+		IMPORTANT! Must call fxStartStreaming before calling this.
+
+		Parameters:
+		dev_id (int): The device ID of the device to read from.
+
+		Returns:
+		(MD10State): Contains the most recent data from the device
+
+		Raises:
+		ValueError if invalid device ID
+		RuntimeError if no read data
+		"""
+		md_state = fxd.MD10State()
+		ret_code = self.c_lib.fxReadMdDevice(dev_id, c.byref(md_state))
+
+		if ret_code == fxe.FX_INVALID_DEVICE.value:
+			raise ValueError(f"fxReadDevice: invalid device ID: {dev_id}")
+		if ret_code == fxe.FX_NOT_STREAMING.value:
+			raise RuntimeError("fxReadDevice: no read data")
+
+		return md_state
 
 	def read_exo_device(self, dev_id):
 		"""
@@ -520,7 +563,8 @@ class FlexSEA:
 		-1 if invalid
 		0 if ActPack
 		1 if Exo
-		2 if NetMaster
+		2 if MD
+		3 if NetMaster
 		"""
 		return c.c_int(self.c_lib.fxGetAppType(dev_id))
 
@@ -584,3 +628,38 @@ class FlexSEA:
 			raise IOError("fxIsBootloaderActivated: command failed")
 
 		return ret_code
+
+	def request_firmware_version(self, dev_id):
+		"""
+		Request version of on board MCUs
+
+		Parameters:
+		dev_id (int): The device ID.
+
+		Raises:
+		FX_INVALID_DEVICE if invalid device.
+		FX_FAILURE if command fails
+		"""
+		ret_code = self.c_lib.fxRequestFirmwareVersion(dev_id)
+
+		if ret_code == fxe.FX_INVALID_DEVICE.value:
+			raise ValueError("fxRequestFirmwareVersion: invalid device ID")
+		if ret_code == fxe.FX_FAILURE.value:
+			raise IOError("fxRequestFirmwareVersion: command failed")
+
+		return ret_code
+
+	def get_last_received_firmware_version(self, dev_id):
+		"""
+		Request version of on board MCUs
+
+		Parameters:
+		dev_id (int): The device ID.
+
+		Returns:
+		FX_INVALID_DEVICE if deviceId is invalid
+		FX_FAILURE if command failed or bootloader is not enabled
+		FX_SUCCESS otherwise
+		"""
+
+		return self.c_lib.fxGetLastReceivedFirmwareVersion(dev_id)

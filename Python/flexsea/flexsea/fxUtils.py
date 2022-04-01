@@ -54,6 +54,28 @@ def is_pi64():
 		return False
 
 
+def decode(val):
+	"""
+	Returns decoded version number formatted as x.y.z
+	"""
+	x = y = z = 0
+
+	if val > 0:
+		while val % 2 == 0:
+			x += 1
+			val /= 2
+
+		while val % 3 == 0:
+			y += 1
+			val /= 3
+
+		while val % 5 == 0:
+			z += 1
+			val /= 5
+
+	return f"{x}.{y}.{z}"
+
+
 def clear_terminal():
 	"""
 	Clears the terminal - use before printing new values
@@ -85,6 +107,8 @@ def print_device(dev_id, app_type):
 		print_bms(dev_id)
 	elif app_type.value == en.FX_EB5X.value:
 		print_eb5x(dev_id)
+	elif app_type.value == en.FX_MD.value:
+		print_md(dev_id)
 	else:
 		raise RuntimeError("Unsupported application type: ", app_type)
 
@@ -119,6 +143,38 @@ def print_eb5x(eb5x_state: fx_devs.EB5xState):
 	print("genVar[9]:            ", eb5x_state.genvar_9)
 	print("Ankle angle:          ", eb5x_state.ank_ang)
 	print("Ankle velocity:       ", eb5x_state.ank_vel)
+
+
+def print_md(md10_state: fx_devs.MD10State):
+	"""
+	Print md info
+	"""
+	print("[ Printing Medical Device ]\n")
+	print("State time:           ", md10_state.state_time)
+	print("Accel X:              ", md10_state.accelx)
+	print("Accel Y:              ", md10_state.accely)
+	print("Accel Z:              ", md10_state.accelz)
+	print("Gyro X:               ", md10_state.gyrox)
+	print("Gyro Y:               ", md10_state.gyroy)
+	print("Gyro Z:               ", md10_state.gyroz)
+	print("Motor angle:          ", md10_state.mot_ang)
+	print("Motor voltage (mV):   ", md10_state.mot_volt)
+	print("Motor current (mA):   ", md10_state.mot_cur)
+	print("Battery Current (mA): ", md10_state.batt_volt)
+	print("Battery Voltage (mV): ", md10_state.batt_curr)
+	print("Battery Temp (C):     ", md10_state.temperature)
+	print("genVar[0]:            ", md10_state.genvar_0)
+	print("genVar[1]:            ", md10_state.genvar_1)
+	print("genVar[2]:            ", md10_state.genvar_2)
+	print("genVar[3]:            ", md10_state.genvar_3)
+	print("genVar[4]:            ", md10_state.genvar_4)
+	print("genVar[5]:            ", md10_state.genvar_5)
+	print("genVar[6]:            ", md10_state.genvar_6)
+	print("genVar[7]:            ", md10_state.genvar_7)
+	print("genVar[8]:            ", md10_state.genvar_8)
+	print("genVar[9]:            ", md10_state.genvar_9)
+	print("Ankle angle:          ", md10_state.ank_ang)
+	print("Ankle velocity:       ", md10_state.ank_vel)
 
 
 def print_act_pack(act_pack_state: fx_devs.ActPackState):
@@ -335,7 +391,7 @@ def load_ports_from_file(file_name):
 	Loads baud_rate and ports serial ports list from a yaml file.
 	"""
 	try:
-		with open(file_name, "r") as com_file:
+		with open(file_name, "r", encoding="utf-8") as com_file:
 			vals = yaml.load(com_file, Loader=yaml.FullLoader)
 			return vals["ports"], int(vals["baud_rate"])
 

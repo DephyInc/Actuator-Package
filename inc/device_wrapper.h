@@ -8,6 +8,7 @@
 
 #include <stdbool.h>
 #include <string>
+#include "md10_struct.h"
 #include "actpack_struct.h"
 #include "netmaster_struct.h"
 #include "cellscreener_struct.h"
@@ -48,6 +49,7 @@ typedef enum fxAppType
 	FxInvalidApp = -1,
 	FxActPack = 0,
 	FxExo,
+	FxMd,
 	FxNetMaster,
 	FxBMS,
 	FxHabsolute,
@@ -174,6 +176,13 @@ int fxGetDeviceIds(int* idArray, unsigned int size);
 FxError fxStartStreaming(unsigned int deviceId,
 			unsigned int frequency,
 			bool shouldLog);
+
+///
+/// \brief Sets the name of the Data log file.  The name must be set before streaming starts.
+/// \param deviceId is the device ID
+/// \param newDataLogFileName The name of the log file.  It must be an acceptable filename.
+/// \return Error codes defined at top of the header
+FxError fxNameDataLogFile(unsigned int deviceId, std::string newDataLogFileName);
 
 /// \brief Stop streaming data from a FlexSEA device.
 ///
