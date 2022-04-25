@@ -1,14 +1,17 @@
 """
 Plotting Utilities
 """
-# pylint: disable=invalid-name
 import matplotlib
 import matplotlib.pyplot as plt
-from . import fxEnums as en
+
+from . import fxEnums as fxe
 from . import fxUtils as fxu
 
 
-def plot_setpoint_vs_desired(  # pylint: disable=too-many-arguments
+# ============================================
+#         plot_setpoint_vs_desired
+# ============================================
+def plot_setpoint_vs_desired(
 	dev_id,
 	fig,
 	ctrl_type,
@@ -27,16 +30,16 @@ def plot_setpoint_vs_desired(  # pylint: disable=too-many-arguments
 	plt.figure(fig)
 	fig += 1
 
-	# Current controller:
-	if ctrl_type == en.HSS_CURRENT:
+	# Current controller
+	if ctrl_type == fxe.HSS_CURRENT:
 		title_str = (
 			"Current control with {:.1f} Hz, {:.1f} mA {} and {:.0f} Hz commands (ID {})"
 		)
 		title = title_str.format(sig_freq, sig_amplitude, sig_type, cmd_freq, dev_id)
 		plt.ylabel("Motor current (mA)")
 
-	# Position controller:
-	elif ctrl_type == en.HSS_POSITION:
+	# Position controller
+	elif ctrl_type == fxe.HSS_POSITION:
 		title_str = (
 			"Position control with {:.1f} Hz, {:.0f} tick{} {} and {:.0f} Hz commands (ID {})"
 		)
@@ -50,7 +53,7 @@ def plot_setpoint_vs_desired(  # pylint: disable=too-many-arguments
 		)
 		plt.ylabel("Encoder position (tick)")
 
-	# Common info:
+	# Common info
 	plt.plot(times, reqs, color="b", label="Desired")
 	plt.plot(times, measurements, color="r", label="Measured")
 	plt.xlabel("Time (s)")
@@ -71,6 +74,9 @@ def plot_setpoint_vs_desired(  # pylint: disable=too-many-arguments
 	return fig
 
 
+# ============================================
+#               plot_exp_stats
+# ============================================
 def plot_exp_stats(dev_id, fig, write_cmd_times, read_cmd_times):
 	"""
 	Multiple figures: command and stream times in linear and occurrence log
@@ -81,6 +87,9 @@ def plot_exp_stats(dev_id, fig, write_cmd_times, read_cmd_times):
 	return fig
 
 
+# ============================================
+#          plot_exp_stats_one_type
+# ============================================
 def plot_exp_stats_one_type(dev_id, fig, action_times, title):
 	"""
 	Two figures: command and stream times in linear and occurrence log

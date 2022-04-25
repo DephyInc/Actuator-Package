@@ -1,15 +1,19 @@
 """
 General purpose utilities
 """
-# pylint: disable=invalid-name
 import os
 import platform
-import yaml
+
 import numpy as np
-from . import fxEnums as en
+import yaml
+
+from . import fxEnums as fxe
 from .dev_spec import AllDevices as fx_devs
 
 
+# ============================================
+#                 print_logo
+# ============================================
 def print_logo():
 	"""
 	print cool logo.
@@ -27,6 +31,9 @@ def print_logo():
 		print("\tDephy\n\tBeyond Nature (TM)")
 
 
+# ============================================
+#                   is_win
+# ============================================
 def is_win():
 	"""
 	Returns true if the OS is windows
@@ -34,6 +41,9 @@ def is_win():
 	return "win" in platform.system().lower()
 
 
+# ============================================
+#                    is_pi
+# ============================================
 def is_pi():
 	"""
 	Returns true if the OS is running on an arm. Used to detect Raspberry pi
@@ -44,6 +54,9 @@ def is_pi():
 		return False
 
 
+# ============================================
+#                   is_pi64
+# ============================================
 def is_pi64():
 	"""
 	Returns true if the OS is running on an Ubuntu 64 for Arm. Used to detect Raspberry pi aarch64
@@ -54,6 +67,9 @@ def is_pi64():
 		return False
 
 
+# ============================================
+#                    decode
+# ============================================
 def decode(val):
 	"""
 	Returns decoded version number formatted as x.y.z
@@ -76,6 +92,9 @@ def decode(val):
 	return f"{x}.{y}.{z}"
 
 
+# ============================================
+#                clear_terminal
+# ============================================
 def clear_terminal():
 	"""
 	Clears the terminal - use before printing new values
@@ -83,6 +102,9 @@ def clear_terminal():
 	os.system("cls" if is_win() else "clear")
 
 
+# ============================================
+#               print_plot_exit
+# ============================================
 def print_plot_exit():
 	"""
 	Prints plot exit message
@@ -91,6 +113,9 @@ def print_plot_exit():
 		print("In Windows, press Ctrl+Break to exit. Ctrl+C may not work.")
 
 
+# ============================================
+#                 print_device
+# ============================================
 def print_device(dev_id, app_type):
 	"""
 	Print device type given ann Application type
@@ -99,20 +124,26 @@ def print_device(dev_id, app_type):
 	dev_id (int): The device ID.
 	app_type (int): application type.
 	"""
-	if app_type.value == en.FX_ACT_PACK.value:
+    # NOTE: We could just loop over state._fields_ instead of having
+    # all of thse different print functions:
+    # for f in state._fields_: print(f"{f[0]}: {getattr(state, f[0])})
+	if app_type.value == fxe.FX_ACT_PACK.value:
 		print_act_pack(dev_id)
-	elif app_type.value == en.FX_NET_MASTER.value:
+	elif app_type.value == fxe.FX_NET_MASTER.value:
 		print_net_master(dev_id)
-	elif app_type.value == en.FX_BMS.value:
+	elif app_type.value == fxe.FX_BMS.value:
 		print_bms(dev_id)
-	elif app_type.value == en.FX_EB5X.value:
+	elif app_type.value == fxe.FX_EB5X.value:
 		print_eb5x(dev_id)
-	elif app_type.value == en.FX_MD.value:
+	elif app_type.value == fxe.FX_MD.value:
 		print_md(dev_id)
 	else:
 		raise RuntimeError("Unsupported application type: ", app_type)
 
 
+# ============================================
+#                 print_eb5x
+# ============================================
 def print_eb5x(eb5x_state: fx_devs.EB5xState):
 	"""
 	Print eb5x info
@@ -145,6 +176,9 @@ def print_eb5x(eb5x_state: fx_devs.EB5xState):
 	print("Ankle velocity:       ", eb5x_state.ank_vel)
 
 
+# ============================================
+#                   print_md
+# ============================================
 def print_md(md10_state: fx_devs.MD10State):
 	"""
 	Print md info
@@ -177,6 +211,9 @@ def print_md(md10_state: fx_devs.MD10State):
 	print("Ankle velocity:       ", md10_state.ank_vel)
 
 
+# ============================================
+#               print_act_pack
+# ============================================
 def print_act_pack(act_pack_state: fx_devs.ActPackState):
 	"""
 	Print ActPack info
@@ -196,6 +233,9 @@ def print_act_pack(act_pack_state: fx_devs.ActPackState):
 	print("Battery Temp (C):     ", act_pack_state.temperature)
 
 
+# ============================================
+#               print_net_master
+# ============================================
 def print_net_master(net_master_state: fx_devs.NetMasterState):
 	"""
 	Print net master info
@@ -337,12 +377,18 @@ def print_net_master(net_master_state: fx_devs.NetMasterState):
 	)
 
 
+# ============================================
+#                 print_bms
+# ============================================
 def print_bms(dev_id):
 	"""Print BMS info"""
 	# TODO (CA): Implement this function
 	print("Printing BMS information not implemented. Device {}".format(dev_id))
 
 
+# ============================================
+#              print_loop_count
+# ============================================
 def print_loop_count(count, total):
 	"""
 	Convenience function for printing run counts
@@ -350,6 +396,9 @@ def print_loop_count(count, total):
 	print("\nRun {} of {}".format(count + 1, total))
 
 
+# ============================================
+#         print_loop_count_and_time
+# ============================================
 def print_loop_count_and_time(count, total, elapsed_time):
 	"""
 	Convenience function for printing run counts and elapsed time in s.
@@ -359,6 +408,9 @@ def print_loop_count_and_time(count, total, elapsed_time):
 	)
 
 
+# ============================================
+#                sin_generator
+# ============================================
 def sin_generator(amplitude, freq, command_freq):
 	"""
 	Generate a sine wave of a specific amplitude and frequency
@@ -370,6 +422,9 @@ def sin_generator(amplitude, freq, command_freq):
 	return sin_vals
 
 
+# ============================================
+#               line_generator
+# ============================================
 def line_generator(mag, length, command_freq):
 	"""
 	Generate a line with specific magnitude
@@ -379,6 +434,9 @@ def line_generator(mag, length, command_freq):
 	return line_vals
 
 
+# ============================================
+#                linear_interp
+# ============================================
 def linear_interp(start, end, points):
 	"""
 	Interpolates between two positions (A to B)
@@ -386,6 +444,9 @@ def linear_interp(start, end, points):
 	return np.linspace(start, end, points)
 
 
+# ============================================
+#            load_ports_from_file
+# ============================================
 def load_ports_from_file(file_name):
 	"""
 	Loads baud_rate and ports serial ports list from a yaml file.
