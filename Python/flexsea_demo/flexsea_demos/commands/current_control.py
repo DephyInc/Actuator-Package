@@ -22,7 +22,7 @@ def _ramp(device, current):
 	Adjusts the device's current and print's the actual measured
 	value for comparison.
 	"""
-	print("Device",device)
+	print("Device", device)
 	device.motor(fxe.FX_CURRENT, current)
 	sleep(0.1)
 	data = device.read()
@@ -44,7 +44,7 @@ class CurrentControlCommand(Command):
 		{paramFile? : Yaml file with demo parameters.}
 		{--ports=* : List of device ports. Comma separated. Overrides parameter file.}
 		{--baud-rate= : USB baud rate. Overrides parameter file.}
-        {--streaming-freq= : Frequency (Hz) for device to stream data.}
+		{--streaming-freq= : Frequency (Hz) for device to stream data.}
 		{--run-time= : Time (s) to run each device. Overrides parameter file.}
 		{--gains= : Order: KP,KI,KD,K,B,FF. Comma separated. Overrides parameter file.}
 		{--hold-current= : Target current to keep device at. Overrides parameter file.}
@@ -57,7 +57,7 @@ class CurrentControlCommand(Command):
 	required = {
 		"ports": List,
 		"baud_rate": int,
-        "streaming_freq" : int,
+		"streaming_freq": int,
 		"run_time": int,
 		"gains": Dict,
 		"hold_current": int,
@@ -73,7 +73,7 @@ class CurrentControlCommand(Command):
 		super().__init__()
 		self.ports = []
 		self.baud_rate = 0
-        self.streaming_freq = None
+		self.streaming_freq = None
 		self.run_time = 0
 		self.gains = {}
 		self.hold_current = 0
@@ -88,10 +88,10 @@ class CurrentControlCommand(Command):
 		"""
 		Current control demo.
 		"""
-		#Creating a list to store the device id of the two exos
+		# Creating a list to store the device id of the two exos
 		device_list = []
 		setup(self, self.required, self.argument("paramFile"), self.__name__)
-		#self.n_loops = int(self.run_time / 0.1)
+		# self.n_loops = int(self.run_time / 0.1)
 		for port in self.ports:
 			input("Press 'ENTER' to continue...")
 			device = Device(self.fxs, port, self.baud_rate, self.streaming_freq)
@@ -111,7 +111,7 @@ class CurrentControlCommand(Command):
 					_ramp(device, self.hold_current)
 
 			except KeyboardInterrupt:
-				print('Ctrl-C detected, Exiting Gracefully')
+				print("Ctrl-C detected, Exiting Gracefully")
 				break
 
 		for device in device_list:

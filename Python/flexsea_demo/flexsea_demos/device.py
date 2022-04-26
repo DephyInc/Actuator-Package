@@ -26,11 +26,12 @@ class Device:
 		self.fxs = fxs
 		self.port = port
 		self.baud_rate = baud_rate
-        self.streaming_freq = streaming_freq
+		self.streaming_freq = streaming_freq
 		for key, value in kwargs.items():
 			setattr(self, key, value)
 
 		self.dev_id = self.fxs.open(self.port, self.baud_rate, 0)
+		print(f"Streaming rate: {self.streaming_freq}")
 		self.fxs.start_streaming(self.dev_id, freq=self.streaming_freq, log_en=True)
 		# NOTE: This sleep is so long because there's an issue that
 		# occurs when trying to open multiple devices in rapid

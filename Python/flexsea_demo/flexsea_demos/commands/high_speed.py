@@ -30,7 +30,7 @@ class HighSpeedCommand(Command):
 		{paramFile? : Yaml file with demo parameters.}
 		{--ports=* : List of device ports. Comma separated. Overrides parameter file.}
 		{--baud-rate= : USB baud rate. Overrides parameter file.}
-        {--streaming-freq= : Frequency (Hz) for device to stream data.}
+		{--streaming-freq= : Frequency (Hz) for device to stream data.}
 		{--controller-type= : See flexsea.fxEnums. Overrides parameter file.}
 		{--signal-type= : 1 is sine, 2 is line. Overrides parameter file.}
 		{--cmd-freq= : Device streaming frequency (Hz). Overrides parameter file.}
@@ -48,7 +48,7 @@ class HighSpeedCommand(Command):
 	required = {
 		"ports": List,
 		"baud_rate": int,
-        "streaming_freq" : int,
+		"streaming_freq": int,
 		"controller_type": int,
 		"signal_type": int,
 		"cmd_freq": int,
@@ -70,7 +70,7 @@ class HighSpeedCommand(Command):
 
 		self.ports = []
 		self.baud_rate = 0
-        self.streaming_freq = None
+		self.streaming_freq = None
 		self.controller_type = 0
 		self.signal_type = 0
 		self.cmd_freq = 0

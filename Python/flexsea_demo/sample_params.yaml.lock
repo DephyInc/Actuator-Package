@@ -8,228 +8,228 @@
 # Parameters used by every demo.
 
 general:
-    # Device ports. Edit/uncomment as needed. The typical port names for
-    # each OS are given.
-    ports:
-        # Windows
-        - COM3
-        # Ubuntu
-        # - /dev/ttyS3
-        # Raspbian
-        # - /dev/ttyACM0
+	# Device ports. Edit/uncomment as needed. The typical port names for
+	# each OS are given.
+	ports:
+		# Windows
+		- COM3
+		# Ubuntu
+		# - /dev/ttyS3
+		# Raspbian
+		# - /dev/ttyACM0
 
-    baud_rate : 230400
-    streaming_freq : 100
+	baud_rate : 230400
+	streaming_freq : 100
 
 
 # ============================================
 #                  bootloader
 # ============================================
 bootloader:
-    # The MCU for which we are testing the bootloader. Can be
-    # Habs for Habsolute, Reg for Regulate, Exe for Execute, Mn for Manage,
-    # BT121 for Bluetooth, or XBee
-    target : Mn
-    run_time : 10
+	# The MCU for which we are testing the bootloader. Can be
+	# Habs for Habsolute, Reg for Regulate, Exe for Execute, Mn for Manage,
+	# BT121 for Bluetooth, or XBee
+	target : Mn
+	run_time : 10
 
 
 # ============================================
 #               current_control
 # ============================================
 current_control:
-    # This is the run time (in seconds) for each device specified in the
-    # ports list
-    run_time : 10
+	# This is the run time (in seconds) for each device specified in the
+	# ports list
+	run_time : 10
 
-    # Gains: kp, ki, kd, K, B, ff
-    gains:
-        KP : 40
-        KI : 400
-        KD : 0
-        K : 0
-        B : 0
-        FF : 0
+	# Gains: kp, ki, kd, K, B, ff
+	gains:
+		KP : 40
+		KI : 400
+		KD : 0
+		K : 0
+		B : 0
+		FF : 0
 
-    # Hold current (mA)
-    hold_current : 1000 
+	# Hold current (mA)
+	hold_current : 1000
 
-    # Ramp down steps
-    ramp_down_steps : 50
+	# Ramp down steps
+	ramp_down_steps : 50
 
 
 # ============================================
 #                 find_poles
 # ============================================
 find_poles:
-    # Deliberately blank. This demo has no parameters beyond the general ones.
+	# Deliberately blank. This demo has no parameters beyond the general ones.
 
 
 # ============================================
 #                check_version
 # ============================================
 check_version:
-    # Deliberately blank. This demo has no parameters beyond the general ones.
+	# Deliberately blank. This demo has no parameters beyond the general ones.
 
 
 # ============================================
 #                  high_speed
 # ============================================
 high_speed:
-    # Controller type. 1 is HSS_CURRENT. See fxEnums.py in the flexsea repo
-    controller_type : 1
+	# Controller type. 1 is HSS_CURRENT. See fxEnums.py in the flexsea repo
+	controller_type : 1
 
-    # Signal type. 1 is sine, 2 is line
-    signal_type : 1
+	# Signal type. 1 is sine, 2 is line
+	signal_type : 1
 
-    # Cmd frequency. Frequency (in Hz) at which the device streams data
-    cmd_freq : 500
+	# Cmd frequency. Frequency (in Hz) at which the device streams data
+	cmd_freq : 500
 
-    # Signal amplitude. If the controller is position, it's the encoder
-    # position. If the controller is current, it's the current in mA
-    signal_amplitude : 500
+	# Signal amplitude. If the controller is position, it's the encoder
+	# position. If the controller is current, it's the current in mA
+	signal_amplitude : 500
 
-    # n_loops. The number of times to send the desired signal to the
-    # controller. Proxy for run time.
-    n_loops : 4
+	# n_loops. The number of times to send the desired signal to the
+	# controller. Proxy for run time.
+	n_loops : 4
 
-    # Signal frequency. Only applies if the signal type is a sine wave.
-    # This is the frequency of that sine wave.
-    signal_freq : 5
+	# Signal frequency. Only applies if the signal type is a sine wave.
+	# This is the frequency of that sine wave.
+	signal_freq : 5
 
-    # Cycle delay. Only applies if the signal type is a sine wave. Gives
-    # the delay between signals sent to the controller.
-    cycle_delay : 0.1
+	# Cycle delay. Only applies if the signal type is a sine wave. Gives
+	# the delay between signals sent to the controller.
+	cycle_delay : 0.1
 
-    # Request jitter. If True, Gaussian noise (jitter) is added to each
-    # signal sent to the controller.
-    request_jitter : False
+	# Request jitter. If True, Gaussian noise (jitter) is added to each
+	# signal sent to the controller.
+	request_jitter : False
 
-    # Jitter. The mean of the Gaussian used to generate jitter. The
-    # variance of the distribution is numpy's default.
-    jitter : 20
+	# Jitter. The mean of the Gaussian used to generate jitter. The
+	# variance of the distribution is numpy's default.
+	jitter : 20
 
 
 # ============================================
 #                  high_stress
 # ============================================
 high_stress:
-    # Command frequency. Rate (in Hz) that data is streamed from device.
-    cmd_freq : 1000
+	# Command frequency. Rate (in Hz) that data is streamed from device.
+	cmd_freq : 1000
 
-    # Position amplitude. Amplitude (in ticks) of the position controller.
-    position_amplitude : 10000
+	# Position amplitude. Amplitude (in ticks) of the position controller.
+	position_amplitude : 10000
 
-    # Current amplitude. Amplitude (in mA) of the current controller.
-    current_amplitude : 1500
+	# Current amplitude. Amplitude (in mA) of the current controller.
+	current_amplitude : 1500
 
-    # Position frequency. Sine wave frequency (in Hz) for the position
-    # controller
-    position_freq : 1
+	# Position frequency. Sine wave frequency (in Hz) for the position
+	# controller
+	position_freq : 1
 
-    # Current frequency. Sine wave frequency (in H) for the current
-    # controller.
-    current_freq : 5
+	# Current frequency. Sine wave frequency (in H) for the current
+	# controller.
+	current_freq : 5
 
-    # Current asymmetric g. Factor determining how much current to use
-    # on the "way back" to the starting point. Should be between 1-3.
-    current_asymmetric_g : 1.15
+	# Current asymmetric g. Factor determining how much current to use
+	# on the "way back" to the starting point. Should be between 1-3.
+	current_asymmetric_g : 1.15
 
-    # n_loops. Number of times to send the desired signal to the controller.
-    # Proxy for run time.
-    n_loops : 3
+	# n_loops. Number of times to send the desired signal to the controller.
+	# Proxy for run time.
+	n_loops : 3
 
 
 # ============================================
 #              impedance_control
 # ============================================
 impedance_control:
-    # Run time. Time (in seconds) to run each device.
-    run_time : 10
+	# Run time. Time (in seconds) to run each device.
+	run_time : 10
 
-    # Gains.
-    gains:
-        KP : 40
-        KI : 400
-        KD : 0
-        K : 600
-        B : 300
-        FF : 128
+	# Gains.
+	gains:
+		KP : 40
+		KI : 400
+		KD : 0
+		K : 600
+		B : 300
+		FF : 128
 
-    # Transition time. Amount of time (in seconds) between gain increments.
-    transition_time : 0.8
+	# Transition time. Amount of time (in seconds) between gain increments.
+	transition_time : 0.8
 
-    # Delta. Offset from initial position.
-    delta : 7500
+	# Delta. Offset from initial position.
+	delta : 7500
 
-    # B increments. Amount to increase the B gain
-    b_increments : 150
+	# B increments. Amount to increase the B gain
+	b_increments : 150
 
 
 # ============================================
 #               leader_follower
 # ============================================
 leader_follower:
-    # Run time. Time (in seconds) to run
-    run_time : 10
+	# Run time. Time (in seconds) to run
+	run_time : 10
 
 
 # ============================================
 #                 open_control
 # ============================================
 open_control:
-    # Run time. Time (in seconds) to run each device
-    run_time : 10
+	# Run time. Time (in seconds) to run each device
+	run_time : 10
 
-    # N cycles. The number of times to ramp each device.
-    n_cycles : 5
+	# N cycles. The number of times to ramp each device.
+	n_cycles : 5
 
-    # Max voltage. Peak voltage (mV) to use.
-    max_voltage : 3000
+	# Max voltage. Peak voltage (mV) to use.
+	max_voltage : 3000
 
 
 # ============================================
 #              position_control
 # ============================================
 position_control:
-    # Run time. Time (in seconds) to run each device
-    run_time : 8
+	# Run time. Time (in seconds) to run each device
+	run_time : 8
 
-    # Gains.
-    gains:
-        KP : 400
-        KI : 50
-        KD : 0
-        K : 0
-        B : 0
-        FF : 0
+	# Gains.
+	gains:
+		KP : 400
+		KI : 50
+		KD : 0
+		K : 0
+		B : 0
+		FF : 0
 
 
 # ============================================
 #                  read_only
 # ============================================
 read_only:
-    # Run time. Time (in seconds) to run each device
-    run_time : 10
+	# Run time. Time (in seconds) to run each device
+	run_time : 10
 
 
 # ============================================
 #            two_position_control
 # ============================================
 two_position_control:
-    # Run time. Time (in seconds) to run
-    run_time : 10
+	# Run time. Time (in seconds) to run
+	run_time : 10
 
-    # Delta. Offset from initial position.
-    delta : 10000
+	# Delta. Offset from initial position.
+	delta : 10000
 
-    # Transition time. Time (in seconds) between position swaps.
-    transition_time : 1.5
+	# Transition time. Time (in seconds) between position swaps.
+	transition_time : 1.5
 
-    # Gains
-    gains:
-        KP : 50
-        KI : 0
-        KD : 0
-        K : 0
-        B : 0
-        FF : 0
+	# Gains
+	gains:
+		KP : 50
+		KI : 0
+		KD : 0
+		K : 0
+		B : 0
+		FF : 0

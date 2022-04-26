@@ -30,7 +30,7 @@ class HighStressCommand(Command):
 		{paramFile? : Yaml file with demo parameters.}
 		{--ports=* : List of device ports. Comma separated. Overrides parameter file.}
 		{--baud-rate= : USB baud rate. Overrides parameter file.}
-        {--streaming-freq= : Frequency (Hz) for device to stream data.}
+		{--streaming-freq= : Frequency (Hz) for device to stream data.}
 		{--cmd-freq= : Device streaming frequency (Hz). Overrides parameter file.}
 		{--position-amplitude= : Amplitude in ticks. Overrides parameter file.}
 		{--current-amplitude= : Current in mA. Overrides parameter file.}
@@ -46,7 +46,7 @@ class HighStressCommand(Command):
 	required = {
 		"ports": List,
 		"baud_rate": int,
-        "streaming_freq" : int,
+		"streaming_freq": int,
 		"cmd_freq": int,
 		"position_amplitude": int,
 		"current_amplitude": int,
@@ -65,7 +65,7 @@ class HighStressCommand(Command):
 		super().__init__()
 		self.ports = []
 		self.baud_rate = 0
-        self.streaming_freq = None
+		self.streaming_freq = None
 		self.cmd_freq = 0
 		self.position_amplitude = 0
 		self.current_amplitude = 0
@@ -105,7 +105,9 @@ class HighStressCommand(Command):
 		setup(self, self.required, self.argument("paramFile"), self.__name__)
 		self.dt = float(1 / (float(self.cmd_freq)))
 		for i, port in enumerate(self.ports):
-			self.devices.append({"port": Device(self.fxs, port, self.baud_rate, self.streaming_freq)})
+			self.devices.append(
+				{"port": Device(self.fxs, port, self.baud_rate, self.streaming_freq)}
+			)
 			self.devices[i]["initial_pos"] = self.devices[i]["port"].initial_pos
 			self.devices[i]["data"] = self.devices[i]["port"].read()
 			self.devices[i]["read_times"] = []

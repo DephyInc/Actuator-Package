@@ -25,7 +25,7 @@ class LeaderFollowerCommand(Command):
 		{paramFile? : Yaml file with demo parameters.}
 		{--ports=* : List of device ports. Comma separated. Overrides parameter file.}
 		{--baud-rate= : USB baud rate. Overrides parameter file.}
-        {--streaming-freq= : Frequency (Hz) for device to stream data.}
+		{--streaming-freq= : Frequency (Hz) for device to stream data.}
 		{--run-time= : Time (s) to run each device. Overrides parameter file.}
 	"""
 
@@ -43,7 +43,7 @@ class LeaderFollowerCommand(Command):
 		super().__init__()
 		self.ports = []
 		self.baud_rate = 0
-        self.streaming_freq = None
+		self.streaming_freq = None
 		self.run_time = 0
 		self.n_loops = 0
 		self.devices = []
@@ -69,7 +69,9 @@ class LeaderFollowerCommand(Command):
 			raise AssertionError(f"Need two devices. Got: '{len(self.ports)}'") from err
 
 		for i in range(2):
-			self.devices.append(Device(self.fxs, self.ports[i], self.baud_rate, self.streaming_freq))
+			self.devices.append(
+				Device(self.fxs, self.ports[i], self.baud_rate, self.streaming_freq)
+			)
 
 		# Set first device to current controller with 0 current (0 torque)
 		self.devices[0].set_gains(self.leader_gains)

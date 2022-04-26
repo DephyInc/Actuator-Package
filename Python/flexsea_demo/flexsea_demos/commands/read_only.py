@@ -24,7 +24,7 @@ class ReadOnlyCommand(Command):
 		{paramFile? : Yaml file with demo parameters.}
 		{--ports=* : List of device ports. Comma separated. Overrides parameter file.}
 		{--baud-rate= : USB baud rate. Overrides parameter file.}
-        {--streaming-freq= : Frequency (Hz) for device to stream data.}
+		{--streaming-freq= : Frequency (Hz) for device to stream data.}
 		{--run-time= : Time (s) to run each device. Overrides parameter file.}
 	"""
 
@@ -40,7 +40,7 @@ class ReadOnlyCommand(Command):
 		super().__init__()
 		self.ports = []
 		self.baud_rate = 0
-        self.streaming_freq = None
+		self.streaming_freq = None
 		self.run_time = 0
 		self.n_loops = 0
 		self.fxs = None
