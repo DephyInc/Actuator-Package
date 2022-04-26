@@ -14,7 +14,6 @@ from flexsea import fxUtils as fxu
 from flexsea_demos.device import Device
 from flexsea_demos.utils import setup
 
-
 # ============================================
 #                  _ramp
 # ============================================
@@ -23,6 +22,7 @@ def _ramp(device, current):
 	Adjusts the device's current and print's the actual measured
 	value for comparison.
 	"""
+	print("Device",device)
 	device.motor(fxe.FX_CURRENT, current)
 	sleep(0.1)
 	data = device.read()
@@ -85,24 +85,35 @@ class CurrentControlCommand(Command):
 		"""
 		Current control demo.
 		"""
+		#Creating a list to store the device id of the two exos
+		device_list = []
 		setup(self, self.required, self.argument("paramFile"), self.__name__)
-		self.n_loops = int(self.run_time / 0.1)
+		#self.n_loops = int(self.run_time / 0.1)
 		for port in self.ports:
 			input("Press 'ENTER' to continue...")
 			device = Device(self.fxs, port, self.baud_rate)
 			device.set_gains(self.gains)
-			sleep(0.5)
-			self._current_control(device)
+			device_list.append(device)
+
+		self._current_control(device_list)
 
 	# -----
 	# _current_control
 	# -----
-	def _current_control(self, device):
-		for _ in range(self.n_loops):
-			_ramp(device, self.hold_current)
-		for i in range(self.ramp_down_steps):
-			current = self.hold_current * (self.ramp_down_steps - i) / self.ramp_down_steps
-			_ramp(device, current)
-		device.motor(fxe.FX_NONE, 0)
-		sleep(0.5)
-		device.close()
+	def _current_control(self, device_list):
+		while True:
+			try:
+				for device in device_list:
+					sleep(0.5)
+					_ramp(device, self.hold_current)
+
+			except KeyboardInterrupt:
+				print('Ctrl-C detected, Exiting Gracefully')
+				break
+
+		for device in device_list:
+			for i in range(self.ramp_down_steps):
+				current = self.hold_current * (self.ramp_down_steps - i) / self.ramp_down_steps
+				_ramp(device, current)
+			sleep(0.5)
+			device.close()
