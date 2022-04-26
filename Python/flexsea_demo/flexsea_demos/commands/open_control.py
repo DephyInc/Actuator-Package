@@ -46,6 +46,7 @@ class OpenControlCommand(Command):
 		{paramFile? : Yaml file with demo parameters.}
 		{--ports=* : List of device ports. Comma separated. Overrides parameter file.}
 		{--baud-rate= : USB baud rate. Overrides parameter file.}
+        {--streaming-freq= : Frequency (Hz) for device to stream data.}
 		{--run-time= : Time (s) to run each device. Overrides parameter file.}
 		{--n-cycles= : Number of times to ramp each device. Overrides parameter file.}
 		{--max-voltage= : Peak voltage to use (mV). Overrides parameter file.}
@@ -55,6 +56,7 @@ class OpenControlCommand(Command):
 	required = {
 		"ports": List,
 		"baud_rate": int,
+        "streaming_freq" : int,
 		"run_time": int,
 		"n_cycles": int,
 		"max_voltage": int,
@@ -69,6 +71,7 @@ class OpenControlCommand(Command):
 		super().__init__()
 		self.ports = []
 		self.baud_rate = 0
+        self.streaming_freq = None
 		self.run_time = 0
 		self.n_cycles = 0
 		self.max_voltage = 0
@@ -86,7 +89,7 @@ class OpenControlCommand(Command):
 		self._get_voltages()
 		for port in self.ports:
 			input("Press 'ENTER' to continue...")
-			device = Device(self.fxs, port, self.baud_rate)
+			device = Device(self.fxs, port, self.baud_rate, self.streaming_freq)
 			self._open_control(device)
 
 	# -----

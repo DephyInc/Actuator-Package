@@ -29,6 +29,7 @@ class ImpedanceControlCommand(Command):
 		{paramFile? : Yaml file with demo parameters.}
 		{--ports=* : List of device ports. Comma separated. Overrides parameter file.}
 		{--baud-rate= : USB baud rate. Overrides parameter file.}
+        {--streaming-freq= : Frequency (Hz) for device to stream data.}
 		{--run-time= : Time (s) to run each device. Overrides parameter file.}
 		{--gains= : Order: KP,KI,KD,K,B,FF. Comma separated. Overrides parameter file.}
 		{--transition-time= : Time (s) between gain changes. Overrides parameter file.}
@@ -42,6 +43,7 @@ class ImpedanceControlCommand(Command):
 	required = {
 		"ports": List,
 		"baud_rate": int,
+        "streaming_freq" : int,
 		"run_time": int,
 		"gains": Dict,
 		"transition_time": float,
@@ -58,6 +60,7 @@ class ImpedanceControlCommand(Command):
 		super().__init__()
 		self.ports = []
 		self.baud_rate = 0
+        self.streaming_freq = None
 		self.run_time = 0
 		self.gains = {}
 		self.transition_time = 0.0
@@ -86,7 +89,7 @@ class ImpedanceControlCommand(Command):
 
 		for port in self.ports:
 			input("Press 'ENTER' to continue...")
-			device = Device(self.fxs, port, self.baud_rate)
+			device = Device(self.fxs, port, self.baud_rate, self.streaming_freq)
 			self._reset_plot()
 
 			self._impedance_control(device)
