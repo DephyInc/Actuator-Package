@@ -6,7 +6,8 @@ Implements the pole-finding tool.
 from typing import List
 
 from cleo import Command
-from flexsea import flexsea as flex
+
+from flexsea.flexsea import Device
 
 from flexsea_demos.utils import setup
 
@@ -39,7 +40,6 @@ class FindPolesCommand(Command):
 		super().__init__()
 		self.ports = []
 		self.baud_rate = 0
-		self.fxs = None
 
 	# -----
 	# handle
@@ -49,8 +49,8 @@ class FindPolesCommand(Command):
 		Finds the devices' poles.
 		"""
 		setup(self, self.required, self.argument("paramFile"), self.__name__)
-		fxs = flex.FlexSEA()
 		for port in self.ports:
 			input("Press 'ENTER' to continue...")
-			dev_id = fxs.open(port, self.baud_rate, 0)
-			fxs.find_poles(dev_id)
+			device = Device(port, self.baud_rate)
+			device.open(0)
+			device.find_poles()

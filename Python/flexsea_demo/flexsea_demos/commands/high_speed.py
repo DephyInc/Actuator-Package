@@ -8,14 +8,14 @@ from time import time
 from typing import List
 
 from cleo import Command
-from flexsea import fxEnums as fxe
-from flexsea import fxPlotting as fxp
-from flexsea import fxUtils as fxu
+from flexsea import fx_enums as fxe
+from flexsea import fx_plotting as fxp
+from flexsea import fx_utils as fxu
+from flexsea.flexsea import Device
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 
-from flexsea_demos.device import Device
 from flexsea_demos.utils import setup
 
 
@@ -30,6 +30,7 @@ class HighSpeedCommand(Command):
 		{paramFile? : Yaml file with demo parameters.}
 		{--ports=* : List of device ports. Comma separated. Overrides parameter file.}
 		{--baud-rate= : USB baud rate. Overrides parameter file.}
+		{--streaming-freq= : Frequency (Hz) for device to stream data.}
 		{--controller-type= : See flexsea.fxEnums. Overrides parameter file.}
 		{--signal-type= : 1 is sine, 2 is line. Overrides parameter file.}
 		{--cmd-freq= : Device streaming frequency (Hz). Overrides parameter file.}
@@ -47,6 +48,7 @@ class HighSpeedCommand(Command):
 	required = {
 		"ports": List,
 		"baud_rate": int,
+		"streaming_freq": int,
 		"controller_type": int,
 		"signal_type": int,
 		"cmd_freq": int,
@@ -68,6 +70,7 @@ class HighSpeedCommand(Command):
 
 		self.ports = []
 		self.baud_rate = 0
+		self.streaming_freq = None
 		self.controller_type = 0
 		self.signal_type = 0
 		self.cmd_freq = 0
@@ -78,7 +81,6 @@ class HighSpeedCommand(Command):
 		self.request_jitter = False
 		self.jitter = 0
 
-		self.fxs = None
 		# pylint: disable=C0103
 		self.dt = 0.0
 		self.start_time = None
@@ -86,8 +88,8 @@ class HighSpeedCommand(Command):
 		self.figure_counter = 1
 		self.signal = {"sine": 1, "line": 2}
 		self.i = 0
-		self.current_gains = {"KP": 40, "KI": 400, "KD": 0, "K": 0, "B": 0, "FF": 128}
-		self.pos_gains = {"KP": 300, "KI": 50, "KD": 0, "K": 0, "B": 0, "FF": 0}
+		self.current_gains = {"kp": 40, "ki": 400, "kd": 0, "k": 0, "b": 0, "ff": 128}
+		self.pos_gains = {"kp": 300, "ki": 50, "kd": 0, "k": 0, "b": 0, "ff": 0}
 		self.plot_data = {
 			"requests": [],
 			"measurements": [],
@@ -124,11 +126,12 @@ class HighSpeedCommand(Command):
 		for port in self.ports:
 			input("Press 'ENTER' to continue...")
 			self._reset_plot()
-			device = Device(self.fxs, port, self.baud_rate)
+			device = Device(port, self.baud_rate)
+			device.open(self.streaming_freq)
 			device.set_controller(self.controller_type)
-			device.set_gains(gains)
+			device.set_gains(**gains)
 			self._high_speed(device)
-			device.motor(fxe.FX_NONE, 0)
+			device.send_motor_command(fxe.FX_NONE, 0)
 			sleep(0.1)
 			self._plot(device)
 			device.close()
@@ -163,7 +166,7 @@ class HighSpeedCommand(Command):
 		self.start_time = time()
 		if device.controller_type == fxe.HSS_POSITION:
 			sleep(0.1)
-			data = device.read()
+			data = device.read_device()
 			pos0 = data.mot_ang
 		else:
 			pos0 = 0
@@ -181,12 +184,12 @@ class HighSpeedCommand(Command):
 
 				# Read
 				begin_time = time()
-				data = device.read()
+				data = device.read_device()
 				self.plot_data["dev_read_command_times"].append(time() - begin_time)
 
 				# Write
 				begin_time = time()
-				device.motor(device.controller, sample)
+				device.send_motor_command(device.controller, sample)
 				self.plot_data["dev_write_command_times"].append(time() - begin_time)
 
 				if device.controller == fxe.FX_CURRENT:
@@ -203,7 +206,7 @@ class HighSpeedCommand(Command):
 			if self.signal_type == self.signal["sine"]:
 				for _ in range(int(self.cycle_delay / self.dt)):
 					sleep(self.dt)
-					data = device.read()
+					data = device.read_device()
 
 					if device.controller_type == fxe.HSS_CURRENT:
 						self.plot_data["measurements"].append(data.mot_cur)

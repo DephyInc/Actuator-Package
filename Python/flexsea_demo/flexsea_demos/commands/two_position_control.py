@@ -9,12 +9,12 @@ from typing import Dict
 from typing import List
 
 from cleo import Command
-from flexsea import fxEnums as fxe
-from flexsea import fxUtils as fxu
+from flexsea import fx_enums as fxe
+from flexsea import fx_utils as fxu
+from flexsea.flexsea import Device
 import matplotlib
 import matplotlib.pyplot as plt
 
-from flexsea_demos.device import Device
 from flexsea_demos.utils import setup
 
 
@@ -29,6 +29,7 @@ class TwoPositionCommand(Command):
 		{paramFile? : Yaml file containing the parameters for the demo.}
 		{--ports=* : List of device ports. Comma separated. Overrides parameter file.}
 		{--baud-rate= : USB baud rate. Overrides parameter file.}
+		{--streaming-freq= : Frequency (Hz) for device to stream data.}
 		{--run-time= : Time (s) to run each device. Overrides parameter file.}
 		{--delta= : Offset from initial position. Overrides parameter file.}
 		{--transition-time= : Time (s) between positions. Overrides parameter file.}
@@ -41,6 +42,7 @@ class TwoPositionCommand(Command):
 	required = {
 		"ports": List,
 		"baud_rate": int,
+		"streaming_freq": int,
 		"run_time": int,
 		"delta": int,
 		"transition_time": float,
@@ -56,6 +58,7 @@ class TwoPositionCommand(Command):
 		super().__init__()
 		self.ports = []
 		self.baud_rate = 0
+		self.streaming_freq = None
 		self.run_time = 0
 		self.delta = 0
 		self.transition_time = 0.0
@@ -64,7 +67,6 @@ class TwoPositionCommand(Command):
 		self.n_loops = 0
 		self.transition_steps = 0
 		self.start_time = 0
-		self.fxs = None
 
 		matplotlib.use("WebAgg")
 		if fxu.is_pi():
@@ -83,10 +85,11 @@ class TwoPositionCommand(Command):
 
 		for port in self.ports:
 			input("Press 'ENTER' to continue...")
-			device = Device(self.fxs, port, self.baud_rate)
+			device = Device(port, self.baud_rate)
+			device.open(self.streaming_freq)
 			self._reset_plot()
 			self._two_position_control(device)
-			device.motor(fxe.FX_VOLTAGE, 0)
+			device.send_motor_command(fxe.FX_VOLTAGE, 0)
 			self._plot()
 			device.close()
 
@@ -94,18 +97,18 @@ class TwoPositionCommand(Command):
 	# _two_position_control
 	# -----
 	def _two_position_control(self, device):
-		data = device.read()
+		data = device.read_device()
 		initial_angle = data.mot_ang
 		positions = [initial_angle, initial_angle + self.delta]
 		current_pos = 0
 
-		device.set_gains(self.gains)
-		device.motor(fxe.FX_POSITION, initial_angle)
+		device.set_gains(**self.gains)
+		device.send_motor_command(fxe.FX_POSITION, initial_angle)
 		self.start_time = time()
 
 		for i in range(self.n_loops):
 			sleep(0.1)
-			data = device.read()
+			data = device.read_device()
 			fxu.clear_terminal()
 			measured_pos = data.mot_ang
 			print(f"Desired:              {positions[current_pos]}")
@@ -115,7 +118,7 @@ class TwoPositionCommand(Command):
 
 			if i % self.transition_steps == 0:
 				current_pos = (current_pos + 1) % len(positions)
-				device.motor(fxe.FX_POSITION, positions[current_pos])
+				device.send_motor_command(fxe.FX_POSITION, positions[current_pos])
 
 			self.plot_data["times"].append(time() - self.start_time)
 			self.plot_data["requests"].append(positions[current_pos])

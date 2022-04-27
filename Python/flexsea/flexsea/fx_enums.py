@@ -52,6 +52,7 @@ APP_NAMES = {
 # ============================================
 #                  Firmware
 # ============================================
+# pylint: disable=R0903
 class FW(c.Structure):
 	"""Firmware version"""
 

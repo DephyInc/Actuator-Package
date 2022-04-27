@@ -4,13 +4,14 @@ Plotting Utilities
 import matplotlib
 import matplotlib.pyplot as plt
 
-from . import fxEnums as fxe
-from . import fxUtils as fxu
+from . import fx_enums as fxe
+from . import fx_utils as fxu
 
 
 # ============================================
 #         plot_setpoint_vs_desired
 # ============================================
+# pylint: disable=R0913
 def plot_setpoint_vs_desired(
 	dev_id,
 	fig,

@@ -11,11 +11,11 @@ from cleo import Command
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
-from flexsea import fxEnums as fxe
-from flexsea import fxPlotting as fxp
-from flexsea import fxUtils as fxu
+from flexsea import fx_enums as fxe
+from flexsea import fx_plotting as fxp
+from flexsea import fx_utils as fxu
+from flexsea.flexsea import Device
 
-from flexsea_demos.device import Device
 from flexsea_demos.utils import setup
 
 
@@ -30,6 +30,7 @@ class HighStressCommand(Command):
 		{paramFile? : Yaml file with demo parameters.}
 		{--ports=* : List of device ports. Comma separated. Overrides parameter file.}
 		{--baud-rate= : USB baud rate. Overrides parameter file.}
+		{--streaming-freq= : Frequency (Hz) for device to stream data.}
 		{--cmd-freq= : Device streaming frequency (Hz). Overrides parameter file.}
 		{--position-amplitude= : Amplitude in ticks. Overrides parameter file.}
 		{--current-amplitude= : Current in mA. Overrides parameter file.}
@@ -45,6 +46,7 @@ class HighStressCommand(Command):
 	required = {
 		"ports": List,
 		"baud_rate": int,
+		"streaming_freq": int,
 		"cmd_freq": int,
 		"position_amplitude": int,
 		"current_amplitude": int,
@@ -63,6 +65,7 @@ class HighStressCommand(Command):
 		super().__init__()
 		self.ports = []
 		self.baud_rate = 0
+		self.streaming_freq = None
 		self.cmd_freq = 0
 		self.position_amplitude = 0
 		self.current_amplitude = 0
@@ -70,13 +73,12 @@ class HighStressCommand(Command):
 		self.current_freq = 0
 		self.current_asymmetric_g = 0.0
 		self.n_loops = 0
-		self.fxs = None
 
 		# pylint: disable=C0103
 		self.dt = 0
 		self.devices = []
-		self.cur_gains = {"KP": 40, "KI": 400, "KD": 0, "K": 0, "B": 0, "FF": 128}
-		self.pos_gains = {"KP": 100, "KI": 10, "KD": 0, "K": 0, "B": 0, "FF": 0}
+		self.cur_gains = {"kp": 40, "ki": 400, "kd": 0, "k": 0, "b": 0, "ff": 128}
+		self.pos_gains = {"kp": 100, "ki": 10, "kd": 0, "k": 0, "b": 0, "ff": 0}
 		self.cmd_count = 0
 		self.start_time = 0
 		self.timestamps = []
@@ -102,9 +104,10 @@ class HighStressCommand(Command):
 		setup(self, self.required, self.argument("paramFile"), self.__name__)
 		self.dt = float(1 / (float(self.cmd_freq)))
 		for i, port in enumerate(self.ports):
-			self.devices.append({"port": Device(self.fxs, port, self.baud_rate)})
+			self.devices.append({"port": Device(port, self.baud_rate)})
+			self.devices[i]["port"].open(self.streaming_freq)
 			self.devices[i]["initial_pos"] = self.devices[i]["port"].initial_pos
-			self.devices[i]["data"] = self.devices[i]["port"].read()
+			self.devices[i]["data"] = self.devices[i]["port"].read_device()
 			self.devices[i]["read_times"] = []
 			self.devices[i]["gains_times"] = []
 			self.devices[i]["motor_times"] = []
@@ -135,7 +138,7 @@ class HighStressCommand(Command):
 		elapsed_time = time() - self.start_time
 
 		for dev in self.devices:
-			dev["port"].motor(fxe.FX_VOLTAGE, 0)
+			dev["port"].send_motor_command(fxe.FX_VOLTAGE, 0)
 		sleep(0.1)
 
 		self._print_stats(elapsed_time)
@@ -247,13 +250,13 @@ class HighStressCommand(Command):
 
 		for dev, cmd in zip(self.devices, cmds):
 			tstart = time()
-			dev["data"] = dev["port"].read()
+			dev["data"] = dev["port"].read_device()
 			dev["read_times"].append(time() - tstart)
 
 			if set_gains:
 				tstart = time()
 				# Gains are, in order: kp, ki, kd, K, B & ff
-				dev["port"].set_gains(gains)
+				dev["port"].set_gains(**gains)
 				dev["gains_times"].append(time() - tstart)
 			else:
 				dev["gains_times"].append(0)
@@ -261,7 +264,7 @@ class HighStressCommand(Command):
 			cmd_val = cmd["cur"] if motor_cmd == fxe.FX_CURRENT else cmd["pos"]
 
 			tstart = time()
-			dev["port"].motor(motor_cmd, cmd_val)
+			dev["port"].send_motor_command(motor_cmd, cmd_val)
 			dev["motor_times"].append(time() - tstart)
 			dev["pos_requests"].append(cmd["pos"])
 			dev["pos_measurements"].append(dev["data"].mot_ang)

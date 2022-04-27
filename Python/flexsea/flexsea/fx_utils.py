@@ -7,7 +7,7 @@ import platform
 import numpy as np
 import yaml
 
-from . import fxEnums as fxe
+from . import fx_enums as fxe
 from .dev_spec import AllDevices as fx_devs
 
 
@@ -74,22 +74,22 @@ def decode(val):
 	"""
 	Returns decoded version number formatted as x.y.z
 	"""
-	x = y = z = 0
+	major = minor = bug = 0
 
 	if val > 0:
 		while val % 2 == 0:
-			x += 1
+			major += 1
 			val /= 2
 
 		while val % 3 == 0:
-			y += 1
+			minor += 1
 			val /= 3
 
 		while val % 5 == 0:
-			z += 1
+			bug += 1
 			val /= 5
 
-	return f"{x}.{y}.{z}"
+	return f"{major}.{minor}.{bug}"
 
 
 # ============================================
@@ -124,9 +124,9 @@ def print_device(dev_id, app_type):
 	dev_id (int): The device ID.
 	app_type (int): application type.
 	"""
-    # NOTE: We could just loop over state._fields_ instead of having
-    # all of thse different print functions:
-    # for f in state._fields_: print(f"{f[0]}: {getattr(state, f[0])})
+	# NOTE: We could just loop over state._fields_ instead of having
+	# all of thse different print functions:
+	# for f in state._fields_: print(f"{f[0]}: {getattr(state, f[0])})
 	if app_type.value == fxe.FX_ACT_PACK.value:
 		print_act_pack(dev_id)
 	elif app_type.value == fxe.FX_NET_MASTER.value:
