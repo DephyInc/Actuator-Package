@@ -16,41 +16,41 @@ from flexsea_demos.utils import setup
 #              FindPolesCommand
 # ============================================
 class FindPolesCommand(Command):
-	"""
-	Finds poles on the device.
+    """
+    Finds poles on the device.
 
-	find_poles
-		{paramFile? : Yaml file with demo parameters.}
-		{--ports=* : List of device ports. Overrides parameter file.}
-		{--baud-rate= : USB baud rate. Overrides parameter file.}
-	"""
+    find_poles
+            {paramFile? : Yaml file with demo parameters.}
+            {--ports=* : List of device ports. Overrides parameter file.}
+            {--baud-rate= : USB baud rate. Overrides parameter file.}
+    """
 
-	# Schema of parameters required by the demo
-	required = {
-		"ports": List,
-		"baud_rate": int,
-	}
+    # Schema of parameters required by the demo
+    required = {
+        "ports": List,
+        "baud_rate": int,
+    }
 
-	__name__ = "find_poles"
+    __name__ = "find_poles"
 
-	# -----
-	# constructor
-	# -----
-	def __init__(self):
-		super().__init__()
-		self.ports = []
-		self.baud_rate = 0
+    # -----
+    # constructor
+    # -----
+    def __init__(self):
+        super().__init__()
+        self.ports = []
+        self.baud_rate = 0
 
-	# -----
-	# handle
-	# -----
-	def handle(self):
-		"""
-		Finds the devices' poles.
-		"""
-		setup(self, self.required, self.argument("paramFile"), self.__name__)
-		for port in self.ports:
-			input("Press 'ENTER' to continue...")
-			device = Device(port, self.baud_rate)
-			device.open(0)
-			device.find_poles()
+    # -----
+    # handle
+    # -----
+    def handle(self):
+        """
+        Finds the devices' poles.
+        """
+        setup(self, self.required, self.argument("paramFile"), self.__name__)
+        for port in self.ports:
+            input("Press 'ENTER' to continue...")
+            device = Device(port, self.baud_rate)
+            device.open(0)
+            device.find_poles()

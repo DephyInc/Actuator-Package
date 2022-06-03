@@ -51,12 +51,12 @@ print("IP Address: ", IPAddr)
 
 # Generate and send email:
 body = (
-	"This is an automated message from RPi4.\nUser: "
-	+ userid
-	+ "\nHostname: "
-	+ hostname
-	+ "\nIP address: "
-	+ IPAddr
+    "This is an automated message from RPi4.\nUser: "
+    + userid
+    + "\nHostname: "
+    + hostname
+    + "\nIP address: "
+    + IPAddr
 )
 msg = MIMEMultipart()
 

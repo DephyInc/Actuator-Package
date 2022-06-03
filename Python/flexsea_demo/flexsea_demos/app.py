@@ -22,33 +22,33 @@ from flexsea_demos.utils import ApplicationConfig
 #            FlexseaDemoApplication
 # ============================================
 class FlexseaDemoApplication(Application):
-	"""
-	Defines the base `run_demos` command and adds each demo as a
-	subcommand.
-	"""
+    """
+    Defines the base `run_demos` command and adds each demo as a
+    subcommand.
+    """
 
-	# -----
-	# constructor
-	# -----
-	def __init__(self):
-		super().__init__(config=ApplicationConfig())
-		self._get_commands()
+    # -----
+    # constructor
+    # -----
+    def __init__(self):
+        super().__init__(config=ApplicationConfig())
+        self._get_commands()
 
-	# -----
-	# _get_commands
-	# -----
-	def _get_commands(self):
-		command_list = [
-			CurrentControlCommand,
-			FindPolesCommand,
-			HighSpeedCommand,
-			HighStressCommand,
-			ImpedanceControlCommand,
-			LeaderFollowerCommand,
-			OpenControlCommand,
-			PositionControlCommand,
-			ReadOnlyCommand,
-			TwoPositionCommand,
-		]
-		for command in command_list:
-			self.add(command())
+    # -----
+    # _get_commands
+    # -----
+    def _get_commands(self):
+        command_list = [
+            CurrentControlCommand,
+            FindPolesCommand,
+            HighSpeedCommand,
+            HighStressCommand,
+            ImpedanceControlCommand,
+            LeaderFollowerCommand,
+            OpenControlCommand,
+            PositionControlCommand,
+            ReadOnlyCommand,
+            TwoPositionCommand,
+        ]
+        for command in command_list:
+            self.add(command())
