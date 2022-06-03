@@ -66,7 +66,6 @@ setuptools.setup(
 	packages=setuptools.find_packages(),
 	package_dir={"flexsea": "flexsea"},
 	install_requires=[
-		"scipy==1.*",
 		"tornado==6.*",
 		"matplotlib==3.*",
 		"numpy==1.*",
