@@ -9,12 +9,12 @@ from typing import Dict
 from typing import List
 
 from cleo import Command
-from flexsea import fxEnums as fxe
-from flexsea import fxUtils as fxu
+from flexsea import fx_enums as fxe
+from flexsea import fx_utils as fxu
+from flexsea.flexsea import Device
 import matplotlib
 import matplotlib.pyplot as plt
 
-from flexsea_demos.device import Device
 from flexsea_demos.utils import setup
 
 
@@ -29,6 +29,7 @@ class ImpedanceControlCommand(Command):
 		{paramFile? : Yaml file with demo parameters.}
 		{--ports=* : List of device ports. Comma separated. Overrides parameter file.}
 		{--baud-rate= : USB baud rate. Overrides parameter file.}
+		{--streaming-freq= : Frequency (Hz) for device to stream data.}
 		{--run-time= : Time (s) to run each device. Overrides parameter file.}
 		{--gains= : Order: KP,KI,KD,K,B,FF. Comma separated. Overrides parameter file.}
 		{--transition-time= : Time (s) between gain changes. Overrides parameter file.}
@@ -42,6 +43,7 @@ class ImpedanceControlCommand(Command):
 	required = {
 		"ports": List,
 		"baud_rate": int,
+		"streaming_freq": int,
 		"run_time": int,
 		"gains": Dict,
 		"transition_time": float,
@@ -58,6 +60,7 @@ class ImpedanceControlCommand(Command):
 		super().__init__()
 		self.ports = []
 		self.baud_rate = 0
+		self.streaming_freq = None
 		self.run_time = 0
 		self.gains = {}
 		self.transition_time = 0.0
@@ -66,7 +69,6 @@ class ImpedanceControlCommand(Command):
 		self.n_loops = 0
 		self.transition_steps = 0
 		self.start_time = 0.0
-		self.fxs = None
 		self.plot_data = {"times": [], "requests": [], "measurements": []}
 
 		matplotlib.use("WebAgg")
@@ -86,12 +88,13 @@ class ImpedanceControlCommand(Command):
 
 		for port in self.ports:
 			input("Press 'ENTER' to continue...")
-			device = Device(self.fxs, port, self.baud_rate)
+			device = Device(port, self.baud_rate)
+			device.open(self.streaming_freq)
 			self._reset_plot()
 
 			self._impedance_control(device)
 
-			device.motor(fxe.FX_VOLTAGE, 0)
+			device.send_motor_command(fxe.FX_VOLTAGE, 0)
 			self._plot()
 			device.close()
 
@@ -99,10 +102,10 @@ class ImpedanceControlCommand(Command):
 	# _impedance_control
 	# -----
 	def _impedance_control(self, device):
-		data = device.read()
+		data = device.read_device()
 		initial_angle = data.mot_ang
-		device.motor(fxe.FX_IMPEDANCE, initial_angle)
-		device.set_gains(self.gains)
+		device.send_motor_command(fxe.FX_IMPEDANCE, initial_angle)
+		device.set_gains(**self.gains)
 		current_pos = 0
 		positions = [initial_angle, initial_angle + self.delta]
 		sleep(0.4)
@@ -110,15 +113,15 @@ class ImpedanceControlCommand(Command):
 		print("")
 
 		for i in range(self.n_loops):
-			data = device.read()
+			data = device.read_device()
 			measured_pos = data.mot_ang
 
 			if i % self.transition_steps == 0:
 				self.gains["B"] += self.b_increments
-				device.set_gains(self.gains)
+				device.set_gains(**self.gains)
 				self.delta = abs(positions[current_pos] - measured_pos)
 				current_pos = (current_pos + 1) % 2
-				device.motor(fxe.FX_IMPEDANCE, positions[current_pos])
+				device.send_motor_command(fxe.FX_IMPEDANCE, positions[current_pos])
 			sleep(0.02)
 
 			if i % 10 == 0:

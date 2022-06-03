@@ -15,7 +15,6 @@ import stat as st
 
 from cleo.config import ApplicationConfig as BaseApplicationConfig
 from clikit.api.formatter import Style
-from flexsea import flexsea as flex
 import yaml
 
 
@@ -51,7 +50,6 @@ def setup(cls, schema, param_file, demo_name):
 	# Validate and assign
 	demo_params = validate(schema, demo_params)
 	assign_params(cls, demo_params)
-	setattr(cls, "fxs", flex.FlexSEA())
 
 
 # ============================================

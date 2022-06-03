@@ -1,13 +1,18 @@
 """
 Enum codes
 """
-# pylint: disable=invalid-name
 import ctypes as c
 
-# High Speed Stress/Test Experiments:
+
+# ============================================
+#    High Speed Stress/Test Experiments
+# ============================================
 (HSS_POSITION, HSS_CURRENT, HSS_MIXED) = map(c.c_int, range(3))
 
-# Motor Controller
+
+# ============================================
+#              Motor Controller
+# ============================================
 (
 	FX_POSITION,
 	FX_VOLTAGE,
@@ -19,12 +24,17 @@ import ctypes as c
 	FX_STALK,
 ) = map(c.c_int, range(8))
 
-# Error Code
+
+# ============================================
+#                 Error Codes
+# ============================================
 (FX_SUCCESS, FX_FAILURE, FX_INVALID_PARAM, FX_INVALID_DEVICE, FX_NOT_STREAMING) = map(
 	c.c_int, range(5)
 )
 
-# App Type
+# ============================================
+#                  App Types
+# ============================================
 (FX_INVALID_APP, FX_ACT_PACK, FX_EB5X, FX_MD, FX_NET_MASTER, FX_BMS) = map(
 	c.c_int, range(-1, 5)
 )
@@ -39,7 +49,11 @@ APP_NAMES = {
 }
 
 
-class FW(c.Structure):  # pylint: disable=too-few-public-methods
+# ============================================
+#                  Firmware
+# ============================================
+# pylint: disable=R0903
+class FW(c.Structure):
 	"""Firmware version"""
 
 	_fields_ = [

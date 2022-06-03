@@ -56,7 +56,7 @@ print("inc files:\n{}".format(inc_files))
 
 setuptools.setup(
 	name="flexsea",
-	version="8.0.0",
+	version="8.1.0",
 	author="Dephy Inc.",
 	author_email="admin@dephy.com",
 	description="Dephy's Actuator Package API library",
@@ -65,14 +65,7 @@ setuptools.setup(
 	url="https://github.com/DephyInc/Actuator-Package/",
 	packages=setuptools.find_packages(),
 	package_dir={"flexsea": "flexsea"},
-	install_requires=[
-		"scipy==1.*",
-		"tornado==6.*",
-		"matplotlib==3.*",
-		"numpy==1.*",
-		"pillow>=9.*",
-		"PyYAML==5.*",
-	],
+	install_requires=["tornado==6.*", "matplotlib==3.*", "numpy==1.*", "PyYAML==5.*",],
 	classifiers=[
 		"Programming Language :: Python :: 3",
 		"License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",

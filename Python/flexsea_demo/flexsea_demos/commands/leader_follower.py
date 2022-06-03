@@ -7,10 +7,10 @@ from time import sleep
 from typing import List
 
 from cleo import Command
-from flexsea import fxEnums as fxe
-from flexsea import fxUtils as fxu
+from flexsea import fx_enums as fxe
+from flexsea import fx_utils as fxu
+from flexsea.flexsea import Device
 
-from flexsea_demos.device import Device
 from flexsea_demos.utils import setup
 
 
@@ -25,13 +25,14 @@ class LeaderFollowerCommand(Command):
 		{paramFile? : Yaml file with demo parameters.}
 		{--ports=* : List of device ports. Comma separated. Overrides parameter file.}
 		{--baud-rate= : USB baud rate. Overrides parameter file.}
+		{--streaming-freq= : Frequency (Hz) for device to stream data.}
 		{--run-time= : Time (s) to run each device. Overrides parameter file.}
 	"""
 
 	# pylint: disable=too-many-instance-attributes
 
 	# Schema of parameters required by the demo
-	required = {"ports": List, "baud_rate": int, "run_time": int}
+	required = {"ports": List, "baud_rate": int, "streaming_freq": int, "run_time": int}
 
 	__name__ = "leader_follower"
 
@@ -42,14 +43,14 @@ class LeaderFollowerCommand(Command):
 		super().__init__()
 		self.ports = []
 		self.baud_rate = 0
+		self.streaming_freq = None
 		self.run_time = 0
 		self.n_loops = 0
 		self.devices = []
 		self.loop_delay = 0.05
-		self.fxs = None
-		self.leader_gains = {"KP": 40, "KI": 400, "KD": 0, "K": 0, "B": 0, "FF": 128}
-		self.follower_gains = {"KP": 100, "KI": 1, "KD": 0, "K": 0, "B": 0, "FF": 0}
-		self.off_gains = {"KP": 0, "KI": 0, "KD": 0, "K": 0, "B": 0, "FF": 0}
+		self.leader_gains = {"kp": 40, "ki": 400, "kd": 0, "k": 0, "b": 0, "ff": 128}
+		self.follower_gains = {"kp": 100, "ki": 1, "kd": 0, "k": 0, "b": 0, "ff": 0}
+		self.off_gains = {"kp": 0, "ki": 0, "kd": 0, "k": 0, "b": 0, "ff": 0}
 
 	# -----
 	# handle
@@ -67,22 +68,23 @@ class LeaderFollowerCommand(Command):
 			raise AssertionError(f"Need two devices. Got: '{len(self.ports)}'") from err
 
 		for i in range(2):
-			self.devices.append(Device(self.fxs, self.ports[i], self.baud_rate))
+			self.devices.append(Device(self.ports[i], self.baud_rate))
+			self.devices[i].open(self.streaming_freq)
 
 		# Set first device to current controller with 0 current (0 torque)
-		self.devices[0].set_gains(self.leader_gains)
-		self.devices[0].motor(fxe.FX_CURRENT, 0)
+		self.devices[0].set_gains(**self.leader_gains)
+		self.devices[0].send_motor_command(fxe.FX_CURRENT, 0)
 
 		# Set position controller for second device
-		self.devices[1].set_gains(self.follower_gains)
-		self.devices[1].motor(fxe.FX_POSITION, self.devices[1].initial_pos)
+		self.devices[1].set_gains(**self.follower_gains)
+		self.devices[1].send_motor_command(fxe.FX_POSITION, self.devices[1].initial_pos)
 
 		self._leader_follower()
 
 		print("Turning off position control...")
 		for i in range(2):
-			self.devices[i].set_gains(self.off_gains)
-			self.devices[i].motor(fxe.FX_NONE, 0)
+			self.devices[i].set_gains(**self.off_gains)
+			self.devices[i].send_motor_command(fxe.FX_NONE, 0)
 			sleep(0.5)
 			self.devices[i].close()
 
@@ -100,11 +102,11 @@ class LeaderFollowerCommand(Command):
 			sleep(self.loop_delay)
 			fxu.clear_terminal()
 
-			leader_data = self.devices[0].read()
+			leader_data = self.devices[0].read_device()
 
 			diff = leader_data.mot_ang - leader_pos0
 
-			self.devices[1].motor(fxe.FX_POSITION, follower_pos0 + diff)
+			self.devices[1].send_motor_command(fxe.FX_POSITION, follower_pos0 + diff)
 
 			print(f"Device {follower_id} following device {leader_id}\n")
 			self.devices[1].print()

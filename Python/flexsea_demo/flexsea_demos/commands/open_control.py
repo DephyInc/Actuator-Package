@@ -7,10 +7,10 @@ from time import sleep
 from typing import List
 
 from cleo import Command
-from flexsea import fxEnums as fxe
-from flexsea import fxUtils as fxu
+from flexsea import fx_enums as fxe
+from flexsea import fx_utils as fxu
+from flexsea.flexsea import Device
 
-from flexsea_demos.device import Device
 from flexsea_demos.utils import setup
 
 
@@ -30,7 +30,7 @@ def _ramp_device(device, voltage):
 		The voltage to set.
 	"""
 	sleep(0.1)
-	device.motor(fxe.FX_VOLTAGE, voltage)
+	device.send_motor_command(fxe.FX_VOLTAGE, voltage)
 	fxu.clear_terminal()
 	device.print()
 
@@ -38,6 +38,7 @@ def _ramp_device(device, voltage):
 # ============================================
 #              OpenControlCommand
 # ============================================
+# pylint: disable=R0902
 class OpenControlCommand(Command):
 	"""
 	Implements the open control demo.
@@ -46,6 +47,7 @@ class OpenControlCommand(Command):
 		{paramFile? : Yaml file with demo parameters.}
 		{--ports=* : List of device ports. Comma separated. Overrides parameter file.}
 		{--baud-rate= : USB baud rate. Overrides parameter file.}
+		{--streaming-freq= : Frequency (Hz) for device to stream data.}
 		{--run-time= : Time (s) to run each device. Overrides parameter file.}
 		{--n-cycles= : Number of times to ramp each device. Overrides parameter file.}
 		{--max-voltage= : Peak voltage to use (mV). Overrides parameter file.}
@@ -55,6 +57,7 @@ class OpenControlCommand(Command):
 	required = {
 		"ports": List,
 		"baud_rate": int,
+		"streaming_freq": int,
 		"run_time": int,
 		"n_cycles": int,
 		"max_voltage": int,
@@ -69,6 +72,7 @@ class OpenControlCommand(Command):
 		super().__init__()
 		self.ports = []
 		self.baud_rate = 0
+		self.streaming_freq = None
 		self.run_time = 0
 		self.n_cycles = 0
 		self.max_voltage = 0
@@ -86,7 +90,8 @@ class OpenControlCommand(Command):
 		self._get_voltages()
 		for port in self.ports:
 			input("Press 'ENTER' to continue...")
-			device = Device(self.fxs, port, self.baud_rate)
+			device = Device(port, self.baud_rate)
+			device.open(self.streaming_freq)
 			self._open_control(device)
 
 	# -----
@@ -107,7 +112,7 @@ class OpenControlCommand(Command):
 	# -----
 	def _open_control(self, device):
 		print(f"Setting open control for device {device.dev_id}...")
-		device.motor(fxe.FX_VOLTAGE, 0)
+		device.send_motor_command(fxe.FX_VOLTAGE, 0)
 		sleep(0.5)
 
 		for rep in range(self.n_cycles):
@@ -120,6 +125,6 @@ class OpenControlCommand(Command):
 			for voltage in self.voltages[-1::-1]:
 				_ramp_device(device, voltage)
 
-		device.motor(fxe.FX_NONE, 0)
+		device.send_motor_command(fxe.FX_NONE, 0)
 		sleep(0.1)
 		device.close()
