@@ -8,10 +8,10 @@ from typing import Dict
 from typing import List
 
 from cleo import Command
-from flexsea import fxEnums as fxe
-from flexsea import fxUtils as fxu
+from flexsea import fx_enums as fxe
+from flexsea import fx_utils as fxu
+from flexsea.flexsea import Device
 
-from flexsea_demos.device import Device
 from flexsea_demos.utils import setup
 
 
@@ -53,7 +53,6 @@ class PositionControlCommand(Command):
 		self.run_time = 0
 		self.gains = {}
 		self.n_loops = 0
-		self.fxs = None
 
 	# -----
 	# handle
@@ -73,15 +72,15 @@ class PositionControlCommand(Command):
 	# _position_control
 	# -----
 	def _position_control(self, device):
-		data = device.read()
+		data = device.read_device()
 		device.print(data)
 		initial_angle = data.mot_ang
-		device.set_gains(self.gains)
-		device.motor(fxe.FX_POSITION, initial_angle)
+		device.set_gains(**self.gains)
+		device.send_motor_command(fxe.FX_POSITION, initial_angle)
 		for i in range(self.n_loops):
 			sleep(0.1)
 			fxu.clear_terminal()
-			data = device.read()
+			data = device.read_device()
 			current_angle = data.mot_ang
 			print("Desired:              ", initial_angle)
 			print("Measured:             ", current_angle)
@@ -90,6 +89,6 @@ class PositionControlCommand(Command):
 			)
 			device.print(data)
 			fxu.print_loop_count(i, self.n_loops)
-		device.motor(fxe.FX_NONE, 0)
+		device.send_motor_command(fxe.FX_NONE, 0)
 		sleep(0.5)
 		device.close()

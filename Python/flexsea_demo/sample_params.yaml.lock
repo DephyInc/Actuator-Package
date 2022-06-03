@@ -18,7 +18,7 @@ general:
 		# Raspbian
 		# - /dev/ttyACM0
 
-	baud_rate : 230400
+    baud_rate : 230400
 	streaming_freq : 100
 
 

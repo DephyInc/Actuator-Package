@@ -8,10 +8,10 @@ from typing import Dict
 from typing import List
 
 from cleo import Command
-from flexsea import fxEnums as fxe
-from flexsea import fxUtils as fxu
+from flexsea import fx_enums as fxe
+from flexsea import fx_utils as fxu
+from flexsea.flexsea import Device
 
-from flexsea_demos.device import Device
 from flexsea_demos.utils import setup
 
 # ============================================
@@ -22,10 +22,14 @@ def _ramp(device, current):
 	Adjusts the device's current and print's the actual measured
 	value for comparison.
 	"""
+<<<<<<< HEAD
 	print("Device", device)
 	device.motor(fxe.FX_CURRENT, current)
+=======
+	device.send_motor_command(fxe.FX_CURRENT, current)
+>>>>>>> develop
 	sleep(0.1)
-	data = device.read()
+	data = device.read_device()
 	fxu.clear_terminal()
 	print("Desired (mA):         ", current)
 	print("Measured (mA):        ", data.mot_cur)
@@ -79,7 +83,6 @@ class CurrentControlCommand(Command):
 		self.hold_current = 0
 		self.ramp_down_steps = 0
 		self.n_loops = 0
-		self.fxs = None
 
 	# -----
 	# handle
@@ -103,20 +106,12 @@ class CurrentControlCommand(Command):
 	# -----
 	# _current_control
 	# -----
-	def _current_control(self, device_list):
-		while True:
-			try:
-				for device in device_list:
-					sleep(0.5)
-					_ramp(device, self.hold_current)
-
-			except KeyboardInterrupt:
-				print("Ctrl-C detected, Exiting Gracefully")
-				break
-
-		for device in device_list:
-			for i in range(self.ramp_down_steps):
-				current = self.hold_current * (self.ramp_down_steps - i) / self.ramp_down_steps
-				_ramp(device, current)
-			sleep(0.5)
-			device.close()
+	def _current_control(self, device):
+		for _ in range(self.n_loops):
+			_ramp(device, self.hold_current)
+		for i in range(self.ramp_down_steps):
+			current = self.hold_current * (self.ramp_down_steps - i) / self.ramp_down_steps
+			_ramp(device, current)
+		device.send_motor_command(fxe.FX_NONE, 0)
+		sleep(0.5)
+		device.close()

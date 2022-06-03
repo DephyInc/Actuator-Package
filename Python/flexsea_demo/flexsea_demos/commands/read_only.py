@@ -7,9 +7,9 @@ from time import sleep
 from typing import List
 
 from cleo import Command
-from flexsea import fxUtils as fxu
+from flexsea import fx_utils as fxu
+from flexsea.flexsea import Device
 
-from flexsea_demos.device import Device
 from flexsea_demos.utils import setup
 
 
@@ -43,7 +43,6 @@ class ReadOnlyCommand(Command):
 		self.streaming_freq = None
 		self.run_time = 0
 		self.n_loops = 0
-		self.fxs = None
 
 	# -----
 	# handle
