@@ -71,7 +71,7 @@ setuptools.setup(
         "tornado==6.*",
         "matplotlib==3.*",
         "numpy==1.*",
-        "PyYAML==5.*",
+        "PyYAML==6.*",
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
