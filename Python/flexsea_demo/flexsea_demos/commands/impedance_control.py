@@ -11,7 +11,7 @@ from typing import List
 from cleo import Command
 from flexsea import fx_enums as fxe
 from flexsea import fx_utils as fxu
-from flexsea.flexsea import Device
+from flexsea.device import Device
 import matplotlib
 import matplotlib.pyplot as plt
 
@@ -88,7 +88,8 @@ class ImpedanceControlCommand(Command):
 
         for port in self.ports:
             input("Press 'ENTER' to continue...")
-            device = Device(self.fxs, port, self.baud_rate, self.streaming_freq)
+            device = Device(port, self.baud_rate)
+            device.open(self.streaming_freq)
             self._reset_plot()
 
             self._impedance_control(device)
@@ -101,7 +102,7 @@ class ImpedanceControlCommand(Command):
     # _impedance_control
     # -----
     def _impedance_control(self, device):
-        data = device.read_device()
+        data = device.read()
         initial_angle = data.mot_ang
         device.send_motor_command(fxe.FX_IMPEDANCE, initial_angle)
         device.set_gains(**self.gains)
@@ -112,7 +113,7 @@ class ImpedanceControlCommand(Command):
         print("")
 
         for i in range(self.n_loops):
-            data = device.read_device()
+            data = device.read()
             measured_pos = data.mot_ang
 
             if i % self.transition_steps == 0:

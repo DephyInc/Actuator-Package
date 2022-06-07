@@ -11,7 +11,7 @@ from cleo import Command
 from flexsea import fx_enums as fxe
 from flexsea import fx_plotting as fxp
 from flexsea import fx_utils as fxu
-from flexsea.flexsea import Device
+from flexsea.device import Device
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
@@ -126,7 +126,8 @@ class HighSpeedCommand(Command):
         for port in self.ports:
             input("Press 'ENTER' to continue...")
             self._reset_plot()
-            device = Device(self.fxs, port, self.baud_rate, self.streaming_freq)
+            device = Device(port, self.baud_rate)
+            device.open(self.streaming_freq)
             device.set_controller(self.controller_type)
             device.set_gains(**gains)
             self._high_speed(device)
@@ -165,7 +166,7 @@ class HighSpeedCommand(Command):
         self.start_time = time()
         if device.controller_type == fxe.HSS_POSITION:
             sleep(0.1)
-            data = device.read_device()
+            data = device.read()
             pos0 = data.mot_ang
         else:
             pos0 = 0
@@ -183,7 +184,7 @@ class HighSpeedCommand(Command):
 
                 # Read
                 begin_time = time()
-                data = device.read_device()
+                data = device.read()
                 self.plot_data["dev_read_command_times"].append(time() - begin_time)
 
                 # Write
@@ -205,7 +206,7 @@ class HighSpeedCommand(Command):
             if self.signal_type == self.signal["sine"]:
                 for _ in range(int(self.cycle_delay / self.dt)):
                     sleep(self.dt)
-                    data = device.read_device()
+                    data = device.read()
 
                     if device.controller_type == fxe.HSS_CURRENT:
                         self.plot_data["measurements"].append(data.mot_cur)

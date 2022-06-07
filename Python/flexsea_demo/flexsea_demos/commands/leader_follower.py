@@ -9,7 +9,7 @@ from typing import List
 from cleo import Command
 from flexsea import fx_enums as fxe
 from flexsea import fx_utils as fxu
-from flexsea.flexsea import Device
+from flexsea.device import Device
 
 from flexsea_demos.utils import setup
 
@@ -68,9 +68,8 @@ class LeaderFollowerCommand(Command):
             raise AssertionError(f"Need two devices. Got: '{len(self.ports)}'") from err
 
         for i in range(2):
-            self.devices.append(
-                Device(self.fxs, self.ports[i], self.baud_rate, self.streaming_freq)
-            )
+            self.devices.append(Device(self.ports[i], self.baud_rate))
+            self.devices[i].open(self.streaming_freq)
 
         # Set first device to current controller with 0 current (0 torque)
         self.devices[0].set_gains(**self.leader_gains)
@@ -103,7 +102,7 @@ class LeaderFollowerCommand(Command):
             sleep(self.loop_delay)
             fxu.clear_terminal()
 
-            leader_data = self.devices[0].read_device()
+            leader_data = self.devices[0].read()
 
             diff = leader_data.mot_ang - leader_pos0
 

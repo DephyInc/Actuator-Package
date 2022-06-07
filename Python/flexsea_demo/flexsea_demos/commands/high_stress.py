@@ -14,7 +14,7 @@ import numpy as np
 from flexsea import fx_enums as fxe
 from flexsea import fx_plotting as fxp
 from flexsea import fx_utils as fxu
-from flexsea.flexsea import Device
+from flexsea.device import Device
 
 from flexsea_demos.utils import setup
 
@@ -104,11 +104,10 @@ class HighStressCommand(Command):
         setup(self, self.required, self.argument("paramFile"), self.__name__)
         self.dt = float(1 / (float(self.cmd_freq)))
         for i, port in enumerate(self.ports):
-            self.devices.append(
-                {"port": Device(self.fxs, port, self.baud_rate, self.streaming_freq)}
-            )
+            self.devices.append({"port": Device(port, self.baud_rate)})
+            self.devices[i]["port"].open(self.streaming_freq)
             self.devices[i]["initial_pos"] = self.devices[i]["port"].initial_pos
-            self.devices[i]["data"] = self.devices[i]["port"].read_device()
+            self.devices[i]["data"] = self.devices[i]["port"].read()
             self.devices[i]["read_times"] = []
             self.devices[i]["gains_times"] = []
             self.devices[i]["motor_times"] = []
@@ -253,7 +252,7 @@ class HighStressCommand(Command):
 
         for dev, cmd in zip(self.devices, cmds):
             tstart = time()
-            dev["data"] = dev["port"].read_device()
+            dev["data"] = dev["port"].read()
             dev["read_times"].append(time() - tstart)
 
             if set_gains:

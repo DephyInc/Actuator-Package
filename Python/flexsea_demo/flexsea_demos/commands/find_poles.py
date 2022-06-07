@@ -7,7 +7,7 @@ from typing import List
 
 from cleo import Command
 
-from flexsea.flexsea import Device
+from flexsea.device import Device
 
 from flexsea_demos.utils import setup
 

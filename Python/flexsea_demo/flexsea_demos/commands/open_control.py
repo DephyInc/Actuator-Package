@@ -9,7 +9,7 @@ from typing import List
 from cleo import Command
 from flexsea import fx_enums as fxe
 from flexsea import fx_utils as fxu
-from flexsea.flexsea import Device
+from flexsea.device import Device
 
 from flexsea_demos.utils import setup
 
@@ -76,7 +76,6 @@ class OpenControlCommand(Command):
         self.run_time = 0
         self.n_cycles = 0
         self.max_voltage = 0
-        self.fxs = None
         self.voltages = []
 
     # -----
@@ -90,7 +89,8 @@ class OpenControlCommand(Command):
         self._get_voltages()
         for port in self.ports:
             input("Press 'ENTER' to continue...")
-            device = Device(self.fxs, port, self.baud_rate, self.streaming_freq)
+            device = Device(port, self.baud_rate)
+            device.open(self.streaming_freq)
             self._open_control(device)
 
     # -----

@@ -8,7 +8,7 @@ from typing import List
 
 from cleo import Command
 from flexsea import fx_utils as fxu
-from flexsea.flexsea import Device
+from flexsea.device import Device
 
 from flexsea_demos.utils import setup
 
@@ -55,7 +55,8 @@ class ReadOnlyCommand(Command):
         self.n_loops = int(self.run_time / 0.1)
         for port in self.ports:
             input("Press 'ENTER' to continue...")
-            device = Device(self.fxs, port, self.baud_rate, self.streaming_freq)
+            device = Device(port, self.baud_rate)
+            device.open(self.streaming_freq)
             self._read_only(device)
 
     # -----
