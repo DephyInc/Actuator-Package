@@ -45,16 +45,12 @@ def get_files(location):
     return paths
 
 
-print(
-    "Libs locaiton: {0}\nInc location: {1}".format(
-        lib_files_location, inc_files_location
-    )
-)
+print(f"Libs locaiton: {lib_files_location}\nInc location: {inc_files_location}")
 
 lib_files = get_files(lib_files_dest)
 inc_files = get_files(inc_files_dest)
-print("Lib files:\n{}".format(lib_files))
-print("inc files:\n{}".format(inc_files))
+print(f"Lib files:\n{lib_files}")
+print(f"inc files:\n{inc_files}")
 
 setuptools.setup(
     name="flexsea",
