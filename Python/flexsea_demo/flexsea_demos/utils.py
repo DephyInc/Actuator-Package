@@ -191,6 +191,10 @@ def get_demo_params(all_params, demo_name):
             demo being run.
     """
     demo_params = all_params.pop(demo_name)
+    # Some demos, such as find_poles, don't have any demo-specific
+    # parameters, so demo_params will be None
+    if demo_params is None:
+        demo_params = {}
     demo_params.update(all_params.pop("general"))
     return demo_params
 

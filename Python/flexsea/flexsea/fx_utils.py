@@ -481,7 +481,6 @@ def _get_os() -> str:
             The name of the operating system. Matches the directory inside
             `libs` containing the c libraries appropriate for that OS.
     """
-    operating_system = "linux"
     # Windows
     if "win" in platform.system().lower():
         # 32 bit
@@ -496,6 +495,10 @@ def _get_os() -> str:
     # Pi - 64 bit
     elif os.uname().machine.startswith("aarch64"):
         operating_system = "raspberryPi64"
+    # This check is specifically after the pi check because the pi also
+    # returns 'Linux' from platform.system()
+    elif "linux" in platform.system().lower():
+        operating_system = "linux"
     else:
         raise OSError("Unknown operating system!")
     return operating_system

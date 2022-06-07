@@ -35,6 +35,8 @@ class Device:
         self.controller = None
         self.initial_pos = None
         self.streaming_freq = 0
+        self.is_streaming = False
+        self.is_open = False
 
     # -----
     # destructor
@@ -69,13 +71,16 @@ class Device:
         RuntimeError:
            If the stream failed.
         """
+        # Don't initialize more than once
+        if self.is_open:
+            return
         self.streaming_freq = freq
         self.dev_id = self.clib.fxOpen(
             self.port.encode("utf-8"), self.baud_rate, log_level
         )
         if self.dev_id == -1:
             raise IOError("Failed to open device")
-
+        self.is_open = True
         self._start_streaming(self.streaming_freq, log_enabled)
 
         # NOTE: This sleep is so long because there's an issue that
@@ -97,10 +102,13 @@ class Device:
         ValueError:
                 If the device ID is invalid.
         """
-        self.streaming_freq = 0
-        self._stop_streaming()
-        if self.clib.fxClose(self.dev_id) == fxe.FX_INVALID_DEVICE.value:
-            raise ValueError("fxClose: invalid device ID")
+        if self.is_streaming:
+            self.streaming_freq = 0
+            self._stop_streaming()
+        if self.is_open:
+            if self.clib.fxClose(self.dev_id) == fxe.FX_INVALID_DEVICE.value:
+                raise ValueError("fxClose: invalid device ID")
+            self.is_open = False
 
     # -----
     # _start_streaming
@@ -142,6 +150,7 @@ class Device:
             raise ValueError("fxStartStreaming: invalid device ID")
         if ret_code == fxe.FX_FAILURE.value:
             raise RuntimeError("fxStartStreaming: stream failed")
+        self.is_streaming = True
 
     # -----
     # _stop_streaming
@@ -163,6 +172,7 @@ class Device:
             raise ValueError("fxStopStreaming: invalid device ID")
         if ret_code == fxe.FX_FAILURE.value:
             raise RuntimeError("fxStopStreaming: stream failed")
+        self.is_streaming = False
 
     # -----
     # read
@@ -187,7 +197,7 @@ class Device:
         deviceState : List
                 Contains the most recent data from the device.
         """
-        if not self.app_type:
+        if not self.is_streaming:
             raise RuntimeError("Must call `open()` before trying to read data.")
 
         # Actpack
