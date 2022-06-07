@@ -4,10 +4,9 @@ Dephy's FlexSEA Python API
 import ctypes as c
 from time import sleep
 
-import flexsea as fxs
+from .dev_spec import AllDevices as fxd
 from . import fx_enums as fxe
 from . import fx_utils as fxu
-from .dev_spec import AllDevices as fxd
 
 
 # ============================================
@@ -28,13 +27,14 @@ class Device:
         for key, value in kwargs.items():
             setattr(self, key, value)
 
-        self.clib = fxs._clib
+        self.clib = fxu._load_clib()
 
         self.dev_id = None
         self.app_type = None
         self.controller_type = None
         self.controller = None
         self.initial_pos = None
+        self.streaming_freq = 0
 
     # -----
     # destructor
@@ -69,13 +69,14 @@ class Device:
         RuntimeError:
            If the stream failed.
         """
+        self.streaming_freq = freq
         self.dev_id = self.clib.fxOpen(
             self.port.encode("utf-8"), self.baud_rate, log_level
         )
         if self.dev_id == -1:
             raise IOError("Failed to open device")
 
-        self._start_streaming(freq, log_enabled)
+        self._start_streaming(self.streaming_freq, log_enabled)
 
         # NOTE: This sleep is so long because there's an issue that
         # occurs when trying to open multiple devices in rapid
@@ -96,6 +97,7 @@ class Device:
         ValueError:
                 If the device ID is invalid.
         """
+        self.streaming_freq = 0
         self._stop_streaming()
         if self.clib.fxClose(self.dev_id) == fxe.FX_INVALID_DEVICE.value:
             raise ValueError("fxClose: invalid device ID")
@@ -163,9 +165,9 @@ class Device:
             raise RuntimeError("fxStopStreaming: stream failed")
 
     # -----
-    # read_device
+    # read
     # -----
-    def read_device(self):
+    def read(self):
         """
         Read the most recent data from a streaming FlexSEA device stream.
 
@@ -229,9 +231,9 @@ class Device:
         return device_state
 
     # -----
-    # read_device_all
+    # read_all
     # -----
-    def read_device_all(self, data_size):
+    def read_all(self, data_size):
         """
         Read all data from a streaming FlexSEA device stream.
 
@@ -578,7 +580,7 @@ class Device:
         """
         Returns the current position of the device.
         """
-        return self.read_device().mot_ang
+        return self.read().mot_ang
 
     # -----
     # print
@@ -588,5 +590,5 @@ class Device:
         Reads the data from the device and then prints it to the screen.
         """
         if not data:
-            data = self.read_device()
+            data = self.read()
         fxu.print_device(data, self.app_type)
