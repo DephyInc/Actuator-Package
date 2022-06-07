@@ -5,7 +5,7 @@ import os
 import sys
 
 IS_WINDOWS = os.name == "nt"
-IS_64BITS = sys.maxsize > 2 ** 32
+IS_64BITS = sys.maxsize > 2**32
 
 MAKE_CMD = "mingw32-make -j" if IS_WINDOWS else "make"
 COPY_CMD = "copy" if IS_WINDOWS else "cp"

@@ -8,7 +8,7 @@ from .app import FlexseaDemoApplication
 #                    main
 # ============================================
 def main():
-	"""
-	Creates and runs an instance of the flexsea demo CLI.
-	"""
-	FlexseaDemoApplication().run()
+    """
+    Creates and runs an instance of the flexsea demo CLI.
+    """
+    FlexseaDemoApplication().run()
