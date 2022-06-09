@@ -8,6 +8,7 @@
 # Parameters used by every demo.
 
 general:
+
 	# Device ports. Edit/uncomment as needed. The typical port names for
 	# each OS are given.
 	ports:
@@ -19,7 +20,7 @@ general:
 		# - /dev/ttyACM0
 
     baud_rate : 230400
-	streaming_freq : 100
+    streaming_freq : 100
 
 
 # ============================================
@@ -49,6 +50,7 @@ current_control:
 		K : 0
 		B : 0
 		FF : 0
+
 
 	# Hold current (mA)
 	hold_current : 1000
@@ -169,6 +171,7 @@ impedance_control:
 #               leader_follower
 # ============================================
 leader_follower:
+
 	# Run time. Time (in seconds) to run
 	run_time : 10
 
