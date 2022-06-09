@@ -78,6 +78,7 @@ class CurrentControlCommand(Command):
         self.gains = {}
         self.hold_current = 0
         self.ramp_down_steps = 0
+        # Number of loops per device to give total desired run time
         self.n_loops = 0
 
     # -----
@@ -90,7 +91,13 @@ class CurrentControlCommand(Command):
         # Creating a list to store the device id of the two exos
         device_list = []
         setup(self, self.required, self.argument("paramFile"), self.__name__)
-        self.n_loops = int(self.run_time / 0.1)
+        # Run time is the total length of the demo. Since each loop takes 0.1
+        # seconds, the total number of loops for the whole demo is the total
+        # run time / 0.1. We then divide this by the number of devices to
+        # get the desired number of loops per device
+        self.n_loops = int(self.run_time / (0.1 * len(self.ports)))
+        if self.n_loops <= 0:
+            self.n_loops = 1
         for port in self.ports:
             input("Press 'ENTER' to continue...")
             device = Device(port, self.baud_rate)
@@ -104,8 +111,8 @@ class CurrentControlCommand(Command):
     # _current_control
     # -----
     def _current_control(self, device_list):
-        for _ in range(self.n_loops):
-            for device in device_list:
+        for device in device_list:
+            for _ in range(self.n_loops):
                 _ramp(device, self.hold_current)
         for device in device_list:
             for i in range(self.ramp_down_steps):
