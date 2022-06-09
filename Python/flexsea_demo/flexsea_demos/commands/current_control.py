@@ -90,7 +90,7 @@ class CurrentControlCommand(Command):
         # Creating a list to store the device id of the two exos
         device_list = []
         setup(self, self.required, self.argument("paramFile"), self.__name__)
-        # self.n_loops = int(self.run_time / 0.1)
+        self.n_loops = int(self.run_time / 0.1)
         for port in self.ports:
             input("Press 'ENTER' to continue...")
             device = Device(port, self.baud_rate)
@@ -106,7 +106,6 @@ class CurrentControlCommand(Command):
     def _current_control(self, device_list):
         for _ in range(self.n_loops):
             for device in device_list:
-                sleep(0.5)
                 _ramp(device, self.hold_current)
         for device in device_list:
             for i in range(self.ramp_down_steps):

@@ -44,12 +44,12 @@ current_control:
 
 	# Gains: kp, ki, kd, K, B, ff
 	gains:
-		KP : 40
-		KI : 400
-		KD : 0
-		K : 0
-		B : 0
-		FF : 0
+		kp : 40
+		ki : 400
+		kd : 0
+		k : 0
+		b : 0
+		ff : 0
 
 
 	# Hold current (mA)
@@ -150,12 +150,12 @@ impedance_control:
 
 	# Gains.
 	gains:
-		KP : 40
-		KI : 400
-		KD : 0
-		K : 600
-		B : 300
-		FF : 128
+		kp : 40
+		ki : 400
+		kd : 0
+		k : 600
+		b : 300
+		ff : 128
 
 	# Transition time. Amount of time (in seconds) between gain increments.
 	transition_time : 0.8
@@ -199,12 +199,12 @@ position_control:
 
 	# Gains.
 	gains:
-		KP : 400
-		KI : 50
-		KD : 0
-		K : 0
-		B : 0
-		FF : 0
+		kp : 400
+		ki : 50
+		kd : 0
+		k : 0
+		b : 0
+		ff : 0
 
 
 # ============================================
@@ -230,9 +230,9 @@ two_position_control:
 
 	# Gains
 	gains:
-		KP : 50
-		KI : 0
-		KD : 0
-		K : 0
-		B : 0
-		FF : 0
+		kp : 50
+		ki : 0
+		kd : 0
+		k : 0
+		b : 0
+		ff : 0
