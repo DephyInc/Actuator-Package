@@ -6,7 +6,7 @@ authors = ["Jared Coughlin <jcoughl3@illinois.edu>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
-flexsea = "^8.1.0"
+flexsea = "^8.0.1"
 cleo = "^0.8.1"
 
 [tool.poetry.dev-dependencies]
