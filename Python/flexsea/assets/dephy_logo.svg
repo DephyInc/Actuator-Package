@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   id="svg1308"
+   width="133.73152"
+   height="133.45886"
+   viewBox="0 0 133.73152 133.45886"
+   sodipodi:docname="dephy_logo.svg"
+   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)">
+  <metadata
+     id="metadata1314">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs1312" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="2560"
+     inkscape:window-height="1415"
+     id="namedview1310"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:zoom="4.5675002"
+     inkscape:cx="84.400422"
+     inkscape:cy="72.417619"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg1308" />
+  <path
+     inkscape:connector-curvature="0"
+     id="path1320"
+     d="M 0,0 H 70.940946 C 95.100101,0 133.40106,22.335926 133.72998,67.044462 133.9704,99.723141 106.1103,133.45887 66.541665,133.45887 V 95.235479 c 18.294878,0 29.367731,-16.078891 28.450398,-30.717743 C 93.942941,47.775783 77.693439,38.321619 70.295072,38.321619 H 38.77843 V 133.45887 H 0 Z"
+     style="opacity:0.85500004;fill:#000000;stroke-width:0.33333331"
+     sodipodi:nodetypes="ccsccsscccc" />
+</svg>
