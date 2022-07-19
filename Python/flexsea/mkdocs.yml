@@ -1,0 +1,5 @@
+site_name: MkLorum
+site_url: https://dephy.com
+nav:
+    - Home: index.md
+theme: readthedocs

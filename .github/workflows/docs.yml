@@ -12,20 +12,22 @@ jobs:
       - name: setup python
         uses: actions/setup-python@v1
       - name: install pip
-      - uses: BSFishy/pip-action@v1
+        uses: BSFishy/pip-action@v1
         with:
           packages: |
             mkdocs
-      - run: mkdocs build
+      - run: cd ./Python/flexsea/docs
+      - working-directory: ./Python/flexsea
+        run: mkdocs build
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
           personal_token: ${{ secrets.TOKEN }}
           external_repository: DephyInc/dephy_website
-          publish_dir: ./Python/flexsea/docs
+          publish_dir: ./Python/flexsea/site
           destination_dir: themes/dephytheme/static/documentation
           # keep_files: true
-          user_name: 'noahbuttner'
-          user_email: 'noahbuttner@gmail.com'
-          publish_branch: hugo-files2
+          user_name: ${{ secrets.USER_NAME }}
+          user_email: ${{ secrets.USER_EMAIL }}
+          publish_branch: hugo-files
         #   cname: example.com
