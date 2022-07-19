@@ -1,0 +1,31 @@
+name: CI
+on:
+  push:
+    branches:
+      - feature/docs_update
+jobs:
+  deploy:
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v2
+      - name: setup python
+        uses: actions/setup-python@v1
+      - name: install pip
+      - uses: BSFishy/pip-action@v1
+        with:
+          packages: |
+            mkdocs
+      - run: mkdocs build
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          personal_token: ${{ secrets.TOKEN }}
+          external_repository: DephyInc/dephy_website
+          publish_dir: ./Python/flexsea/docs
+          destination_dir: themes/dephytheme/static/documentation
+          # keep_files: true
+          user_name: 'noahbuttner'
+          user_email: 'noahbuttner@gmail.com'
+          publish_branch: hugo-files2
+        #   cname: example.com
