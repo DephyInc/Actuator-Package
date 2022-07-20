@@ -37,6 +37,7 @@ class Device:
         self.streaming_freq = 0
         self.is_streaming = False
         self.is_open = False
+        self.heartbeat = 0
 
     # -----
     # destructor
@@ -47,29 +48,36 @@ class Device:
     # -----
     # open
     # -----
-    def open(self, freq, log_level=4, log_enabled=True):
+    def open(self, freq, log_level=4, log_enabled=True, heartbeat=0):
         """
         Establish a connection with a FlexSEA device.
 
         Parameters
         ----------
         freq : int
-                The desired frequency of communication.
+            The desired frequency of communication.
 
         log_level : int
-                The logging level for this device. 0 is most verbose and
-                6 is the least verbose. Values greater than 6 are floored to 6.
+            The logging level for this device. 0 is most verbose and
+            6 is the least verbose. Values greater than 6 are floored to 6.
 
         log_enabled : bool
-                If `True`, all received data is logged to a file.
+            If `True`, all received data is logged to a file.
+
+        heartbeat : int
+            The amount of time (in milliseconds) before the device will
+            stop the motor if it doesn't receive a signal from the
+            computer. If 0, the default firmware value is used (currently
+            20 seconds). This can be used to have the device immediately shut
+            off the motor if it becomes disconnected.
 
         Raises
         ------
         IOError:
-                If we fail to open the device.
+            If we fail to open the device.
 
         RuntimeError:
-           If the stream failed.
+            If the stream failed.
         """
         # Don't initialize more than once
         if self.is_open:
@@ -81,7 +89,7 @@ class Device:
         if self.dev_id == -1:
             raise IOError("Failed to open device")
         self.is_open = True
-        self._start_streaming(self.streaming_freq, log_enabled)
+        self._start_streaming(self.streaming_freq, log_enabled, heartbeat)
 
         # NOTE: This sleep is so long because there's an issue that
         # occurs when trying to open multiple devices in rapid
@@ -100,7 +108,7 @@ class Device:
         Raises
         ------
         ValueError:
-                If the device ID is invalid.
+            If the device ID is invalid.
         """
         if self.is_streaming:
             self.streaming_freq = 0
@@ -113,38 +121,45 @@ class Device:
     # -----
     # _start_streaming
     # -----
-    def _start_streaming(self, freq, log_en):
+    def _start_streaming(self, freq, log_en, heartbeat):
         """
         Start streaming data from a FlexSEA device.
 
         Parameters
         ----------
         freq : int
-                The desired frequency of communication.
+            The desired frequency of communication.
 
         log_en : bool
-                If `True`, all received data to is logged to a file.
-                The name of the file is formed as follows:
+            If `True`, all received data to is logged to a file.
+            The name of the file is formed as follows:
 
-                < FlexSEA model >_id< device ID >_< date and time >.csv
+            < FlexSEA model >_id< device ID >_< date and time >.csv
 
-                for example:
+            for example:
 
-                rigid_id3904_Tue_Nov_13_11_03_50_2018.csv
+            rigid_id3904_Tue_Nov_13_11_03_50_2018.csv
 
-                The file is formatted as a CSV file. The first line of the file will be
-                headers for all columns. Each line after that will contain the data read
-                from the device.
+            The file is formatted as a CSV file. The first line of the file will be
+            headers for all columns. Each line after that will contain the data read
+            from the device.
+
+        heartbeat : int
+            The amount of time (in milliseconds) before the device will
+            stop the motor if it doesn't receive a signal from the
+            computer. If 0, the default firmware value is used (currently
+            20 seconds). This can be used to have the device immediately shut
+            off the motor if it becomes disconnected.
 
         Raises
         ------
         ValueError:
-                If the device ID is invalid.
+            If the device ID is invalid.
 
         RuntimeError:
-                If the stream failed.
+            If the stream failed.
         """
-        ret_code = self.clib.fxStartStreaming(self.dev_id, freq, 1 if log_en else 0)
+        ret_code = self.clib.fxStartStreaming(self.dev_id, freq, 1 if log_en else 0, heartbeat)
 
         if ret_code == fxe.FX_INVALID_DEVICE.value:
             raise ValueError("fxStartStreaming: invalid device ID")
@@ -162,10 +177,10 @@ class Device:
         Raises
         ------
         ValueError:
-                If the device ID is invalid.
+            If the device ID is invalid.
 
         RuntimeError:
-                If the stream failed.
+            If the stream failed.
         """
         ret_code = self.clib.fxStopStreaming(self.dev_id)
         if ret_code == fxe.FX_INVALID_DEVICE.value:
@@ -184,18 +199,18 @@ class Device:
         Raises
         ------
         ValueError:
-                If invalid device ID.
+            If invalid device ID.
 
         RuntimeError:
-                If no read data.
+            If no read data.
 
         IOError:
-                Command failed.
+            Command failed.
 
         Returns
         -------
         deviceState : List
-                Contains the most recent data from the device.
+            Contains the most recent data from the device.
         """
         if not self.is_streaming:
             raise RuntimeError("Must call `open()` before trying to read data.")
@@ -250,20 +265,20 @@ class Device:
         Parameters
         ----------
         data_size : int
-                Size of readData.
+            Size of readData.
 
         Raises
         ------
         RuntimeError:
-                Unsupported app type.
+            Unsupported app type.
 
         ValueError:
-                If invalid device ID.
+            If invalid device ID.
 
         Returns
         -------
         int:
-                Actual number of entries read. You will probably need to use this number.
+            Actual number of entries read. You will probably need to use this number.
         """
         if not self.app_type:
             raise RuntimeError("Must call `open()` before trying to read data.")
@@ -305,12 +320,12 @@ class Device:
         Raises
         ------
         ValueError:
-                If invalid device id.
+            If invalid device id.
 
         Returns
         -------
         int:
-                Maximum read data queue size of a device.
+            Maximum read data queue size of a device.
         """
 
         max_size = self.clib.fxGetReadDataQueueSize(self.dev_id)
@@ -326,15 +341,15 @@ class Device:
         Parameters
         ----------
         data_size : int
-                Size to set the read data queue size to.
+            Size to set the read data queue size to.
 
         Raises
         ------
         ValueError:
-                If either device id or data size are invalid.
+            If either device id or data size are invalid.
 
         IOError:
-                If the command failed.
+            If the command failed.
         """
         ret_code = self.clib.fxSetReadDataQueueSize(self.dev_id, data_size)
 
@@ -356,30 +371,30 @@ class Device:
         Parameters
         ----------
         kp : int
-                Proportional gain.
+            Proportional gain.
 
         ki : int
-                Integral gain.
+            Integral gain.
 
         kd : int
-                Differential gain.
+            Differential gain.
 
         k : int
-                Stiffness (used in impedence control only).
+            Stiffness (used in impedence control only).
 
         b : int
-                Damping (used in impedance control only).
+            Damping (used in impedance control only).
 
         ff : int
-                Feed forward gain.
+            Feed forward gain.
 
         Raises
         ------
         ValueError:
-                If the device ID is invalid.
+            If the device ID is invalid.
 
         IOError:
-                Command failed.
+            Command failed.
         """
         ret_code = self.clib.fxSetGains(self.dev_id, kp, ki, kd, k, b, ff)
 
@@ -398,23 +413,23 @@ class Device:
         Parameters
         ----------
         ctrl_mode : c_int
-                The control mode we will use to send this command.
-                Possible values are: FxPosition, FxCurrent, FxVoltage, FxImpedence
+            The control mode we will use to send this command.
+            Possible values are: FxPosition, FxCurrent, FxVoltage, FxImpedence
 
         value : int
-                The value to use for the ctrl_mode.
-                FxPosition - encoder value
-                FxCurrent - current in mA
-                FxVoltage - voltage in mV
-                FxImpedence - current in mA
+            The value to use for the ctrl_mode.
+            FxPosition - encoder value
+            FxCurrent - current in mA
+            FxVoltage - voltage in mV
+            FxImpedence - current in mA
 
         Raises
         ------
         ValueError:
-                If invalid device ID or invalid control type.
+            If invalid device ID or invalid control type.
 
         IOError:
-                Command failed.
+            Command failed.
         """
         ret_code = self.clib.fxSendMotorCommand(
             self.dev_id, ctrl_mode, c.c_int(int(value))
@@ -437,11 +452,11 @@ class Device:
         Returns
         -------
         int:
-                -1 : invalid
-                0 : ActPack
-                1 : Exo
-                2 : MD
-                3 : NetMaster
+            -1 : invalid
+            0 : ActPack
+            1 : Exo
+            2 : MD
+            3 : NetMaster
         """
         return c.c_int(self.clib.fxGetAppType(self.dev_id))
 
@@ -456,7 +471,7 @@ class Device:
         Raises
         ------
         ValueError:
-                Invalid device id or if the command failed.
+            Invalid device id or if the command failed.
         """
         user_input = input(
             "WARNING: You should not use this function unless you know what "
@@ -481,15 +496,15 @@ class Device:
         Parameters
         ----------
         target : int
-                Bootloader target.
+            Bootloader target.
 
         Raises
         ------
         ValueError:
-                Invalid device id.
+            Invalid device id.
 
         IOError:
-                Command failed.
+            Command failed.
         """
         ret_code = self.clib.fxActivateBootloader(self.dev_id, target)
 
@@ -508,15 +523,15 @@ class Device:
         Raises
         ------
         ValueError:
-                Invalid device id.
+            Invalid device id.
 
         IOError:
-                Command failed.
+            Command failed.
 
         Returns
         -------
         c.c_int
-                A `c_int` giving the `enum` value of the status. See fxEnums.py.
+            A `c_int` giving the `enum` value of the status. See fxEnums.py.
         """
         ret_code = self.clib.fxIsBootloaderActivated(self.dev_id)
 
@@ -537,15 +552,15 @@ class Device:
         Raises
         ------
         ValueError:
-                Invalid device id.
+            Invalid device id.
 
         IOError:
-                Command failed.
+            Command failed.
 
         Returns
         -------
         c.c_int
-                A `c_int` giving the `enum` value of the status. See fxEnums.py.
+            A `c_int` giving the `enum` value of the status. See fxEnums.py.
         """
         ret_code = self.clib.fxRequestFirmwareVersion(self.dev_id)
 
@@ -566,7 +581,7 @@ class Device:
         Returns
         -------
         c.c_int
-                A `c_int` giving the `enum` value of the status. See fxEnums.py.
+            A `c_int` giving the `enum` value of the status. See fxEnums.py.
         """
         return self.clib.fxGetLastReceivedFirmwareVersion(self.dev_id)
 

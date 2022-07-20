@@ -175,7 +175,8 @@ int fxGetDeviceIds(int* idArray, unsigned int size);
 /// commands in quick succession.
 FxError fxStartStreaming(unsigned int deviceId,
 			unsigned int frequency,
-			bool shouldLog);
+			bool shouldLog,
+            uint8_t heartbeat);
 
 ///
 /// \brief Sets the name of the Data log file.  The name must be set before streaming starts.
