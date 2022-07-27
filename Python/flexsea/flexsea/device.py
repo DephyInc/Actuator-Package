@@ -37,6 +37,7 @@ class Device:
         self.streaming_freq = 0
         self.is_streaming = False
         self.is_open = False
+        self.heartbeatPeriod = 0
 
     # -----
     # destructor
@@ -47,7 +48,7 @@ class Device:
     # -----
     # open
     # -----
-    def open(self, freq, log_level=4, log_enabled=True):
+    def open(self, freq, log_level=4, log_enabled=True, heartbeatPeriod=0):
         """
         Establish a connection with a FlexSEA device.
 
@@ -63,6 +64,11 @@ class Device:
         log_enabled : bool
                 If `True`, all received data is logged to a file.
 
+        heartbeatPeriod : int
+            The heartbeat is a message that the computer sends to the device
+            to let it know it's still connected. heartbeatPeriod is the
+            time (in milliseconds) between heartbeat messages being sent.
+
         Raises
         ------
         IOError:
@@ -75,13 +81,14 @@ class Device:
         if self.is_open:
             return
         self.streaming_freq = freq
+        self.heartbeatPeriod = heartbeatPeriod
         self.dev_id = self.clib.fxOpen(
             self.port.encode("utf-8"), self.baud_rate, log_level
         )
         if self.dev_id == -1:
             raise IOError("Failed to open device")
         self.is_open = True
-        self._start_streaming(self.streaming_freq, log_enabled)
+        self._start_streaming(self.streaming_freq, log_enabled, self.heartbeatPeriod)
 
         # NOTE: This sleep is so long because there's an issue that
         # occurs when trying to open multiple devices in rapid
@@ -113,7 +120,7 @@ class Device:
     # -----
     # _start_streaming
     # -----
-    def _start_streaming(self, freq, log_en):
+    def _start_streaming(self, freq, log_en, heartbeatPeriod):
         """
         Start streaming data from a FlexSEA device.
 
@@ -136,6 +143,11 @@ class Device:
                 headers for all columns. Each line after that will contain the data read
                 from the device.
 
+        heartbeatPeriod : int
+            The heartbeat is a message that the computer sends to the device
+            to let it know it's still connected. heartbeatPeriod is the
+            time (in milliseconds) between heartbeat messages being sent.
+
         Raises
         ------
         ValueError:
@@ -144,7 +156,7 @@ class Device:
         RuntimeError:
                 If the stream failed.
         """
-        ret_code = self.clib.fxStartStreaming(self.dev_id, freq, 1 if log_en else 0)
+        ret_code = self.clib.fxStartStreaming(self.dev_id, freq, 1 if log_en else 0, heartbeatPeriod)
 
         if ret_code == fxe.FX_INVALID_DEVICE.value:
             raise ValueError("fxStartStreaming: invalid device ID")

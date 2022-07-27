@@ -156,6 +156,11 @@ int fxGetDeviceIds(int* idArray, unsigned int size);
 /// \param shouldLog If set true, the program logs all received data to a file.
 /// Enabling the data logging can impact performance if you are sending many
 /// commands in quick succession.
+
+/// \param heartbeatPeriod The heartbeat is a message that the computer sends to
+/// the device to let it know it's still connected. heartbeatPeriod is the
+/// time (in milliseconds) between heartbeat messages being sent.
+
 ///
 /// The name of the file is formed as follows:
 ///
@@ -175,7 +180,8 @@ int fxGetDeviceIds(int* idArray, unsigned int size);
 /// commands in quick succession.
 FxError fxStartStreaming(unsigned int deviceId,
 			unsigned int frequency,
-			bool shouldLog);
+			bool shouldLog,
+            uint16_t heartbeatPeriod);
 
 ///
 /// \brief Sets the name of the Data log file.  The name must be set before streaming starts.
