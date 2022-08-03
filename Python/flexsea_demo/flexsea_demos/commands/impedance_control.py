@@ -118,7 +118,7 @@ class ImpedanceControlCommand(Command):
             measured_pos = data.mot_ang
 
             if i % self.transition_steps == 0:
-                self.gains["B"] += self.b_increments
+                self.gains["b"] += self.b_increments
                 device.set_gains(**self.gains)
                 self.delta = abs(positions[current_pos] - measured_pos)
                 current_pos = (current_pos + 1) % 2
