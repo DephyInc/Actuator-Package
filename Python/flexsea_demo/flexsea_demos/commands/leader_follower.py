@@ -69,7 +69,8 @@ class LeaderFollowerCommand(Command):
 
         for i in range(2):
             self.devices.append(Device(self.ports[i], self.baud_rate))
-            self.devices[i].open(self.streaming_freq)
+            self.devices[i].open()
+            self.devices[i].start_streaming(self.streaming_freq)
 
         # Set first device to current controller with 0 current (0 torque)
         self.devices[0].set_gains(**self.leader_gains)
