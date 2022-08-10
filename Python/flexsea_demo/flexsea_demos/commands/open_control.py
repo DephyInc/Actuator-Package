@@ -90,7 +90,8 @@ class OpenControlCommand(Command):
         for port in self.ports:
             input("Press 'ENTER' to continue...")
             device = Device(port, self.baud_rate)
-            device.open(self.streaming_freq)
+            device.open()
+            device.start_streaming(self.streaming_freq)
             self._open_control(device)
 
     # -----

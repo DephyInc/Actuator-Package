@@ -52,5 +52,5 @@ class FindPolesCommand(Command):
         for port in self.ports:
             input("Press 'ENTER' to continue...")
             device = Device(port, self.baud_rate)
-            device.open(100)
+            device.open()
             device.find_poles()

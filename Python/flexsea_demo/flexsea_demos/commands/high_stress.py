@@ -105,7 +105,8 @@ class HighStressCommand(Command):
         self.dt = float(1 / (float(self.cmd_freq)))
         for i, port in enumerate(self.ports):
             self.devices.append({"port": Device(port, self.baud_rate)})
-            self.devices[i]["port"].open(self.streaming_freq)
+            self.devices[i]["port"].open()
+            self.devices[i]["port"].start_streaming(self.streaming_freq)
             self.devices[i]["initial_pos"] = self.devices[i]["port"].initial_pos
             self.devices[i]["data"] = self.devices[i]["port"].read()
             self.devices[i]["read_times"] = []

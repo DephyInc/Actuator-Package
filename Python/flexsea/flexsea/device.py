@@ -22,7 +22,7 @@ class Device:
     # constructor
     # -----
     def __init__(self, port, baud_rate, **kwargs):
-        self.port = port
+        self.port = port.encode("utf-8")
         self.baud_rate = baud_rate
         for key, value in kwargs.items():
             setattr(self, key, value)
@@ -37,7 +37,7 @@ class Device:
         self.streaming_freq = 0
         self.is_streaming = False
         self.is_open = False
-        self.heartbeat_period = 0
+        self.logging_enabled = True
 
     # -----
     # destructor
@@ -48,15 +48,12 @@ class Device:
     # -----
     # open
     # -----
-    def open(self, freq, log_level=4, log_enabled=True, heartbeat_period=0):
+    def open(self, log_level=4, log_enabled=True):
         """
         Establish a connection with a FlexSEA device.
 
         Parameters
         ----------
-        freq : int
-                The desired frequency of communication.
-
         log_level : int
                 The logging level for this device. 0 is most verbose and
                 6 is the least verbose. Values greater than 6 are floored to 6.
@@ -64,38 +61,37 @@ class Device:
         log_enabled : bool
                 If `True`, all received data is logged to a file.
 
-        heartbeat_period : int
-            The heartbeat is a message that the computer sends to the device
-            to let it know it's still connected. heartbeat_period is the
-            time (in milliseconds) between heartbeat messages being sent.
+                The file naming convention is:
+
+                < FlexSEA model >_id< device ID >_< date and time >.csv
+
+                for example:
+
+                rigid_id3904_Tue_Nov_13_11_03_50_2018.csv
+
+                The file is formatted as a CSV file. The first line of the file will be
+                headers for all columns. Each line after that will contain the data read
+                from the device.
 
         Raises
         ------
         IOError:
                 If we fail to open the device.
-
-        RuntimeError:
-           If the stream failed.
         """
         # Don't initialize more than once
         if self.is_open:
             return
-        self.streaming_freq = freq
-        self.heartbeat_period = heartbeat_period
-        self.dev_id = self.clib.fxOpen(
-            self.port.encode("utf-8"), self.baud_rate, log_level
-        )
+        self.logging_enabled = log_enabled
+        self.dev_id = self.clib.fxOpen(self.port, self.baud_rate, log_level)
         if self.dev_id == -1:
             raise IOError("Failed to open device")
         self.is_open = True
-        self._start_streaming(self.streaming_freq, log_enabled, self.heartbeat_period)
 
         # NOTE: This sleep is so long because there's an issue that
         # occurs when trying to open multiple devices in rapid
         # succession that causes flexsea to crash
         sleep(1)
         self.app_type = self._get_app_type()
-        self.initial_pos = self.get_pos()
 
     # -----
     # close
@@ -118,9 +114,9 @@ class Device:
             self.is_open = False
 
     # -----
-    # _start_streaming
+    # start_streaming
     # -----
-    def _start_streaming(self, freq, log_en, heartbeat_period):
+    def start_streaming(self, freq, heartbeat_period=0):
         """
         Start streaming data from a FlexSEA device.
 
@@ -128,25 +124,6 @@ class Device:
         ----------
         freq : int
                 The desired frequency of communication.
-
-        log_en : bool
-                If `True`, all received data to is logged to a file.
-                The name of the file is formed as follows:
-
-                < FlexSEA model >_id< device ID >_< date and time >.csv
-
-                for example:
-
-                rigid_id3904_Tue_Nov_13_11_03_50_2018.csv
-
-                The file is formatted as a CSV file. The first line of the file will be
-                headers for all columns. Each line after that will contain the data read
-                from the device.
-
-        heartbeat_period : int
-            The heartbeat is a message that the computer sends to the device
-            to let it know it's still connected. heartbeat_period is the
-            time (in milliseconds) between heartbeat messages being sent.
 
         Raises
         ------
@@ -156,15 +133,31 @@ class Device:
         RuntimeError:
                 If the stream failed.
         """
-        ret_code = self.clib.fxStartStreaming(
-            self.dev_id, freq, 1 if log_en else 0, heartbeat_period
-        )
+        if self.is_streaming:
+            print("Already streaming. Cannot start new stream.")
+            return
+
+        if not self.is_open:
+            print("Device connection not established. Call `open` first.")
+            return
+
+        self.streaming_freq = freq
+
+        _log = 1 if self.logging_enabled else 0
+        ret_code = self.clib.fxStartStreaming(self.dev_id, freq, _log, heartbeat_period)
 
         if ret_code == fxe.FX_INVALID_DEVICE.value:
             raise ValueError("fxStartStreaming: invalid device ID")
         if ret_code == fxe.FX_FAILURE.value:
             raise RuntimeError("fxStartStreaming: stream failed")
+
         self.is_streaming = True
+
+        # NOTE: This sleep is so long because there's an issue that
+        # occurs when trying to open multiple devices in rapid
+        # succession that causes flexsea to crash
+        sleep(1)
+        self.initial_pos = self.get_pos()
 
     # -----
     # _stop_streaming

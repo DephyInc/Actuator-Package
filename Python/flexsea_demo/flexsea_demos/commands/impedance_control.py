@@ -89,7 +89,8 @@ class ImpedanceControlCommand(Command):
         for port in self.ports:
             input("Press 'ENTER' to continue...")
             device = Device(port, self.baud_rate)
-            device.open(self.streaming_freq)
+            device.open()
+            device.start_streaming(self.streaming_freq)
             self._reset_plot()
 
             self._impedance_control(device)
@@ -117,7 +118,7 @@ class ImpedanceControlCommand(Command):
             measured_pos = data.mot_ang
 
             if i % self.transition_steps == 0:
-                self.gains["B"] += self.b_increments
+                self.gains["b"] += self.b_increments
                 device.set_gains(**self.gains)
                 self.delta = abs(positions[current_pos] - measured_pos)
                 current_pos = (current_pos + 1) % 2
