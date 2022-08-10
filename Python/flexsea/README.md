@@ -9,12 +9,11 @@ More information at https://dephy.com/faster
 You can use the `flexsea` library in your code as follows:
 
 ```python
-from flexsea import fxUtils as fxu # pylint: disable=no-name-in-module
-from flexsea import fxEnums as fxe # pylint: disable=no-name-in-module
-from flexsea import flexsea as flex
+from flexsea.device import Device
 
-fxs = flex.FlexSEA()
-dev_id = fxs.open(...
+device = Device(port, buad_rate)
+device.open()
+device.start_streaming(frequency)
 ```
 
 See the sample scripts in `flexsea_demo` for reference in [this repo](https://github.com/DephyInc/Actuator-Package/tree/master/Python).
@@ -59,3 +58,24 @@ python3 -m pip install --index-url https://test.pypi.org/simple/ --no-deps flexs
 ```bash
 python3 -m twine upload dist/*
 ```
+
+## Heartbeat
+When the device is streaming data to the computer, the computer will routinely send
+a special message, called a heartbeat, to the device. This message lets the device
+know that the connection between it and the computer is still alive.
+
+The frequency of these heartbeat messages can be specified when calling `start_streaming`:
+
+```python
+device = Device(port, baud_rate)
+device.open()
+device.start_streaming(frequency, heartbeat_period=100)
+```
+
+The time given for `heartbeat_period` is in **milliseconds**. One thing to note is that
+if it's too fast, the message won't have time to properly send before the device shuts
+off due to not receiving the message. It also must be smaller than the streaming
+frequency. If no value is given for `heartbeat_period`, it defaults to 4 seconds.
+
+The time that the device will wait without receiving a message before shutting off is
+5 times `heartbeat_period` milliseconds.
