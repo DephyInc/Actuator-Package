@@ -161,6 +161,10 @@ int fxGetDeviceIds(int* idArray, unsigned int size);
 /// the device to let it know it's still connected. heartbeatPeriod is the
 /// time (in milliseconds) between heartbeat messages being sent.
 
+/// \param useSafety If true, the motor will shut off and stop streaming
+/// upon not receiving a heartbeat message within the allotted time. If
+/// false, the device will not shut off, but will stop streaming.
+
 ///
 /// The name of the file is formed as follows:
 ///
@@ -181,7 +185,8 @@ int fxGetDeviceIds(int* idArray, unsigned int size);
 FxError fxStartStreaming(unsigned int deviceId,
 			unsigned int frequency,
 			bool shouldLog,
-            uint16_t heartbeatPeriod);
+            uint16_t heartbeatPeriod,
+            bool useSafety);
 
 ///
 /// \brief Sets the name of the Data log file.  The name must be set before streaming starts.

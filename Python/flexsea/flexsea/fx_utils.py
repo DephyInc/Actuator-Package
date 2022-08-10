@@ -556,7 +556,7 @@ def _set_data_types(clib: c.CDLL) -> c.CDLL:
 
     clib.fxGetDeviceIds.argtypes = [c.POINTER(c.c_int), c.c_uint]
 
-    clib.fxStartStreaming.argtypes = [c.c_uint, c.c_uint, c.c_bool, c.c_uint16]
+    clib.fxStartStreaming.argtypes = [c.c_uint, c.c_uint, c.c_bool, c.c_uint16, c.c_bool]
     clib.fxStartStreaming.restype = c.c_int
 
     clib.fxStopStreaming.argtypes = [c.c_uint]
