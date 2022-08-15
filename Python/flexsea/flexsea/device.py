@@ -163,15 +163,19 @@ class Device:
 
         try:
             assert heartbeat_period == 0 or heartbeat_period >= 50
-        except AssertionError:
-            raise ValueError("`heartbeat_period` must be either 0 (default) or >= 50ms.")
+        except AssertionError as err:
+            raise ValueError(
+                "`heartbeat_period` must be either 0 (default) or >= 50ms."
+            ) from err
 
         try:
             assert heartbeat_period < self.streaming_freq
-        except AssertionError:
-            raise ValueError("`heartbeat_period` must be less than `freq`.")
+        except AssertionError as err:
+            raise ValueError("`heartbeat_period` must be less than `freq`.") from err
 
-        ret_code = self.clib.fxStartStreaming(self.dev_id, freq, _log, heartbeat_period, use_safety)
+        ret_code = self.clib.fxStartStreaming(
+            self.dev_id, freq, _log, heartbeat_period, use_safety
+        )
 
         if ret_code == fxe.FX_INVALID_DEVICE.value:
             raise ValueError("fxStartStreaming: invalid device ID")
