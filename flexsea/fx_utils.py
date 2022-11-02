@@ -382,12 +382,12 @@ def _load_clib(libsVersion: str) -> c.CDLL:
         if not lib_path.exists():
             raise OSError("Unable to download firmware.")
 
-    if "win" in operating_system:
+    if "win" in _os:
         try:
             _add_dlls(str(lib_dir))
             clib = c.cdll.LoadLibrary(str(lib_path))
         except OSError as err:
-            msg = f"\n[!] Error loading the {win_lib} precompiled libraries.\n"
+            msg = f"\n[!] Error loading the {lib} precompiled libraries.\n"
             msg += (
                 "The most likely cause is a mismatch between the Python, pip and shell "
                 "architectures.\n"
