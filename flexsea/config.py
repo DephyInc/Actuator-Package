@@ -1,6 +1,8 @@
 import ctypes as c
 from pathlib import Path
 
+from .dev_specs import AllDevices as fx_devs
+
 
 # ============================================
 #              Path Configuration
