@@ -32,7 +32,6 @@ class Device:
         self.device_state = None
         self.hasHabs = True
         self.deviceType = None
-        self.rigidVersion = None
 
         self.clib = fxu._load_clib()
 
