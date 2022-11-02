@@ -1,10 +1,13 @@
+import boto3
 import ctypes as c
 import os
+from pathlib import Path
 import platform
 
 import numpy as np
 import yaml
 
+from . import config as cfg
 from . import fx_enums as fxe
 from .dev_specs import AllDevices as fx_devs
 
@@ -337,10 +340,17 @@ def _set_data_types(clib: c.CDLL) -> c.CDLL:
 # ============================================
 #                 _load_clib
 # ============================================
-def _load_clib() -> c.CDLL:
+def _load_clib(libsVersion: str) -> c.CDLL:
     """
     Uses `ctypes` to load the appropriate C libraries depending on the
     OS.
+
+    Parameters
+    ----------
+    libsVersion : str
+        The version of the pre-compiled libraries to use. The major version
+        should match the major version of the firmware being used. If no
+        libraries are found, then we download them from AWS.
 
     Raises
     ------
@@ -353,18 +363,28 @@ def _load_clib() -> c.CDLL:
             The Python object from which we can call the flexsea C
             functions.
     """
-    nix_lib = "libfx_plan_stack.so"
-    win_lib = "libfx_plan_stack.dll"
-    libs_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "libs")
-    os.environ["PATH"] += libs_path
+    _os = _get_os()
+    lib_dir = cfg.libsDir.joinpath(libsVersion, _os)
 
-    operating_system = _get_os()
-    lib_path = os.path.join(libs_path, operating_system)
+    if "win" in _os:
+        lib = "libfx_plan_stack.dll"
+    else:
+        lib = "libfx_plan_stack.so"
+
+    lib_path = lib_dir.joinpath(lib)
+
+    if not lib_path.exists():
+        lib_obj = str(Path(libsVersion).joinpath(_os, lib).as_posix())
+        s3 = boto3.resource("s3")
+        s3.Bucket(cfg.libsBucket).download_file(lib_obj, str(lib_path))
+
+        if not lib_path.exists():
+            raise OSError("Unable to download firmware.")
 
     if "win" in operating_system:
         try:
-            _add_dlls(lib_path)
-            clib = c.cdll.LoadLibrary(os.path.join(lib_path, win_lib))
+            _add_dlls(str(lib_dir))
+            clib = c.cdll.LoadLibrary(str(lib_path))
         except OSError as err:
             msg = f"\n[!] Error loading the {win_lib} precompiled libraries.\n"
             msg += (
@@ -379,6 +399,6 @@ def _load_clib() -> c.CDLL:
             msg += f"Detailed error message for debugging:\n{err}\n"
             print(msg)
     else:
-        clib = c.cdll.LoadLibrary(os.path.join(lib_path, nix_lib))
+        clib = c.cdll.LoadLibrary(str(lib_path))
 
     return _set_data_types(clib)

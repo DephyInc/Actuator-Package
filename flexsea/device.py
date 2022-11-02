@@ -17,9 +17,10 @@ class Device:
     # -----
     # constructor
     # -----
-    def __init__(self, port: str, baud_rate: int) -> None:
+    def __init__(self, port: str, baud_rate: int, libsVersion: str = "") -> None:
         self.port = port.encode("utf-8")
         self.baud_rate = baud_rate
+        self.libsVersion = libsVersion if libsVersion else "7.2.0"
 
         self.dev_id = None
         self.app_type = None
@@ -33,7 +34,7 @@ class Device:
         self.hasHabs = True
         self.deviceType = None
 
-        self.clib = fxu._load_clib()
+        self.clib = fxu._load_clib(self.libsVersion)
 
     # -----
     # destructor
