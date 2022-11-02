@@ -105,6 +105,12 @@ class Device:
         except KeyError:
             raise KeyError("Unrecognized app type.")
 
+        # Set the read function to use, which depends on the app_type,
+        # which is why it isn't set with the rest of the clib functions
+        # We can't do them all at once because we need access to fxOpen
+        # in order to get the app_type, so it's a chicken and egg problem
+        self.clib = fxu.set_read_function(self.clib, self.deviceType)
+
     # -----
     # close
     # -----
@@ -219,26 +225,45 @@ class Device:
         if not self.is_streaming:
             raise RuntimeError("Must call `open()` and `start_streaming()` before trying to read data.")
 
-        if self.app_type == fxe.ACT_PACK:
-            ret_code = self.clib.fxReadDevice(self.dev_id, c.byref(self.device_state))
+        ret_code = self.clib.read_device_function(self.dev_id, c.byref(self.device_state))
 
-        elif self.app_type == fxe.NET_MASTER:
-            ret_code = self.clib.fxReadNetMasterDevice(
-                self.dev_id, c.byref(self.device_state)
-            )
+        if ret_code == fxe.INVALID_DEVICE:
+            raise ValueError(f"fxReadDevice: invalid device ID: {self.dev_id}")
+        elif ret_code == fxe.NOT_STREAMING:
+            raise RuntimeError("fxReadDevice: no read data")
+        elif ret_code == fxe.FAILURE:
+            raise IOError("fxReadDevice: command failed")
 
-        elif self.app_type == fxe.BMS:
-            ret_code = self.clib.fxReadBMSDevice(self.dev_id, c.byref(self.device_state))
+        return self.device_state
 
-        elif self.app_type == fxe.EB5X:
-            ret_code = self.clib.fxReadExoDevice(self.dev_id, c.byref(self.device_state))
+    # -----
+    # read_all
+    # -----
+    def read_all(self) -> c.Structure:
+        """
+        Reads the entire data queue from a streaming device.
 
-        elif self.app_type == fxe.MD:
-            ret_code = self.clib.fxReadMdDevice(self.dev_id, c.byref(self.device_state))
+        Raises
+        ------
+        ValueError:
+            If invalid device ID.
 
-        # Unknown
-        else:
-            raise RuntimeError(f"Unsupported application type: {self.app_type}")
+        RuntimeError:
+            If no read data.
+
+        IOError:
+            Command failed.
+
+        Returns
+        -------
+        deviceState : c.Structure
+                Contains the most recent data from the device.
+        """
+        # NOTE: I'm not sure how the "returned" data fits into the device_state dict
+        if not self.is_streaming:
+            raise RuntimeError("Must call `open()` and `start_streaming()` before trying to read data.")
+
+        ret_code = self.clib.read_device_all_function(self.dev_id, c.byref(self.device_state), self.read_data_queue_size)
 
         if ret_code == fxe.INVALID_DEVICE:
             raise ValueError(f"fxReadDevice: invalid device ID: {self.dev_id}")

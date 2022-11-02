@@ -271,35 +271,6 @@ def _set_data_types(clib: c.CDLL) -> c.CDLL:
     clib.fxStopStreaming.argtypes = [c.c_uint]
     clib.fxStopStreaming.restype = c.c_int
 
-    clib.fxReadDevice.argtypes = [c.c_uint, c.POINTER(fx_devs.ActPackState)]
-    clib.fxReadDevice.restype = c.c_int
-
-    clib.fxReadDeviceAll.argtypes = [
-        c.c_uint,
-        c.POINTER(fx_devs.ActPackState),
-        c.c_uint,
-    ]
-    clib.fxReadDeviceAll.restype = c.c_int
-
-    clib.fxReadMdDeviceAll.argtypes = [
-        c.c_uint,
-        c.POINTER(fx_devs.MD10State),
-        c.c_uint,
-    ]
-    clib.fxReadMdDeviceAll.restype = c.c_int
-    clib.fxReadMdDevice.argtypes = [c.c_uint, c.POINTER(fx_devs.MD10State)]
-    clib.fxReadMdDeviceAll.restype = c.c_int
-
-    clib.fxReadNetMasterDevice.argtypes = [c.c_uint, c.POINTER(fx_devs.NetMasterState)]
-    clib.fxReadDevice.restype = c.c_int
-
-    clib.fxReadNetMasterDeviceAll.argtypes = [
-        c.c_uint,
-        c.POINTER(fx_devs.NetMasterState),
-        c.c_uint,
-    ]
-    clib.fxReadNetMasterDeviceAll.restype = c.c_int
-
     clib.fxSetReadDataQueueSize.argtypes = [c.c_uint, c.c_uint]
     clib.fxSetReadDataQueueSize.restype = c.c_uint
 
@@ -403,3 +374,33 @@ def _load_clib(libsVersion: str) -> c.CDLL:
         clib = c.cdll.LoadLibrary(str(lib_path))
 
     return _set_data_types(clib)
+
+
+# ============================================
+#              set_read_function
+# ============================================
+def set_read_function(clib: c.CDLL, deviceType: str) -> c.CDLL:
+    """
+    Set the read function to use, which depends on the app_type,
+    which is why it isn't set with the rest of the clib functions
+    We can't do them all at once because we need access to fxOpen
+    in order to get the app_type, so it's a chicken and egg problem
+    """
+    func = getattr(clib, cfg.read_functions[deviceType]["name"])
+    func.argtypes = cfg.read_functions[deviceType]["args"]
+    func.restype = cfg.read_functions[deviceType]["return"]
+
+    # So we can just call clib.read_device_function(...). This might be
+    # a terrible idea, though
+    setattr(clib, "read_device_function", func)
+
+    # Each device also has a read all variant
+    func = getattr(clib, cfg.read_functions[deviceType]["all_name"])
+    func.argtypes = cfg.read_functions[deviceType]["all_args"]
+    func.restype = cfg.read_functions[deviceType]["all_return"]
+
+    # So we can just call clib.read_device_all_function(...). This might be
+    # a terrible idea, though
+    setattr(clib, "read_device_all_function", func)
+
+    return clib
