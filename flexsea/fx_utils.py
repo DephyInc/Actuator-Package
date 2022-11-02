@@ -374,7 +374,8 @@ def _load_clib(libsVersion: str) -> c.CDLL:
     lib_path = lib_dir.joinpath(lib)
 
     if not lib_path.exists():
-        lib_obj = str(Path(libsVersion).joinpath(_os, lib).as_posix())
+        lib_dir.mkdir(parents=True, exists_ok=True)
+        lib_obj = str(Path("libs").joinpath(libsVersion, _os, lib).as_posix())
         s3 = boto3.resource("s3")
         s3.Bucket(cfg.libsBucket).download_file(lib_obj, str(lib_path))
 
