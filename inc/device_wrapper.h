@@ -27,8 +27,7 @@ typedef enum fxError
 	FxFailure,
 	FxInvalidParam,
 	FxInvalidDevice,
-	FxNotStreaming,
-
+	FxNotStreaming
 } FxError;
 
 typedef enum fxControlMode
@@ -107,6 +106,34 @@ struct BattCyclerState;
 int fxOpen(const char* portName,
 		unsigned int baudRate,
 		unsigned int logLevel);
+
+///
+/// \brief Establish a connection with a FlexSEA device.
+///
+/// \param portName is the name of the serial port to open (e.g. "COM3")
+///
+/// \param deviceVersionMajor is the major version of the device
+///
+/// \param libsVersionMajor is major version of the libraries
+///
+/// \param baudRate is the baud rate used i.e. 115200, 230400, etc.
+///
+/// \param frequency is the frequency of communication with the FlexSEA device.
+/// This applies for streaming device data as well as sending commands to the
+/// device.
+///
+/// \param logLevel is the logging level for this device. 0 is most verbose and
+/// 6 is the least verbose. Values greater than 6 are floored to 6.
+///
+/// \returns device ID (-1 if invalid/failed to open), a 16-bit integer used to
+/// refer to a specific FlexSEA device
+///
+/// \note Device ID is used by the functions in this API to specify which FlexSEA
+/// device to communicate with. It is used by most of the functions in this library to
+/// specify which device to run that function on.
+int fxOpenWithDeviceCheck(const char *portName,unsigned short int *deviceVersionMajor, unsigned short int *libsVersionMajor,
+		   const unsigned int baudRate,
+		   const unsigned int logLevel);
 
 /// \brief Check if the device with the given device ID is open.
 ///
@@ -609,6 +636,12 @@ FxError fxReadAnkleTorquePoints(unsigned int deviceId, uint8_t points);
 ///
 int16_t * fxGetLastReceivedAnkleTorquePoints(unsigned int deviceId);
 
+
+FxError fxGetLastReceivedMDData(unsigned int deviceId, int32_t *powerWatts,
+								int16_t * stepPeriod, int16_t *stepLength, int16_t *toeWhip);
+
+FxError fxReadMDData(unsigned int deviceId);
+
 /// \brief Activates target bootloader
 ///
 /// \param
@@ -649,6 +682,8 @@ double fxGetTimingGain(unsigned int deviceId, bool *isValid, double *highestTimi
 /// polling fxGetLastReceivedFirmwareVersion
 ///
 FxError fxRequestFirmwareVersion(unsigned int deviceId);
+
+FxError fxGetLibsVersion(uint16_t * majorVersion, uint16_t* minorVersion, uint16_t* patchVersion);
 
 /// \brief Check the last Firmware Version values which were received from the device.
 /// These values are updated asynchronously by making calls to

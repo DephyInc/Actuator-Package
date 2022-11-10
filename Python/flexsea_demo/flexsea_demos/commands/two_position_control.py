@@ -86,7 +86,8 @@ class TwoPositionCommand(Command):
         for port in self.ports:
             input("Press 'ENTER' to continue...")
             device = Device(port, self.baud_rate)
-            device.open(self.streaming_freq)
+            device.open()
+            device.start_streaming(self.streaming_freq)
             self._reset_plot()
             self._two_position_control(device)
             device.send_motor_command(fxe.FX_VOLTAGE, 0)
