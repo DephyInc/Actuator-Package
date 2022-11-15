@@ -1,43 +1,19 @@
 [tool.poetry]
 name = "flexsea"
-version = "10.0.0"
-description = "Python API for interacting with Dephy devices."
-authors = ["Dephy <admin@dephy.com>"]
-maintainers = ["Jared <jcoughlin@dephy.com>"]
+version = "0.1.0"
+description = ""
+authors = ["Jared <jcoughlin@dephy.com>"]
 readme = "README.md"
-license = "CC-BY-SA-4.0"
-homepage = "https://dephy.com/start/"
-repository = "https://github.com/DephyInc/Actuator-Package"
 
 [tool.poetry.dependencies]
-python = "^3.10"
-numpy = "^1.23.4"
-PyYAML = "^6.0"
-matplotlib = "^3.6.1"
-boto3 = "^1.26.0"
+python = "^3.11"
+boto3 = "^1.26.8"
 
 
-[tool.poetry.group.demos]
-optional = true
-
-[tool.poetry.group.demos.dependencies]
-cleo = "^0.8.1"
-
-
-[tool.poetry.group.lint.dependencies]
+[tool.poetry.group.dev.dependencies]
 black = "^22.10.0"
 pylint = "^2.15.5"
-mypy = "^0.982"
-
-
-[tool.poetry.group.test.dependencies]
-pytest = "^7.2.0"
-nox = "^2022.8.7"
-
-
-[tool.poetry.scripts]
-flexsea_demos = "demos.main:main"
-
+mypy = "^0.990"
 
 [build-system]
 requires = ["poetry-core"]
@@ -50,6 +26,9 @@ disable = [
   "missing-docstring",
   "too-few-public-methods",
   "invalid-name",
+  "too-many-instance-attributes",
+  "too-many-arguments",
+  "protected-access",
 ]
 
 

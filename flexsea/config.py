@@ -1,14 +1,13 @@
-import ctypes as c
 from pathlib import Path
 
-from .dev_specs import AllDevices as fx_devs
-
 
 # ============================================
-#              Path Configuration
+#             Path Configuration
 # ============================================
-cacheDir = Path.joinpath(Path.home(), ".dephy", "flexsea")
-libsDir = cacheDir.joinpath("libs")
+dephyDir = Path.home().joinpath(".dephy")
+libsDir = dephyDir.joinpath("libs")
+windowsLib = "libfx_plan_stack.dll"
+linuxLib = "libfx_plan_stack.so"
 
 
 # ============================================
@@ -18,15 +17,6 @@ libsBucket = "dephy-public-binaries"
 
 
 # ============================================
-#               Read Functions
+#           Version Configuration
 # ============================================
-read_functions = {
-    "actpack" : {
-        "name" : "fxReadDevice",
-        "args" : [c.c_uint, c.POINTER(fx_devs.ActPackState)],
-        "return" : c.c_int,
-        "all_name" : "fxReadDeviceAll",
-        "all_args" : [c.c_uint, c.POINTER(fx_devs.ActPackState), c.c_uint],
-        "all_return" : c.c_int
-    },
-}
+LTS = "7.2.0"

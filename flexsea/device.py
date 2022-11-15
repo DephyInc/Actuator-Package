@@ -1,9 +1,12 @@
 import ctypes as c
 from time import sleep
 from typing import List
+from typing import Self
 
-from . import fx_enums as fxe
-from . import fx_utils as fxu
+from . import config as cfg
+from . import enums as fxe
+from . import utilities as fxu
+from .specs.api_spec import apiSpec
 
 
 # ============================================
@@ -11,30 +14,37 @@ from . import fx_utils as fxu
 # ============================================
 class Device:
     """
-    Contains and manages the information and state of Dephy's devices.
+    Representation of one of Dephy's devices.
     """
 
     # -----
     # constructor
     # -----
-    def __init__(self, port: str, baud_rate: int, libsVersion: str = "") -> None:
-        self.port = port.encode("utf-8")
-        self.baud_rate = baud_rate
-        self.libsVersion = libsVersion if libsVersion else "7.2.0"
+    def __init__(
+        self,
+        port: str,
+        baudRate: int,
+        cLibVersion: str = cfg.LTS,
+        logLevel: int = 4,
+        loggingEnabled: bool = True,
+    ) -> None:
+        self.port = port
+        self.baudRate = baudRate
+        self.cLibVersion = cLibVersion
+        self.logLevel = logLevel
+        self.loggingEnabled = loggingEnabled
 
-        self.dev_id = None
-        self.app_type = None
-        self.controller = None
-        self.initial_pos = None
-        self.streaming_freq = 0
-        self.is_streaming = False
-        self.is_open = False
-        self.logging_enabled = True
-        self.device_state = None
-        self.hasHabs = True
-        self.deviceType = None
+        self._state: dict = {}
+        self.deviceID: int = fxe.INVALID_DEVICE
+        self.deviceName: str = ""
+        self.hasHabs: bool = False
+        self.isOpen: bool = False
+        self.isStreaming: bool = False
+        self.loggingEnabled: bool = False
+        self.logLevel: int = 0
+        self.streamingFrequency: int = 0
 
-        self.clib = fxu._load_clib(self.libsVersion)
+        self._clib = fxu.load_clib(self.cLibVersion)
 
     # -----
     # destructor
@@ -43,176 +53,177 @@ class Device:
         self.close()
 
     # -----
+    # __enter__
+    # -----
+    def __enter__(self, stream: bool = False, frequency: int = 0) -> Self:
+        self.open()
+
+        if stream and frequency > 0:
+            self.start_streaming(frequency)
+
+        return self
+
+    # -----
+    # __exit__
+    # -----
+    def __exit__(
+        self,
+        excType,
+        excVal,
+        excTb,
+    ) -> None:
+        if excType is not None:
+            print(f"Exception: {excVal}")
+            print(f"{excTb}")
+
+    # -----
     # open
     # -----
-    def open(self, log_level: int=4, log_enabled: bool=True) -> None:
+    def open(self) -> None:
         """
-        Establish a connection with a FlexSEA device.
+        Establish a connection with a device. If `self.loggingEnabled`
+        is `True`, then the file naming convention is:
 
-        Parameters
-        ----------
-        log_level : int
-            The logging level for this device. 0 is most verbose and
-            6 is the least verbose. Values greater than 6 are floored to 6.
+            <model>_id<device ID>_<date and time>.csv
 
-        log_enabled : bool
-            If `True`, all received data is logged to a file.
-
-            The file naming convention is:
-
-            < FlexSEA model >_id< device ID >_< date and time >.csv
-
-            for example:
+        for example:
 
             rigid_id3904_Tue_Nov_13_11_03_50_2018.csv
 
-            The file is formatted as a CSV file. The first line of the
-            file will be headers for all columns. Each line after that
-            will contain the data read from the device.
+        The file is formatted as a CSV file. The first line of the
+        file will be headers for all columns. Each line after that
+        will contain the data read from the device.
 
         Raises
         ------
         IOError:
             If we fail to open the device.
         """
-        if self.is_open:
+        if self.isOpen:
             return
 
-        self.logging_enabled = log_enabled
-        self.dev_id = self.clib.fxOpen(self.port, self.baud_rate, log_level)
-        if self.dev_id == -1:
-            raise IOError("Failed to open device")
-        self.is_open = True
+        port = self.port.encode("utf-8")
+
+        self.deviceID = self._clib.open(port, self.baudRate, self.logLevel)
+
+        if self.deviceID in (fxe.INVALID_DEVICE, -1):
+            raise IOError("Failed to open device.")
+
+        self.isOpen = True
 
         # NOTE: This sleep is so long because there's an issue that
         # occurs when trying to open multiple devices in rapid
         # succession that causes flexsea to crash
         sleep(1)
-        self.app_type = self._get_app_type()
-        if self.app_type == fxe.INVALID_APP:
-            raise ValueError("Invalid app type.")
+        deviceTypeValue = self._clib.get_device_type_value(self.deviceID)
 
-        try:
-            self.deviceType = fxe.deviceTypes[self.app_type]
-        except KeyError:
-            raise KeyError("No device name for given app_type.")
+        self.deviceName = fxe.deviceNames[deviceTypeValue]
 
-        if self.app_type == fxe.ACT_PACK:
-            self.hasHabs = False
+        if self.deviceName in fxe.hasHabs:
+            self.hasHabs = True
 
-        try:
-            self.device_state = fxe.device_state_dicts[self.app_type]
-        except KeyError:
-            raise KeyError("Unrecognized app type.")
+        self._state = fxe.deviceStateDicts[self.deviceName]
 
-        # Set the read function to use, which depends on the app_type,
-        # which is why it isn't set with the rest of the clib functions
-        # We can't do them all at once because we need access to fxOpen
-        # in order to get the app_type, so it's a chicken and egg problem
-        self.clib = fxu.set_read_function(self.clib, self.deviceType)
+        # The read function is set here and not with other c functions
+        # because we need the device name, which we can't get without
+        # calling open, for which we need the c library loaded
+        rf = apiSpec[self.cLibVersion]["read_functions"][self.deviceName]
+
+        for key in ("", "all_"):
+            func = getattr(self._clib, rf[key + "name"])
+            func.argtypes = rf[key + "argTypes"]
+            func.restype = rf[key + "returnType"]
+            setattr(self._clib, key + "read", func)
 
     # -----
     # close
     # -----
     def close(self) -> None:
         """
-        Disconnect from a FlexSEA device.
+        Disconnect from a device.
 
         Raises
         ------
         ValueError:
             If the device ID is invalid.
         """
-        if self.is_streaming:
-            self.streaming_freq = 0
+        if self.isStreaming:
             self.stop_streaming()
-        if self.is_open:
-            if self.clib.fxClose(self.dev_id) == fxe.INVALID_DEVICE:
-                raise ValueError("fxClose: invalid device ID")
-            self.is_open = False
+
+        if self.isOpen:
+            self._clib.close(self.deviceID)
+            self.isOpen = False
 
     # -----
     # start_streaming
     # -----
-    def start_streaming(self, freq: int) -> None:
+    def start_streaming(self, frequency: int) -> None:
         """
-        Start streaming data from a FlexSEA device.
+        Start streaming data from a device.
 
         Parameters
         ----------
-        freq : int
+        frequency : int
             The desired frequency of communication.
 
         Raises
         ------
-        ValueError:
-            If the device ID is invalid.
-
         RuntimeError:
             If the stream failed.
         """
-        if self.is_streaming:
-            print("Already streaming. Cannot start new stream.")
+        if self.isStreaming:
+            print("Already streaming.")
             return
 
-        if not self.is_open:
+        if not self.isOpen:
             print("Device connection not established. Call `open` first.")
             return
 
-        self.streaming_freq = freq
+        self.streamingFrequency = frequency
 
-        _log = 1 if self.logging_enabled else 0
-        ret_code = self.clib.fxStartStreaming(self.dev_id, freq, _log)
+        _log = 1 if self.loggingEnabled else 0
 
-        if ret_code == fxe.INVALID_DEVICE:
-            raise ValueError("fxStartStreaming: invalid device ID")
-        elif ret_code == fxe.FAILURE:
-            raise RuntimeError("fxStartStreaming: stream failed")
+        if self._clib.start_streaming(self.deviceID, frequency, _log) == fxe.FAILURE:
+            raise RuntimeError("Error: could not start stream.")
 
-        self.is_streaming = True
-
-        # NOTE: This sleep is so long because there's an issue that
-        # occurs when trying to open multiple devices in rapid
-        # succession that causes flexsea to crash
-        sleep(1)
-        self.initial_pos = self.pos
+        self.isStreaming = True
 
     # -----
     # stop_streaming
     # -----
     def stop_streaming(self) -> None:
         """
-        Stop streaming data from a FlexSEA device.
+        Stop streaming data from a device.
 
         Raises
         ------
-        ValueError:
-            If the device ID is invalid.
-
         RuntimeError:
             If the stream failed.
         """
-        ret_code = self.clib.fxStopStreaming(self.dev_id)
-        if ret_code == fxe.INVALID_DEVICE:
-            raise ValueError("fxStopStreaming: invalid device ID")
-        if ret_code == fxe.FAILURE:
-            raise RuntimeError("fxStopStreaming: stream failed")
-        self.is_streaming = False
+        self.streamingFrequency = 0
+
+        if self._clib.stop_streaming(self.deviceID) == fxe.FAILURE:
+            raise RuntimeError("Error: failed to stop streaming.")
+
+        self.isStreaming = False
 
     # -----
     # read
     # -----
-    def read(self) -> c.Structure:
+    def read(self, allData: bool = False) -> c.Structure:
         """
-        Read the most recent data from a streaming FlexSEA device stream.
+        Reads data from a streaming device.
+
+        Parameters
+        ----------
+        allData : bool
+            If `True`, read the entire queue. If `False`, read only the
+            most recent data.
 
         Raises
         ------
-        ValueError:
-            If invalid device ID.
-
         RuntimeError:
-            If no read data.
+            If not streaming.
 
         IOError:
             Command failed.
@@ -222,64 +233,30 @@ class Device:
         deviceState : c.Structure
                 Contains the most recent data from the device.
         """
-        if not self.is_streaming:
-            raise RuntimeError("Must call `open()` and `start_streaming()` before trying to read data.")
+        if not self.isStreaming:
+            raise RuntimeError(
+                "Must call `open()` and `start_streaming()` before trying to read data."
+            )
 
-        ret_code = self.clib.read_device_function(self.dev_id, c.byref(self.device_state))
+        if allData:
+            returnCode = self._clib.read(self.deviceID, c.byref(self._state))
 
-        if ret_code == fxe.INVALID_DEVICE:
-            raise ValueError(f"fxReadDevice: invalid device ID: {self.dev_id}")
-        elif ret_code == fxe.NOT_STREAMING:
-            raise RuntimeError("fxReadDevice: no read data")
-        elif ret_code == fxe.FAILURE:
-            raise IOError("fxReadDevice: command failed")
+        else:
+            returnCode = self._clib.all_read(
+                self.deviceID, c.byref(self._state), self.queue_size
+            )
 
-        return self.device_state
+        if returnCode == fxe.FAILURE:
+            raise IOError("Error: read command failed.")
 
-    # -----
-    # read_all
-    # -----
-    def read_all(self) -> c.Structure:
-        """
-        Reads the entire data queue from a streaming device.
-
-        Raises
-        ------
-        ValueError:
-            If invalid device ID.
-
-        RuntimeError:
-            If no read data.
-
-        IOError:
-            Command failed.
-
-        Returns
-        -------
-        deviceState : c.Structure
-                Contains the most recent data from the device.
-        """
-        # NOTE: I'm not sure how the "returned" data fits into the device_state dict
-        if not self.is_streaming:
-            raise RuntimeError("Must call `open()` and `start_streaming()` before trying to read data.")
-
-        ret_code = self.clib.read_device_all_function(self.dev_id, c.byref(self.device_state), self.read_data_queue_size)
-
-        if ret_code == fxe.INVALID_DEVICE:
-            raise ValueError(f"fxReadDevice: invalid device ID: {self.dev_id}")
-        elif ret_code == fxe.NOT_STREAMING:
-            raise RuntimeError("fxReadDevice: no read data")
-        elif ret_code == fxe.FAILURE:
-            raise IOError("fxReadDevice: command failed")
-
-        return self.device_state
+        return self._state
 
     # -----
     # set_gains
     # -----
     def set_gains(self, kp: int, ki: int, kd: int, k: int, b: int, ff: int) -> None:
         """
-        Sets the gains used by PID controllers on the FlexSEA device.
+        Sets the gains used by PID controllers on the device.
 
         Parameters
         ----------
@@ -303,38 +280,43 @@ class Device:
 
         Raises
         ------
-        ValueError:
-            If the device ID is invalid.
-
         IOError:
             Command failed.
         """
-        ret_code = self.clib.fxSetGains(self.dev_id, kp, ki, kd, k, b, ff)
-
-        if ret_code == fxe.INVALID_DEVICE:
-            raise ValueError(f"Invalid device ID: {self.dev_id}")
-        if ret_code == fxe.FX_FAILURE:
+        if self._clib.set_gains(self.deviceID, kp, ki, kd, k, b, ff) == fxe.FAILURE:
             raise IOError("Command failed")
 
     # -----
     # send_motor_command
     # -----
-    def send_motor_command(self, ctrl_mode: int, value: int) -> None:
+    def send_motor_command(self, ctrlMode: str, value: int) -> None:
         """
         Send a command to the device.
 
         Parameters
         ----------
-        ctrl_mode : int
+        ctrlMode : str
             The control mode we will use to send this command.
-            Possible values are: FxPosition, FxCurrent, FxVoltage, FxImpedence
+            Possible values are:
+                * position
+                * current
+                * voltage
+                * impedence
+                * none
+                * custom
+                * meas_res
+                * stalk
 
         value : int
-            The value to use for the ctrl_mode.
-            FxPosition - encoder value
-            FxCurrent - current in mA
-            FxVoltage - voltage in mV
-            FxImpedence - current in mA
+            The value to use for the control mode. Has different units
+            depending on the control mode:
+
+                position : encoder value
+                current : current in mA
+                voltage : voltage in mV
+                impedence : current in mA
+                none : N/A. Stops the motor
+                custom : whatever you've defined it to be
 
         Raises
         ------
@@ -344,40 +326,38 @@ class Device:
         IOError:
             Command failed.
         """
-        ret_code = self.clib.fxSendMotorCommand(self.dev_id, ctrl_mode, value)
+        controller = fxe.controllers[ctrlMode]
+        returnCode = self._clib.send_motor_command(self.deviceID, controller, value)
 
-        if ret_code == fxe.INVALID_DEVICE:
-            raise ValueError(f"Invalid device ID: {self.dev_id}")
-        if ret_code == fxe.FAILURE:
+        if returnCode == fxe.FAILURE:
             raise IOError("Command failed.")
-        if ret_code == fxe.INVALID_PARAM:
-            raise ValueError(f"Invalid control mode: {ctrl_mode}")
-
+        if returnCode == fxe.INVALID_PARAM:
+            raise ValueError(f"Invalid control mode: {ctrlMode}")
 
     # -----
     # find_poles
     # -----
     def find_poles(self) -> None:
         """
-        DO NOT USE THIS FUNCTION UNLESS YOU KNOW WHAT YOU ARE DOING
+        DO NOT USE THIS FUNCTION UNLESS YOU KNOW WHAT YOU ARE DOING!
+
         Finds the motor poles.
 
         Raises
         ------
         ValueError:
-            Invalid device id or if the command failed.
+            If the command failed.
         """
-        user_input = input(
+        userInput = input(
             "WARNING: You should not use this function unless you know what "
             "you are doing!\nProceed?[y/n] "
         )
-        if user_input != "y":
+
+        if userInput != "y":
             print("Aborting pole finding.")
             return
-        ret_code = self.clib.fxFindPoles(self.dev_id)
-        if ret_code == fxe.INVALID_DEVICE:
-            raise ValueError(f"Invalid device ID: {self.dev_id}")
-        if ret_code == fxe.FAILURE:
+
+        if self._clib.find_poles(self.deviceID) == fxe.FAILURE:
             raise ValueError("Command failed")
 
     # -----
@@ -385,7 +365,7 @@ class Device:
     # -----
     def activate_bootloader(self, target: str) -> None:
         """
-        Activate target bootloader.
+        Activates target bootloader.
 
         Parameters
         ----------
@@ -394,36 +374,24 @@ class Device:
 
         Raises
         ------
-        ValueError:
-            Invalid device id.
-
         IOError:
             Command failed.
         """
-        try:
-            target = fxe.bootloader_targets[target]
-        except KeyError:
-            raise KeyError(f"Unknown target: {target}")
+        target = fxe.bootloaderTargets[target]
 
-        ret_code = self.clib.fxActivateBootloader(self.dev_id, target)
-
-        if ret_code == fxe.INVALID_DEVICE:
-            raise ValueError(f"Invalid device ID {self.dev_id}")
-        if ret_code == fxe.FAILURE:
+        if self._clib.activate_bootloader(self.deviceID, target) == fxe.FAILURE:
             raise IOError("Command failed")
 
     # -----
-    # is_bootloader_activated
+    # bootloader_activated
     # -----
-    def is_bootloader_activated(self) -> int:
+    @property
+    def bootloader_activated(self) -> bool:
         """
         Get status of bootloader.
 
         Raises
         ------
-        ValueError:
-            Invalid device id.
-
         IOError:
             Command failed.
 
@@ -432,77 +400,58 @@ class Device:
         int
             Gives the value of the status. See fxEnums.py.
         """
-        ret_code = self.clib.fxIsBootloaderActivated(self.dev_id)
+        returnCode = self._clib.is_bootloader_activated(self.deviceID)
 
-        if ret_code == fxe.INVALID_DEVICE:
-            raise ValueError(f"Invalid device ID {self.dev_id}")
-        if ret_code == fxe.FAILURE:
-            raise IOError("Command failed")
+        if returnCode != fxe.SUCCESS:
+            return False
 
-        return ret_code
-
-    # -----
-    # get_firmware
-    # -----
-    def get_firmware(self) -> List:
-        """
-        Gets fimwareversion of device's MCUs.
-
-        Raises
-        ------
-        ValueError:
-            Invalid device id.
-
-        IOError:
-            Command failed.
-
-        Returns
-        -------
-        List 
-            A list with the semantic version strings of manage,
-            execute, and regulate's firmware.
-        """
-        ret_code = self.clib.fxRequestFirmwareVersion(self.dev_id)
-
-        if ret_code == fxe.FX_INVALID_DEVICE.value:
-            raise ValueError("Invalid device ID")
-        if ret_code == fxe.FX_FAILURE.value:
-            raise IOError("Command failed")
-
-        sleep(5)
-
-        fw = self.clib.fxGetLastReceivedFirmwareVersion(self.dev_id)
-
-        mn_fw = fxu.decode(fw.Mn)
-        ex_fw = fxu.decode(fw.Ex)
-        re_fw = fxu.decode(fw.Re)
-
-        return [mn_fw, ex_fw, re_fw]
-
-    # -----
-    # pos
-    # -----
-    @property
-    def pos(self) -> int:
-        """
-        Returns the current position of the device.
-
-        Returns
-        -------
-        int
-            The current position of the motor in ticks.
-        """
-        return self.read().mot_ang
+        return True
 
     # -----
     # rigidVersion
     # -----
     @property
     def rigidVersion(self) -> str:
+        pass
+
+    # -----
+    # firmware
+    # -----
+    @property
+    def firmware(self) -> List[str]:
         """
-        Returns the device's rigid (board) version, e.g., 4.1.
+        Gets the fimware versions of device's MCUs.
+
+        Raises
+        ------
+        IOError:
+            Command failed.
+
+        Returns
+        -------
+        List
+            A list with the semantic version strings of manage,
+            execute, and regulate's firmware.
         """
-        return self.read().rigid
+        returnCode = self._clib.request_firmware_version(self.deviceID)
+
+        if returnCode == fxe.FAILURE:
+            raise IOError("Command failed")
+
+        sleep(5)
+
+        fw = self._clib.get_last_received_firmware_version(self.deviceID)
+
+        fwList = [
+            fxu.decode(fw.mn),
+            fxu.decode(fw.ex),
+            fxu.decode(fw.re),
+        ]
+
+        if self.hasHabs:
+            fwList.append(fxu.decode(fw.habs))
+
+        return fwList
 
     # -----
     # print
@@ -513,73 +462,92 @@ class Device:
         """
         if not data:
             data = self.read()
-        for field in self.device_state._fields_:
-            print(f"{field[0]}: {getattr(self.device_state, field[0])}")
+        for field in self._state._fields_:
+            print(f"{field[0]}: {getattr(self._state, field[0])}")
 
     # -----
-    # _get_app_type
-    # -----
-    def _get_app_type(self) -> int:
-        """
-        Get the device application type.
-
-        Returns
-        -------
-        int:
-            -1 : invalid
-            0 : ActPack
-            1 : Exo
-            2 : MD
-            3 : NetMaster
-        """
-        return self.clib.fxGetAppType(self.dev_id)
-
-    # -----
-    # read_data_queue_size
+    # queue_size
     # -----
     @property
-    def read_data_queue_size(self) -> int:
+    def queue_size(self) -> int:
         """
         Get the maximum read data queue size of a device.
-
-        Raises
-        ------
-        ValueError:
-            If invalid device id.
 
         Returns
         -------
         int:
             Maximum read data queue size of a device.
         """
-        max_size = self.clib.fxGetReadDataQueueSize(self.dev_id)
-        if max_size == -1:
-            raise ValueError(f"Invalid device ID: {self.dev_id}")
-        return max_size
+        return self._clib.get_read_data_queue_size(self.deviceID)
 
-    @read_data_queue_size.setter
-    def read_data_queue_size(self, data_size) -> None:
+    @queue_size.setter
+    def queue_size(self, dataSize: int) -> None:
         """
         Sets the maximum read data queue size of a device.
 
         Parameters
         ----------
-        data_size : int
+        dataSize : int
             Size to set the read data queue size to.
 
         Raises
         ------
         ValueError:
-            If either device id or data size are invalid.
+            If data size is invalid.
 
         IOError:
             If the command failed.
         """
-        ret_code = self.clib.fxSetReadDataQueueSize(self.dev_id, data_size)
+        returnCode = self._clib.set_read_data_queue_size(self.deviceID, dataSize)
 
-        if ret_code == fxe.INVALID_DEVICE:
-            raise ValueError(f"Invalid device ID: {self.dev_id}")
-        elif ret_code == fxe.INVALID_PARAM:
-            raise ValueError(f"Invalid data_size: {data_size}")
-        elif ret_code == fxe.FAILURE:
+        if returnCode == fxe.INVALID_PARAM:
+            raise ValueError(f"Invalid data_size: {dataSize}")
+        if returnCode == fxe.FAILURE:
             raise IOError("Command failed")
+
+    # -----
+    # set_tunnel_mode
+    # -----
+    def set_tunnel_mode(self, target: str, timeout: int) -> bool:
+        """
+        Activate the bootloader in `target` and wait until either it's active
+        or `timeout` seconds have passed.
+
+        Parameters
+        ----------
+        target : str
+            The name of the target to set (abbreviated).
+
+        timeout : int
+            The number of seconds to wait for confirmation before failing.
+
+        Raises
+        ------
+        IOError
+            If the device cannot be opened.
+
+        OSError
+            If cannot load the pre-compiled C libraries needed for communication.
+
+        RuntimeError
+            If the application type isn't recognized.
+
+        Returns
+        -------
+        result : bool
+            If `True`, the bootloader was set successfully. If `False` then
+            something went wrong.
+        """
+        if not self.isOpen:
+            raise IOError("Error: device must be open before setting tunnel mode.")
+
+        while timeout > 0 and not self.bootloader_activated:
+            if timeout % 5 == 0:
+                try:
+                    self.activate_bootloader(target)
+                except (IOError, ValueError, KeyError):
+                    pass
+            sleep(1)
+            timeout -= 1
+
+        return self.bootloader_activated
