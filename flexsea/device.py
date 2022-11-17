@@ -43,6 +43,8 @@ class Device:
         self.loggingEnabled: bool = False
         self.logLevel: int = 0
         self.streamingFrequency: int = 0
+        self.heartbeatPeriod : int = 0
+        self.useSafety : bool = False
 
         self._clib = fxu.load_clib(self.cLibVersion)
 
@@ -157,7 +159,7 @@ class Device:
     # -----
     # start_streaming
     # -----
-    def start_streaming(self, frequency: int) -> None:
+    def start_streaming(self, frequency: int, heartbeatPeriod: int=50, useSafety: bool=False) -> None:
         """
         Start streaming data from a device.
 
@@ -165,6 +167,22 @@ class Device:
         ----------
         frequency : int
             The desired frequency of communication.
+
+        heartbeatPeriod : int
+            When streaming, the computer periodically sends a message to
+            the device to let it know that the connection between them
+            is still alive. These are called heartbeat messages. This
+            variable specifies the amount of time (in milliseconds)
+            between successive heartbeat messages. This is related to
+            how long the device will wait without receiving a heartbeat
+            before shutting itself off (five times `heartbeatPeriod`).
+
+        useSafety : bool
+            If True, the device will shut itself off if it doesn't
+            receive a heartbeat message from the computer within the
+            allotted time (five times `heartbeatPeriod`). If False,
+            the device will not shut itself off, just stop streaming,
+            if a heartbeat isn't received.
 
         Raises
         ------
@@ -180,10 +198,29 @@ class Device:
             return
 
         self.streamingFrequency = frequency
+        self.heartbeatPeriod = heartbeatPeriod
+        self.useSafety = useSafety
 
         _log = 1 if self.loggingEnabled else 0
 
-        if self._clib.start_streaming(self.deviceID, frequency, _log) == fxe.FAILURE:
+        if self.useSafety:
+            if not hasattr(self._clib, "start_streaming_with_safety"):
+                msg = "Error: the disconnect shutoff safety requires cLibVersion >= 9.1"
+                raise ValueError(msg) 
+
+            hbp = self.heartbeatPeriod
+            try:
+                assert hbp >= 50 and hbp < self.streamingFrequency
+            except AssertionError as err:
+                msg = "Heartbeat period must be >= 50 and < frequency."
+                raise ValueError(msg) from err
+
+            retCode = self._clib.start_streaming_with_safety(self.deviceID, frequency, _log, self.heartbeatPeriod)
+
+        else:
+            retCode = self._clib.start_streaming(self.deviceID, frequency, _log)
+
+        if retCode == fxe.FAILURE:
             raise RuntimeError("Error: could not start stream.")
 
         self.isStreaming = True
