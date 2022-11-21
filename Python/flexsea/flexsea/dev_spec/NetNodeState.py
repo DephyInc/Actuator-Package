@@ -1,3 +1,4 @@
+# pylint: skip-file
 """
 ///
 /// @file NetNodeState.py
@@ -14,6 +15,7 @@
 """
 from ctypes import Structure, c_int
 
+
 class NetNodeState(Structure):
     _pack_ = 1
     _fields_ = [
@@ -25,4 +27,5 @@ class NetNodeState(Structure):
         ("genvar_2", c_int),
         ("genvar_3", c_int),
         ("status", c_int),
-        ("SystemTime", c_int)]
+        ("SystemTime", c_int),
+    ]

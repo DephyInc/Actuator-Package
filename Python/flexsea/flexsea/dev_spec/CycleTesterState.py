@@ -1,3 +1,4 @@
+# pylint: skip-file
 """
 ///
 /// @file CycleTesterState.py
@@ -13,6 +14,7 @@
 /// @author Dephy, Inc.
 """
 from ctypes import Structure, c_int
+
 
 class CycleTesterState(Structure):
     _pack_ = 1
@@ -49,4 +51,5 @@ class CycleTesterState(Structure):
         ("genvar_9", c_int),
         ("ank_ang", c_int),
         ("ank_vel", c_int),
-        ("SystemTime", c_int)]
+        ("SystemTime", c_int),
+    ]

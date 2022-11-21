@@ -1,3 +1,4 @@
+# pylint: skip-file
 """
 ///
 /// @file MD12State.py
@@ -13,6 +14,7 @@
 /// @author Dephy, Inc.
 """
 from ctypes import Structure, c_int
+
 
 class MD12State(Structure):
     _pack_ = 1
@@ -66,4 +68,5 @@ class MD12State(Structure):
         ("gait_state", c_int),
         ("intermediate_state", c_int),
         ("movement", c_int),
-        ("SystemTime", c_int)]
+        ("SystemTime", c_int),
+    ]

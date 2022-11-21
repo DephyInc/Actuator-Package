@@ -1,3 +1,4 @@
+# pylint: skip-file
 """
 ///
 /// @file BattCyclerState.py
@@ -13,6 +14,7 @@
 /// @author Dephy, Inc.
 """
 from ctypes import Structure, c_int
+
 
 class BattCyclerState(Structure):
     _pack_ = 1
@@ -39,4 +41,5 @@ class BattCyclerState(Structure):
         ("charge_discharge_cycles_completed", c_int),
         ("charge_discharge_total_cycles", c_int),
         ("desired_battery_current", c_int),
-        ("SystemTime", c_int)]
+        ("SystemTime", c_int),
+    ]

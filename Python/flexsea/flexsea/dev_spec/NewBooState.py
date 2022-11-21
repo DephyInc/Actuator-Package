@@ -1,3 +1,4 @@
+# pylint: skip-file
 """
 ///
 /// @file NewBooState.py
@@ -13,6 +14,7 @@
 /// @author Dephy, Inc.
 """
 from ctypes import Structure, c_int
+
 
 class NewBooState(Structure):
     _pack_ = 1
@@ -77,4 +79,5 @@ class NewBooState(Structure):
         ("movement", c_int),
         ("speed", c_int),
         ("incline", c_int),
-        ("SystemTime", c_int)]
+        ("SystemTime", c_int),
+    ]

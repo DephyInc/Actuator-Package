@@ -1,3 +1,4 @@
+# pylint: skip-file
 """
 ///
 /// @file CellScreenerState.py
@@ -13,6 +14,7 @@
 /// @author Dephy, Inc.
 """
 from ctypes import Structure, c_int
+
 
 class CellScreenerState(Structure):
     _pack_ = 1
@@ -37,4 +39,5 @@ class CellScreenerState(Structure):
         ("p_dv", c_int),
         ("p_esr", c_int),
         ("p_bin", c_int),
-        ("SystemTime", c_int)]
+        ("SystemTime", c_int),
+    ]

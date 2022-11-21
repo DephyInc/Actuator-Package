@@ -1,3 +1,4 @@
+# pylint: skip-file
 """
 ///
 /// @file NetMasterState.py
@@ -13,6 +14,7 @@
 /// @author Dephy, Inc.
 """
 from ctypes import Structure, c_int
+
 
 class NetMasterState(Structure):
     _pack_ = 1
@@ -89,4 +91,5 @@ class NetMasterState(Structure):
         ("h_gyroz", c_int),
         ("h_pressure", c_int),
         ("h_status", c_int),
-        ("SystemTime", c_int)]
+        ("SystemTime", c_int),
+    ]

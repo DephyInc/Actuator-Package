@@ -1,3 +1,4 @@
+# pylint: skip-file
 """///
 /// @file ../../Actuator-Package/Python/flexsea/flexsea/dev_spec/AllDevices.py
 ///

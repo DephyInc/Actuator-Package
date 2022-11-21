@@ -1,3 +1,4 @@
+# pylint: skip-file
 """
 ///
 /// @file BMSState.py
@@ -13,6 +14,7 @@
 /// @author Dephy, Inc.
 """
 from ctypes import Structure, c_int
+
 
 class BMSState(Structure):
     _pack_ = 1
@@ -46,4 +48,5 @@ class BMSState(Structure):
         ("fw_version", c_int),
         ("genvar_0_", c_int),
         ("genvar_1_", c_int),
-        ("SystemTime", c_int)]
+        ("SystemTime", c_int),
+    ]
