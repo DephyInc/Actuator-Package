@@ -38,6 +38,8 @@ class Device:
         self.is_streaming = False
         self.is_open = False
         self.logging_enabled = True
+        self.heartbeat_period = 0
+        self.use_safety = False
 
     # -----
     # destructor
@@ -116,7 +118,7 @@ class Device:
     # -----
     # start_streaming
     # -----
-    def start_streaming(self, freq):
+    def start_streaming(self, freq, heartbeat_period=0, use_safety=False):
         """
         Start streaming data from a FlexSEA device.
 
@@ -124,6 +126,22 @@ class Device:
         ----------
         freq : int
                 The desired frequency of communication.
+
+        heartbeat_period : int
+            When streaming, the computer periodically sends a message to
+            the device to let it know that the connection between them
+            is still alive. These are called heartbeat messages. This
+            variable specifies the amount of time (in milliseconds)
+            between successive heartbeat messages. This is related to
+            how long the device will wait without receiving a heartbeat
+            before shutting itself off (five times `heartbeat_period`).
+
+        use_safety : bool
+            If True, the device will shut itself off if it doesn't
+            receive a heartbeat message from the computer within the
+            allotted time (five times `heartbeat_period`). If False,
+            the device will not shut itself off, just stop streaming,
+            if a heartbeat isn't received.
 
         Raises
         ------
@@ -142,9 +160,26 @@ class Device:
             return
 
         self.streaming_freq = freq
+        self.heartbeat_period = heartbeat_period
+        self.use_safety = use_safety
 
         _log = 1 if self.logging_enabled else 0
-        ret_code = self.clib.fxStartStreaming(self.dev_id, freq, _log)
+
+        if self.use_safety:
+            try:
+                assert self.heartbeat_period >= 50
+            except AssertionError as err:
+                msg = f"Hearbeat period must be >= 50. Got: `{self.heartbeat_period}`"
+                raise AssertionError(msg) from err
+
+            ret_code = self.clib.fxStartStreamingWithSafety(
+                self.dev_id, self.streaming_freq, _log, self.heartbeat_period
+            )
+
+        else:
+            ret_code = self.clib.fxStartStreaming(
+                self.dev_id, self.streaming_freq, _log
+            )
 
         if ret_code == fxe.FX_INVALID_DEVICE.value:
             raise ValueError("fxStartStreaming: invalid device ID")
