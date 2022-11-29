@@ -1,7 +1,7 @@
 import ctypes as c
 
 from flexsea import firmware as fw
-from flexsea.specs import device_specs as fxd
+from flexsea.specs.device_specs import all_devices as fxd
 
 
 read_functions = {

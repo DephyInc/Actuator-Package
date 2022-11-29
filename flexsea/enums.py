@@ -1,4 +1,4 @@
-from .specs import device_specs as fxd
+from .specs.device_specs import all_devices as fxd
 
 
 # ============================================
@@ -15,7 +15,7 @@ deviceNames = {
 #               Device States
 # ============================================
 deviceStateDicts = {
-    "actpack": fxd.ActPackState.ActPackState(),
+    "actpack": fxd.ActPackState(),
 }
 
 
