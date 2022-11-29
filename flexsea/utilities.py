@@ -167,7 +167,7 @@ def download(fileobj: str, bucket: str, dest: str, profile: str | None = None) -
 
     client.download_file(bucket, fileobj, dest)
 
-    assert Path.exists(dest)
+    assert Path(dest).exists()
 
     # Check the local file's integrity by comparing its md5 hash to
     # AWS's md5 hash, called ETag
