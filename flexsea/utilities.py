@@ -105,7 +105,7 @@ def load_clib(cLibVersion: str) -> c.CDLL:
         libDir.mkdir(parents=True, exist_ok=True)
         libObj = str(Path("libs").joinpath(cLibVersion, _os, lib).as_posix())
 
-        download(cfg.libsBucket, libObj, libPath)
+        download(cfg.libsBucket, libObj, str(libPath))
 
     if "win" in _os:
         try:
