@@ -105,7 +105,7 @@ def load_clib(cLibVersion: str) -> c.CDLL:
         libDir.mkdir(parents=True, exist_ok=True)
         libObj = str(Path("libs").joinpath(cLibVersion, _os, lib).as_posix())
 
-        download(cfg.libsBucket, libObj, str(libPath))
+        download(libObj, cfg.libsBucket, str(libPath))
 
     if "win" in _os:
         try:
@@ -121,14 +121,14 @@ def load_clib(cLibVersion: str) -> c.CDLL:
             print(msg)
             sys.exit(1)
 
-    clib = c.cdll.LoadLibrary(libPath)
+    clib = c.cdll.LoadLibrary(str(libPath))
 
     api = apiSpec[cLibVersion]
 
-    for functionName, functionData in api.items():
+    for functionName, functionData in api["commands"].items():
         func = getattr(clib, functionData["name"], None)
         if func:
-            func.argtypes = functionData["argtypes"]
+            func.argtypes = functionData["argTypes"]
             func.restype = functionData["returnType"]
         setattr(clib, functionName, func)
 

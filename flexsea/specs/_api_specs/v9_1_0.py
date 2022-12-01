@@ -102,7 +102,7 @@ v9_1_0 = {
         "argTypes": [
             c.c_uint,
         ],
-        "returnType": None,
+        "returnType": c.c_int,
     },
     "get_read_data_queue_size": {
         "name": "fxGetReadDataQueueSize",
