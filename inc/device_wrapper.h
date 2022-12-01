@@ -204,6 +204,41 @@ FxError fxStartStreaming(unsigned int deviceId,
 			unsigned int frequency,
 			bool shouldLog);
 
+/// \brief Start streaming data from a FlexSEA device and optionally log the
+/// streamed data. The data logger can impact performance if you are sending
+/// many commands in quick succession. If the device becomes disconnected,
+/// the motor will stop.
+///
+/// \param deviceId is the device ID
+///
+/// \param shouldLog If set true, the program logs all received data to a file.
+/// Enabling the data logging can impact performance if you are sending many
+/// commands in quick succession.
+///
+/// The name of the file is formed as follows:
+///
+/// < FlexSEA model >_id< device ID >_< date and time >.csv
+///
+/// for example:
+///
+/// rigid_id3904_Tue_Nov_13_11_03_50_2018.csv
+///
+/// The file is formatted as a CSV file. The first line of the file will be
+/// headers for all columns. Each line after that will contain the data read
+/// from the device.
+///
+/// \param heartbeatPeriod The time, in milliseconds, between heartbeat messages
+/// sent from the computer to the device. If the device does not receive such a
+/// message within five times this value, it will shut itself off.
+///
+/// \returns Error codes defined at top of the header
+///
+/// \note The data logger can impact performance if you are sending many
+/// commands in quick succession.
+FxError fxStartStreamingWithSafety(unsigned int deviceId,
+			unsigned int frequency,
+			bool shouldLog, uint16_t heartbeatPeriod);
+
 ///
 /// \brief Sets the name of the Data log file.  The name must be set before streaming starts.
 /// \param deviceId is the device ID
