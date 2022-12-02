@@ -416,8 +416,10 @@ class Device:
         """
         target = fxe.bootloaderTargets[target]
 
-        if self._clib.activate_bootloader(self.deviceID, target) == fxe.FAILURE:
-            raise IOError("Command failed")
+        returnCode = self._clib.activate_bootloader(self.deviceID, target)
+
+        if returnCode == fxe.FAILURE or returnCode == fxe.INVALID_DEVICE:
+            raise IOError
 
     # -----
     # bootloader_activated
@@ -439,7 +441,7 @@ class Device:
         """
         returnCode = self._clib.is_bootloader_activated(self.deviceID)
 
-        if returnCode != fxe.SUCCESS:
+        if returnCode == fxe.FAILURE or returnCode == fxe.INVALID_DEVICE:
             return False
 
         return True
@@ -545,7 +547,7 @@ class Device:
     # -----
     # set_tunnel_mode
     # -----
-    def set_tunnel_mode(self, target: str, timeout: int) -> bool:
+    def set_tunnel_mode(self, target: str, timeout: int=30) -> bool:
         """
         Activate the bootloader in `target` and wait until either it's active
         or `timeout` seconds have passed.
@@ -578,13 +580,24 @@ class Device:
         if not self.isOpen:
             raise IOError("Error: device must be open before setting tunnel mode.")
 
-        while timeout > 0 and not self.bootloader_activated:
+        activated = False
+
+        while timeout > 0 and not activated:
             if timeout % 5 == 0:
                 try:
                     self.activate_bootloader(target)
-                except (IOError, ValueError, KeyError):
+                except IOError:
                     pass
+
+                sleep(0.1)
+
+                # This function call is here and not in the while condition
+                # because the device gets disconnected briefly as a part of
+                # activating the bootloader, so we need a longer delay between
+                # checks
+                activated = self.bootloader_activated
+
             sleep(1)
             timeout -= 1
 
-        return self.bootloader_activated
+        return activated 
