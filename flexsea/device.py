@@ -589,13 +589,13 @@ class Device:
                 except IOError:
                     pass
 
-                sleep(0.1)
+            sleep(0.1)
 
-                # This function call is here and not in the while condition
-                # because the device gets disconnected briefly as a part of
-                # activating the bootloader, so we need a longer delay between
-                # checks
-                activated = self.bootloader_activated
+            # This function call is here and not in the while condition
+            # because the device gets disconnected briefly as a part of
+            # activating the bootloader, so we need a longer delay between
+            # checks
+            activated = self.bootloader_activated
 
             sleep(1)
             timeout -= 1
