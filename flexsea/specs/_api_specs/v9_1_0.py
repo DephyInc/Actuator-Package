@@ -12,7 +12,15 @@ read_functions = {
         "all_name": "fxReadDeviceAll",
         "all_argTypes": [c.c_uint, c.POINTER(fxd.ActPackState), c.c_uint],
         "all_returnType": c.c_int,
-    }
+    },
+    "exo": {
+        "name": "fxReadDevice",
+        "argTypes": [c.c_uint, c.POINTER(fxd.EB60State)],
+        "returnType": c.c_int,
+        "all_name": "fxReadDeviceAll",
+        "all_argTypes": [c.c_uint, c.POINTER(fxd.EB60State), c.c_uint],
+        "all_returnType": c.c_int,
+    },
 }
 
 

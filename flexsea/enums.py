@@ -4,10 +4,11 @@ from .specs.device_specs import all_devices as fxd
 # ============================================
 #                Device Names
 # ============================================
-(INVALID_APP, ACTPACK) = map(int, range(-1, 1))
+(INVALID_APP, ACTPACK, EXO) = map(int, range(-1, 2))
 
 deviceNames = {
     ACTPACK: "actpack",
+    EXO: "exo",
 }
 
 
@@ -16,13 +17,14 @@ deviceNames = {
 # ============================================
 deviceStateDicts = {
     "actpack": fxd.ActPackState(),
+    "exo": fxd.EB60State(),
 }
 
 
 # ============================================
 #                    Habs
 # ============================================
-hasHabs = []
+hasHabs = ["exo",]
 
 
 # ============================================
