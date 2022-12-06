@@ -276,12 +276,12 @@ class Device:
             )
 
         if allData:
-            returnCode = self._clib.read(self.deviceID, c.byref(self._state))
-
-        else:
             returnCode = self._clib.all_read(
                 self.deviceID, c.byref(self._state), self.queue_size
             )
+
+        else:
+            returnCode = self._clib.read(self.deviceID, c.byref(self._state))
 
         if returnCode == fxe.FAILURE:
             raise IOError("Error: read command failed.")
@@ -364,6 +364,7 @@ class Device:
             Command failed.
         """
         controller = fxe.controllers[ctrlMode]
+        returnCode = fxe.FAILURE
         returnCode = self._clib.send_motor_command(self.deviceID, controller, value)
 
         if returnCode == fxe.FAILURE:
@@ -378,7 +379,7 @@ class Device:
         """
         DO NOT USE THIS FUNCTION UNLESS YOU KNOW WHAT YOU ARE DOING!
 
-        Finds the motor poles.
+     the motor poles.
 
         Raises
         ------
