@@ -398,6 +398,15 @@ class Device:
         if self._clib.find_poles(self.deviceID) == fxe.FAILURE:
             raise ValueError("Command failed")
 
+        msg = "NOTE: Please wait for the process to complete. The motor will stop "
+        msg += "moving when it is done. It usually takes 1-2 minutes to complete."
+        print(msg)
+
+        msg = "NOTE: Once the pole-finding procedure is completed, you must "
+        msg += "power cylce the device for the changes to take effect."
+        print(msg)
+
+
     # -----
     # activate_bootloader
     # -----
