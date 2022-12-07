@@ -363,9 +363,9 @@ class Device:
         IOError:
             Command failed.
         """
-        controller = fxe.controllers[ctrlMode]
+        controller = c.c_int(fxe.controllers[ctrlMode])
         returnCode = fxe.FAILURE
-        returnCode = self._clib.send_motor_command(self.deviceID, controller, value)
+        returnCode = self._clib.send_motor_command(self.deviceID, controller, c.c_int(int(value)))
 
         if returnCode == fxe.FAILURE:
             raise IOError("Command failed.")
