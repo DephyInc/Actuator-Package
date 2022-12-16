@@ -35,18 +35,19 @@ import ctypes as c
 # ============================================
 #                  App Types
 # ============================================
-(FX_INVALID_APP, FX_ACT_PACK, FX_EB5X, FX_MD, FX_NET_MASTER, FX_BMS) = map(
-    c.c_int, range(-1, 5)
-)
-
-APP_NAMES = {
-    FX_INVALID_APP.value: "Invalid",
-    FX_ACT_PACK.value: "ActPack",
-    FX_EB5X.value: "EBx or ActPack Plus",
-    FX_MD.value: "Medical Device",
-    FX_NET_MASTER.value: "NetMaster",
-    FX_BMS.value: "BMS",
-}
+(
+    FX_APP_ERROR,
+    FX_APP_UNCLASSIFIED,
+    FX_APP_ACTPACK,
+    FX_APP_ACTPACKPLUS,
+    FX_APP_EXO,
+    FX_APP_MD,
+    FX_APP_NETMASTER,
+    FX_APP_BMS,
+    FX_APP_HABS,
+    FX_APP_CELLSCREENER,
+    FX_APP_BATTCYCLER,
+) = map(c.c_int, range(0, 11))
 
 
 # ============================================

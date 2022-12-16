@@ -21,22 +21,14 @@ class Device:
     # -----
     # constructor
     # -----
-    def __init__(self, port, baud_rate, **kwargs):
+    def __init__(self, port, baud_rate):
         self.port = port.encode("utf-8")
         self.baud_rate = baud_rate
-        for key, value in kwargs.items():
-            setattr(self, key, value)
 
         self.clib = fxu._load_clib()
 
         self.dev_id = None
-        self.app_type = None
-        self.controller_type = None
-        self.controller = None
-        self.initial_pos = None
         self.streaming_freq = 0
-        self.is_streaming = False
-        self.is_open = False
         self.logging_enabled = True
 
     # -----
@@ -44,6 +36,37 @@ class Device:
     # -----
     def __del__(self):
         self.close()
+
+    # -----
+    # is_open
+    # -----
+    @property
+    def is_open(self):
+        return self.clib.fxIsOpen(self.dev_id)
+
+    # -----
+    # is_streaming
+    # -----
+    @property
+    def is_streaming(self):
+        return self.clib.fxIsStreaming(self.dev_id)
+
+    # -----
+    # libs_version
+    # -----
+    @property
+    def libs_version(self):
+        major = c.c_uint16(-1)
+        minor = c.c_uint16(-1)
+        patch = c.c_uint16(-1)
+
+        retCode = self.clib.fxGetLibsVersion(c.byref(major), c.byref(minor), c.byref(patch))
+
+        if retCode != fxe.FX_SUCCESS.value:
+            print("Error, could not determine clibs version.")
+            raise OSError
+
+        print(f"{major.value}.{minor.value}.{patch.value}")
 
     # -----
     # open
@@ -85,7 +108,6 @@ class Device:
         self.dev_id = self.clib.fxOpen(self.port, self.baud_rate, log_level)
         if self.dev_id == -1:
             raise IOError("Failed to open device")
-        self.is_open = True
 
         # NOTE: This sleep is so long because there's an issue that
         # occurs when trying to open multiple devices in rapid
@@ -111,7 +133,6 @@ class Device:
         if self.is_open:
             if self.clib.fxClose(self.dev_id) == fxe.FX_INVALID_DEVICE.value:
                 raise ValueError("fxClose: invalid device ID")
-            self.is_open = False
 
     # -----
     # start_streaming
@@ -151,7 +172,6 @@ class Device:
         if ret_code == fxe.FX_FAILURE.value:
             raise RuntimeError("fxStartStreaming: stream failed")
 
-        self.is_streaming = True
 
         # NOTE: This sleep is so long because there's an issue that
         # occurs when trying to open multiple devices in rapid
@@ -179,7 +199,6 @@ class Device:
             raise ValueError("fxStopStreaming: invalid device ID")
         if ret_code == fxe.FX_FAILURE.value:
             raise RuntimeError("fxStopStreaming: stream failed")
-        self.is_streaming = False
 
     # -----
     # read
@@ -435,24 +454,6 @@ class Device:
             raise ValueError(f"Invalid control mode: {ctrl_mode}")
 
     # -----
-    # _get_app_type
-    # -----
-    def _get_app_type(self):
-        """
-        Get the device application type.
-
-        Returns
-        -------
-        int:
-                -1 : invalid
-                0 : ActPack
-                1 : Exo
-                2 : MD
-                3 : NetMaster
-        """
-        return c.c_int(self.clib.fxGetAppType(self.dev_id))
-
-    # -----
     # find_poles
     # -----
     def find_poles(self):
@@ -609,3 +610,43 @@ class Device:
         if not data:
             data = self.read()
         fxu.print_device(data, self.app_type)
+
+    # -----
+    # uvlo
+    # -----
+    @property
+    def uvlo(self):
+        retCode = self.clib.fxRequestUVLO(self.dev_id)
+
+        if retCode != fxe.FX_SUCCESS.value:
+            print("Error, could not request firmware version.")
+            raise IOError
+
+        sleep(5)
+
+        uvlo = self.clib.fxGetLastReceivedUVLO(self.dev_id)
+
+        if uvlo == -1:
+            print("Error, coult not get requested UVLO.")
+            raise IOError
+
+        return uvlo
+
+    @uvlo.setter
+    def uvlo(self, value):
+        # value must be in millivolts
+        retCode = self.clib.fxSetUVLO(self.dev_id, c.c_uint(value))
+
+        if retCode != fxe.FX_SUCCESS.value:
+            print("Error, could not set UVLO.")
+            raise IOError
+
+    # -----
+    # imu_calibration
+    # -----
+    def imu_calibration(self):
+        retCode = self.clib.fxSetImuCalibration(self.dev_id)
+
+        if retCode != fxe.FX_SUCCESS.value:
+            print("Error, could not calibrate imu.")
+            raise IOError

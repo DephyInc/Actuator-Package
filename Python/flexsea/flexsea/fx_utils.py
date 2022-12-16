@@ -548,6 +548,9 @@ def _set_data_types(clib: c.CDLL) -> c.CDLL:
     clib.fxIsOpen.argtypes = [c.c_uint]
     clib.fxIsOpen.restype = c.c_bool
 
+    clib.fxIsStreaming.argtypes = [c.c_uint]
+    clib.fxIsStreaming.restype = c.c_bool
+
     clib.fxClose.argtypes = [c.c_uint]
     clib.fxClose.restype = c.c_int
 
@@ -611,8 +614,6 @@ def _set_data_types(clib: c.CDLL) -> c.CDLL:
     clib.fxSendMotorCommand.argtypes = [c.c_uint, c.c_int, c.c_int]
     clib.fxSendMotorCommand.restype = c.c_int
 
-    clib.fxGetAppType.argtypes = [c.c_uint]
-
     clib.fxActivateBootloader.argtypes = [c.c_uint, c.c_uint8]
     clib.fxActivateBootloader.restype = c.c_int
 
@@ -624,6 +625,21 @@ def _set_data_types(clib: c.CDLL) -> c.CDLL:
 
     clib.fxGetLastReceivedFirmwareVersion.argtypes = [c.c_uint]
     clib.fxGetLastReceivedFirmwareVersion.restype = fxe.FW
+
+    clib.fxGetLibsVersion.argtypes = [c.POINTER(c.c_uint16), c.POINTER(c.c_uint16), c.POINTER(c.c_uint16)]
+    clib.fxGetLibsVersion.restype = c.c_int
+
+    clib.fxRequestUVLO.argtypes = [c.c_uint]
+    clib.fxRequestUVLO.restype = c.c_int
+
+    clib.fxGetLastReceivedUVLO.argtypes = [c.c_uint]
+    clib.fxGetLastReceivedUVLO.restype = c.c_int
+
+    clib.fxSetUVLO.argtypes = [c.c_uint, c.c_uint]
+    clib.fxSetUVLO.restype = c.c_int
+
+    clib.fxSetImuCalibration.argtypes = [c.c_uint]
+    clib.fxSetImuCalibration.restype = c.c_int
 
     return clib
 
