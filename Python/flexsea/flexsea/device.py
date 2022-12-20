@@ -177,7 +177,9 @@ class Device:
         # occurs when trying to open multiple devices in rapid
         # succession that causes flexsea to crash
         sleep(1)
-        self.initial_pos = self.get_pos()
+        self.get_device_type_name()
+        self.get_device_side()
+        self.get_data_labels()
 
     # -----
     # _stop_streaming
@@ -226,45 +228,30 @@ class Device:
         if not self.is_streaming:
             raise RuntimeError("Must call `open()` before trying to read data.")
 
-        # Actpack
-        if self.app_type.value == fxe.FX_ACT_PACK.value:
-            device_state = fxd.ActPackState()
-            ret_code = self.clib.fxReadDevice(self.dev_id, c.byref(device_state))
+        maxDataElements = self.clib.fxGetMaxDataElements()
+        nFields = c.c_int()
+        deviceData = (c.POINTER(c.c_uint32) * maxDataElements)()
 
-        # Net master
-        elif self.app_type.value == fxe.FX_NET_MASTER.value:
-            device_state = fxd.NetMasterState()
-            ret_code = self.clib.fxReadNetMasterDevice(
-                self.dev_id, c.byref(device_state)
-            )
+        retCode = self.clib.fxReadDevice(self.dev_id, deviceData, c.by_ref(nFields))
 
-        # BMS
-        elif self.app_type.value == fxe.FX_BMS.value:
-            device_state = fxd.BMSState()
-            ret_code = self.clib.fxReadBMSDevice(self.dev_id, c.byref(device_state))
+        try:
+            assert nFields.value == len(self.dataFields)
+        except AssertionError:
+            print("Error: Incorrect number of fields read.")
+            raise AssertionError
 
-        # EB5X
-        elif self.app_type.value == fxe.FX_EB5X.value:
-            device_state = fxd.EB5xState()
-            ret_code = self.clib.fxReadExoDevice(self.dev_id, c.byref(device_state))
+        if retCode != fxe.FX_SUCCESS.value:
+            print("Error: Could not read from device.")
+            raise ValueError
 
-        # MD
-        elif self.app_type.value == fxe.FX_MD.value:
-            device_state = fxd.MD10State()
-            ret_code = self.clib.fxReadMdDevice(self.dev_id, c.byref(device_state))
+        data = []
 
-        # Unknown
-        else:
-            raise RuntimeError(f"Unsupported application type: {self.app_type}")
+        for i in range(nFields.value):
+            data.append(deviceData[i].value)
 
-        if ret_code == fxe.FX_INVALID_DEVICE.value:
-            raise ValueError(f"fxReadDevice: invalid device ID: {self.dev_id}")
-        if ret_code == fxe.FX_NOT_STREAMING.value:
-            raise RuntimeError("fxReadDevice: no read data")
-        if ret_code == fxe.FX_FAILURE.value:
-            raise IOError("fxReadDevice: command failed")
+        deviceState = {key : value for (key, value) in zip(self.dataFields, data)}
 
-        return device_state
+        return deviceState
 
     # -----
     # read_all
@@ -650,3 +637,68 @@ class Device:
         if retCode != fxe.FX_SUCCESS.value:
             print("Error, could not calibrate imu.")
             raise IOError
+
+    # -----
+    # get_data_labels
+    # -----
+    def get_data_labels(self):
+        maxFields = self.clib.fxGetMaxDataElements()
+        maxFieldLength = self.clib.fxGetMaxDataLabelLength()
+        nLabels = c.c_int()
+
+        # Create types for holding labels
+        labelType = c.c_char * maxFieldLength
+        labelsType = c.POINTER(c.c_char) * maxFields
+
+        # Allocate memory for the labels container
+        labels = labelsType()
+        for i in range(maxFields):
+            labels[i] = labelType()
+
+        retCode = self.clib.fxGetDataLabelsWrapper(self.dev_id, labels, c.by_ref(nLabels))
+
+        if retCode != fxe.FX_SUCCESS.value:
+            print("Error: Could not get device field labels.")
+            raise ValueError
+
+        # Convert the labels from chars to python strings
+        self.dataFields = [""] * nLabels.value
+        for i in range(nLabels.value):
+            for j in range(maxFieldLength):
+                self.dataFields[i] += labels[i][j].decode("utf9")
+            self.dataFields[i].strip("\x00")
+
+        for field in self.dataFields:
+            setattr(self, field, None)
+
+    # -----
+    # get_device_type_name
+    # -----
+    def get_device_type_name(self):
+        maxDeviceNameLength = self.clib.fxGetMaxDeviceNameLength()
+
+        deviceName = (c.c_char * maxDeviceNameLength)()
+
+        retCode = self.clib.fxGetDeviceTypeNameWrapper(self.dev_id, deviceName)
+
+        if retCode != fxe.FX_SUCCESS.value:
+            print("Error: Could not get device name.")
+            raise ValueError
+
+        self.deviceName = deviceName.value.decode("utf8")
+
+    # -----
+    # get_device_side
+    # -----
+    def get_device_side(self):
+        maxDeviceNameLength = self.clib.fGetMaxDeviceNameLength()
+
+        deviceSideName = (c.c_char * maxDeviceNameLength)()
+
+        retCode = self.clib.fxGetDeviceSideNameWrapper(self.dev_id, deviceSideName)
+
+        if retCode != fxe.FX_SUCCESS.value:
+            print("Error: Could not get device side name.")
+            raise ValueError
+
+        self.side = deviceSideName.value.decode("utf8")
