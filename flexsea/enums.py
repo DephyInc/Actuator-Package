@@ -31,11 +31,11 @@ hasHabs = ["exo",]
 #                 Controllers
 # ============================================
 controllers = {
-    "position": 0,
-    "voltage": 1,
-    "current": 2,
-    "impedance": 3,
-    "none": 4,
+    "position": c.c_int(0),
+    "voltage": c.c_int(1),
+    "current": c.c_int(2),
+    "impedance": c.c_int(3),
+    "none": c.c_int(4),
 }
 
 
