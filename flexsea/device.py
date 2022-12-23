@@ -1,4 +1,5 @@
 import ctypes as c
+import setuptools.version as ver
 from time import sleep
 from typing import List
 from typing import Self
@@ -28,6 +29,8 @@ class Device:
         logLevel: int = 4,
         loggingEnabled: bool = True,
     ) -> None:
+        self._version_check(cLibVersion)
+
         self.port = port
         self.baudRate = baudRate
         self.cLibVersion = cLibVersion
@@ -45,10 +48,17 @@ class Device:
 
         self._clib = fxu.load_clib(self.cLibVersion)
 
-        try:
-            assert self.cLibVersion == self.libs_version
-        except AssertionError:
-            raise AssertionError("Given and actual library versions don't match.")
+    # -----
+    # _version_check
+    # -----
+    def _version_check(self, using: str) -> None:
+        inUse = ver.pkg_resources.parse_version(cLibVersion)
+        cutoff = ver.pkg_resources.parse_version(cfg.legacyCutoff)
+
+        if inUse < cutoff:
+            msg = f"For versions of the pre-compiled C libraries < {cfg.legacyCutoff} "
+            msg += "please use the `LegacyDevice` class."
+            raise ValueError(msg)
 
     # -----
     # destructor
@@ -152,6 +162,13 @@ class Device:
         IOError:
             If we fail to open the device.
         """
+        self._open()
+        self._setup()
+
+    # -----
+    # _open
+    # -----
+    def _open(self) -> None:
         if self.isOpen:
             return
 
@@ -160,6 +177,15 @@ class Device:
 
         if self.deviceID in (fxe.INVALID_DEVICE.value, -1):
             raise IOError("Failed to open device.")
+
+    # -----
+    # _setup
+    # -----
+    def _setup(self) -> None:
+        try:
+            assert self.cLibVersion == self.libsVersion
+        except AssertionError:
+            raise AssertionError("Given and actual library versions don't match.")
 
         self._deviceName = self.deviceName
         self._deviceSide = self.deviceSide
@@ -170,10 +196,10 @@ class Device:
         self.fields = self._get_fields()
 
     # -----
-    # libs_version
+    # libsVersion
     # -----
     @property
-    def libs_version(self) -> str:
+    def libsVersion(self) -> str:
         """
         Gets the version of the precompiled C libraries being used.
 
@@ -246,6 +272,7 @@ class Device:
             self.stop_streaming()
 
         if self.isOpen:
+            self.stop_motor()
             self._clib.close(self.deviceID)
 
     # -----
@@ -360,7 +387,7 @@ class Device:
     # -----
     # _read
     # -----
-    def _read(self) -> List[dict]|dict:
+    def _read(self) -> dict:
         """
         The device returns a list of values. We then have to pair those values
         with their corresponding labels.
@@ -399,7 +426,7 @@ class Device:
     # -----
     # _read_all
     # -----
-    def _read_all(self):
+    def _read_all(self) -> List[dict]:
         """
         Data from each timestep is stored in a queue on the device. Here
         we get the current size of that queue and then read from it.
@@ -670,7 +697,7 @@ class Device:
     # -----
     @property
     def rigidVersion(self) -> str:
-        pass
+        raise NotImplementedError
 
     # -----
     # firmware
@@ -707,7 +734,7 @@ class Device:
     # -----
     # print
     # -----
-    def print(self) -> None:
+     print(self) -> None:
         """
         Reads the data from the device and then prints it to the screen.
         """

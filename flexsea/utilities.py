@@ -95,6 +95,7 @@ def load_clib(cLibVersion: str) -> c.CDLL:
         The Python object from which we can call the flexsea C
         functions.
     """
+    print(f"Using version: {cLibVersion} of pre-compiled C libraries.")
     _os = get_os()
     libDir = cfg.libsDir.joinpath(cLibVersion, _os)
 
