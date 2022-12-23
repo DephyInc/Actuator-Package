@@ -48,6 +48,11 @@ class Device:
 
         self._clib = fxu.load_clib(self.cLibVersion)
 
+        try:
+            assert self.cLibVersion == self.libs_version
+        except AssertionError:
+            raise AssertionError("Given and actual library versions don't match.")
+
     # -----
     # _version_check
     # -----
@@ -438,6 +443,75 @@ class Device:
         ------
         AssertionError:
             If the number of fields differs from what's expected.
+||||||| 4fe8548
+        IOError:
+            Command failed.
+=======
+        Returns
+        -------
+        dict:
+            Data read from device.
+        """
+        if not self.isStreaming:
+            raise RuntimeError("Must call `start_streaming()` before reading data.")
+
+        return self._read() if not allData else self._read_all()
+
+    # -----
+    # _read
+    # -----
+    def _read(self) -> List[dict]|dict:
+        """
+        The device returns a list of values. We then have to pair those values
+        with their corresponding labels.
+
+        Raises
+        ------
+        RuntimeError:
+            If reading fails.
+
+        AssertionError:
+            If the number of fields and amount of data read differ.
+            
+        Returns
+        -------
+        dict:
+            Label-value pairs read from the device.
+        """
+        maxDataElements = self._clib.get_max_data_elements()
+        nFields = c.c_int()
+        deviceData = (c.POINTER(c.c_uint32) * maxDataElements)()
+
+        retCode = self._clib.read(self.deviceId, deviceData, c.by_ref(nFields))
+
+        if retCode != fxe.SUCCESS.value:
+            raise RuntimeError("Could not read from device.")
+
+        try:
+            assert nFields.value == len(self.fields)
+        except AssertionError:
+            raise AssertionError("Incorrect number of fields read.")
+
+        data = [deviceData[i].value for i in range(nFields.value)]
+
+        return {key : value for (key, value) in zip(self.fields, data)}
+
+    # -----
+    # _read_all
+    # -----
+    def _read_all(self):
+        """
+        Data from each timestep is stored in a queue on the device. Here
+        we get the current size of that queue and then read from it.
+
+        NOTE: Can the queue size change between getting the size and reading
+        the data from it?
+
+        Raises
+        ------
+        AssertionError:
+            If the number of fields differs from what's expected.
+>>>>>>> origin/STACK-348-rework-bootloader
 
         Returns
         -------
