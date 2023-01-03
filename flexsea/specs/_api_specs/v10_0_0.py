@@ -4,20 +4,103 @@ from flexsea import firmware as fw
 from flexsea.specs.device_specs import all_devices as fxd
 
 
-read_functions = {
-    "actpack": {
-        "name": "fxReadDevice",
-        "argTypes": [c.c_uint, c.POINTER(fxd.ActPackState)],
-        "returnType": c.c_int,
-        "all_name": "fxReadDeviceAll",
-        "all_argTypes": [c.c_uint, c.POINTER(fxd.ActPackState), c.c_uint],
-        "all_returnType": c.c_int,
-    },
-}
-
-
-v9_2_0 = {
+v10_0_0 = {
     "commands": {
+        "is_open": {
+            "name": "fxIsOpen",
+            "argTypes": [
+                c.c_uint,
+            ],
+            "returnType": c.c_bool,
+        },
+        "is_streaming": {
+            "name": "fxIsStreaming",
+            "argTypes": [
+                c.c_uint,
+            ],
+            "returnType": c.c_bool,
+        },
+        "get_max_device_name_length": {
+            "name": "fxGetMaxDeviceNameLength",
+            "argTypes": [
+                None,
+            ],
+            "returnType": c.c_int,
+        },
+        "get_device_name": {
+            "name": "fxGetDeviceTypeNameWrapper",
+            "argTypes": [c.c_uint, c.c_char_p],
+            "returnType": c.c_int,
+        },
+        "get_max_device_side_length": {
+            "name": "fxGetMaxDeviceSideNameLength",
+            "argTypes": [
+                None,
+            ],
+            "returnType": c.c_int,
+        },
+        "get_side": {
+            "name": "fxGetDeviceSideNameWrapper",
+            "argTypes": [c.c_uint, c.c_char_p],
+            "returnType": c.c_int,
+        },
+        "get_libs_version": {
+            "name": "fxGetLibsVersion",
+            "argTypes": [
+                c.POINTER(c.c_uint16),
+                c.POINTER(c.c_uint16),
+                c.POINTER(c.c_uint16),
+            ],
+            "returnType": c.c_int,
+        },
+        "get_max_field_name_length": {
+            "name": "fxGetMaxDataLabelLength",
+            "argTypes": [
+                None,
+            ],
+            "returnType": c.c_int,
+        },
+        "get_fields": {
+            "name": "fxGetDataLabelsWrapper",
+            "argTypes": [c.c_uint, c.POINTER(c.c_char_p), c.POINTER(c.c_int)],
+            "returnType": c.c_int,
+        },
+        "get_max_data_elements": {
+            "name": "fxGetMaxDataElements",
+            "argTypes": [
+                None,
+            ],
+            "returnType": c.c_int,
+        },
+        "read": {
+            "name": "fxReadDevice",
+            "argTypes": [c.c_uint, c.POINTER(c.c_uint32), c.POINTER(c.c_int)],
+            "returnType": c.c_int,
+        },
+        "read_all": {
+            "name": "fxReadDeviceAllWrapper",
+            "argTypes": [c.c_uint, c.POINTER(c.POINTER(c.c_int)), c.POINTER(c.c_int)],
+            "returnType": None,
+        },
+        "request_uvlo": {
+            "name": "fxRequestUVLO",
+            "argTypes": [
+                c.c_uint,
+            ],
+            "returnType": c.c_int,
+        },
+        "read_uvlo": {
+            "name": "fxGetLastReceivedUVLO",
+            "argTypes": [
+                c.c_uint,
+            ],
+            "returnType": c.c_int,
+        },
+        "set_uvlo": {
+            "name": "fxSetUVLO",
+            "argTypes": [c.c_uint, c.c_uint],
+            "returnType": c.c_int,
+        },
         "open": {
             "name": "fxOpen",
             "argTypes": [c.c_char_p, c.c_uint, c.c_uint],
@@ -98,13 +181,6 @@ v9_2_0 = {
             ],
             "returnType": fw.Firmware,
         },
-        "get_device_type_value": {
-            "name": "fxGetAppType",
-            "argTypes": [
-                c.c_uint,
-            ],
-            "returnType": c.c_int,
-        },
         "get_read_data_queue_size": {
             "name": "fxGetReadDataQueueSize",
             "argTypes": [
@@ -118,5 +194,4 @@ v9_2_0 = {
             "returnType": c.c_uint,
         },
     },
-    "read_functions": read_functions,
 }

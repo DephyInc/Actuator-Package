@@ -13,7 +13,6 @@ read_functions = {
         "all_argTypes": [c.c_uint, c.POINTER(fxd.ActPackState), c.c_uint],
         "all_returnType": c.c_int,
     },
-
     "exo": {
         "name": "fxReadDevice",
         "argTypes": [c.c_uint, c.POINTER(fxd.EB60State)],
@@ -26,7 +25,7 @@ read_functions = {
 
 
 v7_2_0 = {
-    "commands" : {
+    "commands": {
         "open": {
             "name": "fxOpen",
             "argTypes": [c.c_char_p, c.c_uint, c.c_uint],

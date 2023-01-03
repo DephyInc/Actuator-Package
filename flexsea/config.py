@@ -20,3 +20,4 @@ libsBucket = "dephy-public-binaries"
 #           Version Configuration
 # ============================================
 LTS = "7.2.0"
+legacyCutoff = "10.0.0"

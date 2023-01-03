@@ -32,7 +32,7 @@ class LegacyDevice(Device):
     ) -> None:
 
         super().__init__(port, baudRate, cLibVersion, logLevel, loggingEnabled)
-        self._state: c.Structure | None = None 
+        self._state: c.Structure | None = None
 
     # -----
     # _version_check
@@ -60,7 +60,7 @@ class LegacyDevice(Device):
         if self._deviceName in fxe.hasHabsLegacy:
             self.hasHabs = True
 
-        self._state = fxe.deviceStateDicts[self.deviceName]
+        self._state = fxe.deviceStateDicts[self._deviceName]()
 
         # The read function is set here and not with other c functions
         # because we need the device name, which we can't get without
@@ -93,15 +93,24 @@ class LegacyDevice(Device):
     def _read(self) -> dict:
         if self._clib.read(self.deviceID, c.byref(self._state)) != fxe.SUCCESS.value:
             raise RuntimeError("Error: read command failed.")
-        return {f[0]:getattr(self._state, f[0])for f in self._state._fields_}
+        return {f[0]: getattr(self._state, f[0]) for f in self._state._fields_}
 
     # -----
     # _read_all
     # -----
     def _read_all(self) -> List[dict]:
-        # fxReadDeviceAll(const unsigned int deviceId, ActPackState* readData, const unsigned int n) is the prototype
-        # What's "returned" is readData, which is an array of ActPackState structs
-        raise NotImplementedError
-        returnCode = self._clib.all_read(
-            self.deviceID, c.byref(self._state), self.queueSize
-        )
+        qs = self.queueSize
+        data = (c.POINTER(fxe.deviceStateDicts[self._deviceName]) * qs)()
+        allData = []
+
+        nRead = self._clib.all_read(self.deviceID, data, qs)
+
+        try:
+            assert nRead == qs
+        except AssertionError:
+            raise RuntimeError("Could not read all data.")
+
+        for i in range(nRead):
+            allData.append({f[0]: getattr(data[i], f[0]) for f in data[i]._fields_})
+
+        return allData

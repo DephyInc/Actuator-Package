@@ -3,6 +3,7 @@ from ._api_specs.v7_2_6 import v7_2_6
 from ._api_specs.v8_0_0 import v8_0_0
 from ._api_specs.v9_1_0 import v9_1_0
 from ._api_specs.v9_2_0 import v9_2_0
+from ._api_specs.v10_0_0 import v10_0_0
 
 
 apiSpec = {
@@ -11,4 +12,5 @@ apiSpec = {
     "8.0.0": v8_0_0,
     "9.1.0": v9_1_0,
     "9.2.0": v9_2_0,
+    "10.0.0": v10_0_0,
 }

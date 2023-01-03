@@ -25,7 +25,7 @@ read_functions = {
 
 
 v9_1_0 = {
-    "commands" : {
+    "commands": {
         "open": {
             "name": "fxOpen",
             "argTypes": [c.c_char_p, c.c_uint, c.c_uint],

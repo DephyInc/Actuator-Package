@@ -16,15 +16,17 @@ deviceNames = {
 #               Device States
 # ============================================
 deviceStateDicts = {
-    "actpack": fxd.ActPackState(),
-    "exo": fxd.EB60State(),
+    "actpack": fxd.ActPackState,
+    "exo": fxd.EB60State,
 }
 
 
 # ============================================
 #                    Habs
 # ============================================
-hasHabs = ["exo",]
+hasHabs = [
+    "exo",
+]
 
 
 # ============================================

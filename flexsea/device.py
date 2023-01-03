@@ -41,10 +41,10 @@ class Device:
         self.deviceID: int = fxe.INVALID_DEVICE.value
         self.hasHabs: bool = False
         self.streamingFrequency: int = 0
-        self.heartbeatPeriod : int = 0
-        self.useSafety : bool = False
-        self._deviceName : str = ""
-        self._deviceSide : str = ""
+        self.heartbeatPeriod: int = 0
+        self.useSafety: bool = False
+        self._deviceName: str = ""
+        self._deviceSide: str = ""
 
         self._clib = fxu.load_clib(self.cLibVersion)
 
@@ -195,7 +195,7 @@ class Device:
         self._deviceName = self.deviceName
         self._deviceSide = self.deviceSide
 
-        if self.deviceName in fxe.hasHabs:
+        if self._deviceName in fxe.hasHabs:
             self.hasHabs = True
 
         self.fields = self._get_fields()
@@ -217,7 +217,9 @@ class Device:
         minor = c.c_uint16(-1)
         patch = c.c_uint16(-1)
 
-        retCode = self._clib.get_libs_version(c.byref(major), c.byref(minor), c.byref(patch))
+        retCode = self._clib.get_libs_version(
+            c.byref(major), c.byref(minor), c.byref(patch)
+        )
 
         if retCode != fxe.SUCCESS.value:
             raise RuntimeError("Could not determine clibs version.")
@@ -239,7 +241,7 @@ class Device:
         if self.fields:
             return self.fields
 
-        maxFields = self._clib.get_max_fields()
+        maxFields = self._clib.get_max_data_elements()
         maxFieldLength = self._clib.get_max_field_name_length()
         nLabels = c.c_int()
 
@@ -283,7 +285,9 @@ class Device:
     # -----
     # start_streaming
     # -----
-    def start_streaming(self, frequency: int, heartbeatPeriod: int=50, useSafety: bool=False) -> None:
+    def start_streaming(
+        self, frequency: int, heartbeatPeriod: int = 50, useSafety: bool = False
+    ) -> None:
         """
         Start streaming data from a device.
 
@@ -338,7 +342,9 @@ class Device:
                 msg = "Heartbeat period must be >= 50 and < frequency."
                 raise ValueError(msg) from err
 
-            retCode = self._clib.start_streaming_with_safety(self.deviceID, frequency, _log, self.heartbeatPeriod)
+            retCode = self._clib.start_streaming_with_safety(
+                self.deviceID, frequency, _log, self.heartbeatPeriod
+            )
 
         else:
             retCode = self._clib.start_streaming(self.deviceID, frequency, _log)
@@ -404,7 +410,7 @@ class Device:
 
         AssertionError:
             If the number of fields and amount of data read differ.
-            
+
         Returns
         -------
         dict:
@@ -426,7 +432,7 @@ class Device:
 
         data = [deviceData[i].value for i in range(nFields.value)]
 
-        return {key : value for (key, value) in zip(self.fields, data)}
+        return {key: value for (key, value) in zip(self.fields, data)}
 
     # -----
     # _read_all
@@ -443,75 +449,6 @@ class Device:
         ------
         AssertionError:
             If the number of fields differs from what's expected.
-||||||| 4fe8548
-        IOError:
-            Command failed.
-=======
-        Returns
-        -------
-        dict:
-            Data read from device.
-        """
-        if not self.isStreaming:
-            raise RuntimeError("Must call `start_streaming()` before reading data.")
-
-        return self._read() if not allData else self._read_all()
-
-    # -----
-    # _read
-    # -----
-    def _read(self) -> List[dict]|dict:
-        """
-        The device returns a list of values. We then have to pair those values
-        with their corresponding labels.
-
-        Raises
-        ------
-        RuntimeError:
-            If reading fails.
-
-        AssertionError:
-            If the number of fields and amount of data read differ.
-            
-        Returns
-        -------
-        dict:
-            Label-value pairs read from the device.
-        """
-        maxDataElements = self._clib.get_max_data_elements()
-        nFields = c.c_int()
-        deviceData = (c.POINTER(c.c_uint32) * maxDataElements)()
-
-        retCode = self._clib.read(self.deviceId, deviceData, c.by_ref(nFields))
-
-        if retCode != fxe.SUCCESS.value:
-            raise RuntimeError("Could not read from device.")
-
-        try:
-            assert nFields.value == len(self.fields)
-        except AssertionError:
-            raise AssertionError("Incorrect number of fields read.")
-
-        data = [deviceData[i].value for i in range(nFields.value)]
-
-        return {key : value for (key, value) in zip(self.fields, data)}
-
-    # -----
-    # _read_all
-    # -----
-    def _read_all(self):
-        """
-        Data from each timestep is stored in a queue on the device. Here
-        we get the current size of that queue and then read from it.
-
-        NOTE: Can the queue size change between getting the size and reading
-        the data from it?
-
-        Raises
-        ------
-        AssertionError:
-            If the number of fields differs from what's expected.
->>>>>>> origin/STACK-348-rework-bootloader
 
         Returns
         -------
@@ -522,7 +459,7 @@ class Device:
         qs = self.queueSize
         data = (c.POINTER(c.c_uint32) * qs)()
         nElements = c.c_int()
-        
+
         for i in range(qs):
             data[i] = (c.c_uint32 * len(self.fields))()
 
@@ -539,7 +476,7 @@ class Device:
             singleTimeStepData = []
             for j in range(nElements.value):
                 singleTimeStepData.append(data[i][j])
-            allData.append({k : v, for k, v in zip(self.fields, singleTimeStepData)})
+            allData.append({k: v for k, v in zip(self.fields, singleTimeStepData)})
 
         return allData
 
@@ -670,7 +607,7 @@ class Device:
     # -----
     # stop_motor
     # -----
-    def stop_motor(self)
+    def stop_motor(self):
         """
         Stops the motor.
 
@@ -707,7 +644,7 @@ class Device:
             print("Aborting pole finding.")
             return
 
-        if self._clib.find_poles(self.deviceID) 1= fxe.SUCCESS.value:
+        if self._clib.find_poles(self.deviceID) != fxe.SUCCESS.value:
             raise ValueError("Command failed")
 
         msg = "NOTE: Please wait for the process to complete. The motor will stop "
@@ -717,7 +654,6 @@ class Device:
         msg = "NOTE: Once the pole-finding procedure is completed, you must "
         msg += "power cylce the device for the changes to take effect."
         print(msg)
-
 
     # -----
     # activate_bootloader
@@ -808,7 +744,7 @@ class Device:
     # -----
     # print
     # -----
-     print(self) -> None:
+    def print(self) -> None:
         """
         Reads the data from the device and then prints it to the screen.
         """
@@ -858,7 +794,7 @@ class Device:
     # -----
     # set_tunnel_mode
     # -----
-    def set_tunnel_mode(self, target: str, timeout: int=30) -> bool:
+    def set_tunnel_mode(self, target: str, timeout: int = 30) -> bool:
         """
         All communication goes through Manage, so we need to put it into
         tunnel mode in order to activate the other bootloaders. When bootloading
@@ -900,7 +836,7 @@ class Device:
             timeout -= 1
             activated = self.bootloader_activated
 
-        return activated 
+        return activated
 
     # -----
     # uvlo
