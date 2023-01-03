@@ -1,11 +1,9 @@
 import ctypes as c
-from time import sleep
 from typing import List
-from typing import Self
+import setuptools.version as ver
 
 from . import config as cfg
 from . import enums as fxe
-from . import utilities as fxu
 from .device import Device
 from .specs.api_spec import apiSpec
 
@@ -38,7 +36,7 @@ class LegacyDevice(Device):
     # _version_check
     # -----
     def _version_check(self, using: str) -> None:
-        inUse = ver.pkg_resources.parse_version(cLibVersion)
+        inUse = ver.pkg_resources.parse_version(using)
         cutoff = ver.pkg_resources.parse_version(cfg.legacyCutoff)
 
         if inUse >= cutoff:
@@ -54,7 +52,7 @@ class LegacyDevice(Device):
         Gets device meta-info after establishing a connection. This
         is the part of opening that differs from that of Device.
         """
-        deviceTypeValue = self._clib.get_device_type_value(self.deviceID)
+        deviceTypeValue = self._clib.get_device_type_value(self.deviceId)
         self._deviceName = fxe.deviceNames[deviceTypeValue]
 
         if self._deviceName in fxe.hasHabsLegacy:
@@ -91,7 +89,7 @@ class LegacyDevice(Device):
     # _read
     # -----
     def _read(self) -> dict:
-        if self._clib.read(self.deviceID, c.byref(self._state)) != fxe.SUCCESS.value:
+        if self._clib.read(self.deviceId, c.byref(self._state)) != fxe.SUCCESS.value:
             raise RuntimeError("Error: read command failed.")
         return {f[0]: getattr(self._state, f[0]) for f in self._state._fields_}
 
@@ -103,14 +101,21 @@ class LegacyDevice(Device):
         data = (c.POINTER(fxe.deviceStateDicts[self._deviceName]) * qs)()
         allData = []
 
-        nRead = self._clib.all_read(self.deviceID, data, qs)
+        nRead = self._clib.all_read(self.deviceId, data, qs)
 
         try:
             assert nRead == qs
-        except AssertionError:
-            raise RuntimeError("Could not read all data.")
+        except AssertionError as err:
+            raise RuntimeError("Could not read all data.") from err
 
         for i in range(nRead):
             allData.append({f[0]: getattr(data[i], f[0]) for f in data[i]._fields_})
 
         return allData
+
+    # -----
+    # rigidVersion
+    # -----
+    @property
+    def rigidVersion(self) -> str:
+        raise NotImplementedError

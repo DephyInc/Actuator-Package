@@ -14,6 +14,7 @@ boto3 = "^1.26.8"
 black = "^22.10.0"
 pylint = "^2.15.5"
 mypy = "^0.990"
+wrapt = "^1.14.1"
 
 [build-system]
 requires = ["poetry-core"]
@@ -29,7 +30,9 @@ disable = [
   "too-many-instance-attributes",
   "too-many-arguments",
   "protected-access",
+  "too-many-public-methods",
 ]
+ignore= "specs"
 
 
 [tool.black]
