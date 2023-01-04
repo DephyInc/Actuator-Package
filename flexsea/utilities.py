@@ -7,7 +7,10 @@ import sys
 
 import boto3
 import botocore.exceptions as bce
+from serial.tools.list_ports import comports
+
 from flexsea.specs.api_spec import apiSpec
+import flexsea.enums as fxe
 
 from . import config as cfg
 
@@ -181,3 +184,47 @@ def download(fileobj: str, bucket: str, dest: str, profile: str | None = None) -
     localHash = hashlib.md5(data).hexdigest()
 
     assert localHash == awsHash
+
+
+# ============================================
+#                   find_port
+# ============================================
+def find_port(baudRate: int, cLibVersion: str):
+    """
+    Tries to establish a connection to the Dephy device given by
+    the user-supplied port. If no port is supplied, then we loop
+    over all available serial ports to try and find a valid device.
+
+    Parameters
+    ----------
+    port : Union[str, None]
+        The name of the port to connect to, e.g., '/dev/ttyACM0'. If
+        no port is given, we loop over all available serial ports.
+
+    cLibVersion : str
+        The semantic version string of the firmware currently on the device.
+
+    Raises
+    ------
+    RuntimeError
+        If no valid Dephy device can be found.
+
+    Returns
+    -------
+    p : str
+        Name of the device's COM port.
+    """
+    devicePort = None
+    clib = load_clib(cLibVersion)
+
+    for _port in comports():
+        p = _port.device.encode("utf-8")
+        if clib.open(p, baudRate, 0) in (fxe.INVALID_DEVICE.value, -1):
+            continue
+        devicePort = p
+        break
+
+    if not devicePort:
+        raise RuntimeError("Could not find a valid device.")
+
+    return devicePort

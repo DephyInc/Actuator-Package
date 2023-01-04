@@ -1,33 +1,11 @@
 from typing import List
 
-from cleo import Application
-from cleo import Command
-from cleo.config import ApplicationConfig as BaseApplicationConfig
-from clikit.api.formatter import Style
+from cleo.application import Application
+from cleo.commands.command import Command
+
 from flexsea import __version__
 
-
-# ============================================
-#              ApplicationConfig
-# ============================================
-class ApplicationConfig(BaseApplicationConfig):
-    """
-    Controls the configuration and styling of the CLI object.
-    """
-
-    # -----
-    # configure
-    # -----
-    def configure(self) -> None:
-        """
-        Sets the color of various message types.
-        """
-        super().configure()
-
-        self.add_style(Style("info").fg("cyan"))
-        self.add_style(Style("error").fg("red").bold())
-        self.add_style(Style("warning").fg("yellow").bold())
-        self.add_style(Style("success").fg("green"))
+from demos.commands.current_control import CurrentControlCommand
 
 
 # ============================================
@@ -42,7 +20,7 @@ class FlexseaDemoApplication(Application):
     # constructor
     # -----
     def __init__(self) -> None:
-        super().__init__(config=ApplicationConfig("flexsea-demos", __version__))
+        super().__init__("flexsea-demos", __version__)
 
         for command in self._get_commands():
             self.add(command())
@@ -61,6 +39,7 @@ class FlexseaDemoApplication(Application):
             A list of commands available to the CLI.
         """
         commandList = [
+            CurrentControlCommand,
         ]
 
         return commandList

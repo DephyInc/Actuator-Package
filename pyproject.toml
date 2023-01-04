@@ -4,10 +4,15 @@ version = "0.1.0"
 description = ""
 authors = ["Jared <jcoughlin@dephy.com>"]
 readme = "README.md"
+packages = [
+    {include = "flexsea"},
+    {include = "demos"},
+]
 
 [tool.poetry.dependencies]
 python = "^3.11"
 boto3 = "^1.26.8"
+pyserial = "^3.5"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -15,6 +20,16 @@ black = "^22.10.0"
 pylint = "^2.15.5"
 mypy = "^0.990"
 wrapt = "^1.14.1"
+
+
+[tool.poetry.group.demos.dependencies]
+numpy = "^1.24.1"
+cleo = "^2.0.1"
+
+
+[tool.poetry.scripts]
+flexsea-demos = 'demos.console.main:main'
+
 
 [build-system]
 requires = ["poetry-core"]
