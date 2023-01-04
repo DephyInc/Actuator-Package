@@ -1,17 +1,15 @@
 import ctypes as c
 from typing import List
-import setuptools.version as ver
 
-from . import config as cfg
 from . import enums as fxe
-from .device import Device
+from .current_device import CurrentDevice
 from .specs.api_spec import apiSpec
 
 
 # ============================================
 #                LegacyDevice
 # ============================================
-class LegacyDevice(Device):
+class LegacyDevice(CurrentDevice):
     """
     Representation of one of Dephy's devices using old comms and
     functionality (e.g., device doesn't know side info).
@@ -24,25 +22,13 @@ class LegacyDevice(Device):
         self,
         port: str,
         baudRate: int,
-        cLibVersion: str = cfg.LTS,
-        logLevel: int = 4,
-        loggingEnabled: bool = True,
+        cLibVersion: str,
+        logLevel: int,
+        loggingEnabled: bool,
     ) -> None:
 
         super().__init__(port, baudRate, cLibVersion, logLevel, loggingEnabled)
         self._state: c.Structure | None = None
-
-    # -----
-    # _version_check
-    # -----
-    def _version_check(self, using: str) -> None:
-        inUse = ver.pkg_resources.parse_version(using)
-        cutoff = ver.pkg_resources.parse_version(cfg.legacyCutoff)
-
-        if inUse >= cutoff:
-            msg = f"For versions of the pre-compiled C libraries >= {cfg.legacyCutoff} "
-            msg += "please use the `Device` class."
-            raise ValueError(msg)
 
     # -----
     # _setup
