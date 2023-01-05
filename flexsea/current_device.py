@@ -40,21 +40,16 @@ class CurrentDevice:
         self.useSafety: bool = False
         self._deviceName: str = ""
         self._deviceSide: str = ""
+        self._closed: bool = False
 
         self._clib = fxu.load_clib(self.cLibVersion)
-
-        try:
-            assert self.cLibVersion == self.libsVersion
-        except AssertionError as err:
-            raise AssertionError(
-                "Given and actual library versions don't match."
-            ) from err
 
     # -----
     # destructor
     # -----
     def __del__(self) -> None:
-        self.close()
+        if not self._closed:
+            self.close()
 
     # -----
     # __enter__
@@ -154,6 +149,7 @@ class CurrentDevice:
         """
         self._open()
         self._setup()
+        self._closed = False
 
     # -----
     # _open
@@ -269,6 +265,10 @@ class CurrentDevice:
         if self.isOpen:
             self.stop_motor()
             self._clib.close(self.deviceId)
+
+        # If close is called manually, when destructor is called during
+        # garbage collection, isStreaming will raise a runtimeerror
+        self._closed = True
 
     # -----
     # start_streaming
@@ -609,7 +609,7 @@ class CurrentDevice:
         devId = self.deviceId
         controller = fxe.controllers["none"]
         if self._clib.send_motor_command(devId, controller, 0) != fxe.SUCCESS.value:
-            raise RuntimeError("Coult not stop motor.")
+            raise RuntimeError("Could not stop motor.")
 
     # -----
     # find_poles

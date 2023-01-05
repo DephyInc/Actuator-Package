@@ -18,6 +18,20 @@ read_functions = {
 
 v9_2_0 = {
     "commands": {
+        "is_open": {
+            "name": "fxIsOpen",
+            "argTypes": [
+                c.c_uint,
+            ],
+            "returnType": c.c_bool,
+        },
+        "is_streaming": {
+            "name": "fxIsStreaming",
+            "argTypes": [
+                c.c_uint,
+            ],
+            "returnType": c.c_bool,
+        },
         "open": {
             "name": "fxOpen",
             "argTypes": [c.c_char_p, c.c_uint, c.c_uint],

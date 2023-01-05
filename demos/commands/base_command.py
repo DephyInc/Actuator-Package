@@ -1,8 +1,11 @@
+from typing import List
+
+from cleo.commands.command import Command
 from cleo.helpers import option
 
 import flexsea.config as cfg
 from flexsea.device import Device
-from flexsea.utilities import find_device
+from flexsea.utilities import find_port
 from flexsea.utilities import get_os
 
 
@@ -20,31 +23,8 @@ class BaseDemoCommand(Command):
         option("cLibVer", "-c", "C library version to use.", False, default=cfg.LTS),
     ]
 
-    # -----
-    # constructor
-    # -----
-    def __init__(self) -> None:
-        super().__init__()
-
-        self.add_style("info", fg="cyan")
-        self.add_style(
-            "error",
-            fg="red",
-            options=[
-                bold,
-            ],
-        )
-        self.add_style(
-            "warning",
-            fg="yellow",
-            options=[
-                bold,
-            ],
-        )
-        self.add_style("success", fg="green")
-
-        self._devices: List = []
-        self._loopTime: int = 0
+    _devices: List = []
+    _loopTime: int = 0
 
     # -----
     # setup
@@ -61,11 +41,11 @@ class BaseDemoCommand(Command):
         self._devices = [Device(p, br, cv) for p in ports]
 
         if not self._devices:
-            self._devices.append(find_device(None, br, cv))
+            self._devices.append(Device(find_port(br, cv), br, cv))
 
         for device in self._devices:
             device.open()
-            device.start_streaming(self.option("frequency"))
+            device.start_streaming(int(self.option("frequency")))
 
         # Run time is the total demo time. Loop time is the amount of time
         # each device gets such that loopTime * nDevices = runTime
@@ -76,6 +56,4 @@ class BaseDemoCommand(Command):
     # -----
     def cleanup(self) -> None:
         for device in self._devices:
-            device.stop_motor()
-            device.stop_streaming()
             device.close()

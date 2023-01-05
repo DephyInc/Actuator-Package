@@ -6,11 +6,11 @@ from .specs.device_specs import all_devices as fxd
 # ============================================
 #                Device Names
 # ============================================
-(INVALID_APP, ACTPACK, EXO) = map(int, range(-1, 2))
+(INVALID_APP, ACTPACK, EXO) = map(c.c_int, range(-1, 2))
 
 deviceNames = {
-    ACTPACK: "actpack",
-    EXO: "exo",
+    ACTPACK.value: "actpack",
+    EXO.value: "exo",
 }
 
 
@@ -63,4 +63,4 @@ bootloaderTargets = {
 # ============================================
 #                 Error Codes
 # ============================================
-(SUCCESS, FAILURE, INVALID_PARAM, INVALID_DEVICE, NOT_STREAMING) = map(int, range(5))
+(SUCCESS, FAILURE, INVALID_PARAM, INVALID_DEVICE, NOT_STREAMING) = map(c.c_int, range(5))

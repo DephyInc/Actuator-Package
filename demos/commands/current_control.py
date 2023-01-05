@@ -3,8 +3,6 @@ from flexsea.device import Device
 from numpy import linspace
 from time import sleep
 
-from flexsea_demos.utilities import clear_terminal
-
 from .base_command import BaseDemoCommand
 
 
@@ -50,21 +48,39 @@ class CurrentControlCommand(BaseDemoCommand):
         """
         self.setup()
 
-        nCurrents = 50
+        gLabels = ["kp", "ki", "kd", "k", "b", "ff"]
+        g = self.option("gains")
+
+        if g:
+            gains = dict(zip(gLabels, map(int, g.split(","))))
+        else:
+            gains = dict(zip(gLabels, [40, 400, 0, 0, 0, 128]))
+
+        nCurrents = 2
         currents = linspace(0, self.option("current"), nCurrents)
 
         rampTime = self._loopTime / 2
         holdTime = rampTime / nCurrents
 
         for device in self._devices:
+            device.set_gains(**gains)
+
+            data = device.read()
+            msg = f"Device: {device.deviceId}\n"
+            msg += f"Desired (mA):    {currents[0]}\n"
+            msg += f"Measured (mA):   {data['mot_cur']}\n"
+            msg += f"Difference (mA): {data['mot_cur'] - currents[0]}"
+            self.write(msg)
+
             for current in currents:
                 self._ramp(int(current), device, holdTime)
             for current in currents[-1::-1]:
                 self._ramp(int(current), device, holdTime)
 
+        self.line("")
         self.cleanup()
 
-        return 1
+        return 0
 
     # -----
     # _ramp
@@ -85,13 +101,13 @@ class CurrentControlCommand(BaseDemoCommand):
         holdTime : float
             The length of time to stay at the given current.
         """
-        clear_terminal()
-
         device.command_motor_current(current)
         sleep(holdTime)
         data = device.read()
 
-        self.line(f"Device: {device.deviceID}")
-        self.line(f"Desired (mA):    {current}")
-        self.line(f"Measured (mA):   {data['mot_cur']}")
-        self.line(f"Difference (mA): {data['mot_cur'] - current}")
+        msg = f"Device: {device.deviceId}\n"
+        msg += f"Desired (mA):    {current}\n"
+        msg += f"Measured (mA):   {data['mot_cur']}\n"
+        msg += f"Difference (mA): {data['mot_cur'] - current}"
+
+        self.overwrite(msg)

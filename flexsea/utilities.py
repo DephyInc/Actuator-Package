@@ -74,7 +74,7 @@ def decode(val: int) -> str:
 # ============================================
 #                  load_clib
 # ============================================
-def load_clib(cLibVersion: str) -> c.CDLL:
+def load_clib(cLibVersion: str, silent: bool=False) -> c.CDLL:
     """
     Uses `ctypes` to load the appropriate C libraries depending on the
     OS.
@@ -98,7 +98,8 @@ def load_clib(cLibVersion: str) -> c.CDLL:
         The Python object from which we can call the flexsea C
         functions.
     """
-    print(f"Using version: {cLibVersion} of pre-compiled C libraries.")
+    if not silent:
+        print(f"Using version: {cLibVersion} of pre-compiled C libraries.")
     _os = get_os()
     libDir = cfg.libsDir.joinpath(cLibVersion, _os)
 
@@ -124,6 +125,9 @@ def load_clib(cLibVersion: str) -> c.CDLL:
             msg += "bit.\nKeep different versions isolated by virtual environments.\n"
             print(msg)
             sys.exit(1)
+
+    if not silent:
+        print(f"Loading libraries from: {str(libPath)}")
 
     clib = c.cdll.LoadLibrary(str(libPath))
 
@@ -189,7 +193,7 @@ def download(fileobj: str, bucket: str, dest: str, profile: str | None = None) -
 # ============================================
 #                   find_port
 # ============================================
-def find_port(baudRate: int, cLibVersion: str):
+def find_port(baudRate: int, cLibVersion: str) -> str:
     """
     Tries to establish a connection to the Dephy device given by
     the user-supplied port. If no port is supplied, then we loop
@@ -197,9 +201,8 @@ def find_port(baudRate: int, cLibVersion: str):
 
     Parameters
     ----------
-    port : Union[str, None]
-        The name of the port to connect to, e.g., '/dev/ttyACM0'. If
-        no port is given, we loop over all available serial ports.
+    baudRate : int
+        Baud rate for communicating with the device.
 
     cLibVersion : str
         The semantic version string of the firmware currently on the device.
@@ -211,17 +214,19 @@ def find_port(baudRate: int, cLibVersion: str):
 
     Returns
     -------
-    p : str
+    devicePort : str
         Name of the device's COM port.
     """
     devicePort = None
-    clib = load_clib(cLibVersion)
+    clib = load_clib(cLibVersion, True)
 
     for _port in comports():
-        p = _port.device.encode("utf-8")
-        if clib.open(p, baudRate, 0) in (fxe.INVALID_DEVICE.value, -1):
+        p = _port.device
+        deviceID = clib.open(p.encode("utf-8"), baudRate, 0)
+        if deviceID in (fxe.INVALID_DEVICE.value, -1):
             continue
         devicePort = p
+        clib.close(deviceID)
         break
 
     if not devicePort:
