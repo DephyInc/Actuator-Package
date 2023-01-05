@@ -63,4 +63,6 @@ bootloaderTargets = {
 # ============================================
 #                 Error Codes
 # ============================================
-(SUCCESS, FAILURE, INVALID_PARAM, INVALID_DEVICE, NOT_STREAMING) = map(c.c_int, range(5))
+(SUCCESS, FAILURE, INVALID_PARAM, INVALID_DEVICE, NOT_STREAMING) = map(
+    c.c_int, range(5)
+)

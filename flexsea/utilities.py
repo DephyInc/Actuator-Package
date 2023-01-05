@@ -74,7 +74,7 @@ def decode(val: int) -> str:
 # ============================================
 #                  load_clib
 # ============================================
-def load_clib(cLibVersion: str, silent: bool=False) -> c.CDLL:
+def load_clib(cLibVersion: str, silent: bool = False) -> c.CDLL:
     """
     Uses `ctypes` to load the appropriate C libraries depending on the
     OS.
