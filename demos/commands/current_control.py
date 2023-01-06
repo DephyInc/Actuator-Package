@@ -1,7 +1,10 @@
 from cleo.helpers import option
+from cleo.ui.table_cell import TableCell
 from flexsea.device import Device
 from numpy import linspace
 from time import sleep
+
+from demos.utilities import clear_terminal
 
 from .base_command import BaseDemoCommand
 
@@ -56,21 +59,32 @@ class CurrentControlCommand(BaseDemoCommand):
         else:
             gains = dict(zip(gLabels, [40, 400, 0, 0, 0, 128]))
 
-        nCurrents = 2
+        nCurrents = 50
         currents = linspace(0, self.option("current"), nCurrents)
 
         rampTime = self._loopTime / 2
         holdTime = rampTime / nCurrents
 
+        self._demoTable = self.table()
+
         for device in self._devices:
             device.set_gains(**gains)
 
             data = device.read()
-            msg = f"Device: {device.deviceId}\n"
-            msg += f"Desired (mA):    {currents[0]}\n"
-            msg += f"Measured (mA):   {data['mot_cur']}\n"
-            msg += f"Difference (mA): {data['mot_cur'] - currents[0]}"
-            self.write(msg)
+
+            self._demoTable.set_headers([
+                [TableCell(f"Device: {device.deviceId}", colspan=3)],
+                ['Desired (mA)', 'Measured (mA)', 'Difference (mA)']
+            ])
+
+            self._demoTable.set_rows([
+                [
+                    f"{currents[0]}",
+                    f"{data['mot_cur']}",
+                    f"{data['mot_cur'] - currents[0]}",
+                ]
+            ])
+            self._demoTable.render()
 
             for current in currents:
                 self._ramp(int(current), device, holdTime)
@@ -101,13 +115,17 @@ class CurrentControlCommand(BaseDemoCommand):
         holdTime : float
             The length of time to stay at the given current.
         """
+        clear_terminal()
         device.command_motor_current(current)
-        sleep(holdTime)
         data = device.read()
 
-        msg = f"Device: {device.deviceId}\n"
-        msg += f"Desired (mA):    {current}\n"
-        msg += f"Measured (mA):   {data['mot_cur']}\n"
-        msg += f"Difference (mA): {data['mot_cur'] - current}"
+        self._demoTable.set_rows([
+            [
+                f"{current}",
+                f"{data['mot_cur']}",
+                f"{data['mot_cur'] - current}",
+            ]
+        ])
+        self._demoTable.render()
 
-        self.overwrite(msg)
+        sleep(holdTime)
