@@ -8,9 +8,9 @@ from . import utilities as fxu
 
 
 # ============================================
-#                CurrentDevice
+#                 DephyDevice
 # ============================================
-class CurrentDevice:
+class DephyDevice:
     """
     Representation of one of Dephy's devices.
     """

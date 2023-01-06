@@ -2,14 +2,14 @@ import ctypes as c
 from typing import List
 
 from . import enums as fxe
-from .current_device import CurrentDevice
+from .dephy_device import DephyDevice
 from .specs.api_spec import apiSpec
 
 
 # ============================================
 #                LegacyDevice
 # ============================================
-class LegacyDevice(CurrentDevice):
+class LegacyDevice(DephyDevice):
     """
     Representation of one of Dephy's devices using old comms and
     functionality (e.g., device doesn't know side info).
@@ -104,4 +104,4 @@ class LegacyDevice(CurrentDevice):
     # -----
     @property
     def rigidVersion(self) -> str:
-        raise NotImplementedError
+        raise RuntimeError("Legacy devices do not have this functionality.")

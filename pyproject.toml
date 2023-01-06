@@ -10,7 +10,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.11.0rc1"
 boto3 = "^1.26.8"
 pyserial = "^3.5"
 
