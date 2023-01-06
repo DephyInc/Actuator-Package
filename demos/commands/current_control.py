@@ -72,18 +72,22 @@ class CurrentControlCommand(BaseDemoCommand):
 
             data = device.read()
 
-            self._demoTable.set_headers([
-                [TableCell(f"Device: {device.deviceId}", colspan=3)],
-                ['Desired (mA)', 'Measured (mA)', 'Difference (mA)']
-            ])
-
-            self._demoTable.set_rows([
+            self._demoTable.set_headers(
                 [
-                    f"{currents[0]}",
-                    f"{data['mot_cur']}",
-                    f"{data['mot_cur'] - currents[0]}",
+                    [TableCell(f"Device: {device.deviceId}", colspan=3)],
+                    ["Desired (mA)", "Measured (mA)", "Difference (mA)"],
                 ]
-            ])
+            )
+
+            self._demoTable.set_rows(
+                [
+                    [
+                        f"{currents[0]}",
+                        f"{data['mot_cur']}",
+                        f"{data['mot_cur'] - currents[0]}",
+                    ]
+                ]
+            )
             self._demoTable.render()
 
             for current in currents:
@@ -119,13 +123,15 @@ class CurrentControlCommand(BaseDemoCommand):
         device.command_motor_current(current)
         data = device.read()
 
-        self._demoTable.set_rows([
+        self._demoTable.set_rows(
             [
-                f"{current}",
-                f"{data['mot_cur']}",
-                f"{data['mot_cur'] - current}",
+                [
+                    f"{current}",
+                    f"{data['mot_cur']}",
+                    f"{data['mot_cur'] - current}",
+                ]
             ]
-        ])
+        )
         self._demoTable.render()
 
         sleep(holdTime)
