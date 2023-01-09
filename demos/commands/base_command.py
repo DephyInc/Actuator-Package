@@ -1,3 +1,4 @@
+import sys
 from typing import List
 
 from cleo.commands.command import Command
@@ -30,6 +31,22 @@ class BaseDemoCommand(Command):
     # setup
     # -----
     def setup(self) -> None:
+        self._stylize()
+        self._setup()
+
+    # -----
+    # _styleize
+    # -----
+    def _stylize(self) -> None:
+        self.add_style("info", fg="blue")
+        self.add_style("warning", fg="yellow")
+        self.add_style("error", fg="red")
+        self.add_style("success", fg="green")
+
+    # -----
+    # _setup
+    # -----
+    def _setup(self) -> None:
         if "windows" in get_os():
             msg = "Demos might not work right on Windows due to timing issues. Proceed?"
             if not self.confirm(msg, False):
@@ -57,3 +74,9 @@ class BaseDemoCommand(Command):
     def cleanup(self) -> None:
         for device in self._devices:
             device.close()
+
+    # -----
+    # handle
+    # -----
+    def handle(self):
+        raise NotImplementedError

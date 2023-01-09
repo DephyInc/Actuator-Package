@@ -1,10 +1,11 @@
-from cleo.helpers import option
-from cleo.ui.table_cell import TableCell
-from flexsea.device import Device
-from numpy import linspace
 from time import sleep
 
+from cleo.helpers import option
+from cleo.ui.table_cell import TableCell
+from numpy import linspace
+
 from demos.utilities import clear_terminal
+from flexsea.device import Device
 
 from .base_command import BaseDemoCommand
 
@@ -25,6 +26,8 @@ class CurrentControlCommand(BaseDemoCommand):
     --------
     flexsea-demos current_control -i <current>
     """
+
+    _demoTable = None
 
     # -----
     # __new__
