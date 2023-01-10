@@ -6,6 +6,7 @@ import platform
 import sys
 
 import boto3
+from botocore.client import BaseClient
 import botocore.exceptions as bce
 from serial.tools.list_ports import comports
 
@@ -175,19 +176,79 @@ def download(fileobj: str, bucket: str, dest: str, profile: str | None = None) -
 
     client.download_file(bucket, fileobj, dest)
 
+    _validate_download(client, bucket, fileObj, dest)
+
+
+# ============================================
+#             _validate_download
+# ============================================
+def _validate_download(client: BaseClient, bucket: str, fileObj: str, dest: str) -> None:
+    """
+    Compares the AWS md5 hash to the local md5 hash to make sure the
+    files are the same.
+
+    S3 objects have an attribute called 'ETag', which is a string.
+    There are two possibilities: the string is a hex digest or the
+    string is a hex digest + -NUMBER.
+
+    In the case that ETag has no -NUMBER suffix, it means that the ETag
+    is the md5 hash of the file contents.
+
+    In the case that there is a -NUMBER suffix, it means that the file
+    was uploaded to S3 in NUMBER chunks and that the hex digest is actually
+    the hex digest of the digests of all of the chunks concatenated together.
+
+    Parameters
+    ----------
+    client : BaseClient
+        The object that allows use to communicate with S3.
+
+    bucket : str
+        The name of the bucket the file came from.
+
+    fileObj : str
+        The name of the fileObj we are validating.
+
+    dest : str
+        The name of the dowloaded file on disk.
+    """
     assert Path(dest).exists()
 
     # Check the local file's integrity by comparing its md5 hash to
     # AWS's md5 hash, called ETag
     objData = client.head_object(Bucket=bucket, Key=fileobj)
-    awsHash = objData["ETag"].strip('"')
+    etag = objData["ETag"].strip('"')
 
-    with open(dest, "rb") as fd:
-        data = fd.read()
+    try:
+        nChunks = int(etag.split("-")[1])
+    except IndexError:
+        nChunks = 1
 
-    localHash = hashlib.md5(data).hexdigest()
+    if nChunks == 1:
+        with open(dest, "rb") as fd:
+            data = fd.read()
+        localHash = hashlib.md5(data).hexdigest()
 
-    assert localHash == awsHash
+    elif nChunks > 1:
+        chunkHashes = []
+        with open(dest, "rb") as fd:
+            for c in range(1, nParts + 1):
+                objData = client.head_object(Bucket=bucket, Key=fileObj, PartNumber=c)
+                chunkSize = objData["ContentLength"]
+                data = fd.read(chunkSize)
+                if data:
+                    chunkHashes.append(hashlib.md5(data))
+                else:
+                    break
+
+        if len(chunkHashes) == 1:
+            localHash = chunkHashes[0].hexdigest()
+        else:
+            digests = b"".join([m.digest() for m in chunkHashes])
+            digestsMd5 = hashlib.md5(digests)
+            localHash = f"{digestsMd5.hexdigest()}-{len(chunkHashes)}"
+
+    assert localHash == etag
 
 
 # ============================================
