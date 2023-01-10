@@ -38,8 +38,7 @@ class LegacyDevice(DephyDevice):
         Gets device meta-info after establishing a connection. This
         is the part of opening that differs from that of Device.
         """
-        deviceTypeValue = self._clib.get_device_type_value(self.deviceId)
-        self._deviceName = fxe.deviceNames[deviceTypeValue]
+        self._deviceName = self.deviceName
 
         if self._deviceName in fxe.hasHabsLegacy:
             self.hasHabs = True
@@ -56,6 +55,17 @@ class LegacyDevice(DephyDevice):
             func.argtypes = rf[key + "argTypes"]
             func.restype = rf[key + "returnType"]
             setattr(self._clib, key + "read", func)
+
+    # -----
+    # deviceName
+    # -----
+    @property
+    def deviceName(self) -> str:
+        if self._deviceName:
+            return self._deviceName
+
+        deviceTypeValue = self._clib.get_device_type_value(self.deviceId)
+        return fxe.deviceNames[deviceTypeValue]
 
     # -----
     # deviceSide
