@@ -147,9 +147,9 @@ def load_clib(cLibVersion: str, silent: bool = False) -> c.CDLL:
 # ============================================
 #                  download
 # ============================================
-def download(fileobj: str, bucket: str, dest: str, profile: str | None = None) -> None:
+def download(fileObj: str, bucket: str, dest: str, profile: str | None = None) -> None:
     """
-    Downloads `fileobj` from `bucket` to `dest` with the AWS
+    Downloads `fileObj` from `bucket` to `dest` with the AWS
     credentials profile `profile`.
 
     Raises
@@ -174,7 +174,7 @@ def download(fileobj: str, bucket: str, dest: str, profile: str | None = None) -
     except bce.PartialCredentialsError as err:
         raise err
 
-    client.download_file(bucket, fileobj, dest)
+    client.download_file(bucket, fileObj, dest)
 
     _validate_download(client, bucket, fileObj, dest)
 
@@ -216,7 +216,7 @@ def _validate_download(client: BaseClient, bucket: str, fileObj: str, dest: str)
 
     # Check the local file's integrity by comparing its md5 hash to
     # AWS's md5 hash, called ETag
-    objData = client.head_object(Bucket=bucket, Key=fileobj)
+    objData = client.head_object(Bucket=bucket, Key=fileObj)
     etag = objData["ETag"].strip('"')
 
     try:
@@ -232,7 +232,7 @@ def _validate_download(client: BaseClient, bucket: str, fileObj: str, dest: str)
     elif nChunks > 1:
         chunkHashes = []
         with open(dest, "rb") as fd:
-            for c in range(1, nParts + 1):
+            for c in range(1, nChunks + 1):
                 objData = client.head_object(Bucket=bucket, Key=fileObj, PartNumber=c)
                 chunkSize = objData["ContentLength"]
                 data = fd.read(chunkSize)
