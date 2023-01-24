@@ -52,25 +52,6 @@ class DephyDevice:
             self.close()
 
     # -----
-    # __enter__
-    # -----
-    def __enter__(self, stream: bool = False, frequency: int = 0) -> Self:
-        self.open()
-
-        if stream and frequency > 0:
-            self.start_streaming(frequency)
-
-        return self
-
-    # -----
-    # __exit__
-    # -----
-    def __exit__(self, excType, excVal, excTb) -> None:
-        if excType is not None:
-            print(f"Exception: {excVal}")
-            print(f"{excTb}")
-
-    # -----
     # isOpen
     # -----
     @property
@@ -157,6 +138,14 @@ class DephyDevice:
     def _open(self) -> None:
         if self.isOpen:
             return
+
+        if not self.port:
+            print("No port given. Searching...")
+            self.port = find_port(self.baudRate, self.cLibVersion)
+            if self.port:
+                print(f"Found device at: {self.port}")
+            else:
+                raise IOError("Could not find a device.")
 
         port = self.port.encode("utf-8")
         self.deviceId = self._clib.open(port, self.baudRate, self.logLevel)
@@ -577,12 +566,14 @@ class DephyDevice:
     # -----
     def command_motor_impedance(self, value: int) -> None:
         """
-        Sets motor's impedance.
+        Has the motor simulate a stretched from current position to
+        the desired position using the damping gain b and stiffness
+        gain k.
 
         Parameters
         ----------
         value : int
-            Desired motor impedance in milli-amps.
+            Desired motor position in ticks.
 
         Raises
         ------
@@ -734,11 +725,14 @@ class DephyDevice:
     # -----
     # print
     # -----
-    def print(self) -> None:
+    def print(self, data: dict={}) -> None:
         """
         Reads the data from the device and then prints it to the screen.
+        If data is given, we print that instead.
         """
-        for key, value in self.read().items():
+        if not data:
+            data = self.read()
+        for key, value in data.items():
             print(f"{key} : {value}")
 
     # -----
