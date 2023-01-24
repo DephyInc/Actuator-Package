@@ -25,7 +25,8 @@ ipython = "^8.8.0"
 
 [tool.poetry.group.demos.dependencies]
 numpy = "^1.24.1"
-cleo = "^2.0.1"
+jupyterlab = "^3.5.2"
+seaborn = "^0.12.2"
 
 
 [tool.poetry.scripts]
