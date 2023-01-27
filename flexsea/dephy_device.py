@@ -694,7 +694,7 @@ class DephyDevice:
     # firmware
     # -----
     @property
-    def firmware(self) -> List[str]:
+    def firmware(self) -> dict:
         """
         Gets the fimware versions of device's MCUs.
 
@@ -705,9 +705,9 @@ class DephyDevice:
 
         Returns
         -------
-        List
-            A list with the semantic version strings of manage,
-            execute, and regulate's firmware.
+        Dict
+            A dictionary with the semantic version strings of manage,
+            execute, and regulate's firmware. And habs, if applicable.
         """
         if self._clib.request_firmware_version(self.deviceId) != fxe.SUCCESS.value:
             raise RuntimeError("Command failed")
@@ -715,12 +715,16 @@ class DephyDevice:
         sleep(5)
 
         fw = self._clib.get_last_received_firmware_version(self.deviceId)
-        fwList = [fxu.decode(fw.mn), fxu.decode(fw.ex), fxu.decode(fw.re)]
+        fwDict = {
+            "mn" : fxu.decode(fw.mn),
+            "ex" : fxu.decode(fw.ex),
+            "re" : fxu.decode(fw.re),
+        }
 
         if self.hasHabs:
-            fwList.append(fxu.decode(fw.habs))
+            fwDict["habs"] = fxu.decode(fw.habs)
 
-        return fwList
+        return fwDict
 
     # -----
     # print
