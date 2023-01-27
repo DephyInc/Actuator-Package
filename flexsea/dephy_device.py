@@ -25,12 +25,14 @@ class DephyDevice:
         cLibVersion: str,
         logLevel: int,
         loggingEnabled: bool,
+        libFile: str
     ) -> None:
         self.port = port
         self.baudRate = baudRate
         self.cLibVersion = cLibVersion
         self.logLevel = logLevel
         self.loggingEnabled = loggingEnabled
+        self.libFile = libFile
 
         self.fields: List = []
         self.deviceId: int = fxe.INVALID_DEVICE.value
@@ -42,7 +44,7 @@ class DephyDevice:
         self._deviceSide: str = ""
         self._closed: bool = False
 
-        self._clib = fxu.load_clib(self.cLibVersion)
+        self._clib = fxu.load_clib(self.cLibVersion, self.libFile)
 
     # -----
     # destructor
@@ -141,7 +143,7 @@ class DephyDevice:
 
         if not self.port:
             print("No port given. Searching...")
-            self.port = find_port(self.baudRate, self.cLibVersion)
+            self.port = find_port(self.baudRate, self.cLibVersion, self.libFile)
             if self.port:
                 print(f"Found device at: {self.port}")
             else:

@@ -75,7 +75,7 @@ def decode(val: int) -> str:
 # ============================================
 #                  load_clib
 # ============================================
-def load_clib(cLibVersion: str, silent: bool = False) -> c.CDLL:
+def load_clib(cLibVersion: str, silent: bool = False, libFile: str="") -> c.CDLL:
     """
     Uses `ctypes` to load the appropriate C libraries depending on the
     OS.
@@ -87,6 +87,15 @@ def load_clib(cLibVersion: str, silent: bool = False) -> c.CDLL:
         version should match the major version of the firmware on the
         device. If no libraries are found, then we download them from
         AWS.
+
+    silent : bool (optional)
+        If `True`, suppresses messages to stdout.
+
+    libFile : str (optional)
+        If set, specifies the library file to load. Overrides looking
+        in the standard .dephy location and will not attempt to
+        download the file if it isn't found. Still requires cLibVersion
+        to know what api to use with the lib.
 
     Raises
     ------
@@ -100,18 +109,9 @@ def load_clib(cLibVersion: str, silent: bool = False) -> c.CDLL:
         functions.
     """
     if not silent:
-        print(f"Using version: {cLibVersion} of pre-compiled C libraries.")
+        print(f"Using version: {cLibVersion} of pre-compiled C library.")
+
     _os = get_os()
-    libDir = cfg.libsDir.joinpath(cLibVersion, _os)
-
-    lib = cfg.windowsLib if "win" in _os else cfg.linuxLib
-    libPath = libDir.joinpath(lib)
-
-    if not libPath.exists():
-        libDir.mkdir(parents=True, exist_ok=True)
-        libObj = str(Path("libs").joinpath(cLibVersion, _os, lib).as_posix())
-
-        download(libObj, cfg.libsBucket, str(libPath))
 
     if "win" in _os:
         try:
@@ -127,10 +127,26 @@ def load_clib(cLibVersion: str, silent: bool = False) -> c.CDLL:
             print(msg)
             sys.exit(1)
 
-    if not silent:
-        print(f"Loading libraries from: {str(libPath)}")
+    if libFile:
+        if not silent:
+            print(f"Loading library from: {libFile}")
+        clib = c.cdll.LoadLibrary(libFile)
+    else:
+        libDir = cfg.libsDir.joinpath(cLibVersion, _os)
 
-    clib = c.cdll.LoadLibrary(str(libPath))
+        lib = cfg.windowsLib if "win" in _os else cfg.linuxLib
+        libPath = libDir.joinpath(lib)
+
+        if not libPath.exists():
+            libDir.mkdir(parents=True, exist_ok=True)
+            libObj = str(Path("libs").joinpath(cLibVersion, _os, lib).as_posix())
+
+            download(libObj, cfg.libsBucket, str(libPath))
+
+        if not silent:
+            print(f"Loading library from: {str(libPath)}")
+
+        clib = c.cdll.LoadLibrary(str(libPath))
 
     api = apiSpec[cLibVersion]
 
@@ -254,7 +270,7 @@ def _validate_download(client: BaseClient, bucket: str, fileObj: str, dest: str)
 # ============================================
 #                   find_port
 # ============================================
-def find_port(baudRate: int, cLibVersion: str) -> str:
+def find_port(baudRate: int, cLibVersion: str, libFile: str="") -> str:
     """
     Tries to establish a connection to the Dephy device given by
     the user-supplied port. If no port is supplied, then we loop
@@ -268,6 +284,13 @@ def find_port(baudRate: int, cLibVersion: str) -> str:
     cLibVersion : str
         The semantic version string of the firmware currently on the device.
 
+    libFile : str (optional)
+        If set, specifies the library file to load. Overrides looking
+        in the standard .dephy location and will not attempt to
+        download the file if it isn't found. Still requires cLibVersion
+        to know what api to use with the lib.
+        
+
     Raises
     ------
     RuntimeError
@@ -279,7 +302,7 @@ def find_port(baudRate: int, cLibVersion: str) -> str:
         Name of the device's COM port.
     """
     devicePort = None
-    clib = load_clib(cLibVersion, True)
+    clib = load_clib(cLibVersion, True, libFile)
 
     for _port in comports():
         p = _port.device
