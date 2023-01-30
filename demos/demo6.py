@@ -2,18 +2,20 @@
 Demo 6: High Stress
 """
 from time import sleep
+from typing import List
+
+import pandas as pd
+import numpy as np
+import seaborn as sns
+
+from flexsea.device import Device
 
 
 # ============================================
 #                 send_command
 # ============================================
 def send_command(
-    cmd: dict,
-    cmdType: str,
-    gains: dict,
-    setGains: bool,
-    plotData: dict,
-    device: Device
+    cmd: dict, cmdType: str, gains: dict, setGains: bool, plotData: dict, device: Device
 ) -> dict:
     deviceData = device.read()
 
@@ -52,26 +54,26 @@ def get_device(frequency: int) -> Device:
 # ============================================
 def get_gains() -> dict:
     positionGains = {
-        "kp" : 100,
-        "ki" : 10,
-        "kd" : 0,
-        "k" : 0,
-        "b" : 0,
-        "ff" : 0,
+        "kp": 100,
+        "ki": 10,
+        "kd": 0,
+        "k": 0,
+        "b": 0,
+        "ff": 0,
     }
 
     currentGains = {
-        "kp" : 40,
-        "ki" : 400,
-        "kd" : 0,
-        "k" : 0,
-        "b" : 0,
-        "ff" : 128,
+        "kp": 40,
+        "ki": 400,
+        "kd": 0,
+        "k": 0,
+        "b": 0,
+        "ff": 128,
     }
 
     gains = {
-        "current" : currentGains,
-        "position" : positionGains,
+        "current": currentGains,
+        "position": positionGains,
     }
 
     return gains
@@ -106,9 +108,9 @@ def get_samples(frequency: int) -> dict:
 
     # Samples
     samples = {
-        "position" : positionSamples,
-        "currentSine" : currentSamples,
-        "currentLine" : currentSamplesLine,
+        "position": positionSamples,
+        "currentSine": currentSamples,
+        "currentLine": currentSamplesLine,
     }
 
     return samples
@@ -120,18 +122,12 @@ def get_samples(frequency: int) -> dict:
 def plot(time: List, desired: List, measured: List, label: str) -> None:
     nValues = len(time)
     t = np.concatenate((time, time))
-    dataType = ["Desired"]  nValues + ["Measured"] * nValues
+    dataType = ["Desired"] * nValues + ["Measured"] * nValues
     data = np.concatenate((desired, measured))
 
-    df = pd.DataFrame({"Time (ms)":t, "Type":dataType, label:data})
+    df = pd.DataFrame({"Time (ms)": t, "Type": dataType, label: data})
 
-    plt = sns.relplot(
-        data=df,
-        x="Time (ms)",
-        y=label,
-        hue="Type",
-        kind="line"
-    )
+    plt = sns.relplot(data=df, x="Time (ms)", y=label, hue="Type", kind="line")
 
     plt.figure.savefig(f"{label}_demo6.png")
 
@@ -146,7 +142,7 @@ def main():
     for each controller are generated from two different sine waves.
     """
     frequency = 1000
-    delay = 1. / frequency
+    delay = 1.0 / frequency
     nLoops = 3
     # Factor to determine current on "way back" to starting point
     currentAsymmetricG = 1.15
@@ -165,11 +161,11 @@ def main():
 
     # Plotting arrays
     data = {
-        "stateTime" : [],
-        "desiredPosition" : [],
-        "measuredPosition" : [],
-        "desiredCurrent" : [],
-        "measuredCurrent" : [],
+        "stateTime": [],
+        "desiredPosition": [],
+        "measuredPosition": [],
+        "desiredCurrent": [],
+        "measuredCurrent": [],
     }
 
     for i in range(nLoops):

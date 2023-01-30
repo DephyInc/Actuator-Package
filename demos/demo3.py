@@ -7,11 +7,20 @@ Here we loop over an array of currents, demonstrating how to:
     * Command the motor to stop
     * Print device data
 """
+import platform
 import subprocess as sub
 from time import sleep
 
-from flexsea.device import Device
 import numpy as np
+
+from flexsea.device import Device
+
+
+# ============================================
+#                   clear
+# ============================================
+def clear() -> None:
+    sub.run(["cls" if "windows" == platform.system().lower() else "clear"], check=True)
 
 
 # Instantiate and connect to device; see demo1.py
@@ -26,12 +35,12 @@ device.start_streaming(frequency)
 
 # Set device gains; see demo2.py
 gains = {
-    "kp" : 40,
-    "ki" : 400,
-    "kd" : 0,
-    "k" : 0,
-    "b" : 0,
-    "ff" : 0,
+    "kp": 40,
+    "ki": 400,
+    "kd": 0,
+    "k": 0,
+    "b": 0,
+    "ff": 0,
 }
 device.set_gains(**gains)
 
@@ -45,7 +54,6 @@ currents = np.linspace(0, maxCurrent, nCurrents)
 # Ramp up over the desired currents, hold, then ramp back down
 commandDelay = 0.1
 holdTime = 3
-clear = lambda: sub.run(["cls" if "windows" == platform.system().lower() else "clear"])
 
 for current in currents:
     # We set the current with the `command_motor_current` method, which

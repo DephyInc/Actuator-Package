@@ -75,7 +75,7 @@ def decode(val: int) -> str:
 # ============================================
 #                  load_clib
 # ============================================
-def load_clib(cLibVersion: str, silent: bool = False, libFile: str="") -> c.CDLL:
+def load_clib(cLibVersion: str, silent: bool = False, libFile: str = "") -> c.CDLL:
     """
     Uses `ctypes` to load the appropriate C libraries depending on the
     OS.
@@ -108,45 +108,35 @@ def load_clib(cLibVersion: str, silent: bool = False, libFile: str="") -> c.CDLL
         The Python object from which we can call the flexsea C
         functions.
     """
-    if not silent:
-        print(f"Using version: {cLibVersion} of pre-compiled C library.")
-
     _os = get_os()
+
+    if not libFile:
+        lib = cfg.windowsLib if "win" in _os else cfg.linuxLib
+        libFile = cfg.libsDir.joinpath(cLibVersion, _os, lib)
+
+        if not libFile.exists():
+            libFile.parent.mkdir(parents=True, exist_ok=True)
+            libObj = str(Path("libs").joinpath(cLibVersion, _os, lib).as_posix())
+
+            download(libObj, cfg.libsBucket, str(libFile))
+    else:
+        libFile = Path(libFile)
 
     if "win" in _os:
         try:
             for extraPath in os.environ["PATH"].split(";"):
                 if os.path.exists(extraPath) and "mingw" in extraPath:
                     os.add_dll_directory(extraPath)
-            os.add_dll_directory(libPath)
+            os.add_dll_directory(libFile.parent)
         except OSError:
-            msg = f"Error loading precompiled library: `{libPath}`\n"
+            msg = f"Error loading precompiled library: `{libFile}`\n"
             msg += "The most likely cause is a mismatch between the Python, pip and "
             msg += "shell architectures.\nPlease ensure all three are either 32 or 64 "
             msg += "bit.\nKeep different versions isolated by virtual environments.\n"
             print(msg)
             sys.exit(1)
 
-    if libFile:
-        if not silent:
-            print(f"Loading library from: {libFile}")
-        clib = c.cdll.LoadLibrary(libFile)
-    else:
-        libDir = cfg.libsDir.joinpath(cLibVersion, _os)
-
-        lib = cfg.windowsLib if "win" in _os else cfg.linuxLib
-        libPath = libDir.joinpath(lib)
-
-        if not libPath.exists():
-            libDir.mkdir(parents=True, exist_ok=True)
-            libObj = str(Path("libs").joinpath(cLibVersion, _os, lib).as_posix())
-
-            download(libObj, cfg.libsBucket, str(libPath))
-
-        if not silent:
-            print(f"Loading library from: {str(libPath)}")
-
-        clib = c.cdll.LoadLibrary(str(libPath))
+    clib = c.cdll.LoadLibrary(str(libFile))
 
     api = apiSpec[cLibVersion]
 
@@ -156,6 +146,10 @@ def load_clib(cLibVersion: str, silent: bool = False, libFile: str="") -> c.CDLL
             func.argtypes = functionData["argTypes"]
             func.restype = functionData["returnType"]
         setattr(clib, functionName, func)
+
+    if not silent:
+        print(f"Using version: {cLibVersion} of pre-compiled C library.")
+        print(f"Loading library from: {libFile}")
 
     return clib
 
@@ -198,7 +192,9 @@ def download(fileObj: str, bucket: str, dest: str, profile: str | None = None) -
 # ============================================
 #             _validate_download
 # ============================================
-def _validate_download(client: BaseClient, bucket: str, fileObj: str, dest: str) -> None:
+def _validate_download(
+    client: BaseClient, bucket: str, fileObj: str, dest: str
+) -> None:
     """
     Compares the AWS md5 hash to the local md5 hash to make sure the
     files are the same.
@@ -248,8 +244,10 @@ def _validate_download(client: BaseClient, bucket: str, fileObj: str, dest: str)
     elif nChunks > 1:
         chunkHashes = []
         with open(dest, "rb") as fd:
-            for c in range(1, nChunks + 1):
-                objData = client.head_object(Bucket=bucket, Key=fileObj, PartNumber=c)
+            for chunk in range(1, nChunks + 1):
+                objData = client.head_object(
+                    Bucket=bucket, Key=fileObj, PartNumber=chunk
+                )
                 chunkSize = objData["ContentLength"]
                 data = fd.read(chunkSize)
                 if data:
@@ -270,7 +268,7 @@ def _validate_download(client: BaseClient, bucket: str, fileObj: str, dest: str)
 # ============================================
 #                   find_port
 # ============================================
-def find_port(baudRate: int, cLibVersion: str, libFile: str="") -> str:
+def find_port(baudRate: int, cLibVersion: str, libFile: str = "") -> str:
     """
     Tries to establish a connection to the Dephy device given by
     the user-supplied port. If no port is supplied, then we loop
@@ -289,7 +287,7 @@ def find_port(baudRate: int, cLibVersion: str, libFile: str="") -> str:
         in the standard .dephy location and will not attempt to
         download the file if it isn't found. Still requires cLibVersion
         to know what api to use with the lib.
-        
+
 
     Raises
     ------

@@ -7,10 +7,11 @@ Runs the motor at a high speed, demonstrating how to:
 """
 from time import sleep
 
-from flexsea.device import Device
 import numpy as np
 import pandas as pd
 import seaborn as sns
+
+from flexsea.device import Device
 
 
 # Instantiate and connect to the device; see demo1.py
@@ -28,12 +29,12 @@ device.start_streaming(frequency)
 
 # Set gains; see demo2.py
 gains = {
-    "kp" : 40,
-    "ki" : 400,
-    "kd" : 0,
-    "k" : 0,
-    "b" : 0,
-    "ff" : 128,
+    "kp": 40,
+    "ki": 400,
+    "kd": 0,
+    "k": 0,
+    "b": 0,
+    "ff": 128,
 }
 device.set_gains(**gains)
 
@@ -51,7 +52,7 @@ currents = waveAmplitude * np.sin(x)
 # Loop over the currents several times
 nLoops = 4
 commandDelay = 1 / commandFrequency
-cycleDelay = 0.1 
+cycleDelay = 0.1
 
 measuredCurrent = []
 desiredCurrent = []
@@ -76,7 +77,7 @@ for _ in range(nLoops):
             data = device.read()
 
             measuredCurrent.append(data["mot_cur"])
-            desiredCurrent.append(sample)
+            desiredCurrent.append(current)
             deviceTime.append(data["state_time"])
 
 
@@ -87,19 +88,15 @@ currentType = ["Desired Current"] * nValues + ["Measured Current"] * nValues
 current = np.concatenate((desiredCurrent, measuredCurrent))
 
 data = {
-    "Time (ms)" : t,
-    "Current Type" : currentType,
-    "Current (mA)" : current,
+    "Time (ms)": t,
+    "Current Type": currentType,
+    "Current (mA)": current,
 }
 
 df = pd.DataFrame(data)
 
 plot = sns.relplot(
-    data=df,
-    x="Time (ms)",
-    y="Current (mA)",
-    hue="Current Type",
-    kind="line"
+    data=df, x="Time (ms)", y="Current (mA)", hue="Current Type", kind="line"
 )
 
 plot.figure.savefig("high_speed.png")

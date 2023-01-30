@@ -1,7 +1,6 @@
 import ctypes as c
 from time import sleep
 from typing import List
-from typing import Self
 
 from . import enums as fxe
 from . import utilities as fxu
@@ -25,7 +24,7 @@ class DephyDevice:
         cLibVersion: str,
         logLevel: int,
         loggingEnabled: bool,
-        libFile: str=""
+        libFile: str = "",
     ) -> None:
         self.port = port
         self.baudRate = baudRate
@@ -144,7 +143,7 @@ class DephyDevice:
 
         if not self.port:
             print("No port given. Searching...")
-            self.port = find_port(self.baudRate, self.cLibVersion, self.libFile)
+            self.port = fxu.find_port(self.baudRate, self.cLibVersion, self.libFile)
             if self.port:
                 print(f"Found device at: {self.port}")
             else:
@@ -722,9 +721,9 @@ class DephyDevice:
 
         fw = self._clib.get_last_received_firmware_version(self.deviceId)
         fwDict = {
-            "mn" : fxu.decode(fw.mn),
-            "ex" : fxu.decode(fw.ex),
-            "re" : fxu.decode(fw.re),
+            "mn": fxu.decode(fw.mn),
+            "ex": fxu.decode(fw.ex),
+            "re": fxu.decode(fw.re),
         }
 
         if self.hasHabs:
@@ -735,12 +734,12 @@ class DephyDevice:
     # -----
     # print
     # -----
-    def print(self, data: dict={}) -> None:
+    def print(self, data: dict | None = None) -> None:
         """
         Reads the data from the device and then prints it to the screen.
         If data is given, we print that instead.
         """
-        if not data:
+        if data is None:
             data = self.read()
         for key, value in data.items():
             print(f"{key} : {value}")

@@ -10,8 +10,9 @@ Here we loop over an array of voltages, demonstrating how to:
 """
 from time import sleep
 
-from flexsea.device import Device
 import numpy as np
+
+from flexsea.device import Device
 
 
 # We begin by creating an instance of the Device class. By default,
@@ -38,7 +39,7 @@ voltages = np.linspace(0, maxVoltage, nVoltages)
 # Ramp up and down the voltages several times
 nCycles = 5
 
-for _ in nCycles:
+for _ in range(nCycles):
     # Ramp up
     for voltage in voltages:
         # We use the command_motor_voltage method to set the voltage

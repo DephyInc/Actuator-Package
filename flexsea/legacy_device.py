@@ -25,7 +25,7 @@ class LegacyDevice(DephyDevice):
         cLibVersion: str,
         logLevel: int,
         loggingEnabled: bool,
-        libFile: str=""
+        libFile: str = "",
     ) -> None:
 
         super().__init__(port, baudRate, cLibVersion, logLevel, loggingEnabled, libFile)

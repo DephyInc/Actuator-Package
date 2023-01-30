@@ -8,10 +8,11 @@ impedance, demonstrating how to:
 """
 from time import sleep
 
-from flexsea.device import Device
 import numpy as np
 import pandas as pd
 import seaborn as sns
+
+from flexsea.device import Device
 
 
 # Instantiate and connect to the device; see demo1.py
@@ -36,12 +37,12 @@ positions = [pos0, pos0 + offset]
 
 # Set gains; see demo2.py
 gains = {
-    "kp" : 40,
-    "ki" : 400,
-    "kd" : 0,
-    "k" : 600,
-    "b" : 300,
-    "ff" : 128,
+    "kp": 40,
+    "ki": 400,
+    "kd": 0,
+    "k": 600,
+    "b": 300,
+    "ff": 128,
 }
 device.set_gains(**gains)
 
@@ -57,7 +58,7 @@ measuredPosition = []
 desiredPosition = []
 deviceTime = []
 
-nLoops = int(runTime / commadDelay)
+nLoops = int(runTime / commandDelay)
 transitionSteps = int(transitionTime / commandDelay)
 
 for i in range(nLoops):
@@ -65,11 +66,11 @@ for i in range(nLoops):
 
     measuredPosition.append(data["mot_ang"])
     deviceTime.append(data["state_time"])
-    desiredPostion.append(positions[positionIndex])
+    desiredPosition.append(positions[positionIndex])
 
     if i % transitionSteps == 0:
         gains["b"] += bGainDelta
-        self.set_gains(**gains)
+        device.set_gains(**gains)
         positionIndex = (positionIndex + 1) % len(positions)
         # Here we command the motor impedance via the
         # `command_motor_impedance` method, which takes in a motor
@@ -84,23 +85,19 @@ device.close()
 # Plot; see demo2.py
 nValues = len(deviceTime)
 t = np.concatenate((deviceTime, deviceTime))
-postionType = ["Desired Position"] * nValues + ["Measured Position"] * nValues
+positionType = ["Desired Position"] * nValues + ["Measured Position"] * nValues
 position = np.concatenate((desiredPosition, measuredPosition))
 
 data = {
-    "Time (ms)" : t,
-    "Position Type" : positionType,
-    "Motor Position (ticks)" : position,
+    "Time (ms)": t,
+    "Position Type": positionType,
+    "Motor Position (ticks)": position,
 }
 
 df = pd.DataFrame(data)
 
 plot = sns.relplot(
-    data=df,
-    x="Time (ms)",
-    y="Motor Position (ticks)",
-    hue="Position Type",
-    kind="line"
+    data=df, x="Time (ms)", y="Motor Position (ticks)", hue="Position Type", kind="line"
 )
 
 plot.figure.savefig("impedance_demo.png")

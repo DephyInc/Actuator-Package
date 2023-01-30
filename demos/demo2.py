@@ -8,10 +8,11 @@ Here we demonstrate how to:
 """
 from time import sleep
 
-from flexsea.device import Device
 import numpy as np
 import pandas as pd
 import seaborn as sns
+
+from flexsea.device import Device
 
 
 # Instantiate and connect to the device; see demo1.py
@@ -51,12 +52,12 @@ positions = [pos0, pos0 + offset]
 # integral, differential, stiffness (impedance), damping (impedance),
 # and feed-forward
 gains = {
-    "kp" : 50,
-    "ki" : 0,
-    "kd" : 0,
-    "k" : 0,
-    "b" : 0,
-    "ff" : 0,
+    "kp": 50,
+    "ki": 0,
+    "kd": 0,
+    "k": 0,
+    "b": 0,
+    "ff": 0,
 }
 device.set_gains(**gains)
 
@@ -76,7 +77,7 @@ measuredPosition = []
 desiredPosition = []
 deviceTime = []
 
-nLoops = int(runTime / commadDelay)
+nLoops = int(runTime / commandDelay)
 transitionSteps = int(transitionTime / commandDelay)
 
 # Oscillate between the two positions nLoops times
@@ -85,7 +86,7 @@ for i in range(nLoops):
 
     # Save the data for plotting
     measuredPosition.append(data["mot_ang"])
-    desiredPosition.append(position[positionIndex])
+    desiredPosition.append(positions[positionIndex])
     deviceTime.append(data["state_time"])
 
     # Every transitionTime seconds, we go to the next position
@@ -110,23 +111,19 @@ device.close()
 # values on the same plot much easier via seaborn's `hue` keyword
 nValues = len(deviceTime)
 t = np.concatenate((deviceTime, deviceTime))
-postionType = ["Desired Position"] * nValues + ["Measured Position"] * nValues
+positionType = ["Desired Position"] * nValues + ["Measured Position"] * nValues
 position = np.concatenate((desiredPosition, measuredPosition))
 
 data = {
-    "Time (ms)" : t,
-    "Position Type" : positionType,
-    "Motor Position (ticks)" : position,
+    "Time (ms)": t,
+    "Position Type": positionType,
+    "Motor Position (ticks)": position,
 }
 
 df = pd.DataFrame(data)
 
 plot = sns.relplot(
-    data=df,
-    x="Time (ms)",
-    y="Motor Position (ticks)",
-    hue="Position Type",
-    kind="line"
+    data=df, x="Time (ms)", y="Motor Position (ticks)", hue="Position Type", kind="line"
 )
 
 plot.figure.savefig("two_position_demo.png")

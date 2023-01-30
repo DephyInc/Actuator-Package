@@ -25,7 +25,7 @@ class Device(LegacyDevice):
         cLibVersion: str = cfg.LTS,
         logLevel: int = 4,
         loggingEnabled: bool = True,
-        libFile: str = ""
+        libFile: str = "",
     ) -> DephyDevice | LegacyDevice:
         inUse = ver.pkg_resources.parse_version(cLibVersion)
         cutoff = ver.pkg_resources.parse_version(cfg.legacyCutoff)
@@ -34,5 +34,9 @@ class Device(LegacyDevice):
             port = find_port(baudRate, cLibVersion, libFile)
 
         if inUse < cutoff:
-            return LegacyDevice(port, baudRate, cLibVersion, logLevel, loggingEnabled, libFile)
-        return DephyDevice(port, baudRate, cLibVersion, logLevel, loggingEnabled, libFile)
+            return LegacyDevice(
+                port, baudRate, cLibVersion, logLevel, loggingEnabled, libFile
+            )
+        return DephyDevice(
+            port, baudRate, cLibVersion, logLevel, loggingEnabled, libFile
+        )
