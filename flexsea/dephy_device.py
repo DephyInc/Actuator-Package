@@ -25,7 +25,7 @@ class DephyDevice:
         cLibVersion: str,
         logLevel: int,
         loggingEnabled: bool,
-        libFile: str
+        libFile: str=""
     ) -> None:
         self.port = port
         self.baudRate = baudRate
@@ -37,6 +37,7 @@ class DephyDevice:
         self.fields: List = []
         self.deviceId: int = fxe.INVALID_DEVICE.value
         self.hasHabs: bool = False
+        self.isChiral: bool = False
         self.streamingFrequency: int = 0
         self.heartbeatPeriod: int = 0
         self.useSafety: bool = False
@@ -172,6 +173,9 @@ class DephyDevice:
         print("Check hasHabs to make sure correct device name is present.")
         if self._deviceName in fxe.hasHabs:
             self.hasHabs = True
+
+        if self._deviceName in fxe.hasChirality:
+            self.isChiral = True
 
         self.fields = self._get_fields()
 
@@ -690,7 +694,7 @@ class DephyDevice:
     # -----
     @property
     def rigidVersion(self) -> str:
-        raise NotImplementedError
+        raise RuntimeError("Devices don't currently know their own hardware version.")
 
     # -----
     # firmware

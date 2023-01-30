@@ -25,7 +25,7 @@ class LegacyDevice(DephyDevice):
         cLibVersion: str,
         logLevel: int,
         loggingEnabled: bool,
-        libFile: str
+        libFile: str=""
     ) -> None:
 
         super().__init__(port, baudRate, cLibVersion, logLevel, loggingEnabled, libFile)
@@ -115,4 +115,4 @@ class LegacyDevice(DephyDevice):
     # -----
     @property
     def rigidVersion(self) -> str:
-        raise RuntimeError("Legacy devices do not have this functionality.")
+        raise RuntimeError("Devices don't currently know their own hardware version.")
