@@ -127,7 +127,7 @@ def load_clib(cLibVersion: str, silent: bool = False, libFile: str = "") -> c.CD
             for extraPath in os.environ["PATH"].split(";"):
                 if os.path.exists(extraPath) and "mingw" in extraPath:
                     os.add_dll_directory(extraPath)
-            os.add_dll_directory(libFile.parent)
+            os.add_dll_directory(str(libFile.parent.absolute()))
         except OSError:
             msg = f"Error loading precompiled library: `{libFile}`\n"
             msg += "The most likely cause is a mismatch between the Python, pip and "
