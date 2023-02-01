@@ -58,7 +58,7 @@ holdTime = 3
 for current in currents:
     # We set the current with the `command_motor_current` method, which
     # takes in the desired current in milliamps
-    device.command_motor_current(current)
+    device.command_motor_current(int(current))
     sleep(commandDelay)
     # There are two ways to print device data: we can either call the
     # `print` method to print the most recent data, or we can call the
@@ -75,7 +75,7 @@ sleep(holdTime)
 # `stop_motor` method
 try:
     for current in currents[-1::-1]:
-        device.command_motor_current(current)
+        device.command_motor_current(int(current))
         sleep(commandDelay)
         # Here we show the second way of calling `print` in order to
         # easily print data that was read at some point in the past

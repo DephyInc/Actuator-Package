@@ -75,7 +75,7 @@ for i in range(nLoops):
         # Here we command the motor impedance via the
         # `command_motor_impedance` method, which takes in a motor
         # position in ticks
-        device.command_motor_impedance(positions[positionIndex])
+        device.command_motor_impedance(int(positions[positionIndex]))
 
     sleep(commandDelay)
 

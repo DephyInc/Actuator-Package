@@ -68,7 +68,7 @@ for _ in range(nLoops):
         desiredCurrent.append(current)
         deviceTime.append(data["state_time"])
 
-        device.command_motor_current(current)
+        device.command_motor_current(int(current))
 
         # Delay between cycles
         for __ in range(int(cycleDelay / commandDelay)):

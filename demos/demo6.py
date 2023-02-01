@@ -25,9 +25,9 @@ def send_command(
     setPoint = cmd["cur"] if cmdType == "current" else cmd["pos"]
 
     if cmdType == "current":
-        device.command_motor_current(setPoint)
+        device.command_motor_current(int(setPoint))
     else:
-        device.command_motor_position(setPoint)
+        device.command_motor_position(int(setPoint))
 
     plotData["stateTime"].append(deviceData["state_time"])
     plotData["desiredPosition"].append(cmd["pos"])

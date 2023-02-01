@@ -94,7 +94,7 @@ for i in range(nLoops):
         positionIndex = (positionIndex + 1) % len(positions)
         # Here we tell the motor which position to move to, with the
         # value we give it in ticks
-        device.command_motor_position(positions[positionIndex])
+        device.command_motor_position(int(positions[positionIndex]))
 
     # Wait the desired amount of time for the device to process and
     # complete the command

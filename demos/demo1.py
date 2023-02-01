@@ -43,14 +43,14 @@ for _ in range(nCycles):
     # Ramp up
     for voltage in voltages:
         # We use the command_motor_voltage method to set the voltage
-        device.command_motor_voltage(voltage)
+        device.command_motor_voltage(int(voltage))
         # We now perform a brief sleep in order to give the device time
         # to process and execute our command
         sleep(0.1)
 
     # Ramp down
     for voltage in voltages[-1::-1]:
-        device.command_motor_voltage(voltage)
+        device.command_motor_voltage(int(voltage))
         sleep(0.1)
 
 
