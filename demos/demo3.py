@@ -26,6 +26,13 @@ def clear() -> None:
         sub.run(["clear"], check=True)
 
 
+if "windows" == platform.system().lower():
+    msg = "WARNING: these demos may not function properly on Windows "
+    msg += "due to the way the OS handles timing. They are best run on "
+    msg += "linux."
+    print(msg)
+
+
 # Instantiate and connect to device; see demo1.py
 device = Device()
 device.open()

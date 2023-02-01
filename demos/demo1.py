@@ -8,11 +8,19 @@ Here we loop over an array of voltages, demonstrating how to:
     * Command the motor voltage
     * Clean up once we're done
 """
+import platform
 from time import sleep
 
 import numpy as np
 
 from flexsea.device import Device
+
+
+if "windows" == platform.system().lower():
+    msg = "WARNING: these demos may not function properly on Windows "
+    msg += "due to the way the OS handles timing. They are best run on "
+    msg += "linux."
+    print(msg)
 
 
 # We begin by creating an instance of the Device class. By default,

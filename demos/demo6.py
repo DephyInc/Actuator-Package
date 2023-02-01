@@ -1,6 +1,7 @@
 """
 Demo 6: High Stress
 """
+import platform
 from time import sleep
 from typing import List
 
@@ -141,6 +142,12 @@ def main():
     control loop several times in a demanding fashion. The setpoints
     for each controller are generated from two different sine waves.
     """
+    if "windows" == platform.system().lower():
+        msg = "WARNING: these demos may not function properly on Windows "
+        msg += "due to the way the OS handles timing. They are best run on "
+        msg += "linux."
+        print(msg)
+
     frequency = 1000
     delay = 1.0 / frequency
     nLoops = 3
