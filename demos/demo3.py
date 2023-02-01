@@ -20,7 +20,10 @@ from flexsea.device import Device
 #                   clear
 # ============================================
 def clear() -> None:
-    sub.run(["cls" if "windows" == platform.system().lower() else "clear"], check=True)
+    try:
+        sub.run(["cls" if "windows" == platform.system().lower() else "clear"], check=True)
+    except FileNotFoundError:
+        sub.run(["clear"], check=True)
 
 
 # Instantiate and connect to device; see demo1.py
