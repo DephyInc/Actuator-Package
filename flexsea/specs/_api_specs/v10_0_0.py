@@ -22,9 +22,7 @@ v10_0_0 = {
         },
         "get_max_device_name_length": {
             "name": "fxGetMaxDeviceNameLength",
-            "argTypes": [
-                None,
-            ],
+            "argTypes": [],
             "returnType": c.c_int,
         },
         "get_device_name": {
@@ -34,9 +32,7 @@ v10_0_0 = {
         },
         "get_max_device_side_length": {
             "name": "fxGetMaxDeviceSideNameLength",
-            "argTypes": [
-                None,
-            ],
+            "argTypes": [],
             "returnType": c.c_int,
         },
         "get_side": {
@@ -55,9 +51,7 @@ v10_0_0 = {
         },
         "get_max_field_name_length": {
             "name": "fxGetMaxDataLabelLength",
-            "argTypes": [
-                None,
-            ],
+            "argTypes": [],
             "returnType": c.c_int,
         },
         "get_fields": {
@@ -67,9 +61,7 @@ v10_0_0 = {
         },
         "get_max_data_elements": {
             "name": "fxGetMaxDataElements",
-            "argTypes": [
-                None,
-            ],
+            "argTypes": [],
             "returnType": c.c_int,
         },
         "read": {
