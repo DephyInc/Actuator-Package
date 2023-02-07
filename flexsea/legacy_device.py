@@ -1,6 +1,7 @@
 import ctypes as c
 from typing import List
 
+from . import config as cfg
 from . import enums as fxe
 from .dephy_device import DephyDevice
 from .specs.api_spec import apiSpec
@@ -14,6 +15,12 @@ class LegacyDevice(DephyDevice):
     Representation of one of Dephy's devices using old comms and
     functionality (e.g., device doesn't know side info).
     """
+
+    SUCCESS = c.c_int(0)
+    FAILURE = c.c_int(1)
+    INVALID_PARAM = c.c_int(2)
+    INVALID_DEVICE = c.c_int(3)
+    NOT_STREAMING = c.c_int(4)
 
     # -----
     # constructor
@@ -86,7 +93,7 @@ class LegacyDevice(DephyDevice):
     # _read
     # -----
     def _read(self) -> dict:
-        if self._clib.read(self.deviceId, c.byref(self._state)) != fxe.SUCCESS.value:
+        if self._clib.read(self.deviceId, c.byref(self._state)) != self.SUCCESS.value:
             raise RuntimeError("Error: read command failed.")
         return {f[0]: getattr(self._state, f[0]) for f in self._state._fields_}
 

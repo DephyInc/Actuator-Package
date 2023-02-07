@@ -2,6 +2,9 @@ import ctypes as c
 from time import sleep
 from typing import List
 
+import semantic_version as sem
+
+from . import config as cfg
 from . import enums as fxe
 from . import utilities as fxu
 
@@ -13,6 +16,13 @@ class DephyDevice:
     """
     Representation of one of Dephy's devices.
     """
+
+    UNDEFINED = c.c_int(0)
+    SUCCESS = c.c_int(1)
+    FAILURE = c.c_int(2)
+    INVALID_PARAM = c.c_int(3)
+    INVALID_DEVICE = c.c_int(4)
+    NOT_STREAMING = c.c_int(5)
 
     # -----
     # constructor
@@ -34,7 +44,7 @@ class DephyDevice:
         self.libFile = libFile
 
         self.fields: List = []
-        self.deviceId: int = fxe.INVALID_DEVICE.value
+        self.deviceId: int = self.INVALID_DEVICE.value
         self.hasHabs: bool = False
         self.isChiral: bool = False
         self.streamingFrequency: int = 0
@@ -44,7 +54,7 @@ class DephyDevice:
         self._deviceSide: str = ""
         self._closed: bool = False
 
-        self._clib = fxu.load_clib(self.cLibVersion, self.libFile)
+        self._clib = fxu.load_clib(self.cLibVersion, libFile=self.libFile)
 
     # -----
     # destructor
@@ -86,7 +96,7 @@ class DephyDevice:
         maxDeviceNameLength = self._clib.get_max_device_name_length()
         deviceName = (c.c_char * maxDeviceNameLength)()
 
-        if self._clib.get_device_name(self.deviceId, deviceName) != fxe.SUCCESS.value:
+        if self._clib.get_device_name(self.deviceId, deviceName) != self.SUCCESS.value:
             raise RuntimeError("Could not get device name.")
 
         return deviceName.value.decode("utf8")
@@ -110,7 +120,7 @@ class DephyDevice:
         maxDeviceSideLength = self._clib.get_max_device_side_length()
         deviceSide = (c.c_char * maxDeviceSideLength)()
 
-        if self._clib.get_side(self.deviceId, deviceSide) != fxe.SUCCESS.value:
+        if self._clib.get_side(self.deviceId, deviceSide) != self.SUCCESS.value:
             raise RuntimeError("Could not get device name.")
 
         side = deviceSide.value.decode("utf8")
@@ -152,19 +162,28 @@ class DephyDevice:
         port = self.port.encode("utf-8")
         self.deviceId = self._clib.open(port, self.baudRate, self.logLevel)
 
-        if self.deviceId in (fxe.INVALID_DEVICE.value, -1):
+        if self.deviceId in (self.INVALID_DEVICE.value, -1):
             raise IOError("Failed to open device.")
 
     # -----
     # _setup
     # -----
     def _setup(self) -> None:
+        givenVer = sem.Version(self.cLibVersion)
+        libVer = sem.Version(self.libsVersion)
+
         try:
-            assert self.cLibVersion == self.libsVersion
+            assert givenVer == libVer
         except AssertionError as err:
-            raise AssertionError(
-                "Given and actual library versions don't match."
-            ) from err
+            if givenVer.major == libVer.major:
+                msg = f"Given lib version: `{givenVer}` doesn't match file lib "
+                msg += f"version: `{libVer}`, but major versions match. Proceed[y|n]?"
+                proceed = input(msg)
+                if proceed != "y":
+                    sys.exit(1)
+            else:
+                msg = f"{givenVer} doesn't match {libVer} (C lib version)"
+                raise AssertionError(msg) from err
 
         self._deviceName = self.deviceName
         self._deviceSide = self.deviceSide
@@ -199,7 +218,7 @@ class DephyDevice:
             c.byref(major), c.byref(minor), c.byref(patch)
         )
 
-        if retCode != fxe.SUCCESS.value:
+        if retCode != self.SUCCESS.value:
             raise RuntimeError("Could not determine clibs version.")
 
         return f"{major.value}.{minor.value}.{patch.value}"
@@ -234,7 +253,7 @@ class DephyDevice:
 
         retCode = self._clib.get_fields(self.deviceId, labels, c.byref(nLabels))
 
-        if retCode != fxe.SUCCESS.value:
+        if retCode != self.SUCCESS.value:
             raise RuntimeError("Could not get device field labels.")
 
         # Convert the labels from chars to python strings
@@ -331,7 +350,7 @@ class DephyDevice:
         else:
             retCode = self._clib.start_streaming(self.deviceId, frequency, _log)
 
-        if retCode != fxe.SUCCESS.value:
+        if retCode != self.SUCCESS.value:
             raise RuntimeError("Could not start stream.")
 
     # -----
@@ -346,7 +365,7 @@ class DephyDevice:
         RuntimeError:
             If the stream failed to stop.
         """
-        if self._clib.stop_streaming(self.deviceId) != fxe.SUCCESS.value:
+        if self._clib.stop_streaming(self.deviceId) != self.SUCCESS.value:
             raise RuntimeError("Failed to stop streaming.")
 
     # -----
@@ -404,7 +423,7 @@ class DephyDevice:
 
         retCode = self._clib.read(self.deviceId, deviceData, c.byref(nFields))
 
-        if retCode != fxe.SUCCESS.value:
+        if retCode != self.SUCCESS.value:
             raise RuntimeError("Could not read from device.")
 
         try:
@@ -497,7 +516,7 @@ class DephyDevice:
             Command failed.
         """
         devId = self.deviceId
-        if self._clib.set_gains(devId, kp, ki, kd, k, b, ff) != fxe.SUCCESS.value:
+        if self._clib.set_gains(devId, kp, ki, kd, k, b, ff) != self.SUCCESS.value:
             raise RuntimeError("Command failed")
 
     # -----
@@ -519,7 +538,7 @@ class DephyDevice:
         """
         devId = self.deviceId
         controller = fxe.controllers["position"]
-        if self._clib.send_motor_command(devId, controller, value) != fxe.SUCCESS.value:
+        if self._clib.send_motor_command(devId, controller, value) != self.SUCCESS.value:
             raise RuntimeError("Coult not command motor position.")
 
     # -----
@@ -541,7 +560,7 @@ class DephyDevice:
         """
         devId = self.deviceId
         controller = fxe.controllers["current"]
-        if self._clib.send_motor_command(devId, controller, value) != fxe.SUCCESS.value:
+        if self._clib.send_motor_command(devId, controller, value) != self.SUCCESS.value:
             raise RuntimeError("Coult not command motor current.")
 
     # -----
@@ -563,7 +582,7 @@ class DephyDevice:
         """
         devId = self.deviceId
         controller = fxe.controllers["voltage"]
-        if self._clib.send_motor_command(devId, controller, value) != fxe.SUCCESS.value:
+        if self._clib.send_motor_command(devId, controller, value) != self.SUCCESS.value:
             raise RuntimeError("Coult not command motor voltage.")
 
     # -----
@@ -587,7 +606,7 @@ class DephyDevice:
         """
         devId = self.deviceId
         controller = fxe.controllers["impedance"]
-        if self._clib.send_motor_command(devId, controller, value) != fxe.SUCCESS.value:
+        if self._clib.send_motor_command(devId, controller, value) != self.SUCCESS.value:
             raise RuntimeError("Coult not command motor impedance.")
 
     # -----
@@ -604,7 +623,7 @@ class DephyDevice:
         """
         devId = self.deviceId
         controller = fxe.controllers["none"]
-        if self._clib.send_motor_command(devId, controller, 0) != fxe.SUCCESS.value:
+        if self._clib.send_motor_command(devId, controller, 0) != self.SUCCESS.value:
             raise RuntimeError("Could not stop motor.")
 
     # -----
@@ -630,7 +649,7 @@ class DephyDevice:
             print("Aborting pole finding.")
             return
 
-        if self._clib.find_poles(self.deviceId) != fxe.SUCCESS.value:
+        if self._clib.find_poles(self.deviceId) != self.SUCCESS.value:
             raise ValueError("Command failed")
 
         msg = "NOTE: Please wait for the process to complete. The motor will stop "
@@ -662,7 +681,7 @@ class DephyDevice:
 
         returnCode = self._clib.activate_bootloader(self.deviceId, target)
 
-        if returnCode != fxe.SUCCESS.value:
+        if returnCode != self.SUCCESS.value:
             raise RuntimeError(f"Could not activate bootloader for: `{target}`.")
 
     # -----
@@ -683,7 +702,7 @@ class DephyDevice:
         bool
             `True` if bootloader is active and `False` otherwise.
         """
-        if self._clib.is_bootloader_activated(self.deviceId) != fxe.SUCCESS.value:
+        if self._clib.is_bootloader_activated(self.deviceId) != self.SUCCESS.value:
             return False
 
         return True
@@ -714,7 +733,7 @@ class DephyDevice:
             A dictionary with the semantic version strings of manage,
             execute, and regulate's firmware. And habs, if applicable.
         """
-        if self._clib.request_firmware_version(self.deviceId) != fxe.SUCCESS.value:
+        if self._clib.request_firmware_version(self.deviceId) != self.SUCCESS.value:
             raise RuntimeError("Command failed")
 
         sleep(5)
@@ -779,9 +798,9 @@ class DephyDevice:
         """
         returnCode = self._clib.set_read_data_queue_size(self.deviceId, dataSize)
 
-        if returnCode == fxe.INVALID_PARAM:
+        if returnCode == self.INVALID_PARAM:
             raise ValueError(f"Invalid data_size: {dataSize}")
-        if returnCode == fxe.FAILURE:
+        if returnCode == self.FAILURE:
             raise RuntimeError("Command failed")
 
     # -----
@@ -839,7 +858,7 @@ class DephyDevice:
         """
         Gets the currently set UVLO.
         """
-        if self._clib.request_uvlo(self.deviceId) != fxe.SUCCESS.value:
+        if self._clib.request_uvlo(self.deviceId) != self.SUCCESS.value:
             raise RuntimeError("Could not request firmware version.")
 
         # Let the device process the request
@@ -857,7 +876,7 @@ class DephyDevice:
         """
         Sets the UVLO value for the device. `value` needs to be in milli-volts.
         """
-        if self._clib.set_uvlo(self.deviceId, value) != fxe.SUCCESS.value:
+        if self._clib.set_uvlo(self.deviceId, value) != self.SUCCESS.value:
             raise RuntimeError("Could not set UVLO.")
 
     # -----
@@ -883,5 +902,5 @@ class DephyDevice:
             print("Aborting IMU calibration.")
             return
 
-        if self._clib.calibrate_imu(self.deviceId) != fxe.SUCCESS.value:
+        if self._clib.calibrate_imu(self.deviceId) != self.SUCCESS.value:
             raise RuntimeError("Could not calibrate imu.")

@@ -1,4 +1,4 @@
-import setuptools.version as ver
+import semantic_version as sem
 
 from . import config as cfg
 from .dephy_device import DephyDevice
@@ -27,8 +27,8 @@ class Device(LegacyDevice):
         loggingEnabled: bool = True,
         libFile: str = "",
     ) -> DephyDevice | LegacyDevice:
-        inUse = ver.pkg_resources.parse_version(cLibVersion)
-        cutoff = ver.pkg_resources.parse_version(cfg.legacyCutoff)
+        inUse = sem.Version(cLibVersion)
+        cutoff = sem.Version(cfg.legacyCutoff)
 
         if not port:
             port = find_port(baudRate, cLibVersion, libFile)
