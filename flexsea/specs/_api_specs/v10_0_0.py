@@ -56,7 +56,7 @@ v10_0_0 = {
         },
         "get_fields": {
             "name": "fxGetDataLabelsWrapper",
-            "argTypes": [c.c_uint, c.POINTER(c.c_char_p), c.POINTER(c.c_int)],
+            "argTypes": [c.c_uint, c.POINTER(c.POINTER(c.c_char)), c.POINTER(c.c_int)],
             "returnType": c.c_int,
         },
         "get_max_data_elements": {

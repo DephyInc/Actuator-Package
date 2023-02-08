@@ -242,14 +242,11 @@ class DephyDevice:
         maxFieldLength = self._clib.get_max_field_name_length()
         nLabels = c.c_int()
 
-        # Create types for holding labels
-        labelType = c.c_char * maxFieldLength
-        labelsType = c.POINTER(c.c_char) * maxFields
+        # https://code.activestate.com/lists/python-list/704158
+        labels = (c.POINTER(c.c_char) * maxFields)()
 
-        # Allocate memory for the labels container
-        labels = labelsType()
         for i in range(maxFields):
-            labels[i] = labelType()
+            labels[i] = c.create_string_buffer(maxFieldLength)
 
         retCode = self._clib.get_fields(self.deviceId, labels, c.byref(nLabels))
 
