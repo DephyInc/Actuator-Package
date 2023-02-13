@@ -19,9 +19,9 @@ semantic-version = "^2.10.0"
 [tool.poetry.group.dev.dependencies]
 black = "^22.10.0"
 pylint = "^2.15.5"
-mypy = "^0.990"
 wrapt = "^1.14.1"
 ipython = "^8.8.0"
+nox = "^2022.11.21"
 
 
 [tool.poetry.group.demos.dependencies]
