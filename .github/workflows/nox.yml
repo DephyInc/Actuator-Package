@@ -20,7 +20,7 @@ jobs:
         run: python3 -m pip install poetry
 
       - name: Install dependencies
-        run: poetry install --only dev
+        run: poetry install
 
       - name: Run Nox
         run: poetry run nox
