@@ -112,7 +112,7 @@ Where `data` is a dictionary. The available fields depend on the type of device 
 allData = device.read(allData=True)
 ```
 
-In this case, the return value `allData` will be a list of dictionaries, one for each time stamp. 
+In this case, the return value `allData` will be a list of dictionaries, one for each time stamp.
 
 To conveniently display the most recent data:
 

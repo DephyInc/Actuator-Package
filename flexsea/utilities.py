@@ -59,15 +59,15 @@ def decode(val: int) -> str:
     if val > 0:
         while val % 2 == 0:
             major += 1
-            val /= 2
+            val = int(val / 2)
 
         while val % 3 == 0:
             minor += 1
-            val /= 3
+            val = int(val / 3)
 
         while val % 5 == 0:
             bug += 1
-            val /= 5
+            val = int(val / 5)
 
     return f"{major}.{minor}.{bug}"
 
@@ -75,7 +75,9 @@ def decode(val: int) -> str:
 # ============================================
 #                  load_clib
 # ============================================
-def load_clib(cLibVersion: str, silent: bool = False, libFile: str = "") -> c.CDLL:
+def load_clib(
+    cLibVersion: str, silent: bool = False, libFile: str | Path = ""
+) -> c.CDLL:
     """
     Uses `ctypes` to load the appropriate C libraries depending on the
     OS.
@@ -305,7 +307,11 @@ def find_port(baudRate: int, cLibVersion: str, libFile: str = "") -> str:
     for _port in comports():
         p = _port.device
         deviceID = clib.open(p.encode("utf-8"), baudRate, 0)
-        if deviceID in (fxe.INVALID_DEVICE.value, -1):
+        if deviceID in (
+            fxe.dephyDeviceErrorCodes["INVALID_DEVICE"].value,
+            fxe.legacyDeviceErrorCodes["INVALID_DEVICE"].value,
+            -1,
+        ):
             continue
         devicePort = p
         clib.close(deviceID)

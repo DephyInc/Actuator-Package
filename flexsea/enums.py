@@ -66,3 +66,24 @@ bootloaderTargets = {
     "bt": 4,
     "xbee": 5,
 }
+
+
+# ============================================
+#                Error Codes
+# ============================================
+dephyDeviceErrorCodes = {
+    "UNDEFINED": c.c_int(0),
+    "SUCCESS": c.c_int(1),
+    "FAILURE": c.c_int(2),
+    "INVALID_PARAM": c.c_int(3),
+    "INVALID_DEVICE": c.c_int(4),
+    "NOT_STREAMING": c.c_int(5),
+}
+
+legacyDeviceErrorCodes = {
+    "SUCCESS": c.c_int(0),
+    "FAILURE": c.c_int(1),
+    "INVALID_PARAM": c.c_int(2),
+    "INVALID_DEVICE": c.c_int(3),
+    "NOT_STREAMING": c.c_int(4),
+}

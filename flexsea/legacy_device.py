@@ -1,7 +1,6 @@
 import ctypes as c
 from typing import List
 
-from . import config as cfg
 from . import enums as fxe
 from .dephy_device import DephyDevice
 from .specs.api_spec import apiSpec
@@ -16,11 +15,11 @@ class LegacyDevice(DephyDevice):
     functionality (e.g., device doesn't know side info).
     """
 
-    SUCCESS = c.c_int(0)
-    FAILURE = c.c_int(1)
-    INVALID_PARAM = c.c_int(2)
-    INVALID_DEVICE = c.c_int(3)
-    NOT_STREAMING = c.c_int(4)
+    SUCCESS = fxe.legacyDeviceErrorCodes["SUCCESS"]
+    FAILURE = fxe.legacyDeviceErrorCodes["FAILURE"]
+    INVALID_PARAM = fxe.legacyDeviceErrorCodes["INVALID_PARAM"]
+    INVALID_DEVICE = fxe.legacyDeviceErrorCodes["INVALID_DEVICE"]
+    NOT_STREAMING = fxe.legacyDeviceErrorCodes["NOT_STREAMING"]
 
     # -----
     # constructor
@@ -79,14 +78,14 @@ class LegacyDevice(DephyDevice):
     # deviceSide
     # -----
     @property
-    def deviceSide(self) -> None:
+    def deviceSide(self) -> str:
         raise RuntimeError("Legacy devices don't have this functionality.")
 
     # -----
     # libs_version
     # -----
     @property
-    def libsVersion(self) -> None:
+    def libsVersion(self) -> str:
         raise RuntimeError("Legacy devices don't have this functionality.")
 
     # -----

@@ -1,10 +1,10 @@
 import ctypes as c
+import sys
 from time import sleep
 from typing import List
 
 import semantic_version as sem
 
-from . import config as cfg
 from . import enums as fxe
 from . import utilities as fxu
 
@@ -17,12 +17,12 @@ class DephyDevice:
     Representation of one of Dephy's devices.
     """
 
-    UNDEFINED = c.c_int(0)
-    SUCCESS = c.c_int(1)
-    FAILURE = c.c_int(2)
-    INVALID_PARAM = c.c_int(3)
-    INVALID_DEVICE = c.c_int(4)
-    NOT_STREAMING = c.c_int(5)
+    UNDEFINED = fxe.dephyDeviceErrorCodes["UNDEFINED"]
+    SUCCESS = fxe.dephyDeviceErrorCodes["SUCCESS"]
+    FAILURE = fxe.dephyDeviceErrorCodes["FAILURE"]
+    INVALID_PARAM = fxe.dephyDeviceErrorCodes["INVALID_PARAM"]
+    INVALID_DEVICE = fxe.dephyDeviceErrorCodes["INVALID_DEVICE"]
+    NOT_STREAMING = fxe.dephyDeviceErrorCodes["NOT_STREAMING"]
 
     # -----
     # constructor
@@ -368,7 +368,7 @@ class DephyDevice:
     # -----
     # read
     # -----
-    def read(self, allData: bool = False) -> dict:
+    def read(self, allData: bool = False) -> dict | List[dict]:
         """
         Reads data from a streaming device.
 
@@ -535,7 +535,10 @@ class DephyDevice:
         """
         devId = self.deviceId
         controller = fxe.controllers["position"]
-        if self._clib.send_motor_command(devId, controller, value) != self.SUCCESS.value:
+        if (
+            self._clib.send_motor_command(devId, controller, value)
+            != self.SUCCESS.value
+        ):
             raise RuntimeError("Coult not command motor position.")
 
     # -----
@@ -557,7 +560,10 @@ class DephyDevice:
         """
         devId = self.deviceId
         controller = fxe.controllers["current"]
-        if self._clib.send_motor_command(devId, controller, value) != self.SUCCESS.value:
+        if (
+            self._clib.send_motor_command(devId, controller, value)
+            != self.SUCCESS.value
+        ):
             raise RuntimeError("Coult not command motor current.")
 
     # -----
@@ -579,7 +585,10 @@ class DephyDevice:
         """
         devId = self.deviceId
         controller = fxe.controllers["voltage"]
-        if self._clib.send_motor_command(devId, controller, value) != self.SUCCESS.value:
+        if (
+            self._clib.send_motor_command(devId, controller, value)
+            != self.SUCCESS.value
+        ):
             raise RuntimeError("Coult not command motor voltage.")
 
     # -----
@@ -603,7 +612,10 @@ class DephyDevice:
         """
         devId = self.deviceId
         controller = fxe.controllers["impedance"]
-        if self._clib.send_motor_command(devId, controller, value) != self.SUCCESS.value:
+        if (
+            self._clib.send_motor_command(devId, controller, value)
+            != self.SUCCESS.value
+        ):
             raise RuntimeError("Coult not command motor impedance.")
 
     # -----
@@ -674,9 +686,9 @@ class DephyDevice:
         RuntimeError:
             Command failed.
         """
-        target = fxe.bootloaderTargets[target]
+        targetCode = fxe.bootloaderTargets[target]
 
-        returnCode = self._clib.activate_bootloader(self.deviceId, target)
+        returnCode = self._clib.activate_bootloader(self.deviceId, targetCode)
 
         if returnCode != self.SUCCESS.value:
             raise RuntimeError(f"Could not activate bootloader for: `{target}`.")
