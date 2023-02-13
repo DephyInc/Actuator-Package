@@ -11,8 +11,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3.3.0
 
-      - name: Setup Nox
-        uses: daisylb/setup-nox@v2.1.0
+      - name: Setup Python
+        uses: actions/setup-python@v4.5.0
+        with:
+          python-version: "3.11"
+
+      - name: Setup Poetry
+        run: python3 -m pip install poetry
+
+      - name: Install dependencies
+        run: poetry install --only dev
 
       - name: Run Nox
-        run: nox
+        run: poetry run nox
