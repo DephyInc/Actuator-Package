@@ -1,284 +1,173 @@
-# Actuator-Package
+# FlexSEA
 
-The Dephy Actuator Package is a turn-key solution for people who want to test FlexSEA's capabilities or quickly design a prosthetic limb. The Package consists of a custom brushless motor integrated with a FlexSEA-Rigid circuit and a minimalist enclosure, pre-loaded embedded software, and a full suite of high-level software and test scripts.
 
-## Important: Compatibility
+`flexsea` is a Python package for interacting with Dephy's wearable robotic devices.
+It can be used for gathering data from a device or for writing your own controller.
 
-⚠️ Not using compatible firmware will result in segmentation faults or unexpected behavior.
 
-Make sure the Actuator Package repository or flexsea Python package major version matches the major version of the ActPack firmware. This is in accordance with [semantic versioning](https://semver.org/).
+## Installation
 
-For instance, the flexsea package 6.0.3 is compatible with firmware 6.0 but not with firmware 5.1.
+It is **strongly** recommended that you install `flexsea` in a [virtual environment](https://docs.python.org/3/library/venv.html).
+Additionally, `flexsea` requires [Python >= 3.11](https://www.python.org/downloads/release/python-3111/), and has been tested
+on Windows and Ubuntu.
 
-## Scripts
+**NOTE**: These instructions use the `python3` executable. If you are on Windows, you
+will need to replace `python3` -> `python`.
 
-The fx_plan_stack API is a suite of functions that configure and control FlexSEA devices. See the [full documentation](#UPDATE_THIS) for more information.
-
-The repo contains the FlexSEA-Rigid Actuator Package library `flexsea` and sample programs for C/C++, Python, MATLAB and SIMULINK. These scripts are accompanied by and are dependent on pre-compiled libraries for Windows (.dll) or Linux(.so).
-
-## Install Python
-
-### Linux
-
-Run this script to install the python dependencies before running the python scripts
-```bash
-./install_python_deps.sh
-```
-
-If choose to install Python manyually, make sure to add the current user to the `dialout` group so it can access serial ports.
+### Pip
 
 ```bash
-sudo usermod -a -G dialout "$USER"
+python3 -m pip install flexsea
 ```
 
-### Windows 10
 
-1. On Windows, download [Python 3.9](https://www.python.org/downloads/) and install it.
-2. Note which architecture you download (32 or 64 bits) and use the matching [git shell](https://git-scm.com/download/win).
-3. Install [MinGW](https://sourceforge.net/projects/mingw-w64/) select the matching the matchin arhcitecture in the installer. Make sure MinGW gets added to your Path variable.
+### From Source
 
-Then, install the required Python environment using using ___PowerShell___ or __gitbash__:
-
-### Install FlexSEA Library
+In order to install from source, you will need [git](https://git-scm.com/downloads).
 
 ```bash
-# Define your own virtual environment
-# this is not required but it helps keeping your environment clean
-#	In Windows:
-	python -m pip install --upgrade pip
-	python -m pip install virtualenv
-	python -m virtualenv actpack --python=python3.9
-#	In Linux and RasberryPi systems:
-	python3 -m pip install --upgrade pip
-	python3 -m pip install virtualenv
-	python3 -m virtualenv actpack --python=/usr/bin/python3.9
-	sudo apt install libc6 libgcc-s1 -y
-# Activate your virtualenv
-#	On Windows (PowerShell):
-	actpack/Scripts/activate.ps1
-#	On other shells:
-	actpack/bin/activate
-# Once the environment is activated, install the package
-#	On Windows:
-	python -m pip install --upgrade pip
-	python -m pip install flexsea
-#	On Other OS:
-	python3 -m pip install --upgrade pip
-	python3 -m pip install flexsea
-
-# Run your script that uses flexsea
-# Once you want to stop using the flexsea library and go back to the regular shell
-deactivate
-```
-> Please Note to use the right symlink to `python` or `python3` in all the above commands based on your OS that you are running this on.<br>
-
-If you're using the [fish shell](https://fishshell.com/), use this command to activate the virtualenv: `. actpack/bin/activate.fish`
-
-If `flexsea` is already installed and you need to upgrade it, run this:
-```bash
-#activate your virtual environment if desired as shown above
-#	On a Windows system:
-	python -m pip install --upgrade flexsea
-#	On other OS:
-	python3 -m pip install --upgrade flexsea
+git clone https://github.com/DephyInc/Actuator-Package.git
+cd Actuator-Package/
+git checkout v10.0.0 # Or the branch you want
+python3 -m pip install .
 ```
 
-#### Removal
-To uninstall `flexsea` from your computer, run this:
-```bash
-#	On a Windows system:
-	python -m pip uninstall flexsea
-#	On other OS:
-	python3 -m pip uninstall flexsea
+
+## Usage
+
+### Demos
+
+A good reference for what `flexsea` is capable of and how various tasks, such as
+controlling the device's motor, can be accomplished, is the collection of demo scripts
+that live in the `demos/` directory of the repository. There are currently six demos,
+and they should be viewed in order, as each successive demo builds off of the information
+presented in the previous one.
+
+
+### API Overview
+
+#### Importing and Instantiating
+The central object in `flexsea` is the `Device` class. For most use cases, this is the
+only aspect of `flexsea` that you will need to interact with directly. You can import
+it into your code like so:
+
+```python
+from flexsea.device import Device
 ```
 
-## Getting Started
+The constructor takes five keyword arguments:
 
-### ActPack
-
-Use this information to set up your ActPack, power it and update its firmware.:
-
-[General information about the Dephy Actuator Package](http://dephy.com/wiki/flexsea/doku.php?id=dephyactpack)
-
-### Get the demo scripts
-
-Download the latest release as a [zip file](https://github.com/DephyInc/Actuator-Package/archive/refs/heads/master.zip)
-
-Alternatively, use git to clone the repository:
-
-```bash
-$ git clone https://github.com/DephyInc/Actuator-Package.git
-$ cd Actuator_Package
+```python
+class Device(
+    port: str="",
+    baudRate: int=cfg.baudRate,
+    cLibVersion: str=cfg.LTS,
+    logLevel: int=4,
+    loggingEnabled: bool=True
+)
 ```
 
-### Configuring Demo Scripts
+* `port`: The name of the serial port that the device is connected to. On Windows, this is typically something akin to "COM3" and on Linux it is usually something like "/dev/ttyACM0". If you do not provide a value, `flexsea` will scan through all of the available serial ports, stopping at the first valid device that it finds. This means that this keyword is typically only useful if you have more than one device connected at once.
+* `baudRate`: The baud rate used for communicating with the device. Most of Dephy's devices all use the same baud rate, which is set as the default value for you.
+* `cLibVersion`: `flexsea` is a wrapper around a pre-compiled C library that actually handles all of the heavy lifting of communicating with the device. This parameter allows you to specify the semantic version string of the version of this library that you would like to use. These libraries are stored in a public AWS S3 bucket. If you do not already have the version you specify installed, then `flexsea` will attempt to download it from this bucket for you. By default, the latest LTS version is selected for you. In most cases, changing this value is only necessary for bootloading.
+* `logLevel`: Under the hood, the pre-compiled C library makes use of the [spdlog](https://github.com/gabime/spdlog) logging library. This parameter controls the verbosity of the logs, with `0` being the most verbose and `6` disabling logging all together.
+* `loggingEnabled`: If set to `True` then both data and debug logs will be generated (unless `logLevel=6`). If `False`, then no logs are generated, regardless of the value of `logLevel`.
 
-All scripts can be run on their own. Use `--help` to see the required command line arguments.
+Typically, all you'll need to do to create an instance of the object is:
 
-For your convenience, `run_demos.py` displays a menu of all available scripts.
-
-`run_demos.py` uses `ports.yaml` to configure the ports used to communicate with the ActPacks.
-
-You'll need to modify `ports.yaml` to suit your needs. By default, this files contains the most common Windows configuration along with examples for other platforms.
-
-To use it, uncomment and/or modify the lines you need. Below is an example of that file used on Windows, with one port (`COM3`).
-
-```yaml
-# ports.yaml
-#
-# Adjust the baudrate if needed and uncomment or edit the port list.
-#
-# Note that commented-out lines start with a "#"
-# Also the ports list has dashes "-" before the values to signify a list
-#
-# See the sample ports values below depending on your platform
-baud_rate: 230400
-ports:
-# Windows
-	- COM3
-	# - COM4
-# Ubuntu WSL
-	# - /dev/ttyS3
-	# - /dev/ttyS4
-# Native Linux (e.g. Ubuntu or Raspbian)
-	# - /dev/ttyACM0
-	# - /dev/ttyACM1
+```python
+device = Device()
 ```
 
-Once you modify your copy of `ports.yaml`, use the following command to prevent git from tracking the changes.
+#### Connecting and Streaming
 
-```bash
-$ git update-index --assume-unchanged Python/flexsea_demo/ports.yaml
+Once instantiated, you need to establish a connection between the computer and the device. This is done via the `open` method:
+
+```python
+device.open()
 ```
 
-### Getting Started
-The latest instructions for working with the Actuatory Package and sample programs are located on Dephy's Wiki:
+Additionally, if you would like the device to send its data to the computer -- an action called *streaming* -- then you must invoke the `start_streaming` method:
 
-[General information about the Dephy Actuator Package](http://dephy.com/wiki/flexsea/doku.php?id=dephyactpack)
-
-[Information about the scripts](http://dephy.com/wiki/flexsea/doku.php?id=scripts)
-
-
-### Running Demo Scripts
-
-#### Using The Interactive Menu
-
-1. Plug the device in and turn it ON
-2. From a terminal, run the `Actuator-Package/Python/flexsea_demo/run_demos.py` script
-```bash
-$ cd Python/flexsea_demo
-$ ./run_demos.py
-```
-3. Notice the menu that displays
-```bash
-(actpack) ubuntu@PC:~/Actuator-Package/Python/flexsea_demo $ ./run_demos.py
-
-	▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
-	██░▄▄▀██░▄▄▄██░▄▄░██░██░██░███░██
-	██░██░██░▄▄▄██░▀▀░██░▄▄░██▄▀▀▀▄██
-	██░▀▀░██░▀▀▀██░█████░██░████░████
-	▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
-			Beyond Nature™
-
-STOP!
-Read our important safety information at https://dephy.com/start/
-before running the scripts for the first time.
-
-Actuator Package Demo Scripts:
-------------------------------
-[0] Read Only
-[1] Open Control
-[2] Current Control
-[3] Position Control
-[4] Impedance Control
-[5] Two Positions Control
-[6] High Speed Test
-[7] High Stress Test
-[8] Two Devices Position Control
-[9] Two Devices Leader Follower Control
-
-Advanced Utilities:
-------------------------------
-[10] Bootloader Check
-[11] Find Poles
-
-Choose experiment number [q to quit]:
-```
-4. Enter the experiment number. Be careful, most of them will make the motor move!
-
-Alternatively, the `run_demos.py` script accepts command line arguments. The first argument is the experiment number, and the second (optional) is the number of devices.
-
-Calling Read Only directly (default = 1 device):
-```bash
-$ ./run_demos.py 0
-```
-Two Devices Leader Follower is #9, it uses 2 devices. To launch it with one command:
-```bash
-$ ./run_demos.py 9 2
+```python
+device.start_streaming(frequency)
 ```
 
-#### Launching the Demos Directly
-All scripts can be run individually by calling them and passing arguments. Use –help to see usage information. See the example below using `high_speed_test.py`.
+where `frequency` is the rate (in Hertz) at which the device will send data.
 
-```bash
-$ ./high_speed_test.py --help
-usage: high_speed_test.py [-h] [-b B] Ports [Ports ...]
+**NOTE**: Currently, the maximum supported frequency is 1000Hz.
 
-FlexSEA High Speed Test
 
-positional arguments:
-	Ports           Your devices' serial ports.
+#### Reading and Printing
 
-optional arguments:
-	-h, --help      show this help message and exit
-	-b B, --baud B  Serial communication baud rate.
+If you are streaming, you can get the most recent device data from the `read` method:
+
+```python
+data = device.read()
 ```
 
-If your ActPAck is on port `COM3` you can run the script depicted above like this:
+Where `data` is a dictionary. The available fields depend on the type of device as well as the firmware version. If you have not read from the device in a while, you can get all of the data that's currently in the device's internal queue by using the `allData` keyword:
 
-```bash
-$ ./high_speed_test.py COM3
+```python
+allData = device.read(allData=True)
 ```
 
-With more than one ActPAck (e.g. in `COM3` and `COM4`):
+In this case, the return value `allData` will be a list of dictionaries, one for each time stamp.
 
-```bash
-$ ./high_speed_test.py COM3 COM4
+To conveniently display the most recent data:
+
+```python
+device.print()
 ```
 
-### Install Githooks
+`print` takes an optional keyword argument called `data`, which should be a dictionary returned by `read`. This lets you display data that was read at some arbitrary point in the past.
 
-If you're planning to contribute to this repository, run this to install the autoformatting and syntax checks.
 
-```bash
-$ ./install_hooks.sh
+#### Controlling the Motor
+```python
+device.command_motor_current(current) # milliamps
+device.command_motor_position(position) # motor ticks
+device.command_motor_voltage(voltage) # millivolts
+device.command_motor_impedance(position) # motor ticks
+device.stop_motor()
+device.set_gains(kp, ki, kd, k, b, ff) # See below
 ```
 
-To run the checks manually, run this command:
-```bash
-$ pre-commit run --all-files
+When setting the gains:
+
+* `kp`: The proportional gain
+* `ki`: The integral gain
+* `kd`: The differential gain
+* `k`: The stiffness gain for impedance control
+* `b`: The damping gain for impedance control
+* `ff`: The feed-forward gain
+
+
+#### Device State
+
+You can also introspect certain aspects of the device's state, depending on the firmware version you're running:
+
+* `isOpen` : Indicates whether or not the computer and the device are connected
+* `isStreaming`: Indicates whether or not the device is sending data
+* `deviceName`: The name of the type of the device, e.g., "actpack"
+* `deviceSide`: Either "left" or "right", if applicable; `None` otherwise. **Requires firmware >= v10.0.0**.
+* `libsVersion`: The semantic version string of the pre-compiled C library being used. **Requires >= v10.0.0 of the pre-compiled C library**.
+* `firmware`: The semantic version string of the firmware version
+* `uvlo`: Used to both get and set the device's UVLO in millivolts
+
+
+#### Cleaning Up
+
+When finished commanding the device, it is good practice to call the `close` method:
+
+```python
+device.close()
 ```
 
-See more info on [pre-commit syntax](https://pre-commit.com).
+Additionally, when done streaming, you can call the `stop_streaming` method:
 
-### Documentation
-
-To generate the automatic documentation for this repository, run the command below:
-```bash
-$ cd docs
-$ doxygen doxyfile.in
+```python
+device.stop_streaming()
 ```
 
-Then open the generated files:
-```bash
-sensible-browser html/index.html
-```
-
-## Troubleshooting
-
-* On Windows, if flexsea can't install, or it can't load the libraries, make sure only once version of git and Python are installed as specified ins the installation section.
-* If your device has never had poles configured, you should run “find poles” from the demo script before trying other demos. This is not typical!
-* The leading cause of segmentation faults is a Device Spec mismatch between the embedded system and the scripts. This happens when you use old firmware with new scripts.
-
-License: CC BY-NC-SA 4.0
-[![License: CC BY-NC-SA 4.0](https://licensebuttons.net/l/by-nc-sa/4.0/80x15.png)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+**NOTE**: `stop_streaming` is called automatically by `close`, and `close` is called automatically by the `Device` class' destructor
