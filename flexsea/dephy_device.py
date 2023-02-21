@@ -52,7 +52,7 @@ class DephyDevice:
         self.useSafety: bool = False
         self._deviceName: str = ""
         self._deviceSide: str = ""
-        self._closed: bool = False
+        self._closed: bool = True
 
         self._clib = fxu.load_clib(self.cLibVersion, libFile=self.libFile)
 
