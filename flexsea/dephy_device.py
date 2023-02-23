@@ -416,9 +416,9 @@ class DephyDevice:
         """
         maxDataElements = self._clib.get_max_data_elements()
         nFields = c.c_int()
-        deviceData = (c.POINTER(c.c_uint32) * maxDataElements)()
+        deviceData = (c.c_uint32 * maxDataElements)()
 
-        retCode = self._clib.read(self.deviceId, deviceData, c.byref(nFields))
+        retCode = self._clib.read(self.deviceId, c.cast(deviceData, c.POINTER(c.c_uint32)), c.byref(nFields))
 
         if retCode != self.SUCCESS.value:
             raise RuntimeError("Could not read from device.")
@@ -539,7 +539,7 @@ class DephyDevice:
             self._clib.send_motor_command(devId, controller, value)
             != self.SUCCESS.value
         ):
-            raise RuntimeError("Coult not command motor position.")
+            raise RuntimeError("Could not command motor position.")
 
     # -----
     # command_motor_current
@@ -564,7 +564,7 @@ class DephyDevice:
             self._clib.send_motor_command(devId, controller, value)
             != self.SUCCESS.value
         ):
-            raise RuntimeError("Coult not command motor current.")
+            raise RuntimeError("Could not command motor current.")
 
     # -----
     # command_motor_voltage
@@ -589,7 +589,7 @@ class DephyDevice:
             self._clib.send_motor_command(devId, controller, value)
             != self.SUCCESS.value
         ):
-            raise RuntimeError("Coult not command motor voltage.")
+            raise RuntimeError("Could not command motor voltage.")
 
     # -----
     # command_motor_impedance
@@ -616,7 +616,7 @@ class DephyDevice:
             self._clib.send_motor_command(devId, controller, value)
             != self.SUCCESS.value
         ):
-            raise RuntimeError("Coult not command motor impedance.")
+            raise RuntimeError("Could not command motor impedance.")
 
     # -----
     # stop_motor
