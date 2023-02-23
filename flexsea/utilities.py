@@ -138,7 +138,7 @@ def load_clib(
             print(msg)
             sys.exit(1)
 
-    clib = c.cdll.LoadLibrary(str(libFile))
+    clib = c.cdll.LoadLibrary(str(libFile.expanduser().absolute()))
 
     api = apiSpec[cLibVersion]
 
