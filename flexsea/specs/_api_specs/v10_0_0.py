@@ -20,6 +20,11 @@ v10_0_0 = {
             ],
             "returnType": c.c_bool,
         },
+        "get_field_data_types": {
+            "name": "fxGetDeviceDataTypes",
+            "argTypes": [c.c_uint, c.POINTER(c.c_uint8), c.POINTER(c.c_uint8)],
+            "returnType": c.c_int,
+        },
         "get_max_device_name_length": {
             "name": "fxGetMaxDeviceNameLength",
             "argTypes": [],

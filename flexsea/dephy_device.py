@@ -258,7 +258,7 @@ class DephyDevice:
         for i in range(nLabels.value):
             for j in range(maxFieldLength):
                 fields[i] += labels[i][j].decode("utf8")
-            fields[i].strip("\x00")
+            fields[i] = fields[i].strip("\x00")
 
         return fields
 
@@ -428,7 +428,25 @@ class DephyDevice:
         except AssertionError as err:
             raise AssertionError("Incorrect number of fields read.") from err
 
-        data = [deviceData[i].value for i in range(nFields.value)]
+        deviceDataTypes = (c.c_uint8 * maxDataElements)()
+        nTypes = c.c_uint8()
+
+        retCode = self._clib.get_field_data_types(self.deviceId, c.cast(deviceDataTypes, c.POINTER(c.c_uint8)), c.byref(nTypes))
+
+        if retCode != self.SUCCESS.value:
+            raise RuntimeError("Could not get data types from device.")
+
+        try:
+            assert nTypes.value == len(self.fields)
+        except AssertionError as err:
+            raise AssertionError("Incorrect number of types read.") from err
+
+        data = []
+
+        for i in range(nFields.value):
+            dataType = fxe.device_data_type_map[deviceDataTypes[i]]
+            dataValue = dataType(deviceData[i]).value
+            data.append(dataValue)
 
         return dict(zip(self.fields, data))
 
