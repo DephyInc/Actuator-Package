@@ -418,7 +418,9 @@ class DephyDevice:
         nFields = c.c_int()
         deviceData = (c.c_uint32 * maxDataElements)()
 
-        retCode = self._clib.read(self.deviceId, c.cast(deviceData, c.POINTER(c.c_uint32)), c.byref(nFields))
+        retCode = self._clib.read(
+            self.deviceId, c.cast(deviceData, c.POINTER(c.c_uint32)), c.byref(nFields)
+        )
 
         if retCode != self.SUCCESS.value:
             raise RuntimeError("Could not read from device.")
@@ -431,7 +433,11 @@ class DephyDevice:
         deviceDataTypes = (c.c_uint8 * maxDataElements)()
         nTypes = c.c_uint8()
 
-        retCode = self._clib.get_field_data_types(self.deviceId, c.cast(deviceDataTypes, c.POINTER(c.c_uint8)), c.byref(nTypes))
+        retCode = self._clib.get_field_data_types(
+            self.deviceId,
+            c.cast(deviceDataTypes, c.POINTER(c.c_uint8)),
+            c.byref(nTypes),
+        )
 
         if retCode != self.SUCCESS.value:
             raise RuntimeError("Could not get data types from device.")
