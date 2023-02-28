@@ -1,5 +1,7 @@
 import ctypes as c
 import hashlib
+from multiprocessing import Process
+from multiprocessing import Value
 import os
 from pathlib import Path
 import platform
@@ -306,18 +308,40 @@ def find_port(baudRate: int, cLibVersion: str, libFile: str = "") -> str:
 
     for _port in comports():
         p = _port.device
-        deviceID = clib.open(p.encode("utf-8"), baudRate, 0)
-        if deviceID in (
+        deviceID = Value("i", -1)
+
+        process = Process(target=_timed_open, args=[cLib, p, baudRate, 0, deviceID])
+        process.start()
+        process.join(10)
+
+        # Timeout
+        if process.exitcode is None:
+            process.terminate()
+            process.join()
+            continue
+        # Error
+        if process.exitcode != 0:
+            continue
+        # Successful run, check return value
+        if deviceID.value in (
             fxe.dephyDeviceErrorCodes["INVALID_DEVICE"].value,
             fxe.legacyDeviceErrorCodes["INVALID_DEVICE"].value,
             -1,
         ):
             continue
         devicePort = p
-        clib.close(deviceID)
+        clib.close(deviceID.value)
         break
 
     if not devicePort:
         raise RuntimeError("Could not find a valid device.")
 
     return devicePort
+
+
+# ============================================
+#                 _timed_open
+# ============================================
+def _timed_open(clib, port, baudRate, logLevel, deviceID):
+        retValue = clib.open(port.encode("utf-8"), baudRate, logLevel)
+        deviceID.value = retValue
