@@ -92,11 +92,11 @@ legacyDeviceErrorCodes = {
 # ============================================
 #           Device Data Type Map
 # ============================================
-device_data_type_map = {
-    0: c.c_int32,
-    1: c.c_int32,
-    2: c.c_int16,
-    3: c.c_int16,
-    4: c.c_int8,
-    5: c.c_int8,
-}
+# device_data_type_map = {
+#     0: c.c_int32,
+#     1: c.c_int32,
+#     2: c.c_int16,
+#     3: c.c_int16,
+#     4: c.c_int8,
+#     5: c.c_int8,
+# }

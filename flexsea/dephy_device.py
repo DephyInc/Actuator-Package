@@ -416,10 +416,12 @@ class DephyDevice:
         """
         maxDataElements = self._clib.get_max_data_elements()
         nFields = c.c_int()
-        deviceData = (c.c_uint32 * maxDataElements)()
+        # deviceData = (c.c_uint32 * maxDataElements)()
+        deviceData = (c.c_int32 * maxDataElements)()
 
         retCode = self._clib.read(
-            self.deviceId, c.cast(deviceData, c.POINTER(c.c_uint32)), c.byref(nFields)
+            # self.deviceId, c.cast(deviceData, c.POINTER(c.c_uint32)), c.byref(nFields)
+            self.deviceId, c.cast(deviceData, c.POINTER(c.c_int32)), c.byref(nFields)
         )
 
         if retCode != self.SUCCESS.value:
@@ -430,29 +432,33 @@ class DephyDevice:
         except AssertionError as err:
             raise AssertionError("Incorrect number of fields read.") from err
 
-        deviceDataTypes = (c.c_uint8 * maxDataElements)()
-        nTypes = c.c_uint8()
+        # deviceDataTypes = (c.c_uint8 * maxDataElements)()
+        # nTypes = c.c_uint8()
+        #
+        # retCode = self._clib.get_field_data_types(
+        #     self.deviceId,
+        #     c.cast(deviceDataTypes, c.POINTER(c.c_uint8)),
+        #     c.byref(nTypes),
+        # )
+        #
+        # if retCode != self.SUCCESS.value:
+        #     raise RuntimeError("Could not get data types from device.")
+        #
+        # try:
+        #     assert nTypes.value == len(self.fields)
+        # except AssertionError as err:
+        #     raise AssertionError("Incorrect number of types read.") from err
+        #
+        # data = []
+        #
+        # for i in range(nFields.value):
+        #     dataType = fxe.device_data_type_map[deviceDataTypes[i]]
+        #     dataValue = dataType(deviceData[i]).value
+        #     data.append(dataValue)
 
-        retCode = self._clib.get_field_data_types(
-            self.deviceId,
-            c.cast(deviceDataTypes, c.POINTER(c.c_uint8)),
-            c.byref(nTypes),
-        )
-
-        if retCode != self.SUCCESS.value:
-            raise RuntimeError("Could not get data types from device.")
-
-        try:
-            assert nTypes.value == len(self.fields)
-        except AssertionError as err:
-            raise AssertionError("Incorrect number of types read.") from err
-
-        data = []
-
-        for i in range(nFields.value):
-            dataType = fxe.device_data_type_map[deviceDataTypes[i]]
-            dataValue = dataType(deviceData[i]).value
-            data.append(dataValue)
+        import pdb; pdb.set_trace()
+        # TODO: deviceData[i].value?
+        data = [deviceData[i] for i in range(nFields.value)]
 
         return dict(zip(self.fields, data))
 
