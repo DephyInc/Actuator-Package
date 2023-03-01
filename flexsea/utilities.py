@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 import platform
 import sys
+from time import sleep
 
 import boto3
 from botocore.client import BaseClient
@@ -303,6 +304,7 @@ def find_port(baudRate: int, cLibVersion: str, libFile: str = "") -> str:
         Name of the device's COM port.
     """
     devicePort = None
+    successVals = [fxe.dephyDeviceErrorCodes["SUCCESS"].value, fxe.legacyDeviceErrorCodes["SUCCESS"].value]
     clib = load_clib(cLibVersion, True, libFile)
 
     for _port in comports():
@@ -314,10 +316,14 @@ def find_port(baudRate: int, cLibVersion: str, libFile: str = "") -> str:
         with cf.ThreadPoolExecutor() as executor:
             future = executor.submit(_timed_open, clib, p, baudRate, 0)
             try:
-                retValue = future.result(timeout=10)
+                deviceId = future.result(timeout=10)
             except TimeoutError:
                 continue
             devicePort = p
+            sleep(0.1)
+            retValue = clib.close(deviceId)
+            if retValue not in successVals:
+                raise RuntimeError("Could not find a valid device.")
             break
 
     if not devicePort:
