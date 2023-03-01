@@ -1,7 +1,6 @@
+import concurrent.futures as cf
 import ctypes as c
 import hashlib
-from multiprocessing import Process
-from multiprocessing import Value
 import os
 from pathlib import Path
 import platform
@@ -308,30 +307,18 @@ def find_port(baudRate: int, cLibVersion: str, libFile: str = "") -> str:
 
     for _port in comports():
         p = _port.device
-        deviceID = Value("i", -1)
 
-        process = Process(target=_timed_open, args=[cLib, p, baudRate, 0, deviceID])
-        process.start()
-        process.join(10)
-
-        # Timeout
-        if process.exitcode is None:
-            process.terminate()
-            process.join()
-            continue
-        # Error
-        if process.exitcode != 0:
-            continue
-        # Successful run, check return value
-        if deviceID.value in (
-            fxe.dephyDeviceErrorCodes["INVALID_DEVICE"].value,
-            fxe.legacyDeviceErrorCodes["INVALID_DEVICE"].value,
-            -1,
-        ):
-            continue
-        devicePort = p
-        clib.close(deviceID.value)
-        break
+        # Not using multiprocessing.Process b/c Windows doesn't support the "fork"
+        # start method, only "spawn". Spawn cannot pickle a clib object and so the
+        # code crashes
+        with cf.ThreadPoolExecutor() as executor:
+            future = executor.submit(_timed_open, clib, p, baudRate, 0)
+            try:
+                retValue = future.result(timeout=10)
+            except TimeoutError:
+                continue
+            devicePort = p
+            break
 
     if not devicePort:
         raise RuntimeError("Could not find a valid device.")
@@ -342,6 +329,5 @@ def find_port(baudRate: int, cLibVersion: str, libFile: str = "") -> str:
 # ============================================
 #                 _timed_open
 # ============================================
-def _timed_open(clib, port, baudRate, logLevel, deviceID):
-        retValue = clib.open(port.encode("utf-8"), baudRate, logLevel)
-        deviceID.value = retValue
+def _timed_open(clib, port, baudRate, logLevel):
+        return clib.open(port.encode("utf-8"), baudRate, logLevel)
