@@ -45,8 +45,8 @@ class DephyDevice:
 
         self.fields: List = []
         self.deviceId: int = self.INVALID_DEVICE.value
-        self.hasHabs: bool = False
-        self.isChiral: bool = False
+        self._hasHabs: bool = False
+        self._isChiral: bool = False
         self.streamingFrequency: int = 0
         self.heartbeatPeriod: int = 0
         self.useSafety: bool = False
@@ -191,16 +191,6 @@ class DephyDevice:
                 msg = f"{givenVer} doesn't match {libVer} (C lib version)"
                 raise AssertionError(msg) from err
 
-        self._deviceName = self.deviceName
-        self._deviceSide = self.deviceSide
-
-        print("Check hasHabs to make sure correct device name is present.")
-        if self._deviceName in fxe.hasHabs:
-            self.hasHabs = True
-
-        if self._deviceName in fxe.hasChirality:
-            self.isChiral = True
-
         self.fields = self._get_fields()
 
     # -----
@@ -324,6 +314,17 @@ class DephyDevice:
         ValueError:
             If the heartbeatPeriod is invalid.
         """
+        self._start_streaming(frequency, heartbeatPeriod, useSafety)
+        self._get_metadata_from_stream()
+
+    # -----
+    # _start_streaming
+    # -----
+    def _start_streaming(self, frequency: int, heartbeatPeriod: int, useSafety: bool) -> None:
+        """
+        Calls code common to DephyDevice and LegacyDevice for actually beginning the
+        streaming process.
+        """
         if self.isStreaming:
             print("Already streaming.")
             return
@@ -355,6 +356,23 @@ class DephyDevice:
 
         if retCode != self.SUCCESS.value:
             raise RuntimeError("Could not start stream.")
+
+    # -----
+    # _get_metadata_from_stream
+    # -----
+    def _get_metadata_from_stream(self) -> None:
+        """
+        Calls code specific to a DephyDevice for getting name, side, chirality,
+        and hasHabs.
+        """
+        self._deviceName = self.deviceName
+        self._deviceSide = self.deviceSide
+
+        if self._deviceName in fxe.hasHabs:
+            self._hasHabs = True
+
+        if self._deviceName in fxe.hasChirality:
+            self._isChiral = True
 
     # -----
     # stop_streaming
@@ -790,7 +808,7 @@ class DephyDevice:
             "re": fxu.decode(fw.re),
         }
 
-        if self.hasHabs:
+        if self._hasHabs:
             fwDict["habs"] = fxu.decode(fw.habs)
 
         return fwDict
@@ -949,3 +967,21 @@ class DephyDevice:
 
         if self._clib.calibrate_imu(self.deviceId) != self.SUCCESS.value:
             raise RuntimeError("Could not calibrate imu.")
+
+    # -----
+    # hasHabs
+    # -----
+    @property
+    def hasHabs(self) -> bool:
+        if self._deviceName:
+            return self._hasHabs
+        raise RuntimeError("Must call start streaming before checking hasHabs.")
+
+    # -----
+    # isChiral
+    # -----
+    @property
+    def isChiral(self) -> bool:
+        if self._deviceName:
+            return self._isChiral
+        raise RuntimeError("Must call start streaming before checking isChiral.")
