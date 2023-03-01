@@ -93,6 +93,9 @@ class DephyDevice:
         if self._deviceName:
             return self._deviceName
 
+        if not self.isStreaming:
+            raise RuntimeError("Could not get device name. Not streaming.")
+
         maxDeviceNameLength = self._clib.get_max_device_name_length()
         deviceName = (c.c_char * maxDeviceNameLength)()
 
@@ -116,6 +119,9 @@ class DephyDevice:
         """
         if self._deviceSide:
             return self._deviceSide
+
+        if not self.isStreaming:
+            raise RuntimeError("Could not get device name. Not streaming.")
 
         maxDeviceSideLength = self._clib.get_max_device_side_length()
         deviceSide = (c.c_char * maxDeviceSideLength)()
