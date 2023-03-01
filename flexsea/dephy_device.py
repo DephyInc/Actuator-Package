@@ -121,18 +121,21 @@ class DephyDevice:
             return self._deviceSide
 
         if not self.isStreaming:
-            raise RuntimeError("Could not get device name. Not streaming.")
+            raise RuntimeError("Could not get device side. Not streaming.")
 
-        maxDeviceSideLength = self._clib.get_max_device_side_length()
-        deviceSide = (c.c_char * maxDeviceSideLength)()
+        # maxDeviceSideLength = self._clib.get_max_device_side_length()
+        # deviceSide = (c.c_char * maxDeviceSideLength)()
+        #
+        # if self._clib.get_side(self.deviceId, deviceSide) != self.SUCCESS.value:
+        #     raise RuntimeError("Could not get device side.")
+        #
+        # side = deviceSide.value.decode("utf8")
+        #
+        # # If side isn't applicable (for, e.g., an actpack), string is empty
+        # return side if side else "undefined"
 
-        if self._clib.get_side(self.deviceId, deviceSide) != self.SUCCESS.value:
-            raise RuntimeError("Could not get device side.")
-
-        side = deviceSide.value.decode("utf8")
-
-        # If side isn't applicable (for, e.g., an actpack), string is empty
-        return side if side else "undefined"
+        print("Getting device side is currently not functioning.")
+        return None
 
     # -----
     # open
@@ -366,7 +369,8 @@ class DephyDevice:
         and hasHabs.
         """
         self._deviceName = self.deviceName
-        self._deviceSide = self.deviceSide
+        # This functionality is currently not working
+        # self._deviceSide = self.deviceSide
 
         if self._deviceName in fxe.hasHabs:
             self._hasHabs = True
