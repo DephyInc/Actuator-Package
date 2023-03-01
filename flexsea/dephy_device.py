@@ -121,7 +121,7 @@ class DephyDevice:
         deviceSide = (c.c_char * maxDeviceSideLength)()
 
         if self._clib.get_side(self.deviceId, deviceSide) != self.SUCCESS.value:
-            raise RuntimeError("Could not get device name.")
+            raise RuntimeError("Could not get device side.")
 
         side = deviceSide.value.decode("utf8")
 
