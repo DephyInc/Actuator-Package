@@ -535,8 +535,12 @@ class DephyDevice:
             Command failed.
         """
         devId = self.deviceId
-        if self._clib.set_gains(devId, kp, ki, kd, k, b, ff) != self.SUCCESS.value:
-            raise RuntimeError("Command failed")
+        # There is a bug where, sometimes, the gains aren't set, so we try multiple
+        # times
+        for _ in range(5):
+            if self._clib.set_gains(devId, kp, ki, kd, k, b, ff) != self.SUCCESS.value:
+                raise RuntimeError("Command failed")
+            sleep(0.001)
 
     # -----
     # command_motor_position
