@@ -304,7 +304,10 @@ def find_port(baudRate: int, cLibVersion: str, libFile: str = "") -> str:
         Name of the device's COM port.
     """
     devicePort = None
-    successVals = [fxe.dephyDeviceErrorCodes["SUCCESS"].value, fxe.legacyDeviceErrorCodes["SUCCESS"].value]
+    successVals = [
+        fxe.dephyDeviceErrorCodes["SUCCESS"].value,
+        fxe.legacyDeviceErrorCodes["SUCCESS"].value,
+    ]
     clib = load_clib(cLibVersion, True, libFile)
 
     for _port in comports():
@@ -336,4 +339,4 @@ def find_port(baudRate: int, cLibVersion: str, libFile: str = "") -> str:
 #                 _timed_open
 # ============================================
 def _timed_open(clib, port, baudRate, logLevel):
-        return clib.open(port.encode("utf-8"), baudRate, logLevel)
+    return clib.open(port.encode("utf-8"), baudRate, logLevel)

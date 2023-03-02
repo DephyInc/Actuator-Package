@@ -93,16 +93,13 @@ class DephyDevice:
         if self._deviceName:
             return self._deviceName
 
-        if not self.isStreaming:
-            raise RuntimeError("Could not get device name. Not streaming.")
-
         maxDeviceNameLength = self._clib.get_max_device_name_length()
         deviceName = (c.c_char * maxDeviceNameLength)()
 
         if self._clib.get_device_name(self.deviceId, deviceName) != self.SUCCESS.value:
             raise RuntimeError("Could not get device name.")
 
-        return deviceName.value.decode("utf8")
+        return deviceName.value.decode("utf8").lower()
 
     # -----
     # deviceSide
@@ -120,22 +117,16 @@ class DephyDevice:
         if self._deviceSide:
             return self._deviceSide
 
-        if not self.isStreaming:
-            raise RuntimeError("Could not get device side. Not streaming.")
+        maxDeviceSideLength = self._clib.get_max_device_side_length()
+        deviceSide = (c.c_char * maxDeviceSideLength)()
 
-        # maxDeviceSideLength = self._clib.get_max_device_side_length()
-        # deviceSide = (c.c_char * maxDeviceSideLength)()
-        #
-        # if self._clib.get_side(self.deviceId, deviceSide) != self.SUCCESS.value:
-        #     raise RuntimeError("Could not get device side.")
-        #
-        # side = deviceSide.value.decode("utf8")
-        #
-        # # If side isn't applicable (for, e.g., an actpack), string is empty
-        # return side if side else "undefined"
+        if self._clib.get_side(self.deviceId, deviceSide) != self.SUCCESS.value:
+            raise RuntimeError("Could not get device side.")
 
-        print("Getting device side is currently not functioning.")
-        return None
+        side = deviceSide.value.decode("utf8")
+
+        # If side isn't applicable (for, e.g., an actpack), string is empty
+        return side.lower() if side else "undefined"
 
     # -----
     # open
@@ -323,7 +314,9 @@ class DephyDevice:
     # -----
     # _start_streaming
     # -----
-    def _start_streaming(self, frequency: int, heartbeatPeriod: int, useSafety: bool) -> None:
+    def _start_streaming(
+        self, frequency: int, heartbeatPeriod: int, useSafety: bool
+    ) -> None:
         """
         Calls code common to DephyDevice and LegacyDevice for actually beginning the
         streaming process.
@@ -369,8 +362,7 @@ class DephyDevice:
         and hasHabs.
         """
         self._deviceName = self.deviceName
-        # This functionality is currently not working
-        # self._deviceSide = self.deviceSide
+        self._deviceSide = self.deviceSide
 
         if self._deviceName in fxe.hasHabs:
             self._hasHabs = True
@@ -444,11 +436,9 @@ class DephyDevice:
         """
         maxDataElements = self._clib.get_max_data_elements()
         nFields = c.c_int()
-        # deviceData = (c.c_uint32 * maxDataElements)()
         deviceData = (c.c_int32 * maxDataElements)()
 
         retCode = self._clib.read(
-            # self.deviceId, c.cast(deviceData, c.POINTER(c.c_uint32)), c.byref(nFields)
             self.deviceId, c.cast(deviceData, c.POINTER(c.c_int32)), c.byref(nFields)
         )
 
@@ -460,32 +450,6 @@ class DephyDevice:
         except AssertionError as err:
             raise AssertionError("Incorrect number of fields read.") from err
 
-        # deviceDataTypes = (c.c_uint8 * maxDataElements)()
-        # nTypes = c.c_uint8()
-        #
-        # retCode = self._clib.get_field_data_types(
-        #     self.deviceId,
-        #     c.cast(deviceDataTypes, c.POINTER(c.c_uint8)),
-        #     c.byref(nTypes),
-        # )
-        #
-        # if retCode != self.SUCCESS.value:
-        #     raise RuntimeError("Could not get data types from device.")
-        #
-        # try:
-        #     assert nTypes.value == len(self.fields)
-        # except AssertionError as err:
-        #     raise AssertionError("Incorrect number of types read.") from err
-        #
-        # data = []
-        #
-        # for i in range(nFields.value):
-        #     dataType = fxe.device_data_type_map[deviceDataTypes[i]]
-        #     dataValue = dataType(deviceData[i]).value
-        #     data.append(dataValue)
-
-        import pdb; pdb.set_trace()
-        # TODO: deviceData[i].value?
         data = [deviceData[i] for i in range(nFields.value)]
 
         return dict(zip(self.fields, data))

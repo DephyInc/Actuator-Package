@@ -87,16 +87,3 @@ legacyDeviceErrorCodes = {
     "INVALID_DEVICE": c.c_int(3),
     "NOT_STREAMING": c.c_int(4),
 }
-
-
-# ============================================
-#           Device Data Type Map
-# ============================================
-# device_data_type_map = {
-#     0: c.c_int32,
-#     1: c.c_int32,
-#     2: c.c_int16,
-#     3: c.c_int16,
-#     4: c.c_int8,
-#     5: c.c_int8,
-# }
