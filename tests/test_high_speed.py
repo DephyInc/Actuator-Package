@@ -2,10 +2,10 @@ import argparse
 from time import sleep
 
 import numpy as np
-import pandas as pd
-import seaborn as sns
 
 from flexsea.device import Device
+
+from utils import plot
 
 
 # ============================================
@@ -71,31 +71,9 @@ def main(
                 desiredCurrent.append(current)
                 deviceTime.append(data["state_time"])
 
-
-# ============================================
-#                    plot
-# ============================================
-def plot(desired, measured, times):
-    nValues = len(times)
-    t = np.concatenate((times, times))
-    currentType = ["Desired Current"] * nValues + ["Measured Current"] * nValues
-    current = np.concatenate((desired, measured))
-
-    data = {
-        "Time (ms)": t,
-        "Current Type": currentType,
-        "Current (mA)": current,
-    }
-
-    df = pd.DataFrame(data)
-
-    plot = sns.relplot(
-        data=df, x="Time (ms)", y="Current (mA)", hue="Current Type", kind="line"
-    )
-
-    plot.figure.savefig("high_speed.png")
-
-    print("Data plot saved as: 'high_speed.png'")
+    device.close()
+    print("Plotting...")
+    plot(desiredCurrent, measuredCurrent, deviceTime, "Current (mA)", "high_speed.png")
 
 
 # ============================================
@@ -196,14 +174,14 @@ if __name__ == "__main__":
         "--command-frequency",
         dest="commandFrequency",
         type=int,
-        default=500,
+        default=100,
         help="Reciprocal of the time between motor commands.",
     )
     parser.add_argument(
         "--n-loops",
         dest="nLoops",
         type=int,
-        default=4,
+        default=1,
         help="Number of times to iterate.",
     )
     parser.add_argument(

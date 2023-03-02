@@ -1,10 +1,11 @@
 import argparse
-import subprocess as sub
 from time import sleep
 
 import numpy as np
 
 from flexsea.device import Device
+
+from utils import clear
 
 
 # ============================================
@@ -31,14 +32,14 @@ def main(
         for voltage in voltages:
             device.command_motor_voltage(int(voltage))
             sleep(0.1)
-            sub.run(["clear"])
+            clear()
             device.print()
 
         # Ramp down
         for voltage in voltages[-1::-1]:
             device.command_motor_voltage(int(voltage))
             sleep(0.1)
-            sub.run(["clear"])
+            clear()
             device.print()
 
     device.close()

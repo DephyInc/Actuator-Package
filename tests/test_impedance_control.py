@@ -1,11 +1,9 @@
 import argparse
 from time import sleep
 
-import numpy as np
-import pandas as pd
-import seaborn as sns
-
 from flexsea.device import Device
+
+from utils import plot
 
 
 # ============================================
@@ -62,37 +60,13 @@ def main(
 
     device.close()
 
-    plot(desiredPosition, measuredPosition, deviceTime)
-
-
-# ============================================
-#                    plot
-# ============================================
-def plot(desired, measured, times):
-    nValues = len(times)
-    t = np.concatenate((times, times))
-    positionType = ["Desired Position"] * nValues + ["Measured Position"] * nValues
-    position = np.concatenate((desired, measured))
-
-    data = {
-        "Time (ms)": t,
-        "Position Type": positionType,
-        "Motor Position (ticks)": position,
-    }
-
-    df = pd.DataFrame(data)
-
-    plot = sns.relplot(
-        data=df,
-        x="Time (ms)",
-        y="Motor Position (ticks)",
-        hue="Position Type",
-        kind="line",
+    plot(
+        desiredPosition,
+        measuredPosition,
+        deviceTime,
+        "Motor Position (ticks)",
+        "impedance_control.png",
     )
-
-    plot.figure.savefig("impedance.png")
-
-    print("Data plot saved as: 'impedance.png'")
 
 
 # ============================================

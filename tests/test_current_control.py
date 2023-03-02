@@ -1,23 +1,11 @@
 import argparse
-import subprocess as sub
 from time import sleep
 
 import numpy as np
 
 from flexsea.device import Device
 
-
-# ============================================
-#                   clear
-# ============================================
-def clear() -> None:
-    try:
-        sub.run(
-            ["cls" if "windows" == platform.system().lower() else "clear"], check=True
-        )
-    # For git bash
-    except FileNotFoundError:
-        sub.run(["clear"], check=True)
+from utils import clear
 
 
 # ============================================

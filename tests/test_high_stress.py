@@ -1,12 +1,11 @@
 import argparse
 from time import sleep
-from typing import List
 
-import pandas as pd
 import numpy as np
-import seaborn as sns
 
 from flexsea.device import Device
+
+from utils import plot
 
 
 # ============================================
@@ -104,22 +103,6 @@ def get_samples(frequency: int) -> dict:
 
 
 # ============================================
-#                    plot
-# ============================================
-def plot(time: List, desired: List, measured: List, label: str) -> None:
-    nValues = len(time)
-    t = np.concatenate((time, time))
-    dataType = ["Desired"] * nValues + ["Measured"] * nValues
-    data = np.concatenate((desired, measured))
-
-    df = pd.DataFrame({"Time (ms)": t, "Type": dataType, label: data})
-
-    plt = sns.relplot(data=df, x="Time (ms)", y=label, hue="Type", kind="line")
-
-    plt.figure.savefig(f"{label}_demo6.png")
-
-
-# ============================================
 #                    main
 # ============================================
 def main(port: str, cLibVersion: str, libFile: str, freq: int, nLoops: int):
@@ -200,7 +183,7 @@ def main(port: str, cLibVersion: str, libFile: str, freq: int, nLoops: int):
     labels = ["current", "position"]
 
     for (t, des, meas, label) in zip(times, desired, measured, labels):
-        plot(t, des, meas, label)
+        plot(des, meas, t, label, f"{label}_high_stress.png")
 
 
 # ============================================
@@ -238,14 +221,14 @@ if __name__ == "__main__":
         "--frequency",
         dest="freq",
         type=int,
-        default=1000,
+        default=100,
         help="Frequency (Hz) at which device will stream data.",
     )
     parser.add_argument(
         "--n-loops",
         dest="nLoops",
         type=int,
-        default=3,
+        default=1,
         help="Feed-forward gain.",
     )
 
