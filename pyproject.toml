@@ -20,7 +20,7 @@ semantic-version = "^2.10.0"
 black = "^22.10.0"
 pylint = "^2.15.5"
 wrapt = "^1.14.1"
-ipython = "^8.8.0"
+ipython = "^8.10.0"
 nox = "^2022.11.21"
 
 
