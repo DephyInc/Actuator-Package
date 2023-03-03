@@ -695,8 +695,10 @@ class DephyDevice:
 
         returnCode = self._clib.activate_bootloader(self.deviceId, targetCode)
 
+        if returnCode == self.INVALID_DEVICE.value:
+            raise RuntimeError(f"Invalid device ID for: `{target}`.")
         if returnCode != self.SUCCESS.value:
-            raise RuntimeError(f"Could not activate bootloader for: `{target}`.")
+            raise IOError
 
     # -----
     # bootloaderActive
