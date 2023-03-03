@@ -64,21 +64,6 @@ class LegacyDevice(DephyDevice):
             setattr(self._clib, key + "read", func)
 
     # -----
-    # _get_metadata_from_stream
-    # -----
-    def _get_metadata_from_stream(self) -> None:
-        """
-        Calls code specific to a LegacyDevice for getting name.
-        """
-        self._deviceName = self.deviceName
-
-        if self._deviceName in fxe.hasHabs:
-            self._hasHabs = True
-
-        if self._deviceName in fxe.hasChirality:
-            self._isChiral = True
-
-    # -----
     # deviceName
     # -----
     @property

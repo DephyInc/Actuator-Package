@@ -185,6 +185,15 @@ class DephyDevice:
                 msg = f"{givenVer} doesn't match {libVer} (C lib version)"
                 raise AssertionError(msg) from err
 
+        self._deviceName = self.deviceName
+        self._deviceSide = self.deviceSide
+
+        if self._deviceName in fxe.hasHabs:
+            self.hasHabs = True
+
+        if self._deviceName in fxe.hasChirality:
+            self.isChiral = True
+
         self.fields = self._get_fields()
 
     # -----
@@ -308,19 +317,6 @@ class DephyDevice:
         ValueError:
             If the heartbeatPeriod is invalid.
         """
-        self._start_streaming(frequency, heartbeatPeriod, useSafety)
-        self._get_metadata_from_stream()
-
-    # -----
-    # _start_streaming
-    # -----
-    def _start_streaming(
-        self, frequency: int, heartbeatPeriod: int, useSafety: bool
-    ) -> None:
-        """
-        Calls code common to DephyDevice and LegacyDevice for actually beginning the
-        streaming process.
-        """
         if self.isStreaming:
             print("Already streaming.")
             return
@@ -352,23 +348,6 @@ class DephyDevice:
 
         if retCode != self.SUCCESS.value:
             raise RuntimeError("Could not start stream.")
-
-    # -----
-    # _get_metadata_from_stream
-    # -----
-    def _get_metadata_from_stream(self) -> None:
-        """
-        Calls code specific to a DephyDevice for getting name, side, chirality,
-        and hasHabs.
-        """
-        self._deviceName = self.deviceName
-        self._deviceSide = self.deviceSide
-
-        if self._deviceName in fxe.hasHabs:
-            self._hasHabs = True
-
-        if self._deviceName in fxe.hasChirality:
-            self._isChiral = True
 
     # -----
     # stop_streaming
@@ -947,7 +926,7 @@ class DephyDevice:
     def hasHabs(self) -> bool:
         if self._deviceName:
             return self._hasHabs
-        raise RuntimeError("Must call start streaming before checking hasHabs.")
+        raise RuntimeError("Must call open before checking hasHabs.")
 
     # -----
     # isChiral
@@ -956,4 +935,4 @@ class DephyDevice:
     def isChiral(self) -> bool:
         if self._deviceName:
             return self._isChiral
-        raise RuntimeError("Must call start streaming before checking isChiral.")
+        raise RuntimeError("Must call open before checking isChiral.")
