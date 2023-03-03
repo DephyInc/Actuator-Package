@@ -45,14 +45,14 @@ class DephyDevice:
 
         self.fields: List = []
         self.deviceId: int = self.INVALID_DEVICE.value
-        self.hasHabs: bool = False
-        self.isChiral: bool = False
+        self._hasHabs: bool = False
+        self._isChiral: bool = False
         self.streamingFrequency: int = 0
         self.heartbeatPeriod: int = 0
         self.useSafety: bool = False
         self._deviceName: str = ""
         self._deviceSide: str = ""
-        self._closed: bool = False
+        self._closed: bool = True
 
         self._clib = fxu.load_clib(self.cLibVersion, libFile=self.libFile)
 
@@ -99,7 +99,7 @@ class DephyDevice:
         if self._clib.get_device_name(self.deviceId, deviceName) != self.SUCCESS.value:
             raise RuntimeError("Could not get device name.")
 
-        return deviceName.value.decode("utf8")
+        return deviceName.value.decode("utf8").lower()
 
     # -----
     # deviceSide
@@ -121,12 +121,12 @@ class DephyDevice:
         deviceSide = (c.c_char * maxDeviceSideLength)()
 
         if self._clib.get_side(self.deviceId, deviceSide) != self.SUCCESS.value:
-            raise RuntimeError("Could not get device name.")
+            raise RuntimeError("Could not get device side.")
 
         side = deviceSide.value.decode("utf8")
 
         # If side isn't applicable (for, e.g., an actpack), string is empty
-        return side if side else "undefined"
+        return side.lower() if side else "undefined"
 
     # -----
     # open
@@ -184,16 +184,6 @@ class DephyDevice:
             else:
                 msg = f"{givenVer} doesn't match {libVer} (C lib version)"
                 raise AssertionError(msg) from err
-
-        self._deviceName = self.deviceName
-        self._deviceSide = self.deviceSide
-
-        print("Check hasHabs to make sure correct device name is present.")
-        if self._deviceName in fxe.hasHabs:
-            self.hasHabs = True
-
-        if self._deviceName in fxe.hasChirality:
-            self.isChiral = True
 
         self.fields = self._get_fields()
 
@@ -258,7 +248,7 @@ class DephyDevice:
         for i in range(nLabels.value):
             for j in range(maxFieldLength):
                 fields[i] += labels[i][j].decode("utf8")
-            fields[i].strip("\x00")
+            fields[i] = fields[i].strip("\x00")
 
         return fields
 
@@ -318,6 +308,19 @@ class DephyDevice:
         ValueError:
             If the heartbeatPeriod is invalid.
         """
+        self._start_streaming(frequency, heartbeatPeriod, useSafety)
+        self._get_metadata_from_stream()
+
+    # -----
+    # _start_streaming
+    # -----
+    def _start_streaming(
+        self, frequency: int, heartbeatPeriod: int, useSafety: bool
+    ) -> None:
+        """
+        Calls code common to DephyDevice and LegacyDevice for actually beginning the
+        streaming process.
+        """
         if self.isStreaming:
             print("Already streaming.")
             return
@@ -349,6 +352,23 @@ class DephyDevice:
 
         if retCode != self.SUCCESS.value:
             raise RuntimeError("Could not start stream.")
+
+    # -----
+    # _get_metadata_from_stream
+    # -----
+    def _get_metadata_from_stream(self) -> None:
+        """
+        Calls code specific to a DephyDevice for getting name, side, chirality,
+        and hasHabs.
+        """
+        self._deviceName = self.deviceName
+        self._deviceSide = self.deviceSide
+
+        if self._deviceName in fxe.hasHabs:
+            self._hasHabs = True
+
+        if self._deviceName in fxe.hasChirality:
+            self._isChiral = True
 
     # -----
     # stop_streaming
@@ -416,9 +436,11 @@ class DephyDevice:
         """
         maxDataElements = self._clib.get_max_data_elements()
         nFields = c.c_int()
-        deviceData = (c.POINTER(c.c_uint32) * maxDataElements)()
+        deviceData = (c.c_int32 * maxDataElements)()
 
-        retCode = self._clib.read(self.deviceId, deviceData, c.byref(nFields))
+        retCode = self._clib.read(
+            self.deviceId, c.cast(deviceData, c.POINTER(c.c_int32)), c.byref(nFields)
+        )
 
         if retCode != self.SUCCESS.value:
             raise RuntimeError("Could not read from device.")
@@ -428,7 +450,7 @@ class DephyDevice:
         except AssertionError as err:
             raise AssertionError("Incorrect number of fields read.") from err
 
-        data = [deviceData[i].value for i in range(nFields.value)]
+        data = [deviceData[i] for i in range(nFields.value)]
 
         return dict(zip(self.fields, data))
 
@@ -513,8 +535,12 @@ class DephyDevice:
             Command failed.
         """
         devId = self.deviceId
-        if self._clib.set_gains(devId, kp, ki, kd, k, b, ff) != self.SUCCESS.value:
-            raise RuntimeError("Command failed")
+        # There is a bug where, sometimes, the gains aren't set, so we try multiple
+        # times
+        for _ in range(5):
+            if self._clib.set_gains(devId, kp, ki, kd, k, b, ff) != self.SUCCESS.value:
+                raise RuntimeError("Command failed")
+            sleep(0.001)
 
     # -----
     # command_motor_position
@@ -539,7 +565,7 @@ class DephyDevice:
             self._clib.send_motor_command(devId, controller, value)
             != self.SUCCESS.value
         ):
-            raise RuntimeError("Coult not command motor position.")
+            raise RuntimeError("Could not command motor position.")
 
     # -----
     # command_motor_current
@@ -564,7 +590,7 @@ class DephyDevice:
             self._clib.send_motor_command(devId, controller, value)
             != self.SUCCESS.value
         ):
-            raise RuntimeError("Coult not command motor current.")
+            raise RuntimeError("Could not command motor current.")
 
     # -----
     # command_motor_voltage
@@ -589,7 +615,7 @@ class DephyDevice:
             self._clib.send_motor_command(devId, controller, value)
             != self.SUCCESS.value
         ):
-            raise RuntimeError("Coult not command motor voltage.")
+            raise RuntimeError("Could not command motor voltage.")
 
     # -----
     # command_motor_impedance
@@ -616,7 +642,7 @@ class DephyDevice:
             self._clib.send_motor_command(devId, controller, value)
             != self.SUCCESS.value
         ):
-            raise RuntimeError("Coult not command motor impedance.")
+            raise RuntimeError("Could not command motor impedance.")
 
     # -----
     # stop_motor
@@ -754,7 +780,7 @@ class DephyDevice:
             "re": fxu.decode(fw.re),
         }
 
-        if self.hasHabs:
+        if self._hasHabs:
             fwDict["habs"] = fxu.decode(fw.habs)
 
         return fwDict
@@ -913,3 +939,21 @@ class DephyDevice:
 
         if self._clib.calibrate_imu(self.deviceId) != self.SUCCESS.value:
             raise RuntimeError("Could not calibrate imu.")
+
+    # -----
+    # hasHabs
+    # -----
+    @property
+    def hasHabs(self) -> bool:
+        if self._deviceName:
+            return self._hasHabs
+        raise RuntimeError("Must call start streaming before checking hasHabs.")
+
+    # -----
+    # isChiral
+    # -----
+    @property
+    def isChiral(self) -> bool:
+        if self._deviceName:
+            return self._isChiral
+        raise RuntimeError("Must call start streaming before checking isChiral.")
