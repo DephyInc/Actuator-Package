@@ -28,6 +28,7 @@ deviceStateDicts = {
 # ============================================
 hasHabs = [
     "exo",
+    "xc",
 ]
 
 hasHabsLegacy = [
