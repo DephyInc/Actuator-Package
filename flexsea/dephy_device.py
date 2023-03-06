@@ -456,11 +456,11 @@ class DephyDevice:
             by the field name.
         """
         qs = self.queueSize
-        data = (c.POINTER(c.c_uint32) * qs)()
+        data = (c.POINTER(c.c_int32) * qs)()
         nElements = c.c_int()
 
         for i in range(qs):
-            data[i] = (c.c_uint32 * len(self.fields))()
+            data[i] = (c.c_int32 * len(self.fields))()
 
         self._clib.read_all(self.deviceId, data, c.byref(nElements))
 

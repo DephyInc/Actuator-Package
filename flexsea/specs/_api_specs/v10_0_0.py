@@ -77,7 +77,7 @@ v10_0_0 = {
         },
         "read_all": {
             "name": "fxReadDeviceAllWrapper",
-            "argTypes": [c.c_uint, c.POINTER(c.POINTER(c.c_int)), c.POINTER(c.c_int)],
+            "argTypes": [c.c_uint, c.POINTER(c.POINTER(c.c_int32)), c.POINTER(c.c_int)],
             "returnType": None,
         },
         "request_uvlo": {
