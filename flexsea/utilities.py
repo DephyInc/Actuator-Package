@@ -1,9 +1,11 @@
+import concurrent.futures as cf
 import ctypes as c
 import hashlib
 import os
 from pathlib import Path
 import platform
 import sys
+from time import sleep
 
 import boto3
 from botocore.client import BaseClient
@@ -138,7 +140,7 @@ def load_clib(
             print(msg)
             sys.exit(1)
 
-    clib = c.cdll.LoadLibrary(str(libFile))
+    clib = c.cdll.LoadLibrary(str(libFile.expanduser().absolute()))
 
     api = apiSpec[cLibVersion]
 
@@ -302,22 +304,39 @@ def find_port(baudRate: int, cLibVersion: str, libFile: str = "") -> str:
         Name of the device's COM port.
     """
     devicePort = None
+    successVals = [
+        fxe.dephyDeviceErrorCodes["SUCCESS"].value,
+        fxe.legacyDeviceErrorCodes["SUCCESS"].value,
+    ]
     clib = load_clib(cLibVersion, True, libFile)
 
     for _port in comports():
         p = _port.device
-        deviceID = clib.open(p.encode("utf-8"), baudRate, 0)
-        if deviceID in (
-            fxe.dephyDeviceErrorCodes["INVALID_DEVICE"].value,
-            fxe.legacyDeviceErrorCodes["INVALID_DEVICE"].value,
-            -1,
-        ):
-            continue
-        devicePort = p
-        clib.close(deviceID)
-        break
+
+        # Not using multiprocessing.Process b/c Windows doesn't support the "fork"
+        # start method, only "spawn". Spawn cannot pickle a clib object and so the
+        # code crashes
+        with cf.ThreadPoolExecutor() as executor:
+            future = executor.submit(_timed_open, clib, p, baudRate, 0)
+            try:
+                deviceId = future.result(timeout=10)
+            except TimeoutError:
+                continue
+            devicePort = p
+            sleep(0.1)
+            retValue = clib.close(deviceId)
+            if retValue not in successVals:
+                raise RuntimeError("Could not find a valid device.")
+            break
 
     if not devicePort:
         raise RuntimeError("Could not find a valid device.")
 
     return devicePort
+
+
+# ============================================
+#                 _timed_open
+# ============================================
+def _timed_open(clib, port, baudRate, logLevel):
+    return clib.open(port.encode("utf-8"), baudRate, logLevel)
