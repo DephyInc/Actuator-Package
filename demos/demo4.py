@@ -6,6 +6,8 @@ impedance, demonstrating how to:
 
     * Command motor impedance
 """
+# pylint: disable=duplicate-code
+
 import platform
 from time import sleep
 

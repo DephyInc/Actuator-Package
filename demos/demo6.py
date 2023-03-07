@@ -1,6 +1,8 @@
 """
 Demo 6: High Stress
 """
+# pylint: disable=duplicate-code
+
 import platform
 from time import sleep
 from typing import List
@@ -136,7 +138,7 @@ def plot(time: List, desired: List, measured: List, label: str) -> None:
 # ============================================
 #                    main
 # ============================================
-def main():
+def main():  # pylint: disable=too-many-locals
     """
     This demo alternates between a position control loop and a current
     control loop several times in a demanding fashion. The setpoints

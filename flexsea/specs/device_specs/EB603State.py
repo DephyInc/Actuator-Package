@@ -12,6 +12,8 @@
 ///
 /// @author Dephy, Inc.
 """
+# pylint: disable=duplicate-code
+
 from ctypes import Structure, c_int
 
 

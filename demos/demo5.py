@@ -5,6 +5,8 @@ Runs the motor at a high speed, demonstrating how to:
 
     * Control which version of the pre-compiled C library is used
 """
+# pylint: disable=duplicate-code
+
 import platform
 from time import sleep
 
