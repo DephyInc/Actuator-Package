@@ -14,6 +14,7 @@
 """
 from ctypes import Structure, c_int
 
+
 class MD11State(Structure):
     _pack_ = 1
     _fields_ = [
@@ -75,4 +76,5 @@ class MD11State(Structure):
         ("intermediate_state", c_int),
         ("movement", c_int),
         ("toe_whip", c_int),
-        ("SystemTime", c_int)]
+        ("SystemTime", c_int),
+    ]

@@ -14,6 +14,7 @@
 """
 from ctypes import Structure, c_int
 
+
 class ActPackState(Structure):
     _pack_ = 1
     _fields_ = [
@@ -50,4 +51,5 @@ class ActPackState(Structure):
         ("genvar_9", c_int),
         ("ank_ang", c_int),
         ("ank_vel", c_int),
-        ("SystemTime", c_int)]
+        ("SystemTime", c_int),
+    ]

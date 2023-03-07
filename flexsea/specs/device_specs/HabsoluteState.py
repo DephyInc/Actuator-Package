@@ -14,6 +14,7 @@
 """
 from ctypes import Structure, c_int
 
+
 class HabsoluteState(Structure):
     _pack_ = 1
     _fields_ = [
@@ -36,4 +37,5 @@ class HabsoluteState(Structure):
         ("genvar_2", c_int),
         ("genvar_3", c_int),
         ("status", c_int),
-        ("SystemTime", c_int)]
+        ("SystemTime", c_int),
+    ]

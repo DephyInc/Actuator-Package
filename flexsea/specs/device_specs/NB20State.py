@@ -14,6 +14,7 @@
 """
 from ctypes import Structure, c_int
 
+
 class NB20State(Structure):
     _pack_ = 1
     _fields_ = [
@@ -78,4 +79,5 @@ class NB20State(Structure):
         ("movement", c_int),
         ("speed", c_int),
         ("incline", c_int),
-        ("SystemTime", c_int)]
+        ("SystemTime", c_int),
+    ]
