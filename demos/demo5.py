@@ -14,7 +14,6 @@ import seaborn as sns
 
 from flexsea.device import Device
 
-
 if "windows" == platform.system().lower():
     msg = "WARNING: these demos may not function properly on Windows "
     msg += "due to the way the OS handles timing. They are best run on "

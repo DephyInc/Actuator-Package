@@ -5,8 +5,8 @@ import platform
 from time import sleep
 from typing import List
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 import seaborn as sns
 
 from flexsea.device import Device
@@ -226,7 +226,7 @@ def main():
     measured = [data["measuredCurrent"], data["measuredPosition"]]
     labels = ["current", "position"]
 
-    for (t, des, meas, label) in zip(times, desired, measured, labels):
+    for t, des, meas, label in zip(times, desired, measured, labels):
         plot(t, des, meas, label)
 
 
