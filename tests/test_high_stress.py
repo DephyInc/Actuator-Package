@@ -2,10 +2,9 @@ import argparse
 from time import sleep
 
 import numpy as np
+from utils import plot
 
 from flexsea.device import Device
-
-from utils import plot
 
 
 # ============================================
@@ -182,7 +181,7 @@ def main(port: str, cLibVersion: str, libFile: str, freq: int, nLoops: int):
     measured = [data["measuredCurrent"], data["measuredPosition"]]
     labels = ["current", "position"]
 
-    for (t, des, meas, label) in zip(times, desired, measured, labels):
+    for t, des, meas, label in zip(times, desired, measured, labels):
         plot(des, meas, t, label, f"{label}_high_stress.png")
 
 

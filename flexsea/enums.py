@@ -2,7 +2,6 @@ import ctypes as c
 
 from .specs.device_specs import all_devices as fxd
 
-
 # ============================================
 #                Device Names
 # ============================================

@@ -1,9 +1,9 @@
 import argparse
 from time import sleep
 
-from flexsea.device import Device
-
 from utils import plot
+
+from flexsea.device import Device
 
 
 # ============================================

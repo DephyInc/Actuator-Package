@@ -3,7 +3,6 @@ import ctypes as c
 from flexsea import firmware as fw
 from flexsea.specs.device_specs import all_devices as fxd
 
-
 v10_0_0 = {
     "commands": {
         "is_open": {

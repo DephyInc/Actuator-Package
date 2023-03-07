@@ -2,10 +2,9 @@ import argparse
 from time import sleep
 
 import numpy as np
+from utils import plot
 
 from flexsea.device import Device
-
-from utils import plot
 
 
 # ============================================

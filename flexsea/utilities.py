@@ -2,18 +2,18 @@ import concurrent.futures as cf
 import ctypes as c
 import hashlib
 import os
-from pathlib import Path
 import platform
 import sys
+from pathlib import Path
 from time import sleep
 
 import boto3
-from botocore.client import BaseClient
 import botocore.exceptions as bce
+from botocore.client import BaseClient
 from serial.tools.list_ports import comports
 
-from flexsea.specs.api_spec import apiSpec
 import flexsea.enums as fxe
+from flexsea.specs.api_spec import apiSpec
 
 from . import config as cfg
 
