@@ -1,12 +1,14 @@
 """
 Demo 6: High Stress
 """
+# pylint: disable=duplicate-code
+
 import platform
 from time import sleep
 from typing import List
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 import seaborn as sns
 
 from flexsea.device import Device
@@ -136,7 +138,7 @@ def plot(time: List, desired: List, measured: List, label: str) -> None:
 # ============================================
 #                    main
 # ============================================
-def main():
+def main():  # pylint: disable=too-many-locals
     """
     This demo alternates between a position control loop and a current
     control loop several times in a demanding fashion. The setpoints
@@ -226,7 +228,7 @@ def main():
     measured = [data["measuredCurrent"], data["measuredPosition"]]
     labels = ["current", "position"]
 
-    for (t, des, meas, label) in zip(times, desired, measured, labels):
+    for t, des, meas, label in zip(times, desired, measured, labels):
         plot(t, des, meas, label)
 
 

@@ -5,7 +5,6 @@ from ._api_specs.v9_1_0 import v9_1_0
 from ._api_specs.v9_2_0 import v9_2_0
 from ._api_specs.v10_0_0 import v10_0_0
 
-
 apiSpec = {
     "7.2.0": v7_2_0,
     "7.2.6": v7_2_6,

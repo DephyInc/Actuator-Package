@@ -1,17 +1,18 @@
+# pylint: disable=duplicate-code
+
 import argparse
 from time import sleep
 
 import numpy as np
+from utils import plot  # pylint: disable=import-error
 
 from flexsea.device import Device
-
-from utils import plot
 
 
 # ============================================
 #                    main
 # ============================================
-def main(
+def main(  # pylint: disable=too-many-locals
     port: str,
     cLibVersion: str,
     libFile: str,
@@ -194,7 +195,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    gains = {
+    gains_dict = {
         "kp": args.kp,
         "ki": args.ki,
         "kd": args.kd,
@@ -208,7 +209,7 @@ if __name__ == "__main__":
         args.cLibVersion,
         args.libFile,
         args.freq,
-        gains,
+        gains_dict,
         args.waveAmplitude,
         args.waveFrequency,
         args.commandFrequency,

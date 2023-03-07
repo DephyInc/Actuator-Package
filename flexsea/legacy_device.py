@@ -33,7 +33,6 @@ class LegacyDevice(DephyDevice):
         loggingEnabled: bool,
         libFile: str = "",
     ) -> None:
-
         super().__init__(port, baudRate, cLibVersion, logLevel, loggingEnabled, libFile)
         self._state: c.Structure | None = None
 

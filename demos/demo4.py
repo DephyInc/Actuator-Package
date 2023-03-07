@@ -6,6 +6,8 @@ impedance, demonstrating how to:
 
     * Command motor impedance
 """
+# pylint: disable=duplicate-code
+
 import platform
 from time import sleep
 
@@ -14,7 +16,6 @@ import pandas as pd
 import seaborn as sns
 
 from flexsea.device import Device
-
 
 if "windows" == platform.system().lower():
     msg = "WARNING: these demos may not function properly on Windows "

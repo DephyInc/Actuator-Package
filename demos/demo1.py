@@ -8,13 +8,14 @@ Here we loop over an array of voltages, demonstrating how to:
     * Command the motor voltage
     * Clean up once we're done
 """
+# pylint: disable=duplicate-code
+
 import platform
 from time import sleep
 
 import numpy as np
 
 from flexsea.device import Device
-
 
 if "windows" == platform.system().lower():
     msg = "WARNING: these demos may not function properly on Windows "

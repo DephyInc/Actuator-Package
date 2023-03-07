@@ -1,11 +1,12 @@
+# pylint: disable=duplicate-code
+
 import argparse
 from time import sleep
 
 import numpy as np
+from utils import plot  # pylint: disable=import-error
 
 from flexsea.device import Device
-
-from utils import plot
 
 
 # ============================================
@@ -105,7 +106,9 @@ def get_samples(frequency: int) -> dict:
 # ============================================
 #                    main
 # ============================================
-def main(port: str, cLibVersion: str, libFile: str, freq: int, nLoops: int):
+def main(
+    port: str, cLibVersion: str, libFile: str, freq: int, nLoops: int
+):  # pylint: disable=too-many-locals
     delay = 1.0 / freq
     # Factor to determine current on "way back" to starting point
     currentAsymmetricG = 1.15
@@ -182,7 +185,7 @@ def main(port: str, cLibVersion: str, libFile: str, freq: int, nLoops: int):
     measured = [data["measuredCurrent"], data["measuredPosition"]]
     labels = ["current", "position"]
 
-    for (t, des, meas, label) in zip(times, desired, measured, labels):
+    for t, des, meas, label in zip(times, desired, measured, labels):
         plot(des, meas, t, label, f"{label}_high_stress.png")
 
 

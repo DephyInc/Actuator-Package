@@ -32,6 +32,27 @@ git checkout v10.0.0 # Or the branch you want
 python3 -m pip install .
 ```
 
+### Development tools
+
+To develop flexsea, install [Poetry](https://python-poetry.org/docs/):
+
+```bash
+curl -sSL https://install.python-poetry.org | python3 -
+```
+
+Activate the development environemtn and isntall dependencies
+```bash
+poetry shell
+poetry install
+```
+
+Update dependencies and sync the lock file.
+```bash
+poetry update
+poetry install --sync
+poetry lock
+```
+
 
 ## Usage
 
