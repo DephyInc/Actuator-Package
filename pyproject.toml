@@ -1,16 +1,17 @@
 [tool.poetry]
 name = "flexsea"
-version = "10.1.3"
-description = ""
-authors = ["Jared <jcoughlin@dephy.com>"]
+version = "10.1.4"
+description = "Python API to interact with Dephy devices."
+authors = ["Jared <jcoughlin@dephy.com>", "Carlos <casmat@dephy.com>"]
 readme = "README.md"
 packages = [
     {include = "flexsea"},
     {include = "demos"},
+    {include = "tests"},
 ]
 
 [tool.poetry.dependencies]
-python = "^3.11.0rc1"
+python = "^3.10"
 boto3 = "^1.26.8"
 pyserial = "^3.5"
 semantic-version = "^2.10.0"
@@ -22,6 +23,7 @@ pylint = "^2.15.5"
 wrapt = "^1.14.1"
 ipython = "^8.10.0"
 nox = "^2022.11.21"
+pre-commit = "^3.1.1"
 
 
 [tool.poetry.group.demos.dependencies]
@@ -29,6 +31,11 @@ numpy = "^1.24.1"
 jupyterlab = "^3.5.2"
 seaborn = "^0.12.2"
 
+
+
+[tool.poetry.group.tests.dependencies]
+numpy = "^1.24.2"
+pandas = "^1.5.3"
 
 [tool.poetry.scripts]
 flexsea-demos = 'demos.console.main:main'
