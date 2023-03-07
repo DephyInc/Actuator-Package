@@ -189,7 +189,7 @@ class DephyDevice:
         self._deviceSide = self.deviceSide
 
         if self._deviceName in fxe.hasHabs:
-            self.hasHabs = True
+            self._hasHabs = True
 
         if self._deviceName in fxe.hasChirality:
             self.isChiral = True
