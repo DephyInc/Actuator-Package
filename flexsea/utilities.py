@@ -161,7 +161,7 @@ def load_clib(
 # ============================================
 #                  download
 # ============================================
-def download(fileObj: str, bucket: str, dest: str, profile: str | None = None) -> None:
+def download(fileObj: str, bucket: str, dest: str, profile: str = "dephy") -> None:
     """
     Downloads `fileObj` from `bucket` to `dest` with the AWS
     credentials profile `profile`.
