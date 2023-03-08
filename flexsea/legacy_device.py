@@ -47,7 +47,7 @@ class LegacyDevice(DephyDevice):
         self._deviceName = self.deviceName
 
         if self._deviceName in fxe.hasHabsLegacy:
-            self.hasHabs = True
+            self._hasHabs = True
 
         self._state = fxe.deviceStateDicts[self._deviceName]()
 

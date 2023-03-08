@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "flexsea"
-version = "10.1.6"
+version = "10.1.7"
 description = "Python API to interact with Dephy devices."
 authors = ["Jared <jcoughlin@dephy.com>", "Carlos <casmat@dephy.com>"]
 readme = "README.md"
