@@ -192,7 +192,7 @@ class DephyDevice:
             self._hasHabs = True
 
         if self._deviceName in fxe.hasChirality:
-            self.isChiral = True
+            self._isChiral = True
 
         self.fields = self._get_fields()
 
