@@ -173,17 +173,13 @@ class DephyDevice:
         libVer = sem.Version(self.libsVersion)
 
         try:
-            assert givenVer == libVer
+            assert givenVer.major == libVer.major
         except AssertionError as err:
-            if givenVer.major == libVer.major:
-                msg = f"Given lib version: `{givenVer}` doesn't match file lib "
-                msg += f"version: `{libVer}`, but major versions match. Proceed[y|n]?"
-                proceed = input(msg)
-                if proceed != "y":
-                    sys.exit(1)
-            else:
-                msg = f"{givenVer} doesn't match {libVer} (C lib version)"
-                raise AssertionError(msg) from err
+            msg = "C library version mismatch:"
+            msg += f"\n\tVersion loaded from file: {libVer}"
+            msg += f"\n\tExpected (given) version: {givenVer}"
+            print(msg)
+            sys.exit(1)
 
         self._deviceName = self.deviceName
         self._deviceSide = self.deviceSide

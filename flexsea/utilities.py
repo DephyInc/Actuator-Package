@@ -10,6 +10,7 @@ from time import sleep
 import boto3
 import botocore.exceptions as bce
 from botocore.client import BaseClient
+import semantic_version as sem
 from serial.tools.list_ports import comports
 
 import flexsea.enums as fxe
@@ -142,7 +143,40 @@ def load_clib(
 
     clib = c.cdll.LoadLibrary(str(libFile.expanduser().absolute()))
 
-    api = apiSpec[cLibVersion]
+    clib = _initialize_clib(clib)
+
+    if not silent:
+        print(f"Using version: {cLibVersion} of pre-compiled C library.")
+        print(f"Loading library from: {libFile}")
+
+    return clib
+
+
+# ============================================
+#              _initialize_clib
+# ============================================
+def _initialize_clib(clib: c.CDLL) -> c.CDLL:
+    """
+    Sets up the function prototypes based on which version of the API
+    we want to use.
+    """
+    # If the given version doesn't match a cached version, see if we
+    # can find one that shares the same major version
+    try:
+        api = apiSpec[cLibVersion]
+    except KeyError as err:
+        desiredVersion = sem.Version(cLibVersion)
+        versionSpec = sem.SimpleSpec(f">={desiredVersion.major}.0.0,<{desiredVersion}")
+        closestVersion = versionSpec.select([sem.Version(v) for v in apiSpec])
+        
+        if closestVersion is None:
+            raise err(f"Could not find a matching API spec for: {cLibVersion}")
+
+        api = apiSpec[closestVersion]
+
+        msg = f"WARNING: could not find API spec for version: {cLibVersion}."
+        msg += f"Using {closestVersion} instead."
+        print(msg)
 
     for functionName, functionData in api["commands"].items():
         func = getattr(clib, functionData["name"], None)
@@ -151,11 +185,6 @@ def load_clib(
             func.restype = functionData["returnType"]
         setattr(clib, functionName, func)
 
-    if not silent:
-        print(f"Using version: {cLibVersion} of pre-compiled C library.")
-        print(f"Loading library from: {libFile}")
-
-    return clib
 
 
 # ============================================
