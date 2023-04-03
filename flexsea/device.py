@@ -27,7 +27,7 @@ class Device(LegacyDevice):
         loggingEnabled: bool = True,
         libFile: str = "",
     ) -> DephyDevice | LegacyDevice:
-        inUse = sem.Version(cLibVersion)
+        inUse = sem.Version.coerce(cLibVersion)
         cutoff = sem.Version(cfg.legacyCutoff)
 
         if not port:

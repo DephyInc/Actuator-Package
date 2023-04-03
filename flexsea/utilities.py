@@ -143,7 +143,7 @@ def load_clib(
 
     clib = c.cdll.LoadLibrary(str(libFile.expanduser().absolute()))
 
-    clib = _initialize_clib(clib)
+    clib = _initialize_clib(clib, cLibVersion)
 
     if not silent:
         print(f"Using version: {cLibVersion} of pre-compiled C library.")
@@ -155,7 +155,7 @@ def load_clib(
 # ============================================
 #              _initialize_clib
 # ============================================
-def _initialize_clib(clib: c.CDLL) -> c.CDLL:
+def _initialize_clib(clib: c.CDLL, cLibVersion: str) -> c.CDLL:
     """
     Sets up the function prototypes based on which version of the API
     we want to use.
@@ -165,7 +165,7 @@ def _initialize_clib(clib: c.CDLL) -> c.CDLL:
     try:
         api = apiSpec[cLibVersion]
     except KeyError as err:
-        desiredVersion = sem.Version(cLibVersion)
+        desiredVersion = sem.Version.coerce(cLibVersion)
         versionSpec = sem.SimpleSpec(f">={desiredVersion.major}.0.0,<{desiredVersion}")
         closestVersion = versionSpec.select([sem.Version(v) for v in apiSpec])
         
