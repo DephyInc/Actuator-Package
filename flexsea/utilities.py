@@ -190,8 +190,8 @@ def _initialize_clib(clib: c.CDLL, cLibVersion: str) -> c.CDLL:
 # ============================================
 #                  download
 # ============================================
-def download(fileObj: str, bucket: str, dest: str, profile: str = "dephy") -> None:
-    """
+def download(fileObj: str, bucket: str, dest: str, profile: str | None = None) -> None:
+    """ 
     Downloads `fileObj` from `bucket` to `dest` with the AWS
     credentials profile `profile`.
 
