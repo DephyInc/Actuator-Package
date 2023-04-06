@@ -1038,10 +1038,10 @@ class DephyDevice:
             sys.exit(1)
         # We have to sleep for a bit in order to allow the device time
         # to fulfill the request
-        sleep(.25)
+        sleep(0.25)
 
         numUtts = self.num_utts
-        data = (c.c_int * num_utts)()
+        data = (c.c_int * numUtts)()
         retCode = self._clib.get_last_received_utts(self.deviceId, data, numUtts)
 
         if retCode != self.SUCCESS.value:

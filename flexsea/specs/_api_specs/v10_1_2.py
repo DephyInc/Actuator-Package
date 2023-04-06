@@ -203,17 +203,23 @@ v10_1_2 = {
         },
         "reset_utts": {
             "name": "fxSetUTTsToDefault",
-            "argTypes": [c.c_uint,],
+            "argTypes": [
+                c.c_uint,
+            ],
             "returnType": c.c_int,
         },
         "save_utts": {
             "name": "fxSaveUTTToMemory",
-            "argTypes": [c.c_uint,],
+            "argTypes": [
+                c.c_uint,
+            ],
             "returnType": c.c_int,
         },
         "request_utts": {
             "name": "fxRequestUTT",
-            "argTypes": [c.c_uint,],
+            "argTypes": [
+                c.c_uint,
+            ],
             "returnType": c.c_int,
         },
         "get_last_received_utts": {
