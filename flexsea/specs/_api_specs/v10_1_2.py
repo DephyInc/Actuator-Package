@@ -191,5 +191,35 @@ v10_1_2 = {
             "argTypes": [c.c_uint, c.c_uint],
             "returnType": c.c_uint,
         },
+        "get_num_utts": {
+            "name": "fxGetNumUtts",
+            "argtypes": [],
+            "returnType": c.c_int,
+        },
+        "set_utts": {
+            "name": "fxSetUTT",
+            "argTypes": [c.c_uint, c.POINTER(c.c_int), c.c_uint, c.c_byte],
+            "returnType": c.c_int,
+        },
+        "reset_utts": {
+            "name": "fxSetUTTsToDefault",
+            "argTypes": [c.c_uint,],
+            "returnType": c.c_int,
+        },
+        "save_utts": {
+            "name": "fxSaveUTTToMemory",
+            "argTypes": [c.c_uint,],
+            "returnType": c.c_int,
+        },
+        "request_utts": {
+            "name": "fxRequestUTT",
+            "argTypes": [c.c_uint,],
+            "returnType": c.c_int,
+        },
+        "get_last_received_utts": {
+            "name": "fxGetLastReceivedUTT",
+            "argTypes": [c.c_uint, c.POINTER(c.c_int), c.c_uint],
+            "returnType": c.c_int,
+        },
     },
 }
