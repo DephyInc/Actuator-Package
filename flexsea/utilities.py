@@ -6,6 +6,7 @@ import platform
 import sys
 from pathlib import Path
 from time import sleep
+from typing import List
 
 import boto3
 import botocore.exceptions as bce
@@ -124,7 +125,9 @@ def load_clib(
         if cLibVersion not in availableVersions:
             desiredVersion = sem.Version.coerce(cLibVersion)
             versionSpec = sem.SimpleSpec(f"~={desiredVersion.major}.0.0")
-            closestVersion = versionSpec.select([sem.Version(v) for v in availableVersions])
+            closestVersion = versionSpec.select(
+                [sem.Version(v) for v in availableVersions]
+            )
 
             if closestVersion is None:
                 raise RuntimeError(f"Could not find a library for: {cLibVersion}")
@@ -182,9 +185,10 @@ def _initialize_clib(clib: c.CDLL, cLibVersion: str) -> c.CDLL:
         desiredVersion = sem.Version.coerce(cLibVersion)
         versionSpec = sem.SimpleSpec(f">={desiredVersion.major}.0.0,<{desiredVersion}")
         closestVersion = versionSpec.select([sem.Version(v) for v in apiSpec])
-        
+
         if closestVersion is None:
-            raise err(f"Could not find a matching API spec for: {cLibVersion}")
+            msg = f"Could not find a matching API spec for: {cLibVersion}"
+            raise RuntimeError(msg) from err
 
         api = apiSpec[closestVersion]
 
@@ -199,13 +203,14 @@ def _initialize_clib(clib: c.CDLL, cLibVersion: str) -> c.CDLL:
             func.restype = functionData["returnType"]
         setattr(clib, functionName, func)
 
+    return clib
 
 
 # ============================================
 #                  download
 # ============================================
 def download(fileObj: str, bucket: str, dest: str, profile: str | None = None) -> None:
-    """ 
+    """
     Downloads `fileObj` from `bucket` to `dest` with the AWS
     credentials profile `profile`.
 

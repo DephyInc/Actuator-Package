@@ -174,7 +174,7 @@ class DephyDevice:
 
         try:
             assert givenVer.major == libVer.major
-        except AssertionError as err:
+        except AssertionError:
             msg = "C library version mismatch:"
             msg += f"\n\tVersion loaded from file: {libVer}"
             msg += f"\n\tExpected (given) version: {givenVer}"
