@@ -117,6 +117,20 @@ def load_clib(
 
     if not libFile:
         lib = cfg.windowsLib if "win" in _os else cfg.linuxLib
+        # If the given version doesn't match a version available on S3,
+        # we should download the latest version of the matching major
+        # version, then ask the user if they want to proceed
+        availableVersions = get_available_lib_versions()
+        if cLibVersion not in availableVersions:
+            desiredVersion = sem.Version.coerce(cLibVersion)
+            versionSpec = sem.SimpleSpec(f"~={desiredVersion.major}.0.0")
+            closestVersion = versionSpec.select([sem.Version(v) for v in availableVersions])
+
+            if closestVersion is None:
+                raise RuntimeError(f"Could not find a library for: {cLibVersion}")
+
+            cLibVersion = closestVersion
+
         libFile = cfg.libsDir.joinpath(cLibVersion, _os, lib)
 
         if not libFile.exists():
@@ -369,3 +383,60 @@ def find_port(baudRate: int, cLibVersion: str, libFile: str = "") -> str:
 # ============================================
 def _timed_open(clib, port, baudRate, logLevel):
     return clib.open(port.encode("utf-8"), baudRate, logLevel)
+
+
+# ============================================
+#       get_available_lib_versions
+# ============================================
+def get_available_lib_versions() -> List[str]:
+    session = boto3.Session()
+    client = session.client("s3")
+
+    objs = get_s3_objects(cfg.libsBucket, client)
+
+    client.close()
+
+    libs = set()
+
+    for obj in objs:
+        lib = obj.split("/")[1]
+        libs.add(lib)
+
+    return sorted(list(libs))
+
+
+# ============================================
+#                get_s3_objects
+# ============================================
+def get_s3_objects(bucket: str, client: BaseClient, prefix: str = "") -> List:
+    """
+    Recursively loops over all directories in a bucket and returns a
+    list of files.
+
+    Parameters
+    ----------
+    bucket : str
+        The name of the bucket we're getting files from.
+
+    client : botocore.client.BaseClient
+        The object providing an interface to S3.
+
+    prefix : str
+        The directory we're looping over. If `""`, then we get the
+        top-level directories.
+
+    Returns
+    -------
+    List[str]
+        A list of all the objects in the bucket.
+    """
+    objectList = []
+    objects = client.list_objects_v2(Bucket=bucket, Delimiter="/", Prefix=prefix)
+
+    if "CommonPrefixes" in objects:
+        for pre in objects["CommonPrefixes"]:
+            objectList += get_s3_objects(bucket, client, pre["Prefix"])
+
+    if "Contents" in objects:
+        return objectList + [obj["Key"] for obj in objects["Contents"][1:]]
+    return objectList
