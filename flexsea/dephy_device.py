@@ -8,6 +8,8 @@ import semantic_version as sem
 from . import enums as fxe
 from . import utilities as fxu
 
+# pylint: disable=too-many-lines
+
 
 # ============================================
 #                 DephyDevice
