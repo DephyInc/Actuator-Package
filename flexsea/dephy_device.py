@@ -8,6 +8,8 @@ import semantic_version as sem
 from . import enums as fxe
 from . import utilities as fxu
 
+# pylint: disable=too-many-lines
+
 
 # ============================================
 #                 DephyDevice
@@ -920,6 +922,135 @@ class DephyDevice:
 
         if self._clib.calibrate_imu(self.deviceId) != self.SUCCESS.value:
             raise RuntimeError("Could not calibrate imu.")
+
+    # -----
+    # num_utts
+    # -----
+    @property
+    def num_utts(self) -> int:
+        """
+        The number of available UTT values is saved as #define NUM_UTT_VALS
+        in the C library, so we have this convenience wrapper to access it.
+        """
+        try:
+            return self._clib.get_num_utts()
+        except AttributeError:
+            print(f"Error: api version: `{self.cLibVersion}` cannot call `num_utts`")
+            sys.exit(1)
+
+    # -----
+    # set_all_utts
+    # -----
+    def set_all_utts(self, uttVals: List[int]) -> None:
+        """
+        Takes in a list of integer values and assigns each one to a UTT
+        value.
+
+        Parameters
+        ----------
+        uttVals : List[int]
+            List of values, one for each UTT
+        """
+        numUtts = self.num_utts
+        nVals = len(uttVals)
+
+        try:
+            assert nVals <= numUtts
+        except AssertionError:
+            print("Error: too many UTT values given.")
+            sys.exit(1)
+
+        data = (c.c_int * nVals)()
+
+        for i in range(nVals):
+            data[i] = c.c_int(uttVals[i])
+
+        retCode = self._clib.set_utts(self.deviceId, data, nVals, c.c_byte(-1))
+
+        if retCode != self.SUCCESS.value:
+            print("Error: could not set UTT values.")
+            sys.exit(1)
+
+    # -----
+    # set_utt
+    # -----
+    def set_utt(self, uttVal: int, index: int) -> None:
+        """
+        Sets the value of a single UTT.
+
+        Parameters
+        ----------
+        uttVal : int
+            The value the desired UTT will be set to
+
+        index : int
+            The array index for the desired UTT
+        """
+        numUtts = self.num_utts
+
+        try:
+            assert 0 <= index < numUtts
+        except AssertionError:
+            print("Error: invalid UTT index.")
+
+        data = (c.c_int * numUtts)()
+
+        data[index] = c.c_int(uttVal)
+
+        retCode = self._clib.set_utts(self.deviceId, data, numUtts, c.c_byte(index))
+
+        if retCode != self.SUCCESS.value:
+            print("Error: could not set UTT value.")
+            sys.exit(1)
+
+    # -----
+    # reset_utts
+    # -----
+    def reset_utts(self) -> None:
+        """
+        Resets all UTTs to their default values.
+        """
+        if self._clib.reset_utts(self.deviceId) != self.SUCCESS.value:
+            print("Error: could not reset UTTs to their default values.")
+            sys.exit(1)
+
+    # -----
+    # save_utts
+    # -----
+    def save_utts(self) -> None:
+        """
+        Saves the current UTT values to the device's internal memory so
+        that they persist across power cycles.
+        """
+        if self._clib.save_utts(self.deviceId) != self.SUCCESS.value:
+            print("Error: could not save UTTs.")
+            sys.exit(1)
+
+    # -----
+    # read_utts
+    # -----
+    def read_utts(self) -> List[int]:
+        """
+        UTTs are not sent as a part of regular communication, so here we
+        first request that the device send the UTTs to Mn, and then we
+        read them.
+        """
+        if self._clib.request_utts(self.deviceId) != self.SUCCESS.value:
+            print("Error: could not request UTTs.")
+            sys.exit(1)
+        # We have to sleep for a bit in order to allow the device time
+        # to fulfill the request
+        sleep(0.25)
+
+        numUtts = self.num_utts
+        data = (c.c_int * numUtts)()
+        retCode = self._clib.get_last_received_utts(self.deviceId, data, numUtts)
+
+        if retCode != self.SUCCESS.value:
+            print("Error: could not read UTTs.")
+            sys.exit(1)
+
+        return [data[i] for i in range(numUtts)]
 
     # -----
     # hasHabs
