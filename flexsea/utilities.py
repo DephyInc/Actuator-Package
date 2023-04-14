@@ -10,6 +10,7 @@ from time import sleep
 import boto3
 import botocore.exceptions as bce
 from botocore.client import BaseClient
+from botocore.handlers import disable_signing
 from serial.tools.list_ports import comports
 
 import flexsea.enums as fxe
@@ -161,7 +162,7 @@ def load_clib(
 # ============================================
 #                  download
 # ============================================
-def download(fileObj: str, bucket: str, dest: str, profile: str = "dephy") -> None:
+def download(fileObj: str, bucket: str, dest: str, profile: str | None = None) -> None:
     """
     Downloads `fileObj` from `bucket` to `dest` with the AWS
     credentials profile `profile`.
@@ -178,19 +179,26 @@ def download(fileObj: str, bucket: str, dest: str, profile: str = "dephy") -> No
     AssertionError
         If the download fails.
     """
-    try:
-        session = boto3.Session(profile_name=profile)
-    except bce.ProfileNotFound as err:
-        raise err
 
-    try:
-        client = session.client("s3")
-    except bce.PartialCredentialsError as err:
-        raise err
+    if profile is None:
+        resource = boto3.resource("s3")
+        resource.meta.client.meta.events.register("choose-signer.s3.*", disable_signing)
+        bucket = resource.Bucket(bucket)
+        bucket.download_file(fileObj, dest)
+    else:
+        try:
+            session = boto3.Session(profile_name=profile)
+        except bce.ProfileNotFound as err:
+            raise err
 
-    client.download_file(bucket, fileObj, dest)
+        try:
+            client = session.client("s3")
+        except bce.PartialCredentialsError as err:
+            raise err
 
-    _validate_download(client, bucket, fileObj, dest)
+        client.download_file(bucket, fileObj, dest)
+        # TODO(CA): Make validate download work when no profile is given
+        _validate_download(client, bucket, fileObj, dest)
 
 
 # ============================================
