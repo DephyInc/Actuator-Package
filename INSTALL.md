@@ -7,7 +7,7 @@ First, update your system
 sudo apt update && sudo apt upgrade
 ```
 
-Then install the prerequisites 
+Then install the prerequisites
 
 ```bash
 sudo apt install git cmake build-essential
@@ -23,7 +23,7 @@ The `stlink` tools:
 
 
 ```bash
-git clone https://github.com/stlink-org/stlink.git 
+git clone https://github.com/stlink-org/stlink.git
 cd stlink
 make clean
 make release
@@ -41,16 +41,16 @@ Then install Python. `flexsea` requires `python >= 3.11`. You can either install
       lzma lzma-dev tk-dev uuid-dev zlib1g-dev
 
 # Clone the python repo
-git clone https://github.com/python/cpython.git 
+git clone https://github.com/python/cpython.git
 cd cypthon/
 
 # Switch to the version you want to build
-git checkout v3.11.3 
+git checkout v3.11.3
 
 # Build
 ./configure --enable-optimizations --prefix=/path/to/where/you/want/it/installed
 make
-make test 
+make test
 sudo make install
 ```
 
@@ -71,7 +71,7 @@ In addition to the above steps, if you're installing on a Raspberry Pi, you'll a
 sudo apt install libatlas-base-dev
 ```
 
-## Windows 
+## Windows
 
 On Windows, you should first install [Git for Windows](https://git-scm.com/download/win). Make sure you download the version that matches your system (most likely 64 bit).
 
