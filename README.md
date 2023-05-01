@@ -4,54 +4,9 @@
 `flexsea` is a Python package for interacting with Dephy's wearable robotic devices.
 It can be used for gathering data from a device or for writing your own controller.
 
-
 ## Installation
 
-It is **strongly** recommended that you install `flexsea` in a [virtual environment](https://docs.python.org/3/library/venv.html).
-Additionally, `flexsea` requires [Python >= 3.11](https://www.python.org/downloads/release/python-3111/), and has been tested
-on Windows and Ubuntu.
-
-**NOTE**: These instructions use the `python3` executable. If you are on Windows, you
-will need to replace `python3` -> `python`.
-
-### Pip
-
-```bash
-python3 -m pip install flexsea
-```
-
-
-### From Source
-
-In order to install from source, you will need [git](https://git-scm.com/downloads).
-
-```bash
-git clone https://github.com/DephyInc/Actuator-Package.git
-cd Actuator-Package/
-git checkout v10.0.0 # Or the branch you want
-python3 -m pip install .
-```
-
-### Development tools
-
-To develop flexsea, install [Poetry](https://python-poetry.org/docs/):
-
-```bash
-curl -sSL https://install.python-poetry.org | python3 -
-```
-
-Activate the development environemtn and isntall dependencies
-```bash
-poetry shell
-poetry install
-```
-
-Update dependencies and sync the lock file.
-```bash
-poetry update
-poetry install --sync
-poetry lock
-```
+Please see [INSTALL.md](./INSTALL.md) for detailed installation instructions.
 
 
 ## Usage
@@ -88,16 +43,16 @@ class Device(
 )
 ```
 
-* `port`: The name of the serial port that the device is connected to. On Windows, this is typically something akin to "COM3" and on Linux it is usually something like "/dev/ttyACM0". If you do not provide a value, `flexsea` will scan through all of the available serial ports, stopping at the first valid device that it finds. This means that this keyword is typically only useful if you have more than one device connected at once.
+* `port`: The name of the serial port that the device is connected to. On Windows, this is typically something akin to `COM3` and on Linux it is usually something like `/dev/ttyACM0`. If you do not provide a value, `flexsea` will scan through all of the available serial ports, stopping at the first valid device that it finds. This means that this keyword is typically only useful if you have more than one device connected at once. However, if you are having trouble connecting to your device, the first thing you should try is specifying the port.
 * `baudRate`: The baud rate used for communicating with the device. Most of Dephy's devices all use the same baud rate, which is set as the default value for you.
-* `cLibVersion`: `flexsea` is a wrapper around a pre-compiled C library that actually handles all of the heavy lifting of communicating with the device. This parameter allows you to specify the semantic version string of the version of this library that you would like to use. These libraries are stored in a public AWS S3 bucket. If you do not already have the version you specify installed, then `flexsea` will attempt to download it from this bucket for you. By default, the latest LTS version is selected for you. In most cases, changing this value is only necessary for bootloading.
+* `cLibVersion`: Must match your device's firmware, e.g., `9.1.0`. flexsea` is a wrapper around a pre-compiled C library that actually handles all of the heavy lifting of communicating with the device. This parameter allows you to specify the semantic version string of the version of this library that you would like to use. These libraries are stored in a public AWS S3 bucket. If you do not already have the version you specify installed, then `flexsea` will attempt to download it from this bucket for you. By default, the latest LTS version is selected for you.
 * `logLevel`: Under the hood, the pre-compiled C library makes use of the [spdlog](https://github.com/gabime/spdlog) logging library. This parameter controls the verbosity of the logs, with `0` being the most verbose and `6` disabling logging all together.
 * `loggingEnabled`: If set to `True` then both data and debug logs will be generated (unless `logLevel=6`). If `False`, then no logs are generated, regardless of the value of `logLevel`.
 
 Typically, all you'll need to do to create an instance of the object is:
 
 ```python
-device = Device()
+device = Device(port=YOUR_PORT, cLibVersion=YOUR_VERSION)
 ```
 
 #### Connecting and Streaming
@@ -116,7 +71,7 @@ device.start_streaming(frequency)
 
 where `frequency` is the rate (in Hertz) at which the device will send data.
 
-**NOTE**: Currently, the maximum supported frequency is 1000Hz.
+**NOTE**: Currently, the maximum supported frequency is 1000Hz (over USB). If you are streaming over bluetooth, the maximum is 100Hz.
 
 
 #### Reading and Printing
@@ -191,4 +146,4 @@ Additionally, when done streaming, you can call the `stop_streaming` method:
 device.stop_streaming()
 ```
 
-**NOTE**: `stop_streaming` is called automatically by `close`, and `close` is called automatically by the `Device` class' destructor
+**NOTE**: `stop_streaming` is called automatically by `close`, and `close` is called automatically by the `Device` class' destructor, but it's still good practice to clean up manually.
