@@ -193,7 +193,7 @@ v10_5_0 = {
         },
         "get_num_utts": {
             "name": "fxGetNumUtts",
-            "argtypes": [],
+            "argTypes": [],
             "returnType": c.c_int,
         },
         "set_utts": {
