@@ -521,7 +521,7 @@ class DephyDevice:
         for _ in range(5):
             if self._clib.set_gains(devId, kp, ki, kd, k, b, ff) != self.SUCCESS.value:
                 raise RuntimeError("Command failed")
-            sleep(0.001)
+            sleep(0.05)
 
     # -----
     # command_motor_position
