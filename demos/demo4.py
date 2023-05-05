@@ -25,7 +25,9 @@ if "windows" == platform.system().lower():
 
 
 # Instantiate and connect to the device; see demo1.py
-device = Device()
+cLibVersion = input("Please enter cLibVersion: ")
+port = input("Please enter the device port: ")
+device = Device(port=port, cLibVersion=cLibVersion)
 device.open()
 
 
@@ -39,7 +41,7 @@ data = device.read()
 
 
 # Set positions
-offset = 7500
+offset = 1000
 pos0 = data["mot_ang"]
 positions = [pos0, pos0 + offset]
 

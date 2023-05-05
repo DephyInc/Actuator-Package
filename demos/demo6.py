@@ -45,7 +45,9 @@ def send_command(
 #                 get_device
 # ============================================
 def get_device(frequency: int) -> Device:
-    device = Device()
+    cLibVersion = input("Please enter cLibVersion: ")
+    port = input("Please enter the device port: ")
+    device = Device(port=port, cLibVersion=cLibVersion)
     device.open()
     device.start_streaming(frequency)
 

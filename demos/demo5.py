@@ -2,8 +2,6 @@
 Demo 5: High Speed
 
 Runs the motor at a high speed, demonstrating how to:
-
-    * Control which version of the pre-compiled C library is used
 """
 # pylint: disable=duplicate-code
 
@@ -23,11 +21,9 @@ if "windows" == platform.system().lower():
     print(msg)
 
 
-# Instantiate and connect to the device; see demo1.py
-# Here we see that we can change which version of the pre-compiled C
-# library is used by passing in a semantic version string to the
-# `cLibVersion` keyword argument
-device = Device(cLibVersion="9.1.0")
+cLibVersion = input("Please enter cLibVersion: ")
+port = input("Please enter the device port: ")
+device = Device(port=port, cLibVersion=cLibVersion)
 device.open()
 
 

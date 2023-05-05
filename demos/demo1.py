@@ -24,14 +24,12 @@ if "windows" == platform.system().lower():
     print(msg)
 
 
-# We begin by creating an instance of the Device class. By default,
-# flexsea will attempt to find the connected device for you. It will
-# also use a default value for the baud rate and version of the pre-
-# compiled C library, both of which are set in flexsea.config. You
-# can override these values by setting the appropriate keyword
-# arguments in the constructor. If you have more than one device
-# connected, you should manually specify the port for each
-device = Device()
+# We begin by creating an instance of the Device class. It will
+# use a default value for the baud rate and log level. The C library
+# version and device port must be manually specified.
+cLibVersion = input("Please enter cLibVersion: ")
+port = input("Please enter the device port: ")
+device = Device(port=port, cLibVersion=cLibVersion)
 
 
 # Once instantiated, we have to establish a connection between the

@@ -38,7 +38,9 @@ if "windows" == platform.system().lower():
 
 
 # Instantiate and connect to device; see demo1.py
-device = Device()
+cLibVersion = input("Please enter cLibVersion: ")
+port = input("Please enter the device port: ")
+device = Device(port=port, cLibVersion=cLibVersion)
 device.open()
 
 
