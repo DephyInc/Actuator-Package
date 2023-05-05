@@ -3,7 +3,6 @@ import semantic_version as sem
 from . import config as cfg
 from .dephy_device import DephyDevice
 from .legacy_device import LegacyDevice
-from .utilities import find_port
 
 
 # ============================================
@@ -20,18 +19,21 @@ class Device(LegacyDevice):
     # -----
     def __new__(
         cls,
-        port: str = "",
+        port: str | None = None,
         baudRate: int = cfg.baudRate,
-        cLibVersion: str = cfg.LTS,
+        cLibVersion: str | None = None,
         logLevel: int = 4,
         loggingEnabled: bool = True,
         libFile: str = "",
     ) -> DephyDevice | LegacyDevice:
+        if cLibVersion is None:
+            raise ValueError("Please provide a valid version for `cLibVersion`.")
+
+        if port is None:
+            raise ValueError("Please provide the port your device is connected to.")
+
         inUse = sem.Version(cLibVersion)
         cutoff = sem.Version(cfg.legacyCutoff)
-
-        if not port:
-            port = find_port(baudRate, cLibVersion, libFile)
 
         if inUse < cutoff:
             return LegacyDevice(
