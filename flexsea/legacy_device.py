@@ -100,7 +100,7 @@ class LegacyDevice(DephyDevice):
     # -----
     def _read_all(self) -> List[dict]:
         qs = self.queueSize
-        data = (c.POINTER(fxe.deviceStateDicts[self._deviceName]) * qs)()
+        data = (fxe.deviceStateDicts[self._deviceName] * qs)()
         allData = []
 
         nRead = self._clib.all_read(self.deviceId, data, qs)
