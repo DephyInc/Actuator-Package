@@ -1,45 +1,28 @@
 [tool.poetry]
 name = "flexsea"
-version = "10.5.3"
-description = "Python API to interact with Dephy devices."
-authors = ["Jared <jcoughlin@dephy.com>", "Carlos <casmat@dephy.com>"]
+version = "11.0.0"
+description = ""
+authors = ["Jared <jcoughlin@dephy.com>"]
 readme = "README.md"
-packages = [
-    {include = "flexsea"},
-    {include = "demos"},
-    {include = "tests"},
-]
 
 [tool.poetry.dependencies]
-python = "^3.10"
-boto3 = "^1.26.8"
-pyserial = "^3.5"
+python = "^3.11"
 semantic-version = "^2.10.0"
+boto3 = "^1.26.110"
+pyyaml = "^6.0"
 
 
 [tool.poetry.group.dev.dependencies]
-black = "^22.10.0"
-pylint = "^2.15.5"
-wrapt = "^1.14.1"
-ipython = "^8.10.0"
+black = "^23.3.0"
+pytest = "^7.3.0"
+pylint = "^2.17.2"
+pre-commit = "^3.2.2"
 nox = "^2022.11.21"
-pre-commit = "^3.1.1"
-
-
-[tool.poetry.group.demos.dependencies]
-numpy = "^1.24.1"
-jupyterlab = "^3.5.2"
+pandas = "^2.0.0"
 seaborn = "^0.12.2"
-
-
-
-[tool.poetry.group.tests.dependencies]
 numpy = "^1.24.2"
-pandas = "^1.5.3"
-
-[tool.poetry.scripts]
-flexsea-demos = 'demos.console.main:main'
-
+mypy = "^1.2.0"
+ipython = "^8.12.0"
 
 [build-system]
 requires = ["poetry-core"]
@@ -50,14 +33,13 @@ build-backend = "poetry.core.masonry.api"
 max-line-length = 88
 disable = [
   "missing-docstring",
-  "too-few-public-methods",
   "invalid-name",
+  "too-many-public-methods",
   "too-many-instance-attributes",
   "too-many-arguments",
-  "protected-access",
-  "too-many-public-methods",
+  "too-few-public-methods",
+  "too-many-locals",
 ]
-ignore= "specs"
 
 
 [tool.black]
