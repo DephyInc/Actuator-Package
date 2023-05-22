@@ -23,7 +23,7 @@ def main(
     commandDelay: int,
     freq: int,
 ):
-    device = Device(port=port, cLibVersion=cLibVersion, libFile=libFile)
+    device = Device(port=port, firmwareVersion=cLibVersion, libFile=libFile)
     device.open()
     device.start_streaming(freq)
 

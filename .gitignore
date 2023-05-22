@@ -6,6 +6,7 @@ __pycache__
 *.orig
 *.sublime*
 *.idea*
+*.png
 
 test_scripts/build/
 

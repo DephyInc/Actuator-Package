@@ -113,7 +113,7 @@ def main(
     # Factor to determine current on "way back" to starting point
     currentAsymmetricG = 1.15
 
-    device = Device(port=port, cLibVersion=cLibVersion, libFile=libFile)
+    device = Device(port=port, firmwareVersion=cLibVersion, libFile=libFile)
     device.open()
     device.start_streaming(freq)
 

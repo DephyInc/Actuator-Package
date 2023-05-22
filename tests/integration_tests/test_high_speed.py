@@ -24,7 +24,7 @@ def main(  # pylint: disable=too-many-locals
     nLoops: int,
     cycleDelay: float,
 ):
-    device = Device(port=port, cLibVersion=cLibVersion, libFile=libFile)
+    device = Device(port=port, firmwareVersion=cLibVersion, libFile=libFile)
     device.open()
 
     device.start_streaming(freq)
@@ -74,7 +74,11 @@ def main(  # pylint: disable=too-many-locals
 
     device.close()
     print("Plotting...")
-    plot(desiredCurrent, measuredCurrent, deviceTime, "Current (mA)", "high_speed.png")
+    # plot(desiredCurrent, measuredCurrent, deviceTime, "Current (mA)", "high_speed.png")
+    des = desiredCurrent[14:]
+    meas = measuredCurrent[14:]
+    t = deviceTime[14:]
+    plot(des, meas, t, "Current (mA)", "high_speed.png")
 
 
 # ============================================
