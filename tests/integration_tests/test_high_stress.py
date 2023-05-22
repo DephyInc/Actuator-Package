@@ -136,6 +136,7 @@ def main(
     }
 
     for i in range(nLoops):
+        print(f"Loop: {i+1}/{nLoops}")
         # Step 0
         sleep(delay)
         if i:
@@ -146,7 +147,8 @@ def main(
 
         # Step 1
         if i:
-            for sample in np.linspace(data["mot_ang"], pos0, 360):
+            currentPos = device.read()["mot_ang"]
+            for sample in np.linspace(currentPos, pos0, 360):
                 command = {"cur": 0, "pos": sample}
                 sleep(delay)
                 data = send_command(command, "position", {}, False, data, device)
@@ -180,6 +182,7 @@ def main(
     device.close()
 
     # Plot data
+    print("Plotting...")
     times = [data["stateTime"], data["stateTime"]]
     desired = [data["desiredCurrent"], data["desiredPosition"]]
     measured = [data["measuredCurrent"], data["measuredPosition"]]
@@ -231,7 +234,7 @@ if __name__ == "__main__":
         "--n-loops",
         dest="nLoops",
         type=int,
-        default=1,
+        default=4,
         help="Feed-forward gain.",
     )
 

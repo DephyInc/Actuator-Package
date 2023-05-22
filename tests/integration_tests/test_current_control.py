@@ -32,11 +32,14 @@ def main(
 
     currents = np.linspace(minCurrent, maxCurrent, nCurrents)
 
-    for current in currents:
+    for i, current in enumerate(currents):
         device.command_motor_current(int(current))
         sleep(commandDelay)
-        device.print()
-        clear()
+        if i % 5 == 0:
+            data = device.read()
+            print(f"Desired current: {current}")
+            print(f"Measured current: {data['mot_cur']}")
+            sleep(2)
 
     sleep(holdTime)
 

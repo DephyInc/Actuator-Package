@@ -26,6 +26,7 @@ def main(
     device = Device(port=port, firmwareVersion=cLibVersion, libFile=libFile)
     device.open()
     device.start_streaming(freq)
+    sleep(1)
 
     data = device.read()
 

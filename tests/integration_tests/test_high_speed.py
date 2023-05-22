@@ -4,6 +4,7 @@ import argparse
 from time import sleep
 
 import numpy as np
+from numpy.random import default_rng
 from utils import plot  # pylint: disable=import-error
 
 from flexsea.device import Device
@@ -43,8 +44,7 @@ def main(  # pylint: disable=too-many-locals
     x = np.linspace(-np.pi, np.pi, nSamples)
     currents = waveAmplitude * np.sin(x)
 
-    commandDelay = 1 / commandFrequency
-    cycleDelay = 0.1
+    commandDelay = 1. / commandFrequency
 
     measuredCurrent = []
     desiredCurrent = []
@@ -56,11 +56,11 @@ def main(  # pylint: disable=too-many-locals
 
             data = device.read()
 
+            device.command_motor_current(int(current))
+
             measuredCurrent.append(data["mot_cur"])
             desiredCurrent.append(current)
             deviceTime.append(data["state_time"])
-
-            device.command_motor_current(int(current))
 
             # Delay between cycles
             for __ in range(int(cycleDelay / commandDelay)):
@@ -74,11 +74,20 @@ def main(  # pylint: disable=too-many-locals
 
     device.close()
     print("Plotting...")
-    # plot(desiredCurrent, measuredCurrent, deviceTime, "Current (mA)", "high_speed.png")
-    des = desiredCurrent[14:]
-    meas = measuredCurrent[14:]
-    t = deviceTime[14:]
-    plot(des, meas, t, "Current (mA)", "high_speed.png")
+    # There's a long stretch of nothing before the demo gets going, so we 
+    # skip that for plotting. This is because the first several currents are small
+    index = np.where(np.array(measuredCurrent) > 0)[0][0]
+    des = np.array(desiredCurrent[index:])
+    meas = np.array(measuredCurrent[index:])
+    t = np.array(deviceTime[index:])
+    # Plotting can be slow where there's a lot of data, so we use a fraction of it
+    rng = default_rng()
+    n = len(des) // 6
+    indices = rng.choice(np.arange(0, len(des), 1), n)
+    desSample = des[indices]
+    measSample = meas[indices]
+    tSample = t[indices]
+    plot(desSample, measSample, tSample, "Current (mA)", "high_speed.png")
 
 
 # ============================================
@@ -179,7 +188,7 @@ if __name__ == "__main__":
         "--command-frequency",
         dest="commandFrequency",
         type=int,
-        default=100,
+        default=500,
         help="Reciprocal of the time between motor commands.",
     )
     parser.add_argument(
