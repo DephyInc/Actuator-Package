@@ -41,7 +41,7 @@ def s3_download(obj: str, bucket: str, dest: str, profile: str | None = None) ->
 # ============================================
 #              s3_find_object
 # ============================================
-def s3_find_object(str: fileName, str: bucket, BaseClient: client) -> str:
+def s3_find_object(fileName: str, bucket: str, client: str) -> str:
     """
     Searches the given bucket for the given file. Returns the full object 
     path if there's only one match. If there aren't any matches or there's 
