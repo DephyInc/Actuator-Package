@@ -3,7 +3,6 @@ from pathlib import Path
 
 import semantic_version as sem
 
-
 # ============================================
 #             Path Configuration
 # ============================================
@@ -130,9 +129,9 @@ noHabs = [
 # Only applies to legacy devices. These values encode the name of the device
 INVALID_APP = c.c_int(-1)
 ACTPACK = c.c_int(0)
-EXO = c.c_int(1) # XCs are reported as exos
-MD = c.c_int(2)  # NOTE: This is only true for v9.1. For < 9.1, it's 
-                 # NetMaster, but those devices are not in the wild
+EXO = c.c_int(1)  # XCs are reported as exos
+MD = c.c_int(2)  # NOTE: This is only true for v9.1. For < 9.1, it's
+# NetMaster, but those devices are not in the wild
 
 deviceNames = {
     ACTPACK.value: "actpack",

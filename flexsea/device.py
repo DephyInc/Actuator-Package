@@ -38,14 +38,16 @@ class Device:
         logLevel: int = 4,
         interactive: bool = True,
     ) -> None:
-        # These are first so destructor won't complain if setup fails 
+        # These are first so destructor won't complain if setup fails
         # attributes
         self.connected: bool = False
         self.streaming: bool = False
         self.interactive = interactive
 
         self.port: str = port
-        self.firmwareVersion: Version = validate_given_firmware_version(firmwareVersion, self.interactive)
+        self.firmwareVersion: Version = validate_given_firmware_version(
+            firmwareVersion, self.interactive
+        )
 
         if libFile:
             self.libFile = Path(libFile).expanduser().absolute()
@@ -98,8 +100,7 @@ class Device:
             self._isLegacy = False
             self._libVersion = self._get_lib_version()
 
-        print(f"Firmware version: {self.firmwareVersion}")
-        print(f"Library: {self.libFile}")
+        print(f"Firmware version: {self.firmwareVersion}\nLibrary: {self.libFile}")
 
     # -----
     # destructor
@@ -331,7 +332,7 @@ class Device:
             sleep(0.001)
         if returnCode != self._SUCCESS.value:
             raise RuntimeError("Failed to set gains.")
-        self._gains = {"kp" : kp, "ki" : ki, "kd" : kd, "k" : k, "b" : b, "ff" : ff}
+        self._gains = {"kp": kp, "ki": ki, "kd": kd, "k": k, "b": b, "ff": ff}
 
     # -----
     # command_motor_position
@@ -415,7 +416,7 @@ class Device:
         retCode = self._clib.fxSendMotorCommand(self.id, controller, 0)
         if retCode != self._SUCCESS.value:
             raise RuntimeError("Failed to stop motor.")
-        self._gains = {"kp" : 0, "ki" : 0, "kd" : 0, "k" : 0, "b" : 0, "ff" : 0}
+        self._gains = {"kp": 0, "ki": 0, "kd": 0, "k": 0, "b": 0, "ff": 0}
         return retCode
 
     # -----

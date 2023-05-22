@@ -44,7 +44,7 @@ def main(  # pylint: disable=too-many-locals
     x = np.linspace(-np.pi, np.pi, nSamples)
     currents = waveAmplitude * np.sin(x)
 
-    commandDelay = 1. / commandFrequency
+    commandDelay = 1.0 / commandFrequency
 
     measuredCurrent = []
     desiredCurrent = []
@@ -74,7 +74,7 @@ def main(  # pylint: disable=too-many-locals
 
     device.close()
     print("Plotting...")
-    # There's a long stretch of nothing before the demo gets going, so we 
+    # There's a long stretch of nothing before the demo gets going, so we
     # skip that for plotting. This is because the first several currents are small
     index = np.where(np.array(measuredCurrent) > 0)[0][0]
     des = np.array(desiredCurrent[index:])

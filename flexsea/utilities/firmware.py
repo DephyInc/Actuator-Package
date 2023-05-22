@@ -2,11 +2,10 @@ import ctypes as c
 from typing import List
 
 import boto3
-from semantic_version import SimpleSpec
-from semantic_version import Version
+from semantic_version import SimpleSpec, Version
 
-from flexsea.utilities.aws import get_s3_objects
 import flexsea.utilities.constants as fxc
+from flexsea.utilities.aws import get_s3_objects
 
 
 # ============================================
@@ -35,7 +34,7 @@ def get_available_firmware_versions() -> List[str]:
 def validate_given_firmware_version(firmwareVersion: str, interactive: bool) -> Version:
     try:
         fwVer = Version(firmwareVersion)
-    except ValueError:
+    except ValueError as err:
         # If we're not given a valid semantic version string, we'll
         # find the latest available version with the same major version
         # as that of `firmwareVersion`
@@ -44,12 +43,13 @@ def validate_given_firmware_version(firmwareVersion: str, interactive: bool) -> 
         if fwVer != latestVer:
             msg = f"WARNING: Received version: {firmwareVersion}, but found: "
             msg += f"{latestVer}, which is newer."
+            print(msg)
             if interactive:
                 userInput = input(f"Use {latestVer}? [y/n]")
                 if userInput.lower() == "y":
                     fwVer = latestVer
                 else:
-                    raise RuntimeError("Aborting: no valid version selected.")
+                    raise RuntimeError("Aborting: no valid version selected.") from err
             else:
                 fwVer = latestVer
     else:

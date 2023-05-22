@@ -1,10 +1,8 @@
-from pathlib import Path
-
-from semantic_version import Version
 import yaml
+from semantic_version import Version
 
-from flexsea.utilities.aws import s3_download
 import flexsea.utilities.constants as fxc
+from flexsea.utilities.aws import s3_download
 
 
 # ============================================
@@ -17,7 +15,9 @@ def get_device_spec(deviceName: str, firmwareVersion: Version) -> dict:
 
     if not deviceSpecFile.exists():
         deviceSpecFile.parent.mkdir(parents=True, exist_ok=True)
-        deviceSpecObj = f"{fxc.legacyDeviceSpecsDir}/{firmwareVersion}/{deviceSpecFile.name}"
+        deviceSpecObj = (
+            f"{fxc.legacyDeviceSpecsDir}/{firmwareVersion}/{deviceSpecFile.name}"
+        )
         s3_download(
             deviceSpecObj, fxc.dephyPublicFilesBucket, str(deviceSpecFile), None
         )

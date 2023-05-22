@@ -4,8 +4,7 @@ from typing import List
 
 import boto3
 from botocore import UNSIGNED
-from botocore.client import BaseClient
-from botocore.client import Config
+from botocore.client import BaseClient, Config
 from botocore.exceptions import ClientError
 
 
@@ -15,7 +14,7 @@ from botocore.exceptions import ClientError
 def s3_download(obj: str, bucket: str, dest: str, profile: str | None = None) -> None:
     """
     Downloads `obj` from `bucket` to `dest` with the AWS
-    credentials profile `profile`. 
+    credentials profile `profile`.
     """
     # https://stackoverflow.com/a/34866092
     if profile is None:
@@ -29,10 +28,10 @@ def s3_download(obj: str, bucket: str, dest: str, profile: str | None = None) ->
     try:
         client.download_file(bucket, obj, dest)
     except ClientError:
-        # If the download fails, one possible reason is because we weren't given a 
+        # If the download fails, one possible reason is because we weren't given a
         # valid object path, but, instead, just a base name, e.g., myfirmware.dfu
         # instead of firmwareBucket/major.minor.patch/device/hw/myfirmware.dfu
-        # In this case we want to search the given bucket for the file 
+        # In this case we want to search the given bucket for the file
         obj = s3_find_object(obj, bucket, client)
         client.download_file(bucket, obj, dest)
     _validate_download(client, bucket, obj, dest)
@@ -43,8 +42,8 @@ def s3_download(obj: str, bucket: str, dest: str, profile: str | None = None) ->
 # ============================================
 def s3_find_object(fileName: str, bucket: str, client: str) -> str:
     """
-    Searches the given bucket for the given file. Returns the full object 
-    path if there's only one match. If there aren't any matches or there's 
+    Searches the given bucket for the given file. Returns the full object
+    path if there's only one match. If there aren't any matches or there's
     more than one, we fail.
     """
     # https://tinyurl.com/4scnuk6c
@@ -52,13 +51,13 @@ def s3_find_object(fileName: str, bucket: str, client: str) -> str:
     pageIterator = paginator.paginate(Bucket=bucket)
     objects = pageIterator.search(f"Contents[?contains(Key, `{fileName}`)][]")
     # There should only be one match
-    # Objects is a generator, so we have to convert it to a list to check length 
+    # Objects is a generator, so we have to convert it to a list to check length
     items = []
     for item in objects:
         items.append(item["Key"])
     if len(items) == 0:
         raise FileNotFoundError(f"Could not find: {fileName} in {bucket}")
-    elif len(items) > 1:
+    if len(items) > 1:
         raise FileNotFoundError(f"Found multiple options for: {fileName} in {bucket}")
     return items[0]
 

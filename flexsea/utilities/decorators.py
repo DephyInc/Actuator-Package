@@ -1,6 +1,5 @@
 from functools import wraps
-from typing import Any
-from typing import Callable
+from typing import Any, Callable
 
 from semantic_version import Version
 
@@ -37,7 +36,7 @@ def validate(func) -> Callable:
     def validate_wrapper(*args, **kwargs) -> Any:
         retCode = func(*args, **kwargs)
         # pylint: disable-next=protected-access
-        if  retCode != args[0]._SUCCESS.value:
+        if retCode != args[0]._SUCCESS.value:
             raise RuntimeError(f"Command: {func.__name__} failed.")
         return retCode
 
