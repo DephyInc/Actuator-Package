@@ -11,7 +11,7 @@ The following script will:
 * Install the `atlas` library, which is necessary for `numpy` to work
 * Add your current user to the `dialout` group (needed for serial communication)
 
-**NOTE**: You must reboot your machine after adding your user to the `dialout` group 
+**NOTE**: You must reboot your machine after adding your user to the `dialout` group
 in order for the changes to take effect. Logging out and back in is not enough.
 
 

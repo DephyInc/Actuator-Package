@@ -1,6 +1,6 @@
 # Installation
 
-To install `flexsea`, please refer to the detailed installation instructions for your 
+To install `flexsea`, please refer to the detailed installation instructions for your
 operating system:
 
 * [Ubuntu](./linux.md)

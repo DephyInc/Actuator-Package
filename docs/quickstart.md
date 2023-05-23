@@ -31,16 +31,16 @@ Typically, all you'll need to do to create an instance of the object is:
 device = Device(port=YOUR_PORT, firmwareVersion=YOUR_VERSION)
 ```
 
-On Windows, `YOUR_PORT` will typically be something along the lines of `COM3`. You can 
+On Windows, `YOUR_PORT` will typically be something along the lines of `COM3`. You can
 determine which port your device is on by navigating to the Device Manager -> Ports (COM & LPT).
 
-On Linux (Ubuntu and Raspberry Pi), the port will typically be something along the lines of 
-`/dev/ttyACM0`. You can check by using `ls /dev/ttyACM*` before connecting the device's USB 
-cable and then after connecting the device's USB cable. The port will be the difference between 
+On Linux (Ubuntu and Raspberry Pi), the port will typically be something along the lines of
+`/dev/ttyACM0`. You can check by using `ls /dev/ttyACM*` before connecting the device's USB
+cable and then after connecting the device's USB cable. The port will be the difference between
 the two outputs.
 
-The value of `YOUR_VERSION` should be either the full semantic version string of the 
-firmware that's currently on your device or the major version of the firmware that's 
+The value of `YOUR_VERSION` should be either the full semantic version string of the
+firmware that's currently on your device or the major version of the firmware that's
 on your device, e.g., "10.5.0" or "10".
 
 To see what versions are available, you can do:
@@ -97,21 +97,21 @@ device.print()
 ## Logging
 
 Logging is enabled by default, and the verbosity of the logs is controlled by the `logLevel`
-argument in the `Device` constructor. The allowed values are integers [0,6], with 0 
+argument in the `Device` constructor. The allowed values are integers [0,6], with 0
 being the most verbose and 6 disabling logging.
 
 There are two kinds of logs: debug logs and data logs.
 
 Debug logs are saved in a directory called `DebugLog` in the directory from which
-`flexsea` is being run. The files contained inside are generally only useful if you are 
+`flexsea` is being run. The files contained inside are generally only useful if you are
 trying to troubleshoot an issue, as they contain information related to communication
 procedures and motor command messages.
 
 Data logs are saved in a directory called `DataLog` in the directory from which
 `flexsea` is being run. The files contained inside are csv files with all of the data
-streamed by the device to the computer during your run. If your session was long (or 
-streaming rate high) your data will be broken up into several different files in order 
-to prevent any one file from getting too large. Only the first file will have the 
+streamed by the device to the computer during your run. If your session was long (or
+streaming rate high) your data will be broken up into several different files in order
+to prevent any one file from getting too large. Only the first file will have the
 column headings.
 
 

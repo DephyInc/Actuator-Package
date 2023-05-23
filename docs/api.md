@@ -13,23 +13,23 @@ __init__(
 
 Instantiates the `Device` class.
 
-#### Parameters 
-`firmwareVersion` : `str` 
+#### Parameters
+`firmwareVersion` : `str`
     The semantic version string of the firmware currently on Manage, e.g., "9.1.0". You can also pass just a major version, e.g., "9", and `flexsea` will find and use the latest version within that major version for you.
 
-`port` : `str` 
+`port` : `str`
     The name of the serial communication port the device is connected to. On Windows this is usually something along the lines of `COM3` and on linux it is usually something along the lines of `/dev/ttyACM0`.
 
-`baudRate` : `int` 
+`baudRate` : `int`
     The baud rate for communicating with the device. You should ideally never have to change this manually.
 
-`libFile` : `str` 
+`libFile` : `str`
     Manually specify the C library to use for communicating with the device. This overrides `firmwareVersion`. Most users will never need this option.
 
-`logLevel` : `int` 
+`logLevel` : `int`
     An integer from [0,6]. 0 Is the most verbose and 6 disables logging
 
-`interactive` : `bool` 
+`interactive` : `bool`
     If `True`, `flexsea` will occasionally prompt you to answer a question or confirm information. If you don't want this, you can set it to `False`
 
 
@@ -259,7 +259,7 @@ Instructs the device to send its queued data to the computer.
 `allData` : `bool`
     If `False`, only the most recent data is obtained from the device. If `True`, then all of the queued data is read from the device.
 
-#### Returns 
+#### Returns
 `dict`
     If `allData=False`. The exact fields contained in the dictionary depend on the device type and the firmware version.
 
