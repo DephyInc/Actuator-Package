@@ -410,7 +410,7 @@ class Device:
     @requires_status("connected")
     def stop_motor(self) -> int:
         """
-        Stops the motor.
+        Stops the motor and resets the gains to zero.
         """
         controller = fxc.controllers["none"]
         retCode = self._clib.fxSendMotorCommand(self.id, controller, 0)
