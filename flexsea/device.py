@@ -202,9 +202,9 @@ class Device:
             self.stop_streaming()
 
         if self.connected:
-            self.connected = False
             self.stop_motor()
             self._clib.fxClose(self.id)
+            self.connected = False
 
     # -----
     # start_streaming
