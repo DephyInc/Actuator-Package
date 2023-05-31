@@ -50,7 +50,7 @@ def _load_clib(libFile: Path) -> c.CDLL:
     if not libFile.is_absolute():
         libFile = libFile.expanduser().absolute()
     libFile = str(libFile)
-    
+
     if "win" in get_os():
         try:
             for extraPath in os.environ["PATH"].split(";"):
