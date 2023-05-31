@@ -41,12 +41,16 @@ def get_c_library(firmwareVersion: Version, libFile: Path | None) -> Tuple:
 # ============================================
 #                _load_clib
 # ============================================
-def _load_clib(libFile: str) -> c.CDLL:
+def _load_clib(libFile: Path) -> c.CDLL:
     """
     Uses ctypes to actually create an interface to the library file. If
     we're on Windows, we have to additionally add several directories to
     the path.
     """
+    if not libFile.is_absolute():
+        libFile = libFile.expanduser().absolute()
+    libFile = str(libFile)
+    
     if "win" in get_os():
         try:
             for extraPath in os.environ["PATH"].split(";"):
