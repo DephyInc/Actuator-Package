@@ -29,10 +29,10 @@ def s3_download(obj: str, bucket: str, dest: str, profile: str | None = None) ->
     if cloudpath.is_file():
         _validate_download(cloudpath, dest)
     else:
-        # This might be really slow, depending on how many files are
-        # in the bucket and how big they are
+        # Might be slow depending on number of files and file size
         for path in cloudpath.rglob("**/*"):
-            _validate_download(path, str(Path(dest).joinpath(path.key)))
+            if path.is_file():
+                _validate_download(path, path.fspath)
 
     client.clear_cache()
 
