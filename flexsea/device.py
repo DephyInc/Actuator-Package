@@ -39,12 +39,13 @@ class Device:
         interactive: bool = True,
     ) -> None:
         # These are first so destructor won't complain if setup fails
-        # attributes
         self.connected: bool = False
         self.streaming: bool = False
+
         self.interactive = interactive
 
-        self.port: str = port
+        self.port = port
+
         self.firmwareVersion: Version = validate_given_firmware_version(
             firmwareVersion, self.interactive
         )

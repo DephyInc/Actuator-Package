@@ -1,34 +1,19 @@
 import ctypes as c
 from typing import List
 
-import boto3
-from botocore import UNSIGNED
-from botocore.client import Config
 from semantic_version import SimpleSpec, Version
 
+from flexsea.utilities.aws import s3_search
 import flexsea.utilities.constants as fxc
-from flexsea.utilities.aws import get_s3_objects
 
 
 # ============================================
 #       get_available_firmware_versions
 # ============================================
 def get_available_firmware_versions() -> List[str]:
-    client = boto3.client(
-        "s3", config=Config(signature_version=UNSIGNED), region_name="us-east-1"
-    )
+    objs = s3_search(fxc.dephyPublicFilesBucket, f"{fxc.libsDir}/*")
 
-    objs = get_s3_objects(fxc.dephyPublicFilesBucket, client, prefix=fxc.libsDir)
-
-    client.close()
-
-    libs = set()
-
-    for obj in objs:
-        lib = obj.split("/")[1]
-        libs.add(lib)
-
-    return sorted(list(libs))
+    return sorted([obj.name for obj in objs])
 
 
 # ============================================
