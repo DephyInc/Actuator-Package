@@ -22,6 +22,8 @@ libFiles = {
     "windows_32bit": "libfx_plan_stack.dll",
     "linux_64bit": "libfx_plan_stack.so",
     "linux_32bit": "libfx_plan_stack.so",
+    "pi_64bit": "libfx_plan_stack.so",
+    "pi_32bit": "libfx_plan_stack.so",
 }
 
 # legacyDeviceSpecsDir is the name of the directory (mirrored on S3), whereas
