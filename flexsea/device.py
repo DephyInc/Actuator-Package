@@ -38,19 +38,22 @@ class Device:
         logLevel: int = 4,
         interactive: bool = True,
     ) -> None:
-        # These are first so destructor won't complain if setup fails
-        # attributes
+        # These are first so the destructor won't complain about the class not having 
+        # connected and streaming attributes if getting and loading the C library
+        # fails
         self.connected: bool = False
         self.streaming: bool = False
-        self.interactive = interactive
 
         self.port: str = port
+        self.interactive = interactive
         self.firmwareVersion: Version = validate_given_firmware_version(
             firmwareVersion, self.interactive
         )
 
         if libFile:
             self.libFile = Path(libFile).expanduser().absolute()
+            if not self.libFile.is_file():
+                raise FileNotFoundError(f"Could not find library: {self.libFile}")
         else:
             self.libFile = None
 
