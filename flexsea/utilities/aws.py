@@ -23,7 +23,7 @@ def s3_download(obj: str, bucket: str, dest: str, profile: str | None = None) ->
     cloudpath = client.CloudPath(f"s3://{bucket}/{obj}")
 
     if not cloudpath.exists():
-        raise FileNotFoundError(f"Error: could not find: {bucket}/{obj}")
+        raise FileNotFoundError(f"Error: could not find: {bucket}/{obj} for download.")
 
     cloudpath.download_to(dest)
     if cloudpath.is_file():

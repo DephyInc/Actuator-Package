@@ -1,4 +1,5 @@
 import ctypes as c
+import sys
 from typing import List
 
 from semantic_version import SimpleSpec, Version
@@ -20,13 +21,18 @@ def get_available_firmware_versions() -> List[str]:
 #      validate_given_firmware_version
 # ============================================
 def validate_given_firmware_version(firmwareVersion: str, interactive: bool) -> Version:
+    # Check for exact semantic version string, e.g., 7.2.0
     try:
         fwVer = Version(firmwareVersion)
     except ValueError as err:
-        # If we're not given a valid semantic version string, we'll
-        # find the latest available version with the same major version
+        # See if we can get a valid version string from the input
+        try:
+            fwVer = Version.coerce(firmwareVersion)
+        except ValueError as err2:
+            msg = f"Error: {firmwareVersion} is not a valid semantic version string."
+            raise RuntimeError(msg) from err2
+        # Find the latest available version with the same major version
         # as that of `firmwareVersion`
-        fwVer = Version.coerce(firmwareVersion)
         latestVer = get_closest_version(fwVer)
         if fwVer != latestVer:
             msg = f"WARNING: Received version: {firmwareVersion}, but found: "
@@ -37,7 +43,8 @@ def validate_given_firmware_version(firmwareVersion: str, interactive: bool) -> 
                 if userInput.lower() == "y":
                     fwVer = latestVer
                 else:
-                    raise RuntimeError("Aborting: no valid version selected.") from err
+                    print("Aborting: no valid version selected.")
+                    sys.exit(1)
             else:
                 fwVer = latestVer
     else:
@@ -47,7 +54,7 @@ def validate_given_firmware_version(firmwareVersion: str, interactive: bool) -> 
             msg = f"Error: no library found for version: {fwVer}. Use "
             msg += "flexsea.utilities.firmware.get_available_firmware_versions() "
             msg += "to see the available versions."
-            raise ValueError(msg) from err
+            raise RuntimeError(msg) from err
 
     return fwVer
 
