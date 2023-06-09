@@ -1,3 +1,25 @@
+import ctypes as c
+from pathlib import Path
+from time import sleep
+from typing import List
+
+from semantic_version import Version
+
+import flexsea.utilities.constants as fxc
+from flexsea.utilities.decorators import minimum_required_version
+from flexsea.utilities.decorators import requires_status
+from flexsea.utilities.decorators import validate
+from flexsea.utilities.firmware import decode_firmware
+from flexsea.utilities.firmware import validate_given_firmware_version
+from flexsea.utilities.library import get_c_library
+from flexsea.utilities.library import set_prototypes
+from flexsea.utilities.library import set_read_functions
+from flexsea.utilities.specs import get_device_spec
+
+
+# ============================================
+#                    Device
+# ============================================
 class Device:
     """
     Representation of one of Dephy's devices. Serves as a way to
@@ -16,8 +38,8 @@ class Device:
         logLevel: int = 4,
         interactive: bool = True,
     ) -> None:
-        # These are first so the destructor won't complain about the 
-        # class not having connected and streaming attributes if getting 
+        # These are first so the destructor won't complain about the
+        # class not having connected and streaming attributes if getting
         # and loading the C library fails
         self.connected: bool = False
         self.streaming: bool = False
@@ -36,16 +58,12 @@ class Device:
         else:
             self.libFile = None
 
-        try:
-            assert baudRate > 0
-        except AssertionError as err:
-            raise ValueError("Error: baud rate must be positive.") from err
+        if baudRate <= 0:
+            raise ValueError("Error: baud rate must be positive.")
         self.baudRate = baudRate
 
-        try:
-            assert 0 <= logLevel <= 6
-        except AssertionError as err:
-            raise ValueError("Log level must be in [0, 6].") from err
+        if logLevel < 0 or logLevel > 6:
+            raise ValueError("Log level must be in [0, 6].")
         self.logLevel = logLevel
 
         self.heartbeat: int = 0

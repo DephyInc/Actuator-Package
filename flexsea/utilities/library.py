@@ -1,8 +1,10 @@
 import ctypes as c
 import os
 from pathlib import Path
+import sys
 from typing import Tuple
 
+from botocore.exceptions import EndpointConnectionError
 from semantic_version import Version
 
 import flexsea.utilities.constants as fxc
@@ -19,7 +21,7 @@ def get_c_library(firmwareVersion: str, libFile: Path | None) -> Tuple:
     """
     If we're given a library file to use, we make sure it exists. If
     we're not given a library file to use, we check for a cached file
-    on disk corresponding to our firmware version. If we don't have one, 
+    on disk corresponding to our firmware version. If we don't have one,
     we try to download it from S3. We then use ctypes to load the library.
     """
     if libFile is None:

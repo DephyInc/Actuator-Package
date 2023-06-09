@@ -11,6 +11,8 @@ import semantic_version as sem
 # specs, api specs, and bootloading tools)
 dephyPath = Path.home().joinpath(".dephy").expanduser().absolute()
 
+firmwareVersionCacheFile = dephyPath.joinpath("available_versions.yaml")
+
 # libsDir is the name of the directory (mirrored on S3), whereas
 # libsPath is the full path to that directory on the local file system
 libsDir = "precompiled_c_libs"
