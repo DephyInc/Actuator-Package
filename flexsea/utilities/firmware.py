@@ -25,17 +25,17 @@ def validate_given_firmware_version(firmwareVersion: str, interactive: bool) -> 
     # e.g., 7.2.0
     try:
         firmwareVersion = Version(firmwareVersion)
-    except ValueError:
+    except ValueError as err:
         # Check if the user gave us a partial version string, e.g., 7
         try:
             firmwareVersion = Version.coerce(firmwareVersion)
-        except ValueError:
+        except ValueError as err2:
             msg = f"Error: could not cast given version {firmwareVersion} to a valid "
             msg += "semantic version string. Please use the form X.Y.Z, where X, Y, "
             msg += "and Z are integers. For valid versions, please see: "
             msg += "flexsea.utilities.firmware.get_available_firmware_versions()"
             print(msg)
-            sys.exit(1)
+            raise err from err2
 
         # If the user did give us a partial version string, we now want
         # to find the most recent version that shares a major version
@@ -61,11 +61,11 @@ def validate_given_firmware_version(firmwareVersion: str, interactive: bool) -> 
     else:
         try:
             assert str(firmwareVersion) in availableVersions
-        except AssertionError:
+        except AssertionError as err:
             msg = f"Error: no library found for version: {firmwareVersion}. Use "
             msg += "flexsea.utilities.firmware.get_available_firmware_versions() "
             msg += "to see the available versions."
-            sys.exit(1)
+            raise ValueError(msg) from err
 
     return firmwareVersion
 
@@ -94,11 +94,11 @@ def get_available_firmware_versions() -> List[str]:
         try:
             with open(fxc.firmwareVersionCacheFile, "r", encoding="utf-8") as fd:
                 data = yaml.safe_load(fd)
-        except FileNotFoundError:
+        except FileNotFoundError as err:
             msg = "Error: no firmware version cache file found. "
             msg += "Try connecting to the internet and running this function again."
             print(msg)
-            sys.exit(1)
+            raise err
         libs = data["versions"]
         days = (pendulum.today() - pendulum.parse(data["date"])).days
         if days > 7:

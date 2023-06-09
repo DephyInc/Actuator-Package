@@ -1,3 +1,4 @@
+from botocore.exceptions import EndpointConnectionError
 import yaml
 from semantic_version import Version
 
@@ -22,12 +23,12 @@ def get_device_spec(deviceName: str, firmwareVersion: Version) -> dict:
             s3_download(
                 deviceSpecObj, fxc.dephyPublicFilesBucket, str(deviceSpecFile), None
             )
-        except EndpointConnectionError:
+        except EndpointConnectionError as err:
             msg = "Error: could not connect to the internet to download the "
             msg += "necessary device spec file. Please connect to the internet and "
             msg += "try again."
             print(msg)
-            sys.exit(1)
+            raise err
 
     with open(deviceSpecFile, "r", encoding="utf-8") as fd:
         deviceSpec = yaml.safe_load(fd)

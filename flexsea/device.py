@@ -1,5 +1,6 @@
 import ctypes as c
 from pathlib import Path
+import sys
 from time import sleep
 from typing import List
 
@@ -12,7 +13,6 @@ from flexsea.utilities.decorators import validate
 from flexsea.utilities.firmware import decode_firmware
 from flexsea.utilities.firmware import validate_given_firmware_version
 from flexsea.utilities.library import get_c_library
-from flexsea.utilities.library import set_prototypes
 from flexsea.utilities.library import set_read_functions
 from flexsea.utilities.specs import get_device_spec
 
@@ -37,7 +37,10 @@ class Device:
         libFile: str = "",
         logLevel: int = 4,
         interactive: bool = True,
+        debug: bool = False,
     ) -> None:
+        if not debug:
+            sys.tracebacklimit = 0
         # These are first so the destructor won't complain about the
         # class not having connected and streaming attributes if getting
         # and loading the C library fails
@@ -70,8 +73,7 @@ class Device:
         self.id: int = 0
         self.streamingFrequency: int = 0
 
-        (clib, self.libFile) = get_c_library(self.firmwareVersion, self.libFile)
-        self._clib = set_prototypes(clib, self.firmwareVersion)
+        (self._clib, self.libFile) = get_c_library(self.firmwareVersion, self.libFile)
 
         self._fields: List[str] | None = None
         self._gains: dict = {}
