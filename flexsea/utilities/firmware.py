@@ -101,8 +101,9 @@ def get_available_firmware_versions() -> List[str]:
             sys.exit(1)
         libs = data["versions"]
         days = (pendulum.today() - pendulum.parse(data["date"])).days
-        print(f"Warning: using firmware version information from: {days} ago.")
-        print("To update, connect to the internet and re-run this function.")
+        if days > 7:
+            print(f"Warning: using firmware version information from: {days} days ago.")
+            print("To update, connect to the internet and re-run this function.")
     else:
         libs = set()
         for obj in objs:

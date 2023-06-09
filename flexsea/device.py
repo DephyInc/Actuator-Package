@@ -100,7 +100,8 @@ class Device:
             self._isLegacy = False
             self._libVersion = self._get_lib_version()
 
-        print(f"Firmware version: {self.firmwareVersion}\nLibrary: {self.libFile}")
+        print(f"Using firmware version: {self.firmwareVersion}")
+        print(f"Using library file: {self.libFile}")
 
     # -----
     # destructor
