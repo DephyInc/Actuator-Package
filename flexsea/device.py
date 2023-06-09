@@ -1,29 +1,7 @@
-import ctypes as c
-from pathlib import Path
-from time import sleep
-from typing import List
-
-from semantic_version import Version
-
-import flexsea.utilities.constants as fxc
-from flexsea.utilities.decorators import minimum_required_version
-from flexsea.utilities.decorators import requires_status
-from flexsea.utilities.decorators import validate
-from flexsea.utilities.firmware import decode_firmware
-from flexsea.utilities.firmware import validate_given_firmware_version
-from flexsea.utilities.library import get_c_library
-from flexsea.utilities.library import set_prototypes
-from flexsea.utilities.library import set_read_functions
-from flexsea.utilities.specs import get_device_spec
-
-
-# ============================================
-#                   Device
-# ============================================
 class Device:
     """
     Representation of one of Dephy's devices. Serves as a way to
-    send commands to and read data from a Dephy device.
+    send commands to -- and read data from -- a Dephy device.
     """
 
     # -----
@@ -38,15 +16,16 @@ class Device:
         logLevel: int = 4,
         interactive: bool = True,
     ) -> None:
-        # These are first so the destructor won't complain about the class not having 
-        # connected and streaming attributes if getting and loading the C library
-        # fails
+        # These are first so the destructor won't complain about the 
+        # class not having connected and streaming attributes if getting 
+        # and loading the C library fails
         self.connected: bool = False
         self.streaming: bool = False
 
         self.port: str = port
         self.interactive = interactive
-        self.firmwareVersion: Version = validate_given_firmware_version(
+
+        self.firmwareVersion = validate_given_firmware_version(
             firmwareVersion, self.interactive
         )
 

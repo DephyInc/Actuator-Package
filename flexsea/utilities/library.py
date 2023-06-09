@@ -15,25 +15,27 @@ from .system import get_os
 # ============================================
 #                get_c_library
 # ============================================
-def get_c_library(firmwareVersion: Version, libFile: Path | None) -> Tuple:
+def get_c_library(firmwareVersion: str, libFile: Path | None) -> Tuple:
     """
     If we're given a library file to use, we make sure it exists. If
     we're not given a library file to use, we check for a cached file
-    on disk corresponding to our firmware. If we don't have one, we try
-    to download it from S3. We then use ctypes to load the library.
+    on disk corresponding to our firmware version. If we don't have one, 
+    we try to download it from S3. We then use ctypes to load the library.
     """
-    if libFile is not None:
-        try:
-            assert libFile.exists()
-        except AssertionError as err:
-            raise FileNotFoundError(f"Could not find library: {libFile}") from err
-    else:
+    if libFile is None:
         _os = get_os()
         libFile = fxc.libsPath.joinpath(str(firmwareVersion), _os, fxc.libFiles[_os])
         if not libFile.exists():
             libFile.parent.mkdir(parents=True, exist_ok=True)
             libObj = f"{fxc.libsDir}/{firmwareVersion}/{_os}/{libFile.name}"
-            s3_download(libObj, fxc.dephyPublicFilesBucket, str(libFile), None)
+            try:
+                s3_download(libObj, fxc.dephyPublicFilesBucket, str(libFile), None)
+            except EndpointConnectionError:
+                msg = "Error: could not connect to the internet to download the "
+                msg += "necessary C library file. Please connect to the internet and "
+                msg += "try again."
+                print(msg)
+                sys.exit(1)
 
     return (_load_clib(libFile), libFile)
 
