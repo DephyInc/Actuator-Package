@@ -810,7 +810,7 @@ class Device:
     # num_utts
     # -----
     @property
-    @minimum_required_version("10.0.0")
+    @minimum_required_version("9.1.0")
     @requires_status("connected")
     def num_utts(self) -> int:
         """
@@ -822,7 +822,7 @@ class Device:
     # -----
     # set_all_utts
     # -----
-    @minimum_required_version("10.0.0")
+    @minimum_required_version("9.1.0")
     @requires_status("connected")
     @validate
     def set_all_utts(self, uttVals: List[int]) -> int:
@@ -853,7 +853,7 @@ class Device:
     # -----
     # set_utt
     # -----
-    @minimum_required_version("10.0.0")
+    @minimum_required_version("9.1.0")
     @requires_status("connected")
     @validate
     def set_utt(self, uttVal: int, index: int) -> int:
@@ -884,7 +884,7 @@ class Device:
     # -----
     # reset_utts
     # -----
-    @minimum_required_version("10.0.0")
+    @minimum_required_version("9.1.0")
     @requires_status("connected")
     @validate
     def reset_utts(self) -> int:
@@ -896,7 +896,7 @@ class Device:
     # -----
     # save_utts
     # -----
-    @minimum_required_version("10.0.0")
+    @minimum_required_version("9.1.0")
     @requires_status("connected")
     @validate
     def save_utts(self) -> int:
@@ -909,7 +909,7 @@ class Device:
     # -----
     # read_utts
     # -----
-    @minimum_required_version("10.0.0")
+    @minimum_required_version("9.1.0")
     @requires_status("connected")
     def read_utts(self) -> List[int]:
         """
