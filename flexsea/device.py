@@ -817,6 +817,8 @@ class Device:
         The number of available UTT values is saved as #define NUM_UTT_VALS
         in the C library, so we have this convenience wrapper to access it.
         """
+        if self.firmwareVersion.major == 9:
+            return fxc.nUttsV9
         return self._clib.fxGetNumUtts()
 
     # -----
