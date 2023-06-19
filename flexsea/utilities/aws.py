@@ -6,11 +6,15 @@ import boto3
 from botocore import UNSIGNED
 from botocore.client import BaseClient, Config
 from botocore.exceptions import ClientError
+from botocore.exceptions import ProfileNotFound
+
+from flexsea.utilities.decorators import check_status_code
 
 
 # ============================================
 #                 s3_download
 # ============================================
+@check_status_code
 def s3_download(obj: str, bucket: str, dest: str, profile: str | None = None) -> None:
     """
     Downloads `obj` from `bucket` to `dest` with the AWS
@@ -22,7 +26,11 @@ def s3_download(obj: str, bucket: str, dest: str, profile: str | None = None) ->
             "s3", config=Config(signature_version=UNSIGNED), region_name="us-east-1"
         )
     else:
-        session = boto3.Session(profile_name=profile)
+        try:
+            session = boto3.Session(profile_name=profile)
+        except ProfileNotFound as err:
+            msg = f"Error: invalid AWS profile `{profile}`"
+            raise ValueError(msg) from err
         client = session.client("s3")
 
     try:
@@ -40,6 +48,7 @@ def s3_download(obj: str, bucket: str, dest: str, profile: str | None = None) ->
 # ============================================
 #              s3_find_object
 # ============================================
+@check_status_code
 def s3_find_object(fileName: str, bucket: str, client: str) -> str:
     """
     Searches the given bucket for the given file. Returns the full object
@@ -153,6 +162,7 @@ def _validate_download(
 # ============================================
 #                get_s3_objects
 # ============================================
+@check_status_code
 def get_s3_objects(bucket: str, client: BaseClient, prefix: str = "") -> List:
     """
     Recursively loops over all directories in a bucket and returns a
