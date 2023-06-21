@@ -36,7 +36,7 @@ python3 ./test_open_control.py --help
 ```
 
 The above command will show the required arguments for the test you've chosen to run.
-You'll then run the script with the necessary arguments. For the open control test 
+You'll then run the script with the necessary arguments. For the open control test
 referenced above, there are no required arguments, but all key parameters can be
 controlled via command-line options.
 

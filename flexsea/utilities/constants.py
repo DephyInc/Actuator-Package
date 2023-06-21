@@ -147,10 +147,10 @@ deviceNames = {
 # ============================================
 #                   UTTs
 # ============================================
-# This isn't great, but getting the number of UTTs depends on a function that 
+# This isn't great, but getting the number of UTTs depends on a function that
 # was introduced in version 10, but it turns out the UTT functions themselves
 # were available before then. However, when trying to use the utt functions
-# from version 9, we still need to know how many there are, so, since we're 
-# past v9, the number of UTTs is fixed, so we hard code it here, though it makes 
+# from version 9, we still need to know how many there are, so, since we're
+# past v9, the number of UTTs is fixed, so we hard code it here, though it makes
 # me sad to do so
 nUttsV9 = 15
