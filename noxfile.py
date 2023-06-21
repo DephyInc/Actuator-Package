@@ -11,5 +11,4 @@ def lint(session: nox.Session) -> None:
     """
     session.install("poetry")
     session.run("poetry", "install", "--all-extras")
-    session.run("poetry", "run", "black", "./flexsea")
-    session.run("poetry", "run", "pylint", "./flexsea")
+    session.run("poetry", "run", "pre-commit", "run", "--all-files")
