@@ -93,7 +93,8 @@ def check_status_code(func: Callable) -> Callable:
                 msg += "Please check spelling and/or path."
             elif statusCode == 403:
                 msg = "Error: S3 permission denied. Please check your credentials "
-                msg += "in '~/.aws/credentials'."
+                msg += "in '~/.aws/credentials' and make sure you're passing the "
+                msg += "correct profile to the function."
             else:
                 msg = f"Error: received status code {statusCode} from S3."
             raise RuntimeError(msg) from err

@@ -43,6 +43,7 @@ def s3_download(obj: str, bucket: str, dest: str, profile: str | None = None) ->
         obj = s3_find_object(obj, bucket, client)
         client.download_file(bucket, obj, dest)
     _validate_download(client, bucket, obj, dest)
+    print(f"Downloaded {obj} from {bucket} to {dest}")
 
 
 # ============================================
