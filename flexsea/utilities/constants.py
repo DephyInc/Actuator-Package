@@ -11,6 +11,8 @@ import semantic_version as sem
 # specs, api specs, and bootloading tools)
 dephyPath = Path.home().joinpath(".dephy").expanduser().absolute()
 
+firmwareVersionCacheFile = dephyPath.joinpath("available_versions.yaml")
+
 # libsDir is the name of the directory (mirrored on S3), whereas
 # libsPath is the full path to that directory on the local file system
 libsDir = "precompiled_c_libs"
@@ -140,3 +142,15 @@ deviceNames = {
     EXO.value: "exo",
     MD.value: "md",
 }
+
+
+# ============================================
+#                   UTTs
+# ============================================
+# This isn't great, but getting the number of UTTs depends on a function that
+# was introduced in version 10, but it turns out the UTT functions themselves
+# were available before then. However, when trying to use the utt functions
+# from version 9, we still need to know how many there are, so, since we're
+# past v9, the number of UTTs is fixed, so we hard code it here, though it makes
+# me sad to do so
+nUttsV9 = 15

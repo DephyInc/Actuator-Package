@@ -1,5 +1,6 @@
 import ctypes as c
 from pathlib import Path
+import sys
 from time import sleep
 from typing import List
 
@@ -12,18 +13,17 @@ from flexsea.utilities.decorators import validate
 from flexsea.utilities.firmware import decode_firmware
 from flexsea.utilities.firmware import validate_given_firmware_version
 from flexsea.utilities.library import get_c_library
-from flexsea.utilities.library import set_prototypes
 from flexsea.utilities.library import set_read_functions
 from flexsea.utilities.specs import get_device_spec
 
 
 # ============================================
-#                   Device
+#                    Device
 # ============================================
 class Device:
     """
     Representation of one of Dephy's devices. Serves as a way to
-    send commands to and read data from a Dephy device.
+    send commands to -- and read data from -- a Dephy device.
     """
 
     # -----
@@ -37,41 +37,43 @@ class Device:
         libFile: str = "",
         logLevel: int = 4,
         interactive: bool = True,
+        debug: bool = False,
     ) -> None:
-        # These are first so destructor won't complain if setup fails
-        # attributes
+        if not debug:
+            sys.tracebacklimit = 0
+        # These are first so the destructor won't complain about the
+        # class not having connected and streaming attributes if getting
+        # and loading the C library fails
         self.connected: bool = False
         self.streaming: bool = False
-        self.interactive = interactive
 
         self.port: str = port
-        self.firmwareVersion: Version = validate_given_firmware_version(
+        self.interactive = interactive
+
+        self.firmwareVersion = validate_given_firmware_version(
             firmwareVersion, self.interactive
         )
 
         if libFile:
             self.libFile = Path(libFile).expanduser().absolute()
+            if not self.libFile.is_file():
+                raise FileNotFoundError(f"Could not find library: {self.libFile}")
         else:
             self.libFile = None
 
-        try:
-            assert baudRate > 0
-        except AssertionError as err:
-            raise ValueError("Error: baud rate must be positive.") from err
+        if baudRate <= 0:
+            raise ValueError("Error: baud rate must be positive.")
         self.baudRate = baudRate
 
-        try:
-            assert 0 <= logLevel <= 6
-        except AssertionError as err:
-            raise ValueError("Log level must be in [0, 6].") from err
+        if logLevel < 0 or logLevel > 6:
+            raise ValueError("Log level must be in [0, 6].")
         self.logLevel = logLevel
 
         self.heartbeat: int = 0
         self.id: int = 0
         self.streamingFrequency: int = 0
 
-        (clib, self.libFile) = get_c_library(self.firmwareVersion, self.libFile)
-        self._clib = set_prototypes(clib, self.firmwareVersion)
+        (self._clib, self.libFile) = get_c_library(self.firmwareVersion, self.libFile)
 
         self._fields: List[str] | None = None
         self._gains: dict = {}
@@ -100,7 +102,8 @@ class Device:
             self._isLegacy = False
             self._libVersion = self._get_lib_version()
 
-        print(f"Firmware version: {self.firmwareVersion}\nLibrary: {self.libFile}")
+        print(f"Using firmware version: {self.firmwareVersion}")
+        print(f"Using library file: {self.libFile}")
 
     # -----
     # destructor
@@ -807,19 +810,21 @@ class Device:
     # num_utts
     # -----
     @property
-    @minimum_required_version("10.0.0")
+    @minimum_required_version("9.1.0")
     @requires_status("connected")
     def num_utts(self) -> int:
         """
         The number of available UTT values is saved as #define NUM_UTT_VALS
         in the C library, so we have this convenience wrapper to access it.
         """
+        if self.firmwareVersion.major == 9:
+            return fxc.nUttsV9
         return self._clib.fxGetNumUtts()
 
     # -----
     # set_all_utts
     # -----
-    @minimum_required_version("10.0.0")
+    @minimum_required_version("9.1.0")
     @requires_status("connected")
     @validate
     def set_all_utts(self, uttVals: List[int]) -> int:
@@ -850,7 +855,7 @@ class Device:
     # -----
     # set_utt
     # -----
-    @minimum_required_version("10.0.0")
+    @minimum_required_version("9.1.0")
     @requires_status("connected")
     @validate
     def set_utt(self, uttVal: int, index: int) -> int:
@@ -881,7 +886,7 @@ class Device:
     # -----
     # reset_utts
     # -----
-    @minimum_required_version("10.0.0")
+    @minimum_required_version("9.1.0")
     @requires_status("connected")
     @validate
     def reset_utts(self) -> int:
@@ -893,7 +898,7 @@ class Device:
     # -----
     # save_utts
     # -----
-    @minimum_required_version("10.0.0")
+    @minimum_required_version("9.1.0")
     @requires_status("connected")
     @validate
     def save_utts(self) -> int:
@@ -906,7 +911,7 @@ class Device:
     # -----
     # read_utts
     # -----
-    @minimum_required_version("10.0.0")
+    @minimum_required_version("9.1.0")
     @requires_status("connected")
     def read_utts(self) -> List[int]:
         """

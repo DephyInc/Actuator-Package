@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "flexsea"
-version = "11.0.3"
+version = "11.0.4"
 description = ""
 authors = ["Jared <jcoughlin@dephy.com>"]
 readme = "README.md"
@@ -10,6 +10,7 @@ python = "^3.11"
 semantic-version = "^2.10.0"
 boto3 = "^1.26.110"
 pyyaml = "^6.0"
+pendulum = "^2.1.2"
 
 
 [tool.poetry.group.dev.dependencies]

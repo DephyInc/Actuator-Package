@@ -30,6 +30,15 @@ repos:
     rev: 23.1.0
     hooks:
     -   id: black
+# https://stackoverflow.com/a/61238571/8087342
+# -   repo: local
+#     hooks:
+#     -   id: pylint
+#         name: pylint
+#         entry: pylint
+#         language: system
+#         types: [python]
+#         require_serial: true
 -   repo: https://github.com/PyCQA/pylint
     rev: v2.16.4
     hooks:
@@ -44,3 +53,5 @@ repos:
         - nox
         - numpy
         - pandas
+        - pyyaml
+        - pendulum

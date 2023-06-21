@@ -1,6 +1,7 @@
 from functools import wraps
 from typing import Any, Callable
 
+from botocore.exceptions import ClientError
 from semantic_version import Version
 
 
@@ -70,3 +71,32 @@ def minimum_required_version(version: str) -> Callable:
         return min_ver_wrapper
 
     return min_ver_decorator
+
+
+# ============================================
+#             check_status_code
+# ============================================
+def check_status_code(func: Callable) -> Callable:
+    @wraps(func)
+    def check_status_wrapper(*args, **kwargs) -> Any:
+        try:
+            return func(*args, **kwargs)
+        # boto3 raises a client error when we either try to download something
+        # that doesn't exist, download something we don't have permission for,
+        # or try to list the contents of a bucket when we don't have the
+        # credentials to do so. These errors are differentiated by the
+        # HTTPStatusCode key in the response
+        except ClientError as err:
+            statusCode = err.response["ResponseMetadata"]["HTTPStatusCode"]
+            if statusCode == 404:
+                msg = "Error: requested object could not be found on S3. "
+                msg += "Please check spelling and/or path."
+            elif statusCode == 403:
+                msg = "Error: S3 permission denied. Please check your credentials "
+                msg += "in '~/.aws/credentials' and make sure you're passing the "
+                msg += "correct profile to the function."
+            else:
+                msg = f"Error: received status code {statusCode} from S3."
+            raise RuntimeError(msg) from err
+
+    return check_status_wrapper
