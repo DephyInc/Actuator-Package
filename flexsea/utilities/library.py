@@ -164,6 +164,35 @@ def _set_prototypes(clib: c.CDLL, firmwareVersion: Version) -> c.CDLL:
     ]
     clib.fxGetReadDataQueueSize.restype = c.c_int
 
+    # Start training
+    clib.fxStartTraining.argtypes = [c.c_uint]
+    clib.fxStartTraining.restype = c.c_int
+
+    # Set single user mode (training data is re-used between power cycles)
+    clib.fxUseSavedTraining.argtypes = [c.c_uint]
+    clib.fxUseSavedTraining.restype = c.c_int
+
+    # Set multi user mode (training data is not re-used between power cycles)
+    # Must re-train each time
+    clib.fxDoNotUseSaveTraining.argtypes = [c.c_uint]
+    clib.fxDoNotUseSaveTraining.restype = c.c_int
+
+    # Is the device in single user mode?
+    clib.fxIsUsingSavedTrainingData.argtypes = [c.c_uint, c.POINTER(c.c_bool)]
+    clib.fxIsUsingSavedTrainingData.restype = c.c_int
+
+    # Request updated training data from the device
+    clib.fxUpdateTrainingData.argtypes = [c.c_uint]
+    clib.fxUpdateTrainingData.restype = c.c_int
+
+    # Training steps remaining
+    clib.fxGetStepsRemaining.argtypes = [c.c_uint, c.POINTER(c.c_int)]
+    clib.fxGetStepsRemaining.restype = c.c_int
+
+    # Get training state
+    clib.fxGetTrainingState.argtypes = [c.c_uint, c.POINTER(c.c_int)]
+    clib.fxGetTrainingState.restype = c.c_int
+
     if firmwareVersion >= Version("10.0.0"):
         # Get max device name length
         clib.fxGetMaxDeviceNameLength.argtypes = []

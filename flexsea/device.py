@@ -943,3 +943,83 @@ class Device:
         Returns the currently set gains.
         """
         return self._gains
+
+    # -----
+    # start_training
+    # -----
+    @requires_status("connected")
+    @validate
+    def start_training(self) -> None:
+        return self._clib.fxStartTraining(self.id)
+
+    # -----
+    # activate_single_user_mode
+    # -----
+    @requires_status("connected")
+    @validate
+    def activate_single_user_mode(self) -> None:
+        return self._clib.fxUseSavedTraining(self.id)
+
+    # -----
+    # activate_multi_user_mode
+    # -----
+    @requires_status("connected")
+    @validate
+    def activate_multi_user_mode(self) -> None:
+        return self._clib.fxDoNotUseSaveTraining(self.id)
+
+    # -----
+    # remaining_training_steps
+    # -----
+    @property
+    @requires_status("connected")
+    def remaining_training_steps(self) -> int:
+        self._update_training_data()
+        # Give the device time to process the request and send the data
+        sleep(0.25)
+        stepsRemaining = c.c_int()
+        retCode = self._clib.fxGetStepsRemaining(self.id, c.byref(stepsRemaining))
+        if retCode != self._SUCCESS.value:
+            raise RuntimeError(
+                "Error: could not determine how many training steps remain."
+            )
+        return stepsRemaining.value
+
+    # -----
+    # get_training_user_mode
+    # -----
+    @requires_status("connected")
+    def get_training_user_mode(self) -> str:
+        singleUserMode = c.c_bool()
+
+        retCode = self._clib.fxIsUsingSavedTrainingData(
+            self.id, c.byref(singleUserMode)
+        )
+
+        if retCode != self._SUCCESS.value:
+            raise RuntimeError("Error: could not determine training mode.")
+
+        if singleUserMode.value:
+            return "single"
+        return "multi"
+
+    # -----
+    # get_training_state
+    # -----
+    @requires_status("connected")
+    def get_training_state(self) -> str:
+        self._update_training_data()
+        # Give the device time to process the request and send the data
+        sleep(0.25)
+        trainingState = c.c_int()
+        retCode = self._clib.fxGetTrainingState(self.id, c.byref(trainingState))
+        if retCode != self._SUCCESS.value:
+            raise RuntimeError("Error: could not determine training state.")
+        return fxc.training_states[trainingState.value]
+
+    # -----
+    # _update_training_data
+    # -----
+    @validate
+    def _update_training_data(self) -> None:
+        return self._clib.fxUpdateTrainingData(self.id)
