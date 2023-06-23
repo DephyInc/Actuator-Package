@@ -4,6 +4,7 @@ version = "11.1.0"
 description = ""
 authors = ["Jared <jcoughlin@dephy.com>"]
 readme = "README.md"
+homepage = "https://github.com/DephyInc/Actuator-Package"
 
 [tool.poetry.dependencies]
 python = "^3.11"
