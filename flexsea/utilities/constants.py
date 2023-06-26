@@ -87,7 +87,7 @@ bootloaderTargets = {
     "re": 1,
     "ex": 2,
     "mn": 3,
-    "bt": 4,
+    "bt121": 4,
     "xbee": 5,
 }
 
