@@ -41,6 +41,8 @@ class Device:
     ) -> None:
         if not debug:
             sys.tracebacklimit = 0
+        # Create the cache dir
+        fxc.dephyPath.mkdir(parents=True, exist_ok=True)
         # These are first so the destructor won't complain about the
         # class not having connected and streaming attributes if getting
         # and loading the C library fails
