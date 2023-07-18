@@ -21,53 +21,30 @@ import flexsea.utilities.constants as fxc
 def validate_given_firmware_version(firmwareVersion: str, interactive: bool) -> Version:
     availableVersions = get_available_firmware_versions()
 
-    # First we check if the user gave us a complete version string,
-    # e.g., 7.2.0
+    if firmwareVersion in availableVersions:
+        return Version(firmwareVersion)
+
     try:
-        firmwareVersion = Version(firmwareVersion)
+        firmwareVersion = Version.coerce(firmwareVersion)
     except ValueError as err:
-        # Check if the user gave us a partial version string, e.g., 7
-        try:
-            firmwareVersion = Version.coerce(firmwareVersion)
-        except ValueError as err2:
-            msg = f"Error: could not cast given version {firmwareVersion} to a valid "
-            msg += "semantic version string. Please use the form X.Y.Z, where X, Y, "
-            msg += "and Z are integers. For valid versions, please see: "
-            msg += "flexsea.utilities.firmware.get_available_firmware_versions()"
-            print(msg)
-            raise err from err2
+        msg = f"Error: could not cast given version {firmwareVersion} to a valid "
+        msg += "semantic version string. Please use the form X.Y.Z, where X, Y, "
+        msg += "and Z are integers. For valid versions, please see: "
+        msg += "flexsea.utilities.firmware.get_available_firmware_versions()"
+        raise ValueError(msg) from err
 
-        # If the user did give us a partial version string, we now want
-        # to find the most recent version that shares a major version
-        # with what the user gave us. E.g., if the user gave us 7 and
-        # the list of available versions contains 7.2.3 and 7.4.5, we
-        # want to use 7.4.5
-        latestVer = get_closest_version(firmwareVersion, availableVersions)
-        if firmwareVersion != latestVer:
-            msg = f"Warning: received version {firmwareVersion}, but found: "
-            msg += f"{latestVer}, which is newer."
-            print(msg)
-            if interactive:
-                userInput = input(f"Use {latestVer}? [y/n]")
-                if userInput.lower() == "y":
-                    firmwareVersion = latestVer
-                else:
-                    print("Aborting: no valid version selected.")
-                    sys.exit(1)
-            else:
-                firmwareVersion = latestVer
-    # If the user did give us a full version string, we make sure that
-    # it's in the list of known versions
-    else:
-        try:
-            assert str(firmwareVersion) in availableVersions
-        except AssertionError as err:
-            msg = f"Error: no library found for version: {firmwareVersion}. Use "
-            msg += "flexsea.utilities.firmware.get_available_firmware_versions() "
-            msg += "to see the available versions."
-            raise ValueError(msg) from err
-
-    return firmwareVersion
+    # Check for latest available version with the same major version as
+    # the given version
+    latestVer = get_closest_version(firmwareVersion, availableVersions)
+    msg = f"Warning: received version {firmwareVersion}, but found: "
+    msg += f"{latestVer}, which is newer."
+    print(msg)
+    if interactive:
+        userInput = input(f"Use {latestVer}? [y/n]")
+        if userInput.lower() != "y":
+            print("Aborting: no valid version selected.")
+            sys.exit(1)
+    return latestVer
 
 
 # ============================================

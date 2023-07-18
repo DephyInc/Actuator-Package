@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "flexsea"
-version = "11.0.6"
+version = "11.0.7"
 description = ""
 authors = ["Jared <jcoughlin@dephy.com>"]
 readme = "README.md"
@@ -40,6 +40,7 @@ disable = [
   "too-many-arguments",
   "too-few-public-methods",
   "too-many-locals",
+  "too-many-statements",
 ]
 
 
