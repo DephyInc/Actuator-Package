@@ -55,7 +55,7 @@ data = device.read()
 # positions: the initial position and then the initial position plus
 # some offset. The motor position is given in "ticks", and the
 # conversion between ticks and degrees depends on the device. For an
-# actpack, the conversion is 350 degrees = 16384 ticks
+# actpack, the conversion is 360 degrees = 16384 ticks
 offset = 1000
 pos0 = data["mot_ang"]
 positions = [pos0, pos0 + offset]
