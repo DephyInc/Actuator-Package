@@ -24,6 +24,103 @@ class Device:
     """
     Representation of one of Dephy's devices. Serves as a way to
     send commands to -- and read data from -- a Dephy device.
+
+    Communication is done through a COM port (either bluetooth or
+    serial).
+
+    This class is essentially a Python wrapper around lower-level
+    C/C++ code that has been pre-compiled into a shared library.
+    These library files are stored on S3 and downloaded lazily.
+    They are referenced by a semantic version string specified in
+    the ``firmwareVersion`` constructor argument.
+
+    Available versions can be listed with
+    :py:func:`flexsea.utilities.firmware.get_available_firmware_versions`
+
+    Parameters
+    ----------
+    firmwareVersion : str
+        Semantic version string of the firmware currently on Manage. Used
+        to load the correct pre-compiled C library for communicating with
+        the device. If the full version string, e.g., "10.7.0" is not
+        given, e.g, "10" or "10.7", the string will be expanded to a
+        full version string. If an exact match cannot be found, you
+        will be prompted to use the latest version sharing your
+        version's major version.
+    port : str
+        The name of the communication port the device is connected to.
+        On Windows, this is usually something akin to ``COM3``. On
+        Linux, it is usually something akin to ``/dev/ttyACM0``. On
+        Windows, you can use the Device Manager to search for the port
+        and on Linux you can use the ``ls`` command on ``/dev/ttyACM*``
+    baudRate : int, optional
+        The communication rate expected by the device in bauds. The
+        default value is 230400, which is the current rate used by
+        all Dephy devices.
+    libFile : str, optional
+        ``flexsea`` serves as a wrapper around pre-compiled C/C++
+        libraries. Normally, these libraries are downloaded from S3,
+        but in the event that you want to use a custom, local file,
+        you can use this argument to specify the path to that file.
+    logLevel : int, optional
+        Describes the verbosity of the log files created by the
+        device. Can be in the range [0,6], with 0 being the most
+        verbose and 6 disabling logging.
+    interactive : bool, optional
+        There are certain scenarios where, if this is set to ``True``,
+        you will be prompted for confirmation. If ``False``, you
+        will not be prompted and the code will simply proceed.
+        This mostly has to do with using a different library version
+        than the one specified if an exact match for the specified
+        version could not be found. The default value is ``True``.
+    debug : bool, optional
+        Controls the traceback level. If ``False`` (the default),
+        then the traceback limit is set to 0. If ``True``, Python's
+        default traceback limit is used.
+
+    Attributes
+    ----------
+    connected : bool
+        If ``True``, a connection has been established with the device
+        over the serial port.
+    streaming : bool
+        If ``True``, the device is currently sending data at the
+        specified rate (:py:attr:`streamingFrequency`)
+    port : str
+        The value of ``port`` passed to the constructor.
+    interactive : bool
+        The value of ``interactive`` passed to the constructor.
+    firmwareVersion : semantic_version.Version
+        The value of ``firmwareVersion`` passed to the constructor.
+    libFile : str
+        The value of ``libFile`` passed to the constructor.
+    baudRate : int
+        The value of ``baudRate`` passed to the constructor.
+    logLevel : int
+        The value of ``logLevel`` passed to the constructor.
+    heartbeat : int
+        How frequently the device should check for a connection to
+        the computer. See: :py:meth:`start_streaming`
+    id : int
+        The decimal id of the device.
+    streamingFrequency : int
+        The frequency (in Hz) at which the device is sending data. See:
+        :py:meth:`start_streaming`
+    bootloaderActive
+    firmwareVersion
+    uvlo
+    hasHabs
+    name
+    side
+    num_utts
+    gains
+    remaining_training_steps
+
+    Examples
+    --------
+    >>> Device("7.2.0", "COM3")
+
+    >>> Device("10", "/dev/ttyACM0", logLevel=6, interactive=False)
     """
 
     # -----
