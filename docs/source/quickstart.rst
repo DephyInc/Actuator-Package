@@ -6,7 +6,7 @@ Quickstart
 
 Instantiating
 -------------
-The central object in ``flexsea`` is the :py:class:`Device` class. For most use cases, this is the
+The central object in ``flexsea`` is the :py:class:`~flexsea.device.Device` class. For most use cases, this is the
 only aspect of ``flexsea`` that you will need to interact with directly. You can import
 it into your code like so:
 
@@ -46,13 +46,13 @@ See the :ref:`api docs <flexsea_api>` for more details.
 Connecting and Streaming
 ------------------------
 
-Once instantiated, you need to establish a connection between the computer and the device. This is done via the :py:meth:`open` method:
+Once instantiated, you need to establish a connection between the computer and the device. This is done via the :py:meth:`~flexsea.device.Device.open` method:
 
 .. code-block:: python
 
     device.open()
 
-Additionally, if you would like the device to send its data to the computer -- an action called *streaming* -- then you must invoke the :py:meth:`start_streaming` method:
+Additionally, if you would like the device to send its data to the computer -- an action called *streaming* -- then you must invoke the :py:meth:`~flexsea.device.Device.start_streaming` method:
 
 .. code-block:: python
 
@@ -68,7 +68,7 @@ where ``frequency`` is the rate (in Hertz) at which the device will send data.
 Reading and Printing
 --------------------
 
-If you are streaming, you can get the most recent device data from the :py:meth:`read` method:
+If you are streaming, you can get the most recent device data from the :py:meth:`~flexsea.device.Device.read` method:
 
 .. code-block:: python
 
@@ -88,14 +88,14 @@ To conveniently display the most recent data:
 
     device.print()
 
-:py:meth:`print` takes an optional keyword argument called ``data``, which should be a dictionary returned by :py:meth:`read`. This lets you display data that was read at some arbitrary point in the past.
+:py:meth:`~flexsea.device.Device.print` takes an optional keyword argument called ``data``, which should be a dictionary returned by :py:meth:`~flexsea.device.Device.read`. This lets you display data that was read at some arbitrary point in the past.
 
 
 Logging
 -------
 
 Logging is enabled by default, and the verbosity of the logs is controlled by the ``logLevel``
-argument in the :py:class:`Device` constructor. The allowed values are integers [0,6], with 0
+argument in the :py:class:`~flexsea.device.Device` constructor. The allowed values are integers [0,6], with 0
 being the most verbose and 6 disabling logging.
 
 There are two kinds of logs: debug logs and data logs.
@@ -116,19 +116,19 @@ column headings.
 Controlling the Motor
 ---------------------
 
-The :py:class:`Device` class has methods for controlling the motor current, position,
+The :py:class:`~flexsea.device.Device` class has methods for controlling the motor current, position,
 voltage, impedance, and gains. Additionally, there is a method for stopping the motor:
 
-* :py:meth:`command_motor_current`
-* :py:meth:`command_motor_position`
-* :py:meth:`command_motor_voltage`
-* :py:meth:`command_motor_impedance`
-* :py:meth:`stop_motor()`
-* :py:meth:`set_gains`
+* :py:meth:`~flexsea.device.Device.command_motor_current`
+* :py:meth:`~flexsea.device.Device.command_motor_position`
+* :py:meth:`~flexsea.device.Device.command_motor_voltage`
+* :py:meth:`~flexsea.device.Device.command_motor_impedance`
+* :py:meth:`~flexsea.device.Device.stop_motor`
+* :py:meth:`~flexsea.device.Device.set_gains`
 
 .. note:: 
 
-   The :py:meth:`stop_motor` method resets all of the gains to 0 as a safety precaution.
+   The :py:meth:`~flexsea.device.Device.stop_motor` method resets all of the gains to 0 as a safety precaution.
 
 When setting the gains:
 
@@ -145,26 +145,26 @@ Device State
 
 You can also introspect certain aspects of the device's state, depending on the firmware version you're running:
 
-* ``connected`` : Indicates whether or not the computer and the device are connected
-* ``streaming``: Indicates whether or not the device is sending data
-* ``name``: The name of the type of the device, e.g., "actpack"
-* ``side``: Either "left" or "right", if applicable; ``None`` otherwise. **Requires firmware >= v10.0.0**.
-* ``uvlo``: Used to both get and set the device's UVLO in millivolts
-* ``gains``: The currently set gains
-* ``utts``: The currently set UTT values
-* ``hasHabs``: Whether or not the current device has a habsolute encoder
+* :py:meth:`~flexsea.device.Device.connected` : Indicates whether or not the computer and the device are connected
+* :py:meth:`~flexsea.device.Device.streaming`: Indicates whether or not the device is sending data
+* :py:meth:`~flexsea.device.Device.name`: The name of the type of the device, e.g., "actpack"
+* :py:meth:`~flexsea.device.Device.side`: Either "left" or "right", if applicable; ``None`` otherwise. **Requires firmware >= v10.0.0**.
+* :py:meth:`~flexsea.device.Device.uvlo`: Used to both get and set the device's UVLO in millivolts
+* :py:meth:`~flexsea.device.Device.gains`: The currently set gains
+* :py:meth:`~flexsea.device.Device.utts`: The currently set UTT values
+* :py:meth:`~flexsea.device.Device.hasHabs`: Whether or not the current device has a habsolute encoder
 
 
 Cleaning Up
 -----------
 
-When finished commanding the device, it is good practice to call the :py:meth:`close` method:
+When finished commanding the device, it is good practice to call the :py:meth:`~flexsea.device.Device.close` method:
 
 .. code-block:: python
 
     device.close()
 
-Additionally, when done streaming, you can call the :py:meth:`stop_streaming` method:
+Additionally, when done streaming, you can call the :py:meth:`~flexsea.device.Device.stop_streaming` method:
 
 .. code-block:: python
 
@@ -172,4 +172,4 @@ Additionally, when done streaming, you can call the :py:meth:`stop_streaming` me
 
 .. note:: 
 
-   :py:meth:`stop_streaming` is called automatically by :py:meth:`close`, and :py:meth:`close` is called automatically by the :py:class:`Device` class' destructor, but it's still good practice to clean up manually.
+   :py:meth:`~flexsea.device.Device.stop_streaming` is called automatically by :py:meth:`~flexsea.device.Device.close`, and :py:meth:`~flexsea.device.Device.close` is called automatically by the :py:class:`~flexsea.device.Device` class' destructor, but it's still good practice to clean up manually.

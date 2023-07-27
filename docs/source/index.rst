@@ -8,4 +8,5 @@ FlexSEA Documentation
     :caption: Contents
 
     Installing <installing/index>
+    Quickstart <quickstart>
     API Reference <api/index>

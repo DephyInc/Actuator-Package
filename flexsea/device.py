@@ -166,7 +166,7 @@ class Device:
         fxc.dephyPath.mkdir(parents=True, exist_ok=True)
         # These are first so the destructor won't complain about the
         # class not having connected and streaming attributes if getting
-        # and loading the C library fails (since these attrs are 
+        # and loading the C library fails (since these attrs are
         # referenced in the destructor)
         self.connected: bool = False
         self.streaming: bool = False
@@ -242,7 +242,7 @@ class Device:
         """
         Establish a connection to a device.
 
-        This is needed in order to send commands to the device and/or 
+        This is needed in order to send commands to the device and/or
         receive data from the device via serial communication through
         the COM port.
         """
@@ -480,10 +480,10 @@ class Device:
 
         Returns
         -------
-        int 
+        int
             Status code indicating success or failure.
 
-        See Also 
+        See Also
         --------
         :py:func:`success`
         :py:func:`failure`
@@ -507,10 +507,10 @@ class Device:
 
         Returns
         -------
-        int 
+        int
             Status code indicating success or failure.
 
-        See Also 
+        See Also
         --------
         :py:func:`success`
         :py:func:`failure`
@@ -534,10 +534,10 @@ class Device:
 
         Returns
         -------
-        int 
+        int
             Status code indicating success or failure.
 
-        See Also 
+        See Also
         --------
         :py:func:`success`
         :py:func:`failure`
@@ -563,10 +563,10 @@ class Device:
 
         Returns
         -------
-        int 
+        int
             Status code indicating success or failure.
 
-        See Also 
+        See Also
         --------
         :py:func:`success`
         :py:func:`failure`
@@ -584,10 +584,10 @@ class Device:
 
         Returns
         -------
-        int 
+        int
             Status code indicating success or failure.
 
-        See Also 
+        See Also
         --------
         :py:func:`success`
         :py:func:`failure`
@@ -753,15 +753,15 @@ class Device:
         -------
         dict, List[dict]
             If ``allData`` is ``False``, then a dictionary is returned.
-            If ``allData`` is ``True``, then a list of dictionaries is 
+            If ``allData`` is ``True``, then a list of dictionaries is
             returned. The dictionaries in each case are keyed by the
-            names of the data fields and the values are the values of 
+            names of the data fields and the values are the values of
             those fields. For firmware versions prior to ``10.0.0``,
             the fields are contained in a device specification file,
             which you can find in ``~/.dephy/legacy_device_spcs``.
-            These spec files are downloaded lazily from AWS. For 
+            These spec files are downloaded lazily from AWS. For
             firmware versions >= ``10.0.0``, the fields are provided
-            by the device itself, which means the list of fields is 
+            by the device itself, which means the list of fields is
             both device and firmware-version dependent.
         """
         if allData:
@@ -861,10 +861,10 @@ class Device:
 
         Returns
         -------
-        int 
+        int
             Status code indicating success or failure.
 
-        See Also 
+        See Also
         --------
         :py:func:`success`
         :py:func:`failure`
@@ -898,10 +898,10 @@ class Device:
 
         Returns
         -------
-        int 
+        int
             Status code indicating success or failure.
 
-        See Also 
+        See Also
         --------
         :py:func:`success`
         :py:func:`failure`
@@ -921,10 +921,10 @@ class Device:
 
         Returns
         -------
-        int 
+        int
             Status code indicating success or failure.
 
-        See Also 
+        See Also
         --------
         :py:func:`success`
         :py:func:`failure`
@@ -942,10 +942,10 @@ class Device:
 
         Returns
         -------
-        int 
+        int
             Status code indicating success or failure.
 
-        See Also 
+        See Also
         --------
         :py:func:`success`
         :py:func:`failure`
@@ -974,7 +974,7 @@ class Device:
         Returns
         -------
         bool
-            ``True`` if the device has a Habsolute encoder and 
+            ``True`` if the device has a Habsolute encoder and
             ``Faslse`` otherwise.
         """
         return self._hasHabs
@@ -990,7 +990,7 @@ class Device:
 
         Returns
         -------
-        str 
+        str
             The name of the device.
         """
         if self._name:
@@ -1038,8 +1038,8 @@ class Device:
 
         Returns
         -------
-        str 
-            Can be 'left', 'right', 'none' (for no chirality), or 
+        str
+            Can be 'left', 'right', 'none' (for no chirality), or
             'undefined' (for legacy devices that don't know their side
             information)
         """
@@ -1116,10 +1116,10 @@ class Device:
 
         Returns
         -------
-        int 
+        int
             Status code indicating success or failure.
 
-        See Also 
+        See Also
         --------
         :py:func:`success`
         :py:func:`failure`
@@ -1159,10 +1159,10 @@ class Device:
 
         Returns
         -------
-        int 
+        int
             Status code indicating success or failure.
 
-        See Also 
+        See Also
         --------
         :py:func:`success`
         :py:func:`failure`
@@ -1192,10 +1192,10 @@ class Device:
 
         Returns
         -------
-        int 
+        int
             Status code indicating success or failure.
 
-        See Also 
+        See Also
         --------
         :py:func:`success`
         :py:func:`failure`
@@ -1215,10 +1215,10 @@ class Device:
 
         Returns
         -------
-        int 
+        int
             Status code indicating success or failure.
 
-        See Also 
+        See Also
         --------
         :py:func:`success`
         :py:func:`failure`
@@ -1280,24 +1280,24 @@ class Device:
         """
         Activates training mode.
 
-        When in training mode, the user must take a certain number of 
-        steps. This allows the device to learn the user's gait and set 
-        the value of several parameters accordingly in order for the 
+        When in training mode, the user must take a certain number of
+        steps. This allows the device to learn the user's gait and set
+        the value of several parameters accordingly in order for the
         device to provide optimal augmentation.
 
         Returns
         -------
-        int 
+        int
             Status code indicating success or failure.
 
-        See Also 
+        See Also
         --------
         :py:func:`success`
         :py:func:`failure`
 
         Notes
         -----
-        Training mode is only available if the device is flashed with 
+        Training mode is only available if the device is flashed with
         one of Dephy's controllers.
         """
         return self._clib.fxStartTraining(self.id)
@@ -1313,22 +1313,22 @@ class Device:
 
         In this mode, training mode runs once and then the parameters
         are saved. This means that training mode will not re-activate
-        if the device is power-cycled, so the same gait parameters will 
+        if the device is power-cycled, so the same gait parameters will
         be used across sessions.
 
         Returns
         -------
-        int 
+        int
             Status code indicating success or failure.
 
-        See Also 
+        See Also
         --------
         :py:func:`success`
         :py:func:`failure`
 
         Notes
         -----
-        Training mode is only available if the device is flashed with 
+        Training mode is only available if the device is flashed with
         one of Dephy's controllers.
         """
         return self._clib.fxUseSavedTraining(self.id)
@@ -1342,23 +1342,23 @@ class Device:
         """
         Puts the device into multi-user mode.
 
-        This causes training mode to activate each time the device is 
-        power-cycled, so gait parameters do not persist across power 
+        This causes training mode to activate each time the device is
+        power-cycled, so gait parameters do not persist across power
         cycles.
 
         Returns
         -------
-        int 
+        int
             Status code indicating success or failure.
 
-        See Also 
+        See Also
         --------
         :py:func:`success`
         :py:func:`failure`
 
         Notes
         -----
-        Training mode is only available if the device is flashed with 
+        Training mode is only available if the device is flashed with
         one of Dephy's controllers.
         """
         return self._clib.fxDoNotUseSaveTraining(self.id)
@@ -1370,17 +1370,17 @@ class Device:
     @requires_status("connected")
     def remaining_training_steps(self) -> int:
         """
-        Returns the number of steps remaining before training is 
+        Returns the number of steps remaining before training is
         completed.
 
         Returns
         -------
-        int 
+        int
             The number of steps remaining before training is complete.
 
         Notes
         -----
-        Training mode is only available if the device is flashed with 
+        Training mode is only available if the device is flashed with
         one of Dephy's controllers.
         """
         self._update_training_data()
@@ -1400,22 +1400,22 @@ class Device:
     @requires_status("connected")
     def get_training_user_mode(self) -> str:
         """
-        Returns the current mode the device is in: either single-user 
+        Returns the current mode the device is in: either single-user
         or multi-user.
 
         Returns
         -------
-        str 
+        str
             The device's current mode.
 
-        See Also 
+        See Also
         --------
         :py:meth:`activate_multi_user_mode`
         :py:meth:`activate_single_user_mode`
 
         Notes
         -----
-        Training mode is only available if the device is flashed with 
+        Training mode is only available if the device is flashed with
         one of Dephy's controllers.
         """
         singleUserMode = c.c_bool()
@@ -1439,17 +1439,17 @@ class Device:
         """
         Returns the current status of training.
 
-        Can be: ``loading``, ``in_progress``, ``done``, 
+        Can be: ``loading``, ``in_progress``, ``done``,
         ``walk_training_in_progress``, or ``run_training_in_progress``.
 
         Returns
         -------
-        str 
+        str
             Status of training.
 
         Notes
         -----
-        Training mode is only available if the device is flashed with 
+        Training mode is only available if the device is flashed with
         one of Dephy's controllers.
         """
         self._update_training_data()
@@ -1471,7 +1471,7 @@ class Device:
     # -----
     # success
     # -----
-    @@property
+    @property
     def success(self) -> int:
         """
         The integer corresponding to a status code of success.
@@ -1486,7 +1486,7 @@ class Device:
     # -----
     # failure
     # -----
-    @@property
+    @property
     def failure(self) -> int:
         """
         The integer corresponding to a status code of failure.
@@ -1501,7 +1501,7 @@ class Device:
     # -----
     # undefined
     # -----
-    @@property
+    @property
     @minimum_required_version("10.0.0")
     def undefined(self) -> int:
         """
@@ -1517,7 +1517,7 @@ class Device:
     # -----
     # invalidParam
     # -----
-    @@property
+    @property
     def invalidParam(self) -> int:
         """
         The integer corresponding to a status code of invalidParam.
@@ -1528,11 +1528,11 @@ class Device:
             The integer corresponding to a status code of invalidParam.
         """
         return self._INVALID_PARAM
- 
+
     # -----
     # invalidDevice
     # -----
-    @@property
+    @property
     def invalidDevice(self) -> int:
         """
         The integer corresponding to a status code of invalidDevice.
@@ -1547,7 +1547,7 @@ class Device:
     # -----
     # isLegacy
     # -----
-    @@property
+    @property
     def isLegacy(self) -> bool:
         """
         Whether or not the device is a legacy device.
@@ -1562,7 +1562,7 @@ class Device:
     # -----
     # libVersion
     # -----
-    @@property
+    @property
     def libVersion(self) -> str:
         """
         Version string of the currently loaded library.
