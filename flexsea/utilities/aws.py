@@ -17,8 +17,28 @@ from flexsea.utilities.decorators import check_status_code
 @check_status_code
 def s3_download(obj: str, bucket: str, dest: str, profile: str | None = None) -> None:
     """
-    Downloads `obj` from `bucket` to `dest` with the AWS
-    credentials profile `profile`.
+    Downloads a file from S3.
+
+    Parameters
+    ----------
+    obj : str 
+        The name of the S3 object to download.
+
+    bucket : str 
+        The name of the S3 bucket ``obj`` resides in.
+
+    dest : str
+        The path to where ``obj`` will be downloaded.
+
+    profile : str, optional
+        The name of the profile in the ``~/.aws/credentials`` file. 
+        This profile should hold both the access key and secret access
+        key needed for downloading private or restricted files.
+
+    Raises
+    ------
+    ValueError
+        If the given profile cannot be found.
     """
     # https://stackoverflow.com/a/34866092
     if profile is None:
@@ -52,11 +72,36 @@ def s3_download(obj: str, bucket: str, dest: str, profile: str | None = None) ->
 @check_status_code
 def s3_find_object(fileName: str, bucket: str, client: str) -> str:
     """
-    Searches the given bucket for the given file. Returns the full object
-    path if there's only one match. If there aren't any matches or there's
-    more than one, we fail.
+    Searches the given bucket for the given file.
+
+    Returns the full object path if there's only one match. If there 
+    aren't any matches or there's more than one, we fail.
+
+    Parameters
+    ----------
+    fileName : str
+        The name of the S3 object to search for.
+
+    bucket : str
+        The name of the S3 bucket to search.
+
+    client : :py:class:`BaseClient`
+        The object responsible for connecting to S3.
+
+    Raises
+    ------
+    FileNotFoundError
+        If the given ``fileName`` cannot be found.
+
+    Returns
+    -------
+    str
+        The full S3 path to the object.
+
+    Notes
+    -----
+    Paginator use: https://tinyurl.com/4scnuk6c
     """
-    # https://tinyurl.com/4scnuk6c
     paginator = client.get_paginator("list_objects_v2")
     pageIterator = paginator.paginate(Bucket=bucket)
     objects = pageIterator.search(f"Contents[?contains(Key, `{fileName}`)][]")
@@ -95,7 +140,7 @@ def _validate_download(
 
     Parameters
     ----------
-    client : BaseClient
+    client : :py:class:`BaseClient`
         The object that allows use to communicate with S3.
 
     bucket : str
@@ -174,7 +219,7 @@ def get_s3_objects(bucket: str, client: BaseClient, prefix: str = "") -> List:
     bucket : str
         The name of the bucket we're getting files from.
 
-    client : botocore.client.BaseClient
+    client : :py:class:`BaseClient`
         The object providing an interface to S3.
 
     prefix : str

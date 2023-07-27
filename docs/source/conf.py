@@ -30,6 +30,7 @@ extensions = [
 
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3/", None),
+    "boto3": ("https://boto3.amazonaws.com/v1/documentation/api/latest/", None),
 }
 
 templates_path = ["_templates"]

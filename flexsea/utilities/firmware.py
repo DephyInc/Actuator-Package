@@ -19,6 +19,33 @@ import flexsea.utilities.constants as fxc
 #      validate_given_firmware_version
 # ============================================
 def validate_given_firmware_version(firmwareVersion: str, interactive: bool) -> Version:
+    """
+    Makes sure that the given ``firmwareVersion`` is known to 
+    ``flexsea``.
+
+    Parameters
+    ----------
+    firmwareVersion : str
+        The version string to check.
+
+    interactive : bool
+        If no exact match is known to ``flexsea``, but there is a known
+        version with the same major version as ``firmwareVersion``, if 
+        this parameter is ``True`` we prompt the user whether or not 
+        they want to use it. If ``False``, we go ahead and just use it.
+
+    Raises
+    ------
+    ValueError
+        If the given ``firmwareVersion`` cannot be cast to a valid
+        semantic string.
+
+    Returns
+    -------
+    Version
+        The Version object representing the valid semantic version 
+        string.
+    """
     availableVersions = get_available_firmware_versions()
 
     if firmwareVersion in availableVersions:
@@ -52,6 +79,8 @@ def validate_given_firmware_version(firmwareVersion: str, interactive: bool) -> 
 # ============================================
 def get_available_firmware_versions() -> List[str]:
     """
+    Returns a list of firmware versions known to ``flexsea``.
+
     To facilitiate offline use and firmware version validation, we
     cache a list of the currently available versions each time this
     function is run while online. If the user is not online, we load
@@ -59,6 +88,17 @@ def get_available_firmware_versions() -> List[str]:
     the user about how long it has been since their information was
     updated. If the file doesn't exist and we're not online, then
     the version information cannot be obtained, so we exit.
+
+    Raises
+    ------
+    FileNotFoundError
+        If we cannot connect to the internet and we do not have a 
+        cached list of versions.
+
+    Returns
+    -------
+    List[str]
+        List of known semantic version strings.
     """
     client = boto3.client(
         "s3", config=Config(signature_version=UNSIGNED), region_name="us-east-1"
@@ -100,7 +140,34 @@ def get_available_firmware_versions() -> List[str]:
 #             get_closest_version
 # ============================================
 def get_closest_version(version: Version, versionList: List[str]) -> Version:
-    # https://tinyurl.com/3e4t6svb
+    """
+    Returns the latest known version that shares a major version with 
+    ``version``.
+
+    Parameters
+    ----------
+    version : Version
+        Semantic version string to check.
+
+    versionList : List[str]
+        List of versions known to ``flexsea``.
+
+    Raises
+    ------
+    RuntimeError
+        If none of the known versions share a major version with 
+        ``version``.
+
+    Returns
+    -------
+    Version
+        The latest known version that shares a major version with 
+        ``version``.
+
+    Notes
+    -----
+    Using version specs : https://tinyurl.com/3e4t6svb
+    """
     versionSpec = SimpleSpec(f"~={version.major}")
     closestVersion = versionSpec.select([Version(v) for v in versionList])
 
@@ -134,6 +201,17 @@ class Firmware(c.Structure):
 def decode_firmware(val: int) -> str:
     """
     Returns decoded version number formatted as x.y.z
+
+    Parameters
+    ----------
+    val : int 
+        The value returned by the device that encodes the major,
+        minor, and patch versions of the firmware.
+
+    Returns
+    -------
+    str
+        The decoded firmware version in the form x.y.z
     """
     major: int = 0
     minor: int = 0

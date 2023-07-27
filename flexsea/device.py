@@ -47,25 +47,30 @@ class Device:
         full version string. If an exact match cannot be found, you
         will be prompted to use the latest version sharing your
         version's major version.
+
     port : str
         The name of the communication port the device is connected to.
         On Windows, this is usually something akin to ``COM3``. On
         Linux, it is usually something akin to ``/dev/ttyACM0``. On
         Windows, you can use the Device Manager to search for the port
         and on Linux you can use the ``ls`` command on ``/dev/ttyACM*``
+
     baudRate : int, optional
         The communication rate expected by the device in bauds. The
         default value is 230400, which is the current rate used by
         all Dephy devices.
+
     libFile : str, optional
         ``flexsea`` serves as a wrapper around pre-compiled C/C++
         libraries. Normally, these libraries are downloaded from S3,
         but in the event that you want to use a custom, local file,
         you can use this argument to specify the path to that file.
+
     logLevel : int, optional
         Describes the verbosity of the log files created by the
         device. Can be in the range [0,6], with 0 being the most
         verbose and 6 disabling logging.
+
     interactive : bool, optional
         There are certain scenarios where, if this is set to ``True``,
         you will be prompted for confirmation. If ``False``, you
@@ -73,6 +78,7 @@ class Device:
         This mostly has to do with using a different library version
         than the one specified if an exact match for the specified
         version could not be found. The default value is ``True``.
+
     debug : bool, optional
         Controls the traceback level. If ``False`` (the default),
         then the traceback limit is set to 0. If ``True``, Python's
@@ -80,32 +86,44 @@ class Device:
 
     Attributes
     ----------
+
     connected : bool
         If ``True``, a connection has been established with the device
         over the serial port.
+
     streaming : bool
         If ``True``, the device is currently sending data at the
         specified rate (:py:attr:`streamingFrequency`)
+
     port : str
         The value of ``port`` passed to the constructor.
+
     interactive : bool
         The value of ``interactive`` passed to the constructor.
+
     firmwareVersion : semantic_version.Version
         The value of ``firmwareVersion`` passed to the constructor.
+
     libFile : str
         The value of ``libFile`` passed to the constructor.
+
     baudRate : int
         The value of ``baudRate`` passed to the constructor.
+
     logLevel : int
         The value of ``logLevel`` passed to the constructor.
+
     heartbeat : int
         How frequently the device should check for a connection to
         the computer. See: :py:meth:`start_streaming`
+
     id : int
         The decimal id of the device.
+
     streamingFrequency : int
         The frequency (in Hz) at which the device is sending data. See:
         :py:meth:`start_streaming`
+
     bootloaderActive
     firmwareVersion
     uvlo
@@ -115,6 +133,13 @@ class Device:
     num_utts
     gains
     remaining_training_steps
+    success
+    failure
+    invalidParam
+    invalidDevice
+    libVersion
+    isLegacy
+
 
     Examples
     --------
@@ -138,11 +163,11 @@ class Device:
     ) -> None:
         if not debug:
             sys.tracebacklimit = 0
-        # Create the cache dir
         fxc.dephyPath.mkdir(parents=True, exist_ok=True)
         # These are first so the destructor won't complain about the
         # class not having connected and streaming attributes if getting
-        # and loading the C library fails
+        # and loading the C library fails (since these attrs are 
+        # referenced in the destructor)
         self.connected: bool = False
         self.streaming: bool = False
 
@@ -215,9 +240,11 @@ class Device:
     # -----
     def open(self) -> None:
         """
-        Establish a connection to a device. This is needed in order
-        to send commands to the device and/or receive data from the
-        device.
+        Establish a connection to a device.
+
+        This is needed in order to send commands to the device and/or 
+        receive data from the device via serial communication through
+        the COM port.
         """
         if self.connected:
             print("Already connected.")
@@ -297,8 +324,9 @@ class Device:
     # -----
     def close(self) -> None:
         """
-        Severs connection with device. Will no longer be able to send
-        commands or receive data.
+        Severs connection with device.
+
+        Will no longer be able to send commands or receive data.
         """
         if self.streaming:
             self.stop_streaming()
@@ -316,7 +344,7 @@ class Device:
         self, frequency: int, heartbeat: int = 0, useSafety: bool = False
     ) -> None:
         """
-        Instructs the device to send us data at the given `frequency`.
+        Instructs the device to send data at the given ``frequency``.
 
         Parameters
         ----------
@@ -330,16 +358,16 @@ class Device:
             variable specifies the amount of time (in milliseconds)
             between successive heartbeat messages. This is related to
             how long the device will wait without receiving a heartbeat
-            message before shutting itself off (five times `heartbeat`).
+            message before shutting itself off (five times ``heartbeat``).
 
-        useSafety : bool
-            If `True`, the device will stop the motor if it doesn't receive
+        useSafety : bool, optional
+            If ``True``, the device will stop the motor if it doesn't receive
             a heartbeat message in time.
 
         Raises
         ------
         ValueError
-            If `frequency` or `heartbeat` are invalid.
+            If ``frequency`` or ``heartbeat`` are invalid.
         """
         if self.streaming:
             print("Already streaming.")
@@ -388,7 +416,7 @@ class Device:
     # stop_streaming
     # -----
     @requires_status("streaming")
-    def stop_streaming(self) -> int:
+    def stop_streaming(self) -> None:
         """
         Instructs the device to stop sending data.
         """
@@ -449,6 +477,16 @@ class Device:
         ----------
         value : int
             Desired motor position in encoder units.
+
+        Returns
+        -------
+        int 
+            Status code indicating success or failure.
+
+        See Also 
+        --------
+        :py:func:`success`
+        :py:func:`failure`
         """
         controller = fxc.controllers["position"]
         return self._clib.fxSendMotorCommand(self.id, controller, value)
@@ -466,6 +504,16 @@ class Device:
         ----------
         value : int
             Desired motor current in milli-Amps.
+
+        Returns
+        -------
+        int 
+            Status code indicating success or failure.
+
+        See Also 
+        --------
+        :py:func:`success`
+        :py:func:`failure`
         """
         controller = fxc.controllers["current"]
         return self._clib.fxSendMotorCommand(self.id, controller, value)
@@ -483,6 +531,16 @@ class Device:
         ----------
         value : int
             Desired motor voltage in milli-volts.
+
+        Returns
+        -------
+        int 
+            Status code indicating success or failure.
+
+        See Also 
+        --------
+        :py:func:`success`
+        :py:func:`failure`
         """
         controller = fxc.controllers["voltage"]
         return self._clib.fxSendMotorCommand(self.id, controller, value)
@@ -502,6 +560,16 @@ class Device:
         ----------
         value : int
             Desired motor position in ticks.
+
+        Returns
+        -------
+        int 
+            Status code indicating success or failure.
+
+        See Also 
+        --------
+        :py:func:`success`
+        :py:func:`failure`
         """
         controller = fxc.controllers["impedance"]
         return self._clib.fxSendMotorCommand(self.id, controller, value)
@@ -513,6 +581,16 @@ class Device:
     def stop_motor(self) -> int:
         """
         Stops the motor and resets the gains to zero.
+
+        Returns
+        -------
+        int 
+            Status code indicating success or failure.
+
+        See Also 
+        --------
+        :py:func:`success`
+        :py:func:`failure`
         """
         controller = fxc.controllers["none"]
         retCode = self._clib.fxSendMotorCommand(self.id, controller, 0)
@@ -527,7 +605,7 @@ class Device:
     @requires_status("connected")
     def activate_bootloader(self, target: str) -> None:
         """
-        Activates the bootloader for `target`.
+        Activates the bootloader for ``target``.
 
         Parameters
         ----------
@@ -556,7 +634,7 @@ class Device:
         Returns
         -------
         bool
-            `True` if bootloader is active and `False` otherwise.
+            ``True`` if bootloader is active and ``False`` otherwise.
         """
         returnCode = self._clib.fxIsBootloaderActivated(self.id)
         if returnCode != self._SUCCESS.value:
@@ -569,6 +647,8 @@ class Device:
     @requires_status("connected")
     def set_tunnel_mode(self, target: str, timeout: int = 30) -> bool:
         """
+        Puts Manage into tunnel mode.
+
         All communication goes through Manage, so we need to put it into
         tunnel mode in order to activate the other bootloaders. When bootloading
         Manage itself, this causes it to reboot in DFU mode.
@@ -580,15 +660,16 @@ class Device:
         Parameters
         ----------
         target : str
-            The name of the target to set (abbreviated).
+            The name of the target to set. Can be: mn, ex, re, habs,
+            bt121, or xbee.
 
-        timeout : int
+        timeout : int, optional
             The number of seconds to wait for confirmation before failing.
 
         Returns
         -------
         activated : bool
-            If `True`, the bootloader was set successfully. If `False` then
+            If ``True``, the bootloader was set successfully. If ``False`` then
             something went wrong.
         """
         activated = False
@@ -658,6 +739,31 @@ class Device:
     # -----
     @requires_status("streaming")
     def read(self, allData: bool = False) -> dict | List[dict]:
+        """
+        Gets data from the data queue.
+
+        Parameters
+        ----------
+        allData : bool, optional
+            If ``False`` (the default), then only the most recent entry
+            in the data queue is obtained. If ``True``, then all of the
+            data entries in the queue are obtained.
+
+        Returns
+        -------
+        dict, List[dict]
+            If ``allData`` is ``False``, then a dictionary is returned.
+            If ``allData`` is ``True``, then a list of dictionaries is 
+            returned. The dictionaries in each case are keyed by the
+            names of the data fields and the values are the values of 
+            those fields. For firmware versions prior to ``10.0.0``,
+            the fields are contained in a device specification file,
+            which you can find in ``~/.dephy/legacy_device_spcs``.
+            These spec files are downloaded lazily from AWS. For 
+            firmware versions >= ``10.0.0``, the fields are provided
+            by the device itself, which means the list of fields is 
+            both device and firmware-version dependent.
+        """
         if allData:
             if self._isLegacy:
                 return self._read_all_legacy()
@@ -752,6 +858,16 @@ class Device:
         """
         Instructs the device to go through the pole-finding process to
         align the motor correctly.
+
+        Returns
+        -------
+        int 
+            Status code indicating success or failure.
+
+        See Also 
+        --------
+        :py:func:`success`
+        :py:func:`failure`
         """
         if not self.interactive:
             userInput = input(
@@ -779,6 +895,16 @@ class Device:
     def uvlo(self) -> int:
         """
         Gets the currently set UVLO.
+
+        Returns
+        -------
+        int 
+            Status code indicating success or failure.
+
+        See Also 
+        --------
+        :py:func:`success`
+        :py:func:`failure`
         """
         self._clib.fxRequestUVLO(self.id)
         sleep(5)
@@ -792,6 +918,16 @@ class Device:
     def uvlo(self, value: int) -> int:
         """
         Sets the UVLO value for the device. `value` needs to be in milli-volts.
+
+        Returns
+        -------
+        int 
+            Status code indicating success or failure.
+
+        See Also 
+        --------
+        :py:func:`success`
+        :py:func:`failure`
         """
         return self._clib.fxSetUVLO(self.id, value)
 
@@ -803,6 +939,16 @@ class Device:
     def calibrate_imu(self) -> int:
         """
         Instructs the device to go through the IMU calibration process.
+
+        Returns
+        -------
+        int 
+            Status code indicating success or failure.
+
+        See Also 
+        --------
+        :py:func:`success`
+        :py:func:`failure`
         """
         if not self.interactive:
             userInput = input(
@@ -822,6 +968,15 @@ class Device:
     @property
     @requires_status("connected")
     def hasHabs(self) -> bool:
+        """
+        Returns whether or not the device has a Habsolute encoder.
+
+        Returns
+        -------
+        bool
+            ``True`` if the device has a Habsolute encoder and 
+            ``Faslse`` otherwise.
+        """
         return self._hasHabs
 
     # -----
@@ -830,6 +985,14 @@ class Device:
     @property
     @requires_status("connected")
     def name(self) -> str:
+        """
+        Returns the human-friendly name of the device, e.g., actpack.
+
+        Returns
+        -------
+        str 
+            The name of the device.
+        """
         if self._name:
             return self._name
         if self._isLegacy:
@@ -870,6 +1033,16 @@ class Device:
     @property
     @requires_status("connected")
     def side(self) -> str:
+        """
+        Returns the chirality of the device.
+
+        Returns
+        -------
+        str 
+            Can be 'left', 'right', 'none' (for no chirality), or 
+            'undefined' (for legacy devices that don't know their side
+            information)
+        """
         if self._side:
             return self._side
         if self._isLegacy:
@@ -915,6 +1088,11 @@ class Device:
         """
         The number of available UTT values is saved as #define NUM_UTT_VALS
         in the C library, so we have this convenience wrapper to access it.
+
+        Returns
+        -------
+        int
+            The number of User Testing Tweaks (UTTs)
         """
         if self.firmwareVersion.major == 9:
             return fxc.nUttsV9
@@ -935,6 +1113,16 @@ class Device:
         ----------
         uttVals : List[int]
             List of values, one for each UTT
+
+        Returns
+        -------
+        int 
+            Status code indicating success or failure.
+
+        See Also 
+        --------
+        :py:func:`success`
+        :py:func:`failure`
         """
         numUtts = self.num_utts
         nVals = len(uttVals)
@@ -968,6 +1156,16 @@ class Device:
 
         index : int
             The array index for the desired UTT
+
+        Returns
+        -------
+        int 
+            Status code indicating success or failure.
+
+        See Also 
+        --------
+        :py:func:`success`
+        :py:func:`failure`
         """
         numUtts = self.num_utts
 
@@ -991,6 +1189,16 @@ class Device:
     def reset_utts(self) -> int:
         """
         Resets all UTTs to their default values.
+
+        Returns
+        -------
+        int 
+            Status code indicating success or failure.
+
+        See Also 
+        --------
+        :py:func:`success`
+        :py:func:`failure`
         """
         return self._clib.fxSetUTTsToDefault(self.id)
 
@@ -1004,6 +1212,16 @@ class Device:
         """
         Saves the current UTT values to the device's internal memory so
         that they persist across power cycles.
+
+        Returns
+        -------
+        int 
+            Status code indicating success or failure.
+
+        See Also 
+        --------
+        :py:func:`success`
+        :py:func:`failure`
         """
         return self._clib.fxSaveUTTToMemory(self.id)
 
@@ -1017,6 +1235,11 @@ class Device:
         UTTs are not sent as a part of regular communication, so here we
         first request that the device send the UTTs to Mn, and then we
         read them.
+
+        Returns
+        -------
+        List[int]
+            The current value of each UTT.
         """
         if self._clib.fxRequestUTT(self.id) != self._SUCCESS.value:
             raise RuntimeError("Error: could not request UTTs.")
@@ -1040,6 +1263,11 @@ class Device:
     def gains(self) -> dict:
         """
         Returns the currently set gains.
+
+        Returns
+        -------
+        dict
+            The names and values of each gain.
         """
         return self._gains
 
@@ -1048,7 +1276,30 @@ class Device:
     # -----
     @requires_status("connected")
     @validate
-    def start_training(self) -> None:
+    def start_training(self) -> int:
+        """
+        Activates training mode.
+
+        When in training mode, the user must take a certain number of 
+        steps. This allows the device to learn the user's gait and set 
+        the value of several parameters accordingly in order for the 
+        device to provide optimal augmentation.
+
+        Returns
+        -------
+        int 
+            Status code indicating success or failure.
+
+        See Also 
+        --------
+        :py:func:`success`
+        :py:func:`failure`
+
+        Notes
+        -----
+        Training mode is only available if the device is flashed with 
+        one of Dephy's controllers.
+        """
         return self._clib.fxStartTraining(self.id)
 
     # -----
@@ -1056,7 +1307,30 @@ class Device:
     # -----
     @requires_status("connected")
     @validate
-    def activate_single_user_mode(self) -> None:
+    def activate_single_user_mode(self) -> int:
+        """
+        Puts the device into single-user mode.
+
+        In this mode, training mode runs once and then the parameters
+        are saved. This means that training mode will not re-activate
+        if the device is power-cycled, so the same gait parameters will 
+        be used across sessions.
+
+        Returns
+        -------
+        int 
+            Status code indicating success or failure.
+
+        See Also 
+        --------
+        :py:func:`success`
+        :py:func:`failure`
+
+        Notes
+        -----
+        Training mode is only available if the device is flashed with 
+        one of Dephy's controllers.
+        """
         return self._clib.fxUseSavedTraining(self.id)
 
     # -----
@@ -1064,7 +1338,29 @@ class Device:
     # -----
     @requires_status("connected")
     @validate
-    def activate_multi_user_mode(self) -> None:
+    def activate_multi_user_mode(self) -> int:
+        """
+        Puts the device into multi-user mode.
+
+        This causes training mode to activate each time the device is 
+        power-cycled, so gait parameters do not persist across power 
+        cycles.
+
+        Returns
+        -------
+        int 
+            Status code indicating success or failure.
+
+        See Also 
+        --------
+        :py:func:`success`
+        :py:func:`failure`
+
+        Notes
+        -----
+        Training mode is only available if the device is flashed with 
+        one of Dephy's controllers.
+        """
         return self._clib.fxDoNotUseSaveTraining(self.id)
 
     # -----
@@ -1073,6 +1369,20 @@ class Device:
     @property
     @requires_status("connected")
     def remaining_training_steps(self) -> int:
+        """
+        Returns the number of steps remaining before training is 
+        completed.
+
+        Returns
+        -------
+        int 
+            The number of steps remaining before training is complete.
+
+        Notes
+        -----
+        Training mode is only available if the device is flashed with 
+        one of Dephy's controllers.
+        """
         self._update_training_data()
         # Give the device time to process the request and send the data
         sleep(0.25)
@@ -1089,6 +1399,25 @@ class Device:
     # -----
     @requires_status("connected")
     def get_training_user_mode(self) -> str:
+        """
+        Returns the current mode the device is in: either single-user 
+        or multi-user.
+
+        Returns
+        -------
+        str 
+            The device's current mode.
+
+        See Also 
+        --------
+        :py:meth:`activate_multi_user_mode`
+        :py:meth:`activate_single_user_mode`
+
+        Notes
+        -----
+        Training mode is only available if the device is flashed with 
+        one of Dephy's controllers.
+        """
         singleUserMode = c.c_bool()
 
         retCode = self._clib.fxIsUsingSavedTrainingData(
@@ -1107,6 +1436,22 @@ class Device:
     # -----
     @requires_status("connected")
     def get_training_state(self) -> str:
+        """
+        Returns the current status of training.
+
+        Can be: ``loading``, ``in_progress``, ``done``, 
+        ``walk_training_in_progress``, or ``run_training_in_progress``.
+
+        Returns
+        -------
+        str 
+            Status of training.
+
+        Notes
+        -----
+        Training mode is only available if the device is flashed with 
+        one of Dephy's controllers.
+        """
         self._update_training_data()
         # Give the device time to process the request and send the data
         sleep(0.25)
@@ -1122,3 +1467,109 @@ class Device:
     @validate
     def _update_training_data(self) -> None:
         return self._clib.fxUpdateTrainingData(self.id)
+
+    # -----
+    # success
+    # -----
+    @@property
+    def success(self) -> int:
+        """
+        The integer corresponding to a status code of success.
+
+        Returns
+        -------
+        int
+            The integer corresponding to a status code of success.
+        """
+        return self._SUCCESS
+
+    # -----
+    # failure
+    # -----
+    @@property
+    def failure(self) -> int:
+        """
+        The integer corresponding to a status code of failure.
+
+        Returns
+        -------
+        int
+            The integer corresponding to a status code of failure.
+        """
+        return self._FAILURE
+
+    # -----
+    # undefined
+    # -----
+    @@property
+    @minimum_required_version("10.0.0")
+    def undefined(self) -> int:
+        """
+        The integer corresponding to a status code of undefined.
+
+        Returns
+        -------
+        int
+            The integer corresponding to a status code of undefined.
+        """
+        return self._UNDEFINED
+
+    # -----
+    # invalidParam
+    # -----
+    @@property
+    def invalidParam(self) -> int:
+        """
+        The integer corresponding to a status code of invalidParam.
+
+        Returns
+        -------
+        int
+            The integer corresponding to a status code of invalidParam.
+        """
+        return self._INVALID_PARAM
+ 
+    # -----
+    # invalidDevice
+    # -----
+    @@property
+    def invalidDevice(self) -> int:
+        """
+        The integer corresponding to a status code of invalidDevice.
+
+        Returns
+        -------
+        int
+            The integer corresponding to a status code of invalidDevice.
+        """
+        return self._INVALID_DEVICE
+
+    # -----
+    # isLegacy
+    # -----
+    @@property
+    def isLegacy(self) -> bool:
+        """
+        Whether or not the device is a legacy device.
+
+        Returns
+        -------
+        bool
+            Whether or not the device is a legacy device.
+        """
+        return self._isLegacy
+
+    # -----
+    # libVersion
+    # -----
+    @@property
+    def libVersion(self) -> str:
+        """
+        Version string of the currently loaded library.
+
+        Returns
+        -------
+        str
+            Version string of the currently loaded library.
+        """
+        return self._libVersion
