@@ -20,7 +20,7 @@ import flexsea.utilities.constants as fxc
 # ============================================
 def validate_given_firmware_version(firmwareVersion: str, interactive: bool) -> Version:
     """
-    Makes sure that the given ``firmwareVersion`` is known to 
+    Makes sure that the given ``firmwareVersion`` is known to
     ``flexsea``.
 
     Parameters
@@ -30,8 +30,8 @@ def validate_given_firmware_version(firmwareVersion: str, interactive: bool) -> 
 
     interactive : bool
         If no exact match is known to ``flexsea``, but there is a known
-        version with the same major version as ``firmwareVersion``, if 
-        this parameter is ``True`` we prompt the user whether or not 
+        version with the same major version as ``firmwareVersion``, if
+        this parameter is ``True`` we prompt the user whether or not
         they want to use it. If ``False``, we go ahead and just use it.
 
     Raises
@@ -43,7 +43,7 @@ def validate_given_firmware_version(firmwareVersion: str, interactive: bool) -> 
     Returns
     -------
     Version
-        The Version object representing the valid semantic version 
+        The Version object representing the valid semantic version
         string.
     """
     availableVersions = get_available_firmware_versions()
@@ -92,7 +92,7 @@ def get_available_firmware_versions() -> List[str]:
     Raises
     ------
     FileNotFoundError
-        If we cannot connect to the internet and we do not have a 
+        If we cannot connect to the internet and we do not have a
         cached list of versions.
 
     Returns
@@ -141,7 +141,7 @@ def get_available_firmware_versions() -> List[str]:
 # ============================================
 def get_closest_version(version: Version, versionList: List[str]) -> Version:
     """
-    Returns the latest known version that shares a major version with 
+    Returns the latest known version that shares a major version with
     ``version``.
 
     Parameters
@@ -155,13 +155,13 @@ def get_closest_version(version: Version, versionList: List[str]) -> Version:
     Raises
     ------
     RuntimeError
-        If none of the known versions share a major version with 
+        If none of the known versions share a major version with
         ``version``.
 
     Returns
     -------
     Version
-        The latest known version that shares a major version with 
+        The latest known version that shares a major version with
         ``version``.
 
     Notes
@@ -204,7 +204,7 @@ def decode_firmware(val: int) -> str:
 
     Parameters
     ----------
-    val : int 
+    val : int
         The value returned by the device that encodes the major,
         minor, and patch versions of the firmware.
 

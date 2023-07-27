@@ -1,6 +1,6 @@
 .. _flexsea_docs_installing_ubuntu:
 
-Installing on Ubuntu 
+Installing on Ubuntu
 ====================
 
 Prerequisites
@@ -13,7 +13,7 @@ The following script will:
 * Install the linux USB libraries
 * Add your current user to the ``dialout`` group (needed for serial communication)
 
-.. note:: 
+.. note::
 
    You must reboot your machine after adding your user to the ``dialout`` group in order for the changes to take effect. Logging out and back in is not enough.
 
@@ -106,7 +106,7 @@ If you intend to contribute or modify the code, however, it may be helpful to in
 
 .. code-block:: bash
 
-   git clone https://github.com/DephyInc/Actuator-Package.git 
+   git clone https://github.com/DephyInc/Actuator-Package.git
    cd Actuator-Package/
    git checkout v11.0.7
    python3 -m pip install .

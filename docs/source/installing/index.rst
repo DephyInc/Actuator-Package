@@ -16,5 +16,5 @@ operating system:
     :hidden:
 
     ubuntu
-    pi 
+    pi
     windows

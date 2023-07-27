@@ -14,30 +14,30 @@ Utilities
 
 AWS
 ^^^
-.. automodule:: flexsea.utilities.aws 
+.. automodule:: flexsea.utilities.aws
     :members:
 
 Decorators
 ^^^^^^^^^^
-.. automodule:: flexsea.utilities.decorators 
+.. automodule:: flexsea.utilities.decorators
     :members:
 
 Firmware
 ^^^^^^^^
-.. automodule:: flexsea.utilities.firmware 
+.. automodule:: flexsea.utilities.firmware
     :members:
 
 Library
 ^^^^^^^
-.. automodule:: flexsea.utilities.library 
+.. automodule:: flexsea.utilities.library
     :members:
 
 Legacy Device Specifications
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. automodule:: flexsea.utilities.specs 
+.. automodule:: flexsea.utilities.specs
     :members:
 
 System
 ^^^^^^
-.. automodule:: flexsea.utilities.system 
+.. automodule:: flexsea.utilities.system
     :members:

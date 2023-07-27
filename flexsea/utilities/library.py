@@ -36,7 +36,7 @@ def get_c_library(firmwareVersion: Version, libFile: Path | None) -> Tuple:
     Raises
     ------
     EndpointConnectionError
-        If we cannot connect to the internet in order to download the 
+        If we cannot connect to the internet in order to download the
         necessary library.
 
     Returns
@@ -318,7 +318,7 @@ def set_read_functions(
     clib: c.CDLL, deviceName: str, isLegacy: bool, deviceType: c.Structure | None
 ) -> c.CDLL:
     """
-    Sets the prototypes for the read and read_all functions. 
+    Sets the prototypes for the read and read_all functions.
 
     Done here and not with the rest of the prototypes because,
     for legacy devices, we need the device name, which we can't get
@@ -336,8 +336,8 @@ def set_read_functions(
         function.
 
     isLegacy : bool
-        Whether or not the device is a legacy device. The two types 
-        handle reading quite differently, so we need to know the type 
+        Whether or not the device is a legacy device. The two types
+        handle reading quite differently, so we need to know the type
         in order to set the methods appropriately.
 
     deviceType : Structure, None
@@ -348,7 +348,7 @@ def set_read_functions(
     ------
     ValueError
         If the device type is unknown.
-        
+
     Returns
     -------
     CDLL

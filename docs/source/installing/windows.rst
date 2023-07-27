@@ -10,11 +10,11 @@ Prerequisites
 * Install `Git for Windows <https://git-scm.com/download/win>`_. Make sure you download the version (either 32-bit or 64-bit) that matches your system (most likely 64 bit)
 * Install `Python 3.11 <https://www.python.org/downloads/windows/>`_
 
-.. note:: 
+.. note::
 
    Make sure you download the 64-bit version if you downloaded the 64-bit Git above and the 32-bit version if you installed the 32-bit Git above.
 
-.. note:: 
+.. note::
 
    When going through the installation wizard, make sure you check the box that adds Python to your PATH.
 
@@ -42,7 +42,7 @@ If you intend to contribute or modify the code, however, it may be helpful to in
 
 .. code-block:: bash
 
-   git clone https://github.com/DephyInc/Actuator-Package.git 
+   git clone https://github.com/DephyInc/Actuator-Package.git
    cd Actuator-Package/
    git checkout v11.0.7
    python -m pip install .
@@ -64,7 +64,7 @@ environment from Powershell, we have to first navigate to that directory. Here w
     .\Activate.ps1
     (Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | python -
 
-.. note:: 
+.. note::
 
    Once installed, `poetry` should be available from your Git Bash terminal.
 

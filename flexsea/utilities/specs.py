@@ -21,7 +21,7 @@ def get_device_spec(deviceName: str, firmwareVersion: Version) -> dict:
         Name of the device, e.g., actpack.
 
     firmwareVersion : Version
-        Semantic version string so that the correct spec file can be 
+        Semantic version string so that the correct spec file can be
         loaded.
 
     Raises
@@ -31,7 +31,7 @@ def get_device_spec(deviceName: str, firmwareVersion: Version) -> dict:
 
     Returns
     -------
-    Dict 
+    Dict
         A dictionary containing the field names and data types.
     """
     deviceSpecFile = fxc.legacyDeviceSpecsPath.joinpath(

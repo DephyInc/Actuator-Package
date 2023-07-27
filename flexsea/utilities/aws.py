@@ -21,17 +21,17 @@ def s3_download(obj: str, bucket: str, dest: str, profile: str | None = None) ->
 
     Parameters
     ----------
-    obj : str 
+    obj : str
         The name of the S3 object to download.
 
-    bucket : str 
+    bucket : str
         The name of the S3 bucket ``obj`` resides in.
 
     dest : str
         The path to where ``obj`` will be downloaded.
 
     profile : str, optional
-        The name of the profile in the ``~/.aws/credentials`` file. 
+        The name of the profile in the ``~/.aws/credentials`` file.
         This profile should hold both the access key and secret access
         key needed for downloading private or restricted files.
 
@@ -74,7 +74,7 @@ def s3_find_object(fileName: str, bucket: str, client: str) -> str:
     """
     Searches the given bucket for the given file.
 
-    Returns the full object path if there's only one match. If there 
+    Returns the full object path if there's only one match. If there
     aren't any matches or there's more than one, we fail.
 
     Parameters

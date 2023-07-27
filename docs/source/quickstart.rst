@@ -126,7 +126,7 @@ voltage, impedance, and gains. Additionally, there is a method for stopping the 
 * :py:meth:`~flexsea.device.Device.stop_motor`
 * :py:meth:`~flexsea.device.Device.set_gains`
 
-.. note:: 
+.. note::
 
    The :py:meth:`~flexsea.device.Device.stop_motor` method resets all of the gains to 0 as a safety precaution.
 
@@ -170,6 +170,6 @@ Additionally, when done streaming, you can call the :py:meth:`~flexsea.device.De
 
     device.stop_streaming()
 
-.. note:: 
+.. note::
 
    :py:meth:`~flexsea.device.Device.stop_streaming` is called automatically by :py:meth:`~flexsea.device.Device.close`, and :py:meth:`~flexsea.device.Device.close` is called automatically by the :py:class:`~flexsea.device.Device` class' destructor, but it's still good practice to clean up manually.

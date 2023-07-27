@@ -13,7 +13,7 @@
 import flexsea
 
 project = "flexsea"
-copyright = "2023, Dephy, Inc."
+copyright = "2023, Dephy, Inc."  # pylint: disable=W0622
 author = "Dephy, Inc."
 release = flexsea.__version__
 
