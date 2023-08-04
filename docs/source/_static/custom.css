@@ -9,18 +9,33 @@ pre, code {
   line-height: 155%;
 }
 
-h1 {
+h1[data-theme="light"] {
   font-family: "Lato", sans-serif;
   color: #013243; /* warm black */
 }
 
-h2 {
+h1[data-theme="dark"] {
+  font-family: "Lato", sans-serif;
+  color: #FFFFFF; /* white */
+}
+
+h2[data-theme="light"] {
   color: #013243; /* warm black */
   letter-spacing: -.03em;
 }
 
-h3 {
+h2[data-theme="dark"] {
+  color: #FFFFFF; /* white */
+  letter-spacing: -.03em;
+}
+
+h3[data-theme="light"] {
   color: #013243; /* warm black */
+  letter-spacing: -.03em;
+}
+
+h3[data-theme="dark"] {
+  color: #FFFFFF; /* white */
   letter-spacing: -.03em;
 }
 
@@ -56,35 +71,32 @@ html[data-theme="light"] {
 }
 
 html[data-theme="dark"] {
-    /* --pst-color-primary: rgb(11, 76, 99); */
-    /* --pst-color-secondary: rgb(227, 46, 0); */
-    /* --pst-color-inline-code: rgb(227, 46, 0); */
     --pst-color-primary: rgb(122, 136, 156);
+    /* --pst-color-primary-bg: rgb(245, 117, 52); */
+
     --pst-color-secondary: rgb(227, 46, 0);
+    /* --pst-color-secondary-bg: rgb(0, 0, 255); */
+    /**/
+    /* --pst-color-accent: rgb(0, 0, 0); */
+    /* --pst-color-accent-bg: rgb(0, 0, 0); */
+    /**/
+    /* --pst-color-warning: rgb(0, 0, 0); */
+    /* --pst-color-warning-bg: rgb(0, 0, 0); */
+    /**/
+    /* --pst-color-success: rgb(0, 0, 0); */
+    /* --pst-color-success-bg: rgb(0, 0, 0); */
+    /**/
+    /* --pst-color-info: rgb(0, 0, 0); */
+    /* --pst-color-info-bg: rgb(0, 0, 0); */
+    /**/
+    /* --pst-color-attention-bg: rgb(0, 0, 0); */
+    /* --pst-color-attention-bg: rgb(0, 0, 0); */
+    /**/
+    /* --pst-color-danger: rgb(0, 0, 0); */
+    /* --pst-color-danger-bg: rgb(0, 0, 0); */
+    /**/
     --pst-color-inline-code: rgb(227, 46, 0);
+
     --pst-color-link: rgb(255, 0, 0);
     --pst-color-link-hover: rbg(0, 255, 0);
-/*     --pst-color-primary: #e5540b; */
-    /* --pst-color-primary-bg: #f57534,  */
-/**/
-/*     --pst-color-secondary:  */
-/*     --pst-color-secondary-bg:  */
-/**/
-/*     --pst-color-accent:  */
-/*     --pst-color-accent-bg:  */
-/**/
-/*     --pst-color-warning:  */
-/*     --pst-color-warning-bg:  */
-/**/
-/*     --pst-color-success:  */
-/*     --pst-color-success-bg:  */
-/**/
-/*     --pst-color-info:  */
-/*     --pst-color-info-bg:  */
-/**/
-/*     --pst-color-attention-bg:  */
-/*     --pst-color-attention-bg:  */
-/**/
-/*     --pst-color-danger:  */
-/*     --pst-color-danger-bg:  */
 }

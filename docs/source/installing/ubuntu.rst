@@ -53,9 +53,8 @@ Installing from Source
 ++++++++++++++++++++++
 
 The following script will:
-* Download all of the dependencies for Python (this list is current as of Python 3.11.3.
-If you are building a later version, it's possible that this list has changed. Please
-see `this <https://devguide.python.org/getting-started/setup-building/#build-dependencies>`_ link for the most up to date dependencies)
+
+* Download all of the dependencies for Python (this list is current as of Python 3.11.3. If you are building a later version, it's possible that this list has changed. Please see `this <https://devguide.python.org/getting-started/setup-building/#build-dependencies>`_ link for the most up to date dependencies)
 * Download the Python source code
 * Build, test, and install Python (this can take a while)
 
