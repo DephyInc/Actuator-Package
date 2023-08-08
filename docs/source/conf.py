@@ -52,8 +52,8 @@ html_theme_options = {
     "header_links_before_dropdown": 6,
     "navbar_end": ["theme-switcher", "navbar-icon-links"],
     "logo": {
-        "image_light": "logo-dephy.png",
-        "image_dark": "logo-dephy.png",
+        "image_light": "_static/logo-dephy.png",
+        "image_dark": "_static/logo-dephy.png",
     },
 }
 html_static_path = ["_static"]
