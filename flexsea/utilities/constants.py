@@ -78,6 +78,18 @@ controllers = {
 
 
 # ============================================
+#              Training States
+# ============================================
+training_states = {
+    0: "loading",
+    1: "in_progress",
+    2: "done",
+    3: "walk_training_in_progress",
+    4: "run_training_in_progress",
+}
+
+
+# ============================================
 #                 Bootloader
 # ============================================
 

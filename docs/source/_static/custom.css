@@ -1,0 +1,102 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&family=Open+Sans:ital,wght@0,400;0,600;1,400;1,600&display=swap');
+
+body {
+  font-family: 'Open Sans', sans-serif;
+}
+
+pre, code {
+  font-size: 100%;
+  line-height: 155%;
+}
+
+h1[data-theme="light"] {
+  font-family: "Lato", sans-serif;
+  color: #013243; /* warm black */
+}
+
+h1[data-theme="dark"] {
+  font-family: "Lato", sans-serif;
+  color: #FFFFFF; /* white */
+}
+
+h2[data-theme="light"] {
+  color: #013243; /* warm black */
+  letter-spacing: -.03em;
+}
+
+h2[data-theme="dark"] {
+  color: #FFFFFF; /* white */
+  letter-spacing: -.03em;
+}
+
+h3[data-theme="light"] {
+  color: #013243; /* warm black */
+  letter-spacing: -.03em;
+}
+
+h3[data-theme="dark"] {
+  color: #FFFFFF; /* white */
+  letter-spacing: -.03em;
+}
+
+html[data-theme="light"] {
+    --pst-color-primary: rgb(229, 84, 11);
+    --pst-color-primary-bg: rgb(245, 117, 52);
+
+    /* --pst-color-secondary: rgb(0, 0, 255); */
+    /* --pst-color-secondary-bg: rgb(0, 0, 255); */
+    /**/
+    /* --pst-color-accent: rgb(0, 0, 0); */
+    /* --pst-color-accent-bg: rgb(0, 0, 0); */
+    /**/
+    /* --pst-color-warning: rgb(0, 0, 0); */
+    /* --pst-color-warning-bg: rgb(0, 0, 0); */
+    /**/
+    /* --pst-color-success: rgb(0, 0, 0); */
+    /* --pst-color-success-bg: rgb(0, 0, 0); */
+    /**/
+    /* --pst-color-info: rgb(0, 0, 0); */
+    /* --pst-color-info-bg: rgb(0, 0, 0); */
+    /**/
+    /* --pst-color-attention-bg: rgb(0, 0, 0); */
+    /* --pst-color-attention-bg: rgb(0, 0, 0); */
+    /**/
+    /* --pst-color-danger: rgb(0, 0, 0); */
+    /* --pst-color-danger-bg: rgb(0, 0, 0); */
+    /**/
+    --pst-color-inline-code: rgb(122, 136, 156);
+
+    /* --pst-color-link: rgb(0, 0, 0); */
+    /* --pst-color-link-hover: rbg(0, 0, 0); */
+}
+
+html[data-theme="dark"] {
+    --pst-color-primary: rgb(122, 136, 156);
+    /* --pst-color-primary-bg: rgb(245, 117, 52); */
+
+    --pst-color-secondary: rgb(227, 46, 0);
+    /* --pst-color-secondary-bg: rgb(0, 0, 255); */
+    /**/
+    /* --pst-color-accent: rgb(0, 0, 0); */
+    /* --pst-color-accent-bg: rgb(0, 0, 0); */
+    /**/
+    /* --pst-color-warning: rgb(0, 0, 0); */
+    /* --pst-color-warning-bg: rgb(0, 0, 0); */
+    /**/
+    /* --pst-color-success: rgb(0, 0, 0); */
+    /* --pst-color-success-bg: rgb(0, 0, 0); */
+    /**/
+    /* --pst-color-info: rgb(0, 0, 0); */
+    /* --pst-color-info-bg: rgb(0, 0, 0); */
+    /**/
+    /* --pst-color-attention-bg: rgb(0, 0, 0); */
+    /* --pst-color-attention-bg: rgb(0, 0, 0); */
+    /**/
+    /* --pst-color-danger: rgb(0, 0, 0); */
+    /* --pst-color-danger-bg: rgb(0, 0, 0); */
+    /**/
+    --pst-color-inline-code: rgb(227, 46, 0);
+
+    --pst-color-link: rgb(255, 0, 0);
+    --pst-color-link-hover: rbg(0, 255, 0);
+}

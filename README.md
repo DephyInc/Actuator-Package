@@ -6,7 +6,7 @@ It can be used for gathering data from a device or for writing your own controll
 
 ## Installation
 
-Please see the installation documentation [here](./docs/install.md) for detailed
+Please see the installation documentation [here](https://flexsea.readthedocs.io/en/latest/installing/index.html) for detailed
 installation instructions.
 
 
@@ -19,7 +19,7 @@ that live in the `demos/` directory. The demos are numbered and should be viewed
 order, as each successive demo builds off of the information presented in the previous
 one. Each demo has verbose comments explaining each step.
 
-You can also find a quickstart guide [here](./docs/quickstart.md)
+You can also find a quickstart guide [here](https://flexsea.readthedocs.io/en/latest/quickstart.html)
 
 
 ## Testing
@@ -47,7 +47,7 @@ python3 ./test_open_control.py
 
 ### API Overview
 
-Please see the api documentation [here](./docs/api.md).
+Please see the api documentation [here](https://flexsea.readthedocs.io/en/latest/api/index.html).
 
 
 ## Contributing

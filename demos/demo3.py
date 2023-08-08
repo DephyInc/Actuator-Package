@@ -23,11 +23,11 @@ from flexsea.device import Device
 #                   clear
 # ============================================
 def clear() -> None:
-    try:
-        sub.run(
-            ["cls" if "windows" == platform.system().lower() else "clear"], check=True
-        )
-    except FileNotFoundError:
+    if platform.system().lower() == "windows":
+        # https://stackoverflow.com/a/24306385/8087342
+        # Solves Issue #116
+        sub.run(["cls"], check=True, shell=True)
+    else:
         sub.run(["clear"], check=True)
 
 

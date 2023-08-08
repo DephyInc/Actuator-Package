@@ -8,9 +8,24 @@ from semantic_version import Version
 # ============================================
 #              requires_status
 # ============================================
-def requires_status(status) -> Callable:
+def requires_status(status: str) -> Callable:
     """
     Ensures we are either connected or streaming.
+
+    Parameters
+    ----------
+    status : str
+        The status to check for.
+
+    Raises
+    ------
+    RuntimeError
+        If the given status is not set.
+
+    Returns
+    -------
+    Callable
+        The function being wrapped.
     """
 
     def status_decorator(func: Callable) -> Callable:
@@ -28,9 +43,24 @@ def requires_status(status) -> Callable:
 # ============================================
 #                  validate
 # ============================================
-def validate(func) -> Callable:
+def validate(func: Callable) -> Callable:
     """
     Checks if the result of a command is SUCCESS.
+
+    Parameters
+    ----------
+    func : Callable
+        The function being wrapped.
+
+    Raises
+    ------
+    RuntimeError
+        If the wrapped function does not return a SUCCESS status code.
+
+    Returns
+    -------
+    Callable
+        The wrapped function.
     """
 
     @wraps(func)
@@ -51,6 +81,24 @@ def minimum_required_version(version: str) -> Callable:
     """
     Makes sure that the device's firmware is at least the given
     version.
+
+    Parameters
+    ----------
+    version : str
+        The firmware version required in order to use the wrapped
+        method.
+
+    Raises
+    ------
+    RuntimeError
+        If the wrapped function is not a :py:class:`Device` method or
+        if the given version is greater than the device's firmware
+        version.
+
+    Returns
+    -------
+    Callable
+        The wrapped method
     """
 
     def min_ver_decorator(func: Callable) -> Callable:
@@ -77,6 +125,26 @@ def minimum_required_version(version: str) -> Callable:
 #             check_status_code
 # ============================================
 def check_status_code(func: Callable) -> Callable:
+    """
+    Makes sure that the S3 request succeeded.
+
+    Parameters
+    ----------
+    func : Callable
+        The wrapped method.
+
+    Raises
+    ------
+    RuntimeError
+        If we receive a 403 (permission denied) or 404 (not found)
+        status code.
+
+    Returns
+    -------
+    Callable
+        The wrapped method.
+    """
+
     @wraps(func)
     def check_status_wrapper(*args, **kwargs) -> Any:
         try:

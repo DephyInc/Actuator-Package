@@ -18,10 +18,32 @@ from .system import get_os
 # ============================================
 def get_c_library(firmwareVersion: Version, libFile: Path | None) -> Tuple:
     """
+    Loads the correct C library for interacting with the device.
+
     If we're given a library file to use, we make sure it exists. If
     we're not given a library file to use, we check for a cached file
     on disk corresponding to our firmware version. If we don't have one,
     we try to download it from S3. We then use ctypes to load the library.
+
+    Parameters
+    ----------
+    firmwareVersion : Version
+        The firmware version the library is built to interact with.
+
+    libFile : Path, None
+        The path to the local library file to load.
+
+    Raises
+    ------
+    EndpointConnectionError
+        If we cannot connect to the internet in order to download the
+        necessary library.
+
+    Returns
+    -------
+    Tuple
+        Contains the ``ctypes.CDLL``, the version of the library, and
+        the full path to the library file.
     """
     if libFile is None:
         _os = get_os()
@@ -164,6 +186,35 @@ def _set_prototypes(clib: c.CDLL, firmwareVersion: Version) -> c.CDLL:
     ]
     clib.fxGetReadDataQueueSize.restype = c.c_int
 
+    # Start training
+    clib.fxStartTraining.argtypes = [c.c_uint]
+    clib.fxStartTraining.restype = c.c_int
+
+    # Set single user mode (training data is re-used between power cycles)
+    clib.fxUseSavedTraining.argtypes = [c.c_uint]
+    clib.fxUseSavedTraining.restype = c.c_int
+
+    # Set multi user mode (training data is not re-used between power cycles)
+    # Must re-train each time
+    clib.fxDoNotUseSaveTraining.argtypes = [c.c_uint]
+    clib.fxDoNotUseSaveTraining.restype = c.c_int
+
+    # Is the device in single user mode?
+    clib.fxIsUsingSavedTrainingData.argtypes = [c.c_uint, c.POINTER(c.c_bool)]
+    clib.fxIsUsingSavedTrainingData.restype = c.c_int
+
+    # Request updated training data from the device
+    clib.fxUpdateTrainingData.argtypes = [c.c_uint]
+    clib.fxUpdateTrainingData.restype = c.c_int
+
+    # Training steps remaining
+    clib.fxGetStepsRemaining.argtypes = [c.c_uint, c.POINTER(c.c_int)]
+    clib.fxGetStepsRemaining.restype = c.c_int
+
+    # Get training state
+    clib.fxGetTrainingState.argtypes = [c.c_uint, c.POINTER(c.c_int)]
+    clib.fxGetTrainingState.restype = c.c_int
+
     if firmwareVersion >= Version("10.0.0"):
         # Get max device name length
         clib.fxGetMaxDeviceNameLength.argtypes = []
@@ -267,12 +318,41 @@ def set_read_functions(
     clib: c.CDLL, deviceName: str, isLegacy: bool, deviceType: c.Structure | None
 ) -> c.CDLL:
     """
-    Sets the prototypes for the read and read_all functions. This
-    is done here and not with the rest of the prototypes because,
+    Sets the prototypes for the read and read_all functions.
+
+    Done here and not with the rest of the prototypes because,
     for legacy devices, we need the device name, which we can't get
     until we call open, for which we need the function prototypes...
     We do it here for non-legacy devices because it's easier than
     passing and worrying about the firmware version to set_prototypes
+
+    Parameters
+    ----------
+    clib : CDLL
+        The object on which the prototypes will be set.
+
+    deviceName : str
+        The name of the device, e.g., actpack. Used to set the correct
+        function.
+
+    isLegacy : bool
+        Whether or not the device is a legacy device. The two types
+        handle reading quite differently, so we need to know the type
+        in order to set the methods appropriately.
+
+    deviceType : Structure, None
+        For legacy devices, this includes the fields and data types of
+        the device's data.
+
+    Raises
+    ------
+    ValueError
+        If the device type is unknown.
+
+    Returns
+    -------
+    CDLL
+        The library object with the set prototypes.
     """
     if isLegacy:
         if deviceName == "actpack":

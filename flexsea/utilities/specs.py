@@ -10,6 +10,30 @@ from flexsea.utilities.aws import s3_download
 #               get_device_spec
 # ============================================
 def get_device_spec(deviceName: str, firmwareVersion: Version) -> dict:
+    """
+    Loads the correct device specification for legacy devices.
+
+    If we cannot find a cached file, we check S3 and download it.
+
+    Parameters
+    ----------
+    deviceName : str
+        Name of the device, e.g., actpack.
+
+    firmwareVersion : Version
+        Semantic version string so that the correct spec file can be
+        loaded.
+
+    Raises
+    ------
+    EndpointConnectionError
+        If we cannot connect to the internet to search for the file.
+
+    Returns
+    -------
+    Dict
+        A dictionary containing the field names and data types.
+    """
     deviceSpecFile = fxc.legacyDeviceSpecsPath.joinpath(
         str(firmwareVersion), f"{deviceName}.yaml"
     )

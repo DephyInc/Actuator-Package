@@ -7,7 +7,9 @@ import platform
 # ============================================
 def get_os() -> str:
     """
-    Returns the operating system and "bitness" (64 or 32 bit):
+    Returns the operating system and "bitness" (64 or 32 bit).
+
+    Can be:
 
         * windows_32bit
         * windows_64bit
