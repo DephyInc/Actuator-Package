@@ -43,7 +43,7 @@ today_fmt = "%B %d, %Y"
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = "pydata_sphinx_theme"
-html_logo = "_static/logo-d.svg"
+html_logo = "_static/logo-dephy.png"
 html_theme_options = {
     "github_url": "https://github.com/DephyInc/Actuator-Package",
     "collapse_navigation": True,
@@ -52,8 +52,8 @@ html_theme_options = {
     "header_links_before_dropdown": 6,
     "navbar_end": ["theme-switcher", "navbar-icon-links"],
     "logo": {
-        "image_light": "logo-d.svg",
-        "image_dark": "logo-d.svg",
+        "image_light": "logo-dephy.png",
+        "image_dark": "logo-dephy.png",
     },
 }
 html_static_path = ["_static"]
