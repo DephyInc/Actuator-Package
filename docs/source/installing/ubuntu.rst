@@ -68,7 +68,7 @@ The following script will:
 
     # Clone the python repo
     git clone https://github.com/python/cpython.git
-    cd cypthon/
+    cd cpython/
 
     # Switch to the version you want to build
     git checkout v3.11.3
