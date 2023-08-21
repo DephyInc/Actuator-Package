@@ -114,6 +114,13 @@ def _set_prototypes(clib: c.CDLL, firmwareVersion: Version) -> c.CDLL:
     clib.fxStartStreaming.argtypes = [c.c_uint, c.c_uint, c.c_bool]
     clib.fxStartStreaming.restype = c.c_int
 
+    #files
+    clib.setFileName.argtypes = [c.c_char_p]
+    clib.setFileName.restype = None
+    clib.setFileSize.argtypes = [c.c_int]
+    clib.setFileSize.restype = None
+
+    
     # Start streaming with safety
     if firmwareVersion >= Version("9.1.2"):
         clib.fxStartStreamingWithSafety.argtypes = [

@@ -404,7 +404,8 @@ class Device:
         return self._clib.fxStartStreamingWithSafety(
             self.id, self.streamingFrequency, 1, self.heartbeat
         )
-
+        
+   
     # -----
     # _stream_without_safety
     # -----
@@ -1573,3 +1574,27 @@ class Device:
             Version string of the currently loaded library.
         """
         return self._libVersion
+    # -----
+    # log files
+    # -----
+    def setFileName(self, name) -> None:
+        """
+        Sets the name of the log file
+
+        Parameters
+        ----------
+        name : string
+            The desired name of the log file
+        """
+        return self._clib.device.getDataLogger().setHandle(name)
+    
+    def setFileSize(self, size) -> None:
+        """
+        Sets the size of the log file
+
+        Parameters
+        ----------
+        size: int
+            The desired name of the log file
+        """
+        return self._clib.device.getDebugLogger().setMaxFileSize(size)
