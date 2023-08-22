@@ -84,6 +84,10 @@ class Device:
         then the traceback limit is set to 0. If ``True``, Python's
         default traceback limit is used.
 
+    s3Timeout : int, optional
+        Time, in seconds, spent trying to connect to S3 before an
+        exception is raised.
+
     Attributes
     ----------
 
@@ -160,6 +164,7 @@ class Device:
         logLevel: int = 4,
         interactive: bool = True,
         debug: bool = False,
+        s3Timeout: int = 60,
     ) -> None:
         if not debug:
             sys.tracebacklimit = 0
@@ -175,7 +180,7 @@ class Device:
         self.interactive = interactive
 
         self.firmwareVersion = validate_given_firmware_version(
-            firmwareVersion, self.interactive
+            firmwareVersion, self.interactive, s3Timeout
         )
 
         if libFile:
