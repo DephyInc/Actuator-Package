@@ -67,8 +67,8 @@ The following script will:
         lzma lzma-dev tk-dev uuid-dev zlib1g-dev
 
     # Clone the python repo
-    git clone https://github.com/python/cpython.git
-    cd cypthon/
+    git clone --depth 1 --branch v3.11.3 https://github.com/python/cpython.git
+    cd cpython/
 
     # Switch to the version you want to build
     git checkout v3.11.3
