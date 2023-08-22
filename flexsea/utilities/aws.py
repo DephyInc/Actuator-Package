@@ -6,6 +6,7 @@ import boto3
 from botocore import UNSIGNED
 from botocore.client import BaseClient, Config
 from botocore.exceptions import ClientError
+from botocore.exceptions import ConnectTimeoutError
 from botocore.exceptions import ProfileNotFound
 
 from flexsea.utilities.decorators import check_status_code
@@ -15,7 +16,9 @@ from flexsea.utilities.decorators import check_status_code
 #                 s3_download
 # ============================================
 @check_status_code
-def s3_download(obj: str, bucket: str, dest: str, profile: str | None = None) -> None:
+def s3_download(
+    obj: str, bucket: str, dest: str, profile: str | None = None, timeout=60
+) -> None:
     """
     Downloads a file from S3.
 
@@ -35,15 +38,26 @@ def s3_download(obj: str, bucket: str, dest: str, profile: str | None = None) ->
         This profile should hold both the access key and secret access
         key needed for downloading private or restricted files.
 
+    timeout : int, optional
+        Time, in seconds, spent trying to connect to S3 before an
+        exception is raised.
+
     Raises
     ------
     ValueError
         If the given profile cannot be found.
+
+    ConnectTimeoutError
+        If a connection to S3 cannot be established within the
+        allotted time.
     """
     # https://stackoverflow.com/a/34866092
     if profile is None:
+        # pylint: disable=duplicate-code
         client = boto3.client(
-            "s3", config=Config(signature_version=UNSIGNED), region_name="us-east-1"
+            "s3",
+            config=Config(signature_version=UNSIGNED, connect_timeout=timeout),
+            region_name="us-east-1",
         )
     else:
         try:
@@ -51,7 +65,7 @@ def s3_download(obj: str, bucket: str, dest: str, profile: str | None = None) ->
         except ProfileNotFound as err:
             msg = f"Error: invalid AWS profile `{profile}`"
             raise ValueError(msg) from err
-        client = session.client("s3")
+        client = session.client("s3", config=Config(connect_timeout=timeout))
 
     try:
         client.download_file(bucket, obj, dest)
@@ -61,7 +75,12 @@ def s3_download(obj: str, bucket: str, dest: str, profile: str | None = None) ->
         # instead of firmwareBucket/major.minor.patch/device/hw/myfirmware.dfu
         # In this case we want to search the given bucket for the file
         obj = s3_find_object(obj, bucket, client)
-        client.download_file(bucket, obj, dest)
+        try:
+            client.download_file(bucket, obj, dest)
+        except ConnectTimeoutError as err:
+            raise RuntimeError("Could not connect to S3. Timeout.") from err
+    except ConnectTimeoutError as err:
+        raise RuntimeError("Could not connect to S3. Timeout.") from err
     _validate_download(client, bucket, obj, dest)
     print(f"Downloaded {obj} from {bucket} to {dest}")
 

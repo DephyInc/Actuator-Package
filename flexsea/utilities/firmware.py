@@ -5,6 +5,7 @@ from typing import List
 import boto3
 from botocore import UNSIGNED
 from botocore.client import Config
+from botocore.exceptions import ConnectTimeoutError
 from botocore.exceptions import EndpointConnectionError
 import pendulum
 from semantic_version import SimpleSpec
@@ -18,7 +19,9 @@ import flexsea.utilities.constants as fxc
 # ============================================
 #      validate_given_firmware_version
 # ============================================
-def validate_given_firmware_version(firmwareVersion: str, interactive: bool) -> Version:
+def validate_given_firmware_version(
+    firmwareVersion: str, interactive: bool, timeout=60
+) -> Version:
     """
     Makes sure that the given ``firmwareVersion`` is known to
     ``flexsea``.
@@ -34,11 +37,19 @@ def validate_given_firmware_version(firmwareVersion: str, interactive: bool) -> 
         this parameter is ``True`` we prompt the user whether or not
         they want to use it. If ``False``, we go ahead and just use it.
 
+    timeout : int, optional
+        Time, in seconds, spent trying to connect to S3 before an
+        exception is raised.
+
     Raises
     ------
     ValueError
         If the given ``firmwareVersion`` cannot be cast to a valid
         semantic string.
+
+    ConnectTimeoutError
+        If a connection to S3 cannot be established within the
+        allotted time.
 
     Returns
     -------
@@ -46,7 +57,7 @@ def validate_given_firmware_version(firmwareVersion: str, interactive: bool) -> 
         The Version object representing the valid semantic version
         string.
     """
-    availableVersions = get_available_firmware_versions()
+    availableVersions = get_available_firmware_versions(timeout)
 
     if firmwareVersion in availableVersions:
         return Version(firmwareVersion)
@@ -77,7 +88,7 @@ def validate_given_firmware_version(firmwareVersion: str, interactive: bool) -> 
 # ============================================
 #       get_available_firmware_versions
 # ============================================
-def get_available_firmware_versions() -> List[str]:
+def get_available_firmware_versions(timeout=60) -> List[str]:
     """
     Returns a list of firmware versions known to ``flexsea``.
 
@@ -88,6 +99,12 @@ def get_available_firmware_versions() -> List[str]:
     the user about how long it has been since their information was
     updated. If the file doesn't exist and we're not online, then
     the version information cannot be obtained, so we exit.
+
+    Parameters
+    ----------
+    timeout : int, optional
+        Time, in seconds, spent trying to connect to S3 before an
+        exception is raised.
 
     Raises
     ------
@@ -100,13 +117,16 @@ def get_available_firmware_versions() -> List[str]:
     List[str]
         List of known semantic version strings.
     """
+    # pylint: disable=duplicate-code
     client = boto3.client(
-        "s3", config=Config(signature_version=UNSIGNED), region_name="us-east-1"
+        "s3",
+        config=Config(signature_version=UNSIGNED, connect_timeout=timeout),
+        region_name="us-east-1",
     )
 
     try:
         objs = get_s3_objects(fxc.dephyPublicFilesBucket, client, prefix=fxc.libsDir)
-    except EndpointConnectionError:
+    except (EndpointConnectionError, ConnectTimeoutError):
         print("Warning: unable to access S3 to obtain updated available versions.")
         try:
             with open(fxc.firmwareVersionCacheFile, "r", encoding="utf-8") as fd:
