@@ -120,9 +120,8 @@ def get_available_firmware_versions(timeout=60) -> List[str]:
     # pylint: disable=duplicate-code
     client = boto3.client(
         "s3",
-        config=Config(signature_version=UNSIGNED),
+        config=Config(signature_version=UNSIGNED, connect_timeout=timeout),
         region_name="us-east-1",
-        connect_timeout=timeout,
     )
 
     try:

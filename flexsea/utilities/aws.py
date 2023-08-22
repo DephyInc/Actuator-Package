@@ -56,9 +56,8 @@ def s3_download(
         # pylint: disable=duplicate-code
         client = boto3.client(
             "s3",
-            config=Config(signature_version=UNSIGNED),
+            config=Config(signature_version=UNSIGNED, connect_timeout=timeout),
             region_name="us-east-1",
-            connect_timeout=timeout,
         )
     else:
         try:
