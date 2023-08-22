@@ -1577,6 +1577,8 @@ class Device:
     # -----
     # log files
     # -----
+    
+    @requires_status("connected")
     def setFileName(self, name) -> None:
         """
         Sets the name of the log file
@@ -1588,6 +1590,7 @@ class Device:
         """
         return self._clib.device.getDataLogger().setHandle(name)
     
+    @requires_status("connected")
     def setFileSize(self, size) -> None:
         """
         Sets the size of the log file
