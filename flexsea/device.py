@@ -1588,7 +1588,7 @@ class Device:
         name : string
             The desired name of the log file
         """
-        return self._clib.fxSetLoggerName(name, self.id)
+        return self._clib.fxSetLoggerName(name.encode("utf-8"), self.id)
     
     @requires_status("connected")
     def setFileSize(self, size) -> None:
