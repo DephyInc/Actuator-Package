@@ -1,4 +1,3 @@
-import os
 import platform
 
 
@@ -26,7 +25,7 @@ def get_os() -> str:
     system = platform.system().lower()
 
     if system == "linux":
-        machine = os.uname().machine
+        machine = platform.machine()
         if machine.startswith("arm") or machine.startswith("aarch"):
             system = "pi"
 
