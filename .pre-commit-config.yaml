@@ -27,7 +27,7 @@ repos:
     -   id: check-docstring-first
     -   id: check-case-conflict
 -   repo: https://github.com/psf/black
-    rev: 23.1.0
+    rev: 23.7.0
     hooks:
     -   id: black
 # https://stackoverflow.com/a/61238571/8087342
@@ -40,7 +40,7 @@ repos:
 #         types: [python]
 #         require_serial: true
 -   repo: https://github.com/PyCQA/pylint
-    rev: v2.16.4
+    rev: v3.0.0a7
     hooks:
     -   id: pylint
         args:
