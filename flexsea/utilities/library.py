@@ -16,7 +16,9 @@ from .system import get_os
 # ============================================
 #                get_c_library
 # ============================================
-def get_c_library(firmwareVersion: Version, libFile: Path | None) -> Tuple:
+def get_c_library(
+    firmwareVersion: Version, libFile: Path | None, timeout: int = 60
+) -> Tuple:
     """
     Loads the correct C library for interacting with the device.
 
@@ -32,6 +34,10 @@ def get_c_library(firmwareVersion: Version, libFile: Path | None) -> Tuple:
 
     libFile : Path, None
         The path to the local library file to load.
+
+    timeout : int, optional
+        Time, in seconds, spent trying to connect to S3 before an
+        exception is raised.
 
     Raises
     ------
@@ -52,7 +58,9 @@ def get_c_library(firmwareVersion: Version, libFile: Path | None) -> Tuple:
             libFile.parent.mkdir(parents=True, exist_ok=True)
             libObj = f"{fxc.libsDir}/{firmwareVersion}/{_os}/{libFile.name}"
             try:
-                s3_download(libObj, fxc.dephyPublicFilesBucket, str(libFile), None)
+                s3_download(
+                    libObj, fxc.dephyPublicFilesBucket, str(libFile), None, timeout
+                )
             except EndpointConnectionError as err:
                 msg = "Error: could not connect to the internet to download the "
                 msg += "necessary C library file. Please connect to the internet and "
@@ -60,7 +68,7 @@ def get_c_library(firmwareVersion: Version, libFile: Path | None) -> Tuple:
                 print(msg)
                 raise err
 
-    clib = _load_clib(libFile)
+    clib = _load_clib(libFile, timeout)
 
     return (_set_prototypes(clib, firmwareVersion), libFile)
 
@@ -68,7 +76,7 @@ def get_c_library(firmwareVersion: Version, libFile: Path | None) -> Tuple:
 # ============================================
 #                _load_clib
 # ============================================
-def _load_clib(libFile: Path) -> c.CDLL:
+def _load_clib(libFile: Path, timeout: int = 60) -> c.CDLL:
     """
     Uses ctypes to actually create an interface to the library file. If
     we're on Windows, we have to additionally add several directories to
@@ -79,20 +87,41 @@ def _load_clib(libFile: Path) -> c.CDLL:
     libFile = str(libFile)
 
     if "win" in get_os():
-        try:
-            for extraPath in os.environ["PATH"].split(";"):
-                if os.path.exists(extraPath) and "mingw" in extraPath:
-                    os.add_dll_directory(extraPath)
-            os.add_dll_directory(libFile)
-        except OSError as err:
-            msg = f"Error loading precompiled library: `{libFile}`\n"
-            msg += "The most likely cause is a mismatch between the Python, pip and "
-            msg += "shell architectures.\nPlease ensure all three are either 32 or 64 "
-            msg += "bit.\nKeep different versions isolated by virtual environments.\n"
-            print(msg)
-            raise err
+        _add_windows_dlls(libFile, timeout)
 
     return c.cdll.LoadLibrary(libFile)
+
+
+# ============================================
+#            _add_windows_dlls
+# ============================================
+def _add_windows_dlls(libFile: str, timeout: int = 60) -> None:
+    """
+    There are several dlls that are required for the precompiled C lib
+    to work on Windows. These dlls come packaged with Git Bash, but if
+    you're not using Git Bash and you don't have MinGW on your PATH,
+    then trying to use the library will error out. As such, here we
+    make sure that the necessary dlls are on the system and add them
+    to the PATH. If they are not, we download them from S3 and then
+    add them to the PATH.
+    """
+    opSys = get_os()
+    dllPath = fxc.winDllsPath.joinpath(opSys)
+
+    if not dllPath.exists():
+        obj = str(Path("bootloader_tools").joinpath(opSys, "win_dlls.zip").as_posix())
+        bucket = fxc.dephyPublicFilesBucket
+        s3_download(obj, bucket, dllPath, timeout=timeout)
+    os.add_dll_directory(dllPath)
+    try:
+        os.add_dll_directory(libFile)
+    except OSError as err:
+        msg = f"Error loading precompiled library: `{libFile}`\n"
+        msg += "The most likely cause is a mismatch between the Python, pip and "
+        msg += "shell architectures.\nPlease ensure all three are either 32 or 64 "
+        msg += "bit.\nKeep different versions isolated by virtual environments.\n"
+        print(msg)
+        raise err
 
 
 # ============================================
