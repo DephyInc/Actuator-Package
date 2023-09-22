@@ -133,6 +133,10 @@ def _set_prototypes(clib: c.CDLL, firmwareVersion: Version) -> c.CDLL:
     clib.fxOpen.argtypes = [c.c_char_p, c.c_uint, c.c_uint]
     clib.fxOpen.restype = c.c_int
 
+    # Limited open
+    clib.fxOpenLimited.argtypes = [c.c_char_p]
+    clib.fxOpenLimited.restype = c.c_int
+
     # Close
     clib.fxClose.argtypes = [
         c.c_uint,

@@ -245,19 +245,40 @@ class Device:
     # -----
     # open
     # -----
-    def open(self) -> None:
+    def open(self, bootloading: bool = False) -> None:
         """
         Establish a connection to a device.
 
         This is needed in order to send commands to the device and/or
         receive data from the device via serial communication through
         the COM port.
+
+        Parameters
+        ----------
+        bootloading : bool (optional)
+            This keyword is really onlymeant to be used by the
+            bootloader and a user of `flexsea` should not have to use
+            it at all.
+            Starting with v12.0.0, a development version number was
+            introduced. We can only connect to the device if both the
+            firmware version (e.g., 12.0.0) and the development version
+            (e.g., 2.0.0) match. If only the firmware version matches,
+            we can connect to the device, but not send motor commands,
+            only the bootloading command.
         """
         if self.connected:
             print("Already connected.")
             return
 
         port = self.port.encode("utf-8")
+
+        if bootloading and self.firmwareVersion >= Version("12.0.0"):
+            try:
+                self.id = self._clib.fxOpenLimited(port)
+            except AttributeError as err:
+                msg = "Error, unable to connect to device. Your library is missing "
+                msg += "the `fxOpenLimited` function."
+                raise RuntimeError(msg) from err
 
         self.id = self._clib.fxOpen(port, self.baudRate, self.logLevel)
 
