@@ -1606,6 +1606,7 @@ class Device:
     # log files
     # -----
 
+    @minimum_required_version("12.0.0")
     @requires_status("connected")
     def set_file_name(self, name) -> None:
         """
@@ -1618,6 +1619,7 @@ class Device:
         """
         return self._clib.fxSetLoggerName(name.encode("utf-8"), self.id)
 
+    @minimum_required_version("12.0.0")
     @requires_status("connected")
     def set_file_size(self, size) -> None:
         """

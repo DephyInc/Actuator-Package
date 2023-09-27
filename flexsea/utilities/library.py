@@ -134,8 +134,16 @@ def _set_prototypes(clib: c.CDLL, firmwareVersion: Version) -> c.CDLL:
     clib.fxOpen.restype = c.c_int
 
     # Limited open
-    clib.fxOpenLimited.argtypes = [c.c_char_p]
-    clib.fxOpenLimited.restype = c.c_int
+    if firmwareVersion >= Version("12.0.0"):
+        try:
+            clib.fxOpenLimited.argtypes = [c.c_char_p]
+            clib.fxOpenLimited.restype = c.c_int
+        # v12 changed how versioning works and employs a development version
+        # that we do not have access to. Further, the libs were uploaded to S3
+        # all under 12.0.0 regardless of development version, so there are some
+        # version 12s that don't have this function
+        except AttributeError:
+            pass
 
     # Close
     clib.fxClose.argtypes = [
@@ -147,11 +155,19 @@ def _set_prototypes(clib: c.CDLL, firmwareVersion: Version) -> c.CDLL:
     clib.fxStartStreaming.argtypes = [c.c_uint, c.c_uint, c.c_bool]
     clib.fxStartStreaming.restype = c.c_int
 
-    # files
-    clib.fxSetLoggerName.argtypes = [c.c_char_p]
-    clib.fxSetLoggerName.restype = None
-    clib.fxSetLoggerSize.argtypes = [c.c_int]
-    clib.fxSetLoggerSize.restype = None
+    # Log file specification
+    if firmwareVersion >= Version("12.0.0"):
+        try:
+            clib.fxSetLoggerName.argtypes = [c.c_char_p]
+            clib.fxSetLoggerName.restype = None
+            clib.fxSetLoggerSize.argtypes = [c.c_int]
+            clib.fxSetLoggerSize.restype = None
+        # v12 changed how versioning works and employs a development version
+        # that we do not have access to. Further, the libs were uploaded to S3
+        # all under 12.0.0 regardless of development version, so there are some
+        # version 12s that don't have this function
+        except AttributeError:
+            pass
 
     # Start streaming with safety
     if firmwareVersion >= Version("9.1.2"):
