@@ -106,13 +106,17 @@ def _add_windows_dlls(libFile: str, timeout: int = 60) -> None:
     add them to the PATH.
     """
     opSys = get_os()
-    dllPath = fxc.winDllsPath.joinpath(opSys)
+    dllZip = fxc.dephyPath.joinpath("bootloader_tools", opSys, "win_dlls.zip")
+    base = dllZip.name.split(".")[0]
+    extractedDest = Path(os.path.dirname(dllZip)).joinpath(base)
 
-    if not dllPath.exists():
+    if not dllZip.exists():
         obj = str(Path("bootloader_tools").joinpath(opSys, "win_dlls.zip").as_posix())
         bucket = fxc.dephyPublicFilesBucket
-        s3_download(obj, bucket, dllPath, timeout=timeout)
-    os.add_dll_directory(dllPath)
+        s3_download(obj, bucket, str(dllZip), timeout=timeout)
+        with zipfile.ZipFile(dllZip, "r") as archive:
+            archive.extractall(extractedDest)
+    os.add_dll_directory(extractedDest.joinpath("git_bash_mingw64", "bin"))
     try:
         os.add_dll_directory(libFile)
     except OSError as err:
@@ -327,35 +331,40 @@ def _set_prototypes(clib: c.CDLL, firmwareVersion: Version) -> c.CDLL:
         clib.fxSetUVLO.argtypes = [c.c_uint, c.c_uint]
         clib.fxSetUVLO.restype = c.c_int
 
-        # Get num utts
-        clib.fxGetNumUtts.argtypes = []
-        clib.fxGetNumUtts.restype = c.c_int
+        # Somehow, it appears 10.1 doesn't have these
+        try:
+            # Get num utts
+            clib.fxGetNumUtts.argtypes = []
+            clib.fxGetNumUtts.restype = c.c_int
 
-        # Set utts
-        clib.fxSetUTT.argtypes = [c.c_uint, c.POINTER(c.c_int), c.c_uint, c.c_byte]
-        clib.fxSetUTT.restype = c.c_int
+            # Set utts
+            clib.fxSetUTT.argtypes = [c.c_uint, c.POINTER(c.c_int), c.c_uint, c.c_byte]
+            clib.fxSetUTT.restype = c.c_int
 
-        # Reset utts
-        clib.fxSetUTTsToDefault.argtypes = [
-            c.c_uint,
-        ]
-        clib.fxSetUTTsToDefault.restype = c.c_int
+            # Reset utts
+            clib.fxSetUTTsToDefault.argtypes = [
+                c.c_uint,
+            ]
+            clib.fxSetUTTsToDefault.restype = c.c_int
 
-        # Save utts
-        clib.fxSaveUTTToMemory.argtypes = [
-            c.c_uint,
-        ]
-        clib.fxSaveUTTToMemory.restype = c.c_int
+            # Save utts
+            clib.fxSaveUTTToMemory.argtypes = [
+                c.c_uint,
+            ]
+            clib.fxSaveUTTToMemory.restype = c.c_int
 
-        # Request utts
-        clib.fxRequestUTT.argtypes = [
-            c.c_uint,
-        ]
-        clib.fxRequestUTT.restype = c.c_int
+            # Request utts
+            clib.fxRequestUTT.argtypes = [
+                c.c_uint,
+            ]
+            clib.fxRequestUTT.restype = c.c_int
 
-        # Get last received utts
-        clib.fxGetLastReceivedUTT.argtypes = [c.c_uint, c.POINTER(c.c_int), c.c_uint]
-        clib.fxGetLastReceivedUTT.restype = c.c_int
+            # Get last received utts
+            clib.fxGetLastReceivedUTT.argtypes = [c.c_uint, c.POINTER(c.c_int), c.c_uint]
+            clib.fxGetLastReceivedUTT.restype = c.c_int
+        except AttributeError:
+            print("Warning: could not find UTT methods in library.")
+            pass
 
         # IMU Calibration
         clib.fxSetImuCalibration.argtypes = [
