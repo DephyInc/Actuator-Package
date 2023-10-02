@@ -2,6 +2,7 @@ import ctypes as c
 import os
 from pathlib import Path
 from typing import Tuple
+import zipfile
 
 from botocore.exceptions import EndpointConnectionError
 from semantic_version import Version
@@ -360,11 +361,14 @@ def _set_prototypes(clib: c.CDLL, firmwareVersion: Version) -> c.CDLL:
             clib.fxRequestUTT.restype = c.c_int
 
             # Get last received utts
-            clib.fxGetLastReceivedUTT.argtypes = [c.c_uint, c.POINTER(c.c_int), c.c_uint]
+            clib.fxGetLastReceivedUTT.argtypes = [
+                c.c_uint,
+                c.POINTER(c.c_int),
+                c.c_uint,
+            ]
             clib.fxGetLastReceivedUTT.restype = c.c_int
         except AttributeError:
             print("Warning: could not find UTT methods in library.")
-            pass
 
         # IMU Calibration
         clib.fxSetImuCalibration.argtypes = [
