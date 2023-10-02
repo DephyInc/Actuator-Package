@@ -42,6 +42,11 @@ legacyDeviceSpecsPath = dephyPath.joinpath(legacyDeviceSpecsDir)
 # specs, api specs, and bootloader tools
 dephyPublicFilesBucket = "dephy-public-files"
 
+# On Windows, several dll files from mingw are needed in order for the
+# library to work correctly
+winDllsDir = "win_dlls"
+winDllsPath = dephyPath.joinpath(winDllsDir)
+
 
 # ============================================
 #           Version Configuration

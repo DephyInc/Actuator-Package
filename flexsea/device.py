@@ -84,6 +84,10 @@ class Device:
         then the traceback limit is set to 0. If ``True``, Python's
         default traceback limit is used.
 
+    s3Timeout : int, optional
+        Time, in seconds, spent trying to connect to S3 before an
+        exception is raised.
+
     Attributes
     ----------
 
@@ -160,6 +164,7 @@ class Device:
         logLevel: int = 4,
         interactive: bool = True,
         debug: bool = False,
+        s3Timeout: int = 60,
     ) -> None:
         if not debug:
             sys.tracebacklimit = 0
@@ -175,7 +180,7 @@ class Device:
         self.interactive = interactive
 
         self.firmwareVersion = validate_given_firmware_version(
-            firmwareVersion, self.interactive
+            firmwareVersion, self.interactive, s3Timeout
         )
 
         if libFile:
@@ -197,7 +202,9 @@ class Device:
         self.id: int = 0
         self.streamingFrequency: int = 0
 
-        (self._clib, self.libFile) = get_c_library(self.firmwareVersion, self.libFile)
+        (self._clib, self.libFile) = get_c_library(
+            self.firmwareVersion, self.libFile, s3Timeout
+        )
 
         self._fields: List[str] | None = None
         self._gains: dict = {}
@@ -238,19 +245,40 @@ class Device:
     # -----
     # open
     # -----
-    def open(self) -> None:
+    def open(self, bootloading: bool = False) -> None:
         """
         Establish a connection to a device.
 
         This is needed in order to send commands to the device and/or
         receive data from the device via serial communication through
         the COM port.
+
+        Parameters
+        ----------
+        bootloading : bool (optional)
+            This keyword is really onlymeant to be used by the
+            bootloader and a user of `flexsea` should not have to use
+            it at all.
+            Starting with v12.0.0, a development version number was
+            introduced. We can only connect to the device if both the
+            firmware version (e.g., 12.0.0) and the development version
+            (e.g., 2.0.0) match. If only the firmware version matches,
+            we can connect to the device, but not send motor commands,
+            only the bootloading command.
         """
         if self.connected:
             print("Already connected.")
             return
 
         port = self.port.encode("utf-8")
+
+        if bootloading and self.firmwareVersion >= Version("12.0.0"):
+            try:
+                self.id = self._clib.fxOpenLimited(port)
+            except AttributeError as err:
+                msg = "Error, unable to connect to device. Your library is missing "
+                msg += "the `fxOpenLimited` function."
+                raise RuntimeError(msg) from err
 
         self.id = self._clib.fxOpen(port, self.baudRate, self.logLevel)
 
@@ -1578,6 +1606,7 @@ class Device:
     # log files
     # -----
 
+    @minimum_required_version("12.0.0")
     @requires_status("connected")
     def set_file_name(self, name) -> None:
         """
@@ -1590,6 +1619,7 @@ class Device:
         """
         return self._clib.fxSetLoggerName(name.encode("utf-8"), self.id)
 
+    @minimum_required_version("12.0.0")
     @requires_status("connected")
     def set_file_size(self, size) -> None:
         """
