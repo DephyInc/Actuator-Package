@@ -2,7 +2,6 @@ import ctypes as c
 import os
 from pathlib import Path
 from typing import Tuple
-import zipfile
 
 from botocore.exceptions import EndpointConnectionError
 from semantic_version import Version
@@ -17,9 +16,7 @@ from .system import get_os
 # ============================================
 #                get_c_library
 # ============================================
-def get_c_library(
-    firmwareVersion: Version, libFile: Path | None, timeout: int = 60
-) -> Tuple:
+def get_c_library(firmwareVersion: Version, libFile: Path | None) -> Tuple:
     """
     Loads the correct C library for interacting with the device.
 
@@ -35,10 +32,6 @@ def get_c_library(
 
     libFile : Path, None
         The path to the local library file to load.
-
-    timeout : int, optional
-        Time, in seconds, spent trying to connect to S3 before an
-        exception is raised.
 
     Raises
     ------
@@ -59,9 +52,7 @@ def get_c_library(
             libFile.parent.mkdir(parents=True, exist_ok=True)
             libObj = f"{fxc.libsDir}/{firmwareVersion}/{_os}/{libFile.name}"
             try:
-                s3_download(
-                    libObj, fxc.dephyPublicFilesBucket, str(libFile), None, timeout
-                )
+                s3_download(libObj, fxc.dephyPublicFilesBucket, str(libFile), None)
             except EndpointConnectionError as err:
                 msg = "Error: could not connect to the internet to download the "
                 msg += "necessary C library file. Please connect to the internet and "
@@ -69,7 +60,7 @@ def get_c_library(
                 print(msg)
                 raise err
 
-    clib = _load_clib(libFile, timeout)
+    clib = _load_clib(libFile)
 
     return (_set_prototypes(clib, firmwareVersion), libFile)
 
@@ -77,7 +68,7 @@ def get_c_library(
 # ============================================
 #                _load_clib
 # ============================================
-def _load_clib(libFile: Path, timeout: int = 60) -> c.CDLL:
+def _load_clib(libFile: Path) -> c.CDLL:
     """
     Uses ctypes to actually create an interface to the library file. If
     we're on Windows, we have to additionally add several directories to
@@ -88,45 +79,20 @@ def _load_clib(libFile: Path, timeout: int = 60) -> c.CDLL:
     libFile = str(libFile)
 
     if "win" in get_os():
-        _add_windows_dlls(libFile, timeout)
+        try:
+            for extraPath in os.environ["PATH"].split(";"):
+                if os.path.exists(extraPath) and "mingw" in extraPath:
+                    os.add_dll_directory(extraPath)
+            os.add_dll_directory(libFile)
+        except OSError as err:
+            msg = f"Error loading precompiled library: `{libFile}`\n"
+            msg += "The most likely cause is a mismatch between the Python, pip and "
+            msg += "shell architectures.\nPlease ensure all three are either 32 or 64 "
+            msg += "bit.\nKeep different versions isolated by virtual environments.\n"
+            print(msg)
+            raise err
 
     return c.cdll.LoadLibrary(libFile)
-
-
-# ============================================
-#            _add_windows_dlls
-# ============================================
-def _add_windows_dlls(libFile: str, timeout: int = 60) -> None:
-    """
-    There are several dlls that are required for the precompiled C lib
-    to work on Windows. These dlls come packaged with Git Bash, but if
-    you're not using Git Bash and you don't have MinGW on your PATH,
-    then trying to use the library will error out. As such, here we
-    make sure that the necessary dlls are on the system and add them
-    to the PATH. If they are not, we download them from S3 and then
-    add them to the PATH.
-    """
-    opSys = get_os()
-    dllZip = fxc.dephyPath.joinpath("bootloader_tools", opSys, "win_dlls.zip")
-    base = dllZip.name.split(".")[0]
-    extractedDest = Path(os.path.dirname(dllZip)).joinpath(base)
-
-    if not dllZip.exists():
-        obj = str(Path("bootloader_tools").joinpath(opSys, "win_dlls.zip").as_posix())
-        bucket = fxc.dephyPublicFilesBucket
-        s3_download(obj, bucket, str(dllZip), timeout=timeout)
-        with zipfile.ZipFile(dllZip, "r") as archive:
-            archive.extractall(extractedDest)
-    os.add_dll_directory(extractedDest.joinpath("git_bash_mingw64", "bin"))
-    try:
-        os.add_dll_directory(libFile)
-    except OSError as err:
-        msg = f"Error loading precompiled library: `{libFile}`\n"
-        msg += "The most likely cause is a mismatch between the Python, pip and "
-        msg += "shell architectures.\nPlease ensure all three are either 32 or 64 "
-        msg += "bit.\nKeep different versions isolated by virtual environments.\n"
-        print(msg)
-        raise err
 
 
 # ============================================
@@ -138,18 +104,6 @@ def _set_prototypes(clib: c.CDLL, firmwareVersion: Version) -> c.CDLL:
     clib.fxOpen.argtypes = [c.c_char_p, c.c_uint, c.c_uint]
     clib.fxOpen.restype = c.c_int
 
-    # Limited open
-    if firmwareVersion >= Version("12.0.0"):
-        try:
-            clib.fxOpenLimited.argtypes = [c.c_char_p]
-            clib.fxOpenLimited.restype = c.c_int
-        # v12 changed how versioning works and employs a development version
-        # that we do not have access to. Further, the libs were uploaded to S3
-        # all under 12.0.0 regardless of development version, so there are some
-        # version 12s that don't have this function
-        except AttributeError:
-            pass
-
     # Close
     clib.fxClose.argtypes = [
         c.c_uint,
@@ -160,19 +114,11 @@ def _set_prototypes(clib: c.CDLL, firmwareVersion: Version) -> c.CDLL:
     clib.fxStartStreaming.argtypes = [c.c_uint, c.c_uint, c.c_bool]
     clib.fxStartStreaming.restype = c.c_int
 
-    # Log file specification
-    if firmwareVersion >= Version("12.0.0"):
-        try:
-            clib.fxSetLoggerName.argtypes = [c.c_char_p]
-            clib.fxSetLoggerName.restype = None
-            clib.fxSetLoggerSize.argtypes = [c.c_int]
-            clib.fxSetLoggerSize.restype = None
-        # v12 changed how versioning works and employs a development version
-        # that we do not have access to. Further, the libs were uploaded to S3
-        # all under 12.0.0 regardless of development version, so there are some
-        # version 12s that don't have this function
-        except AttributeError:
-            pass
+    # files
+    clib.fxSetLoggerName.argtypes = [c.c_char_p]
+    clib.fxSetLoggerName.restype = None
+    clib.fxSetLoggerSize.argtypes = [c.c_int]
+    clib.fxSetLoggerSize.restype = None
 
     # Start streaming with safety
     if firmwareVersion >= Version("9.1.2"):
@@ -332,43 +278,35 @@ def _set_prototypes(clib: c.CDLL, firmwareVersion: Version) -> c.CDLL:
         clib.fxSetUVLO.argtypes = [c.c_uint, c.c_uint]
         clib.fxSetUVLO.restype = c.c_int
 
-        # Somehow, it appears 10.1 doesn't have these
-        try:
-            # Get num utts
-            clib.fxGetNumUtts.argtypes = []
-            clib.fxGetNumUtts.restype = c.c_int
+        # Get num utts
+        clib.fxGetNumUtts.argtypes = []
+        clib.fxGetNumUtts.restype = c.c_int
 
-            # Set utts
-            clib.fxSetUTT.argtypes = [c.c_uint, c.POINTER(c.c_int), c.c_uint, c.c_byte]
-            clib.fxSetUTT.restype = c.c_int
+        # Set utts
+        clib.fxSetUTT.argtypes = [c.c_uint, c.POINTER(c.c_int), c.c_uint, c.c_byte]
+        clib.fxSetUTT.restype = c.c_int
 
-            # Reset utts
-            clib.fxSetUTTsToDefault.argtypes = [
-                c.c_uint,
-            ]
-            clib.fxSetUTTsToDefault.restype = c.c_int
+        # Reset utts
+        clib.fxSetUTTsToDefault.argtypes = [
+            c.c_uint,
+        ]
+        clib.fxSetUTTsToDefault.restype = c.c_int
 
-            # Save utts
-            clib.fxSaveUTTToMemory.argtypes = [
-                c.c_uint,
-            ]
-            clib.fxSaveUTTToMemory.restype = c.c_int
+        # Save utts
+        clib.fxSaveUTTToMemory.argtypes = [
+            c.c_uint,
+        ]
+        clib.fxSaveUTTToMemory.restype = c.c_int
 
-            # Request utts
-            clib.fxRequestUTT.argtypes = [
-                c.c_uint,
-            ]
-            clib.fxRequestUTT.restype = c.c_int
+        # Request utts
+        clib.fxRequestUTT.argtypes = [
+            c.c_uint,
+        ]
+        clib.fxRequestUTT.restype = c.c_int
 
-            # Get last received utts
-            clib.fxGetLastReceivedUTT.argtypes = [
-                c.c_uint,
-                c.POINTER(c.c_int),
-                c.c_uint,
-            ]
-            clib.fxGetLastReceivedUTT.restype = c.c_int
-        except AttributeError:
-            print("Warning: could not find UTT methods in library.")
+        # Get last received utts
+        clib.fxGetLastReceivedUTT.argtypes = [c.c_uint, c.POINTER(c.c_int), c.c_uint]
+        clib.fxGetLastReceivedUTT.restype = c.c_int
 
         # IMU Calibration
         clib.fxSetImuCalibration.argtypes = [
@@ -376,6 +314,8 @@ def _set_prototypes(clib: c.CDLL, firmwareVersion: Version) -> c.CDLL:
         ]
         clib.fxSetImuCalibration.restype = c.c_int
 
+        clib.fxIsStreaming.argtypes = [c.c_uint]
+        clib.fxIsStreaming.restype = bool
     return clib
 
 
