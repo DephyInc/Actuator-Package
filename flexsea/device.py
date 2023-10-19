@@ -1602,5 +1602,7 @@ class Device:
         """
         return self._clib.fxSetLoggerSize(size, self.id)
     
+    @minimum_required_version("10.0.0")
+    @requires_status("connected")
     def is_streaming(self) -> bool:
         return self._clib.fxIsStreaming(self.id)
