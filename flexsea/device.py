@@ -88,6 +88,17 @@ class Device:
         Time, in seconds, spent trying to connect to S3 before an
         exception is raised.
 
+    stopMotorOnDisconnect : bool, optional
+        If ``True``, ``stop_motor`` is called by ``close`` (which, in
+        turn, is called by the desctructor). If ``False``, ``stop_motor``
+        is **not** called by ``close`` or the destructor. The default
+        value is ``False``. This is useful for on-device controllers
+        (controllers that are baked into the device firmware), so
+        that, should the device become disconnected from the computer it
+        is streaming data to, the controller will not suddenly shut off
+        and cause the wearer to potentially fall. If this is ``True``, you
+        must call ``stop_motor`` manually.
+
     Attributes
     ----------
 
@@ -165,6 +176,7 @@ class Device:
         interactive: bool = True,
         debug: bool = False,
         s3Timeout: int = 60,
+        stopMotorOnDisconnect: bool = False,
     ) -> None:
         if not debug:
             sys.tracebacklimit = 0
@@ -172,6 +184,7 @@ class Device:
 
         self.port: str = port
         self.interactive = interactive
+        self._stopMotorOnDisconnect = stopMotorOnDisconnect
 
         self.firmwareVersion = validate_given_firmware_version(
             firmwareVersion, self.interactive, s3Timeout
@@ -256,7 +269,7 @@ class Device:
         ----------
         bootloading : bool (optional)
             This keyword is really onlymeant to be used by the
-            bootloader and a user of `flexsea` should not have to use
+            bootloader and a user of ``flexsea`` should not have to use
             it at all.
             Starting with v12.0.0, a development version number was
             introduced. We can only connect to the device if both the
@@ -349,11 +362,14 @@ class Device:
     # -----
     def close(self) -> None:
         """
-        Severs connection with device. Does not stop the motor.
+        Severs connection with device. Does not stop the motor by
+        default. To stop the motor on a call to ``close``,
 
         Will no longer be able to send commands or receive data.
         """
         if self.connected or self.streaming:
+            if self._stopMotorOnDisconnect:
+                self.stop_motor()
             # fxClose calls fxStopStreaming for us
             retCode = self._clib.fxClose(self.id)
 
