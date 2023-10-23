@@ -1,6 +1,5 @@
 import ctypes as c
 import platform
-import sys
 from typing import List
 
 from serial.tools.list_ports import comports
