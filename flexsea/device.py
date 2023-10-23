@@ -240,7 +240,12 @@ class Device:
     # destructor
     # -----
     def __del__(self) -> None:
-        self.close()
+        try:
+            self.close()
+        except RuntimeError:
+            print("Failed to call `close`. Is the device disconnected or off?")
+        else:
+            print("Device connection closed.")
 
     # -----
     # open
@@ -352,17 +357,18 @@ class Device:
     # -----
     def close(self) -> None:
         """
-        Severs connection with device.
+        Severs connection with device. Does not stop the motor.
 
         Will no longer be able to send commands or receive data.
         """
-        if self.streaming:
-            self.stop_streaming()
-
-        if self.connected:
-            self.stop_motor()
-            self._clib.fxClose(self.id)
+        if self.connected or self.streaming:
+            # fxClose calls fxStopStreaming for us
+            retCode = self._clib.fxClose(self.id)
             self.connected = False
+            self.streaming = False
+
+            if retCode != self._SUCCESS.value:
+                raise RuntimeError("Failed to close connection.")
 
     # -----
     # start_streaming
