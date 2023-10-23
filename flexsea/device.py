@@ -169,12 +169,6 @@ class Device:
         if not debug:
             sys.tracebacklimit = 0
         fxc.dephyPath.mkdir(parents=True, exist_ok=True)
-        # These are first so the destructor won't complain about the
-        # class not having connected and streaming attributes if getting
-        # and loading the C library fails (since these attrs are
-        # referenced in the destructor)
-        self.connected: bool = False
-        self.streaming: bool = False
 
         self.port: str = port
         self.interactive = interactive
@@ -290,8 +284,6 @@ class Device:
         if self.id in (self._INVALID_DEVICE.value, -1):
             raise RuntimeError("Failed to connect to device.")
 
-        self.connected = True
-
         self._name = self.name
         self._side = self.side
         self._hasHabs = self._name not in fxc.noHabs
@@ -364,8 +356,6 @@ class Device:
         if self.connected or self.streaming:
             # fxClose calls fxStopStreaming for us
             retCode = self._clib.fxClose(self.id)
-            self.connected = False
-            self.streaming = False
 
             if retCode != self._SUCCESS.value:
                 raise RuntimeError("Failed to close connection.")
@@ -421,8 +411,6 @@ class Device:
         else:
             self._stream_without_safety()
 
-        self.streaming = True
-
     # -----
     # _stream_with_safety
     # -----
@@ -458,8 +446,6 @@ class Device:
 
         if retCode != self._SUCCESS.value:
             raise RuntimeError("Failed to stop streaming.")
-
-        self.streaming = False
 
     # -----
     # set_gains
@@ -1637,3 +1623,17 @@ class Device:
             The desired name of the log file
         """
         return self._clib.fxSetLoggerSize(size, self.id)
+
+    # -----
+    # connected
+    # -----
+    @property
+    def connected(self) -> bool:
+        return self._clib.fxIsOpen(self.id)
+
+    # -----
+    # streaming
+    # -----
+    @property
+    def streaming(self) -> bool:
+        return self._clib.fxIsStreaming(self.id)

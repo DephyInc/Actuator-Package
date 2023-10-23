@@ -138,6 +138,9 @@ def _set_prototypes(clib: c.CDLL, firmwareVersion: Version) -> c.CDLL:
     clib.fxOpen.argtypes = [c.c_char_p, c.c_uint, c.c_uint]
     clib.fxOpen.restype = c.c_int
 
+    clib.fxIsOpen.argtypes = [c.c_uint]
+    clib.fxIsOpen.restype = c.c_bool
+
     # Limited open
     if firmwareVersion >= Version("12.0.0"):
         try:
@@ -159,6 +162,9 @@ def _set_prototypes(clib: c.CDLL, firmwareVersion: Version) -> c.CDLL:
     # Start streaming
     clib.fxStartStreaming.argtypes = [c.c_uint, c.c_uint, c.c_bool]
     clib.fxStartStreaming.restype = c.c_int
+
+    clib.fxIsStreaming.argtypes = [c.c_uint]
+    clib.fxIsStreaming.restype = c.c_bool
 
     # Log file specification
     if firmwareVersion >= Version("12.0.0"):
