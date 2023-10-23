@@ -247,12 +247,13 @@ class Device:
     # destructor
     # -----
     def __del__(self) -> None:
-        try:
-            self.close()
-        except RuntimeError:
-            print("Failed to call `close`. Is the device disconnected or off?")
-        else:
-            print("Device connection closed.")
+        if self.connected:
+            try:
+                self.close()
+            except RuntimeError:
+                print("Failed to close connection. Is the device disconnected or off?")
+            else:
+                print("Closed connection to device.")
 
     # -----
     # open
@@ -1652,4 +1653,6 @@ class Device:
     # -----
     @property
     def streaming(self) -> bool:
-        return self._clib.fxIsStreaming(self.id)
+        if self.connected:
+            return self._clib.fxIsStreaming(self.id)
+        return False

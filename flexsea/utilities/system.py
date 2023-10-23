@@ -1,5 +1,7 @@
 import ctypes as c
+import os
 import platform
+import sys
 from typing import List
 
 from serial.tools.list_ports import comports
@@ -39,21 +41,25 @@ def get_os() -> str:
 #             find_device_ports
 # ============================================
 def find_device_ports(clib: c.CDLL, baudRate: int = 230400) -> List[str]:
+    stdout = sys.stdout
     devicePorts = []
 
-    for _port in comports():
-        p = _port.device
-        if p.startswith("/dev/ttyACM"):
-            deviceID = clib.fxOpen(p.encode("utf-8"), baudRate, 0)
-            if deviceID in (
-                fxc.deviceErrorCodes["INVALID_DEVICE"].value,
-                fxc.legacyDeviceErrorCodes["INVALID_DEVICE"].value,
-                -1,
-            ):
-                continue
-            devicePorts.append(p)
-            clib.fxClose(deviceID)
+    with open(os.devnull, "w") as fd:
+        sys.stdout = fd
+        for _port in comports():
+            p = _port.device
+            if p.startswith("/dev/ttyACM"):
+                deviceID = clib.fxOpen(p.encode("utf-8"), baudRate, 0)
+                if deviceID in (
+                    fxc.deviceErrorCodes["INVALID_DEVICE"].value,
+                    fxc.legacyDeviceErrorCodes["INVALID_DEVICE"].value,
+                    -1,
+                ):
+                    continue
+                devicePorts.append(p)
+                clib.fxClose(deviceID)
 
+    sys.stdout = stdout
     if len(devicePorts) == 0:
         raise RuntimeError("Could not find a valid device.")
 
