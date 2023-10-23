@@ -39,6 +39,9 @@ def get_os() -> str:
 #             find_device_ports
 # ============================================
 def find_device_ports(clib: c.CDLL, baudRate: int = 230400) -> List[str]:
+    if "windows" in get_os():
+        raise OSError("This function only works on Linux.")
+
     devicePorts = []
 
     for _port in comports():
