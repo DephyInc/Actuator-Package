@@ -70,4 +70,5 @@ for _ in range(nCycles):
 
 # Once we're done using the device, we should clean up by calling the
 # close method
+device.stop_motor()
 device.close()

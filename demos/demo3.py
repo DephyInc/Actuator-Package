@@ -108,4 +108,5 @@ except KeyboardInterrupt:
     device.stop_motor()
     sleep(commandDelay)
 
+device.stop_motor()
 device.close()

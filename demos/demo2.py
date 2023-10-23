@@ -117,6 +117,7 @@ for i in range(nLoops):
     # complete the command
     sleep(commandDelay)
 
+device.stop_motor()
 device.close()
 
 
