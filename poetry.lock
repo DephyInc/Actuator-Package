@@ -1569,6 +1569,17 @@ files = [
 ]
 
 [[package]]
+name = "pyudev"
+version = "0.24.1"
+description = "A libudev binding"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "pyudev-0.24.1-py3-none-any.whl", hash = "sha256:da7e977be15fb5eccf8797b8e2176cd5b4f39288707cdcb39d1cabe7c8793e2b"},
+    {file = "pyudev-0.24.1.tar.gz", hash = "sha256:75e54d37218f5ac45b0da1f0fd9cc5e526a3cac3ef1cfad410cf7ab338b01471"},
+]
+
+[[package]]
 name = "pyyaml"
 version = "6.0"
 description = "YAML parser and emitter for Python"
@@ -2082,4 +2093,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "9c36771a21ee9a22fdd1c820b172e4f0f1cd4c37e5825b770d0b805e9d810aad"
+content-hash = "c77f367ecebb95117db495b15f6f35b6b8d9f39bdca389ad148758a779684477"
