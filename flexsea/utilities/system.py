@@ -57,7 +57,4 @@ def find_device_ports(clib: c.CDLL, baudRate: int = 230400) -> List[str]:
             devicePorts.append(p)
             clib.fxClose(deviceID)
 
-    if len(devicePorts) == 0:
-        raise RuntimeError("Could not find a valid device.")
-
     return devicePorts
