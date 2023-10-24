@@ -2,7 +2,7 @@ import ctypes as c
 import platform
 from typing import List
 
-from serial.tools.list_ports import comports
+import pyudev
 
 import flexsea.utilities.constants as fxc
 
@@ -36,25 +36,16 @@ def get_os() -> str:
 
 
 # ============================================
-#             find_device_ports
+#               find_stm_ports
 # ============================================
-def find_device_ports(clib: c.CDLL, baudRate: int = 230400) -> List[str]:
+def find_stm_ports() -> List[str]:
     if "windows" in get_os():
         raise OSError("This function only works on Linux.")
 
+    context = pyudev.Context()
     devicePorts = []
 
-    for _port in comports():
-        p = _port.device
-        if p.startswith("/dev/ttyACM"):
-            deviceID = clib.fxOpen(p.encode("utf-8"), baudRate, 0)
-            if deviceID in (
-                fxc.deviceErrorCodes["INVALID_DEVICE"].value,
-                fxc.legacyDeviceErrorCodes["INVALID_DEVICE"].value,
-                -1,
-            ):
-                continue
-            devicePorts.append(p)
-            clib.fxClose(deviceID)
+    for device in context.list_devices(ID_VENDOR="STMicroelectronics", block="tty"):
+        devicePorts.append(device.device_node)
 
     return devicePorts
