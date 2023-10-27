@@ -1,10 +1,7 @@
-import ctypes as c
 import platform
 from typing import List
 
 import pyudev
-
-import flexsea.utilities.constants as fxc
 
 
 # ============================================
