@@ -1,8 +1,12 @@
 import platform
+from typing import List
 
-# ...
+import pyudev
 
 
+# ============================================
+#                   get_os
+# ============================================
 def get_os() -> str:
     """
     Returns the operating system and "bitness" (64 or 32 bit).
@@ -26,3 +30,19 @@ def get_os() -> str:
             system = "pi"
 
     return system + "_" + platform.architecture()[0]
+
+
+# ============================================
+#               find_stm_ports
+# ============================================
+def find_stm_ports() -> List[str]:
+    if "windows" in get_os():
+        raise OSError("This function only works on Linux.")
+
+    context = pyudev.Context()
+    devicePorts = []
+
+    for device in context.list_devices(ID_VENDOR="STMicroelectronics", block="tty"):
+        devicePorts.append(device.device_node)
+
+    return devicePorts

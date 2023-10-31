@@ -88,6 +88,17 @@ class Device:
         Time, in seconds, spent trying to connect to S3 before an
         exception is raised.
 
+    stopMotorOnDisconnect : bool, optional
+        If ``True``, ``stop_motor`` is called by ``close`` (which, in
+        turn, is called by the desctructor). If ``False``, ``stop_motor``
+        is **not** called by ``close`` or the destructor. The default
+        value is ``False``. This is useful for on-device controllers
+        (controllers that are baked into the device firmware), so
+        that, should the device become disconnected from the computer it
+        is streaming data to, the controller will not suddenly shut off
+        and cause the wearer to potentially fall. If this is ``True``, you
+        must call ``stop_motor`` manually.
+
     Attributes
     ----------
 
@@ -165,19 +176,15 @@ class Device:
         interactive: bool = True,
         debug: bool = False,
         s3Timeout: int = 60,
+        stopMotorOnDisconnect: bool = False,
     ) -> None:
         if not debug:
             sys.tracebacklimit = 0
         fxc.dephyPath.mkdir(parents=True, exist_ok=True)
-        # These are first so the destructor won't complain about the
-        # class not having connected and streaming attributes if getting
-        # and loading the C library fails (since these attrs are
-        # referenced in the destructor)
-        self.connected: bool = False
-        self.streaming: bool = False
 
         self.port: str = port
         self.interactive = interactive
+        self._stopMotorOnDisconnect = stopMotorOnDisconnect
 
         self.firmwareVersion = validate_given_firmware_version(
             firmwareVersion, self.interactive, s3Timeout
@@ -240,7 +247,13 @@ class Device:
     # destructor
     # -----
     def __del__(self) -> None:
-        self.close()
+        if self.connected:
+            try:
+                self.close()
+            except RuntimeError:
+                print("Failed to close connection. Is the device disconnected or off?")
+            else:
+                print("Closed connection to device.")
 
     # -----
     # open
@@ -257,7 +270,7 @@ class Device:
         ----------
         bootloading : bool (optional)
             This keyword is really onlymeant to be used by the
-            bootloader and a user of `flexsea` should not have to use
+            bootloader and a user of ``flexsea`` should not have to use
             it at all.
             Starting with v12.0.0, a development version number was
             introduced. We can only connect to the device if both the
@@ -284,8 +297,6 @@ class Device:
 
         if self.id in (self._INVALID_DEVICE.value, -1):
             raise RuntimeError("Failed to connect to device.")
-
-        self.connected = True
 
         self._name = self.name
         self._side = self.side
@@ -352,17 +363,19 @@ class Device:
     # -----
     def close(self) -> None:
         """
-        Severs connection with device.
+        Severs connection with device. Does not stop the motor by
+        default. To stop the motor on a call to ``close``,
 
         Will no longer be able to send commands or receive data.
         """
-        if self.streaming:
-            self.stop_streaming()
+        if self.connected or self.streaming:
+            if self._stopMotorOnDisconnect:
+                self.stop_motor()
+            # fxClose calls fxStopStreaming for us
+            retCode = self._clib.fxClose(self.id)
 
-        if self.connected:
-            self.stop_motor()
-            self._clib.fxClose(self.id)
-            self.connected = False
+            if retCode != self._SUCCESS.value:
+                raise RuntimeError("Failed to close connection.")
 
     # -----
     # start_streaming
@@ -415,8 +428,6 @@ class Device:
         else:
             self._stream_without_safety()
 
-        self.streaming = True
-
     # -----
     # _stream_with_safety
     # -----
@@ -452,8 +463,6 @@ class Device:
 
         if retCode != self._SUCCESS.value:
             raise RuntimeError("Failed to stop streaming.")
-
-        self.streaming = False
 
     # -----
     # set_gains
@@ -1631,3 +1640,19 @@ class Device:
             The desired name of the log file
         """
         return self._clib.fxSetLoggerSize(size, self.id)
+
+    # -----
+    # connected
+    # -----
+    @property
+    def connected(self) -> bool:
+        return self._clib.fxIsOpen(self.id)
+
+    # -----
+    # streaming
+    # -----
+    @property
+    def streaming(self) -> bool:
+        if self.connected:
+            return self._clib.fxIsStreaming(self.id)
+        return False
