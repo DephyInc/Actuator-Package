@@ -12,7 +12,7 @@ semantic-version = "^2.10.0"
 boto3 = "^1.26.110"
 pyyaml = "^6.0"
 pendulum = "^2.1.2"
-pyudev = "^0.24.1"
+pyudev = {version = "^0.24.1", platform = "linux"}
 
 
 [tool.poetry.group.dev.dependencies]

@@ -1,7 +1,11 @@
 import platform
+import sys
 from typing import List
 
-import pyudev
+# We use sys instead of platform because that's what poetry uses to
+# determine if a dependency should be installed or not
+if sys.platform == "linux":
+    import pyudev
 
 
 # ============================================
