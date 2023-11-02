@@ -43,6 +43,7 @@ def find_stm_ports() -> List[str]:
     if "windows" in get_os():
         raise OSError("This function only works on Linux.")
 
+    # pylint: disable-next=used-before-assignment
     context = pyudev.Context()
     devicePorts = []
 
