@@ -293,7 +293,8 @@ class Device:
                 msg += "the `fxOpenLimited` function."
                 raise RuntimeError(msg) from err
 
-        self.id = self._clib.fxOpen(port, self.baudRate, self.logLevel)
+        else:
+            self.id = self._clib.fxOpen(port, self.baudRate, self.logLevel)
 
         if self.id in (self._INVALID_DEVICE.value, -1):
             raise RuntimeError("Failed to connect to device.")
