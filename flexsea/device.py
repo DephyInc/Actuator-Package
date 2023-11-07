@@ -1647,12 +1647,12 @@ class Device:
     @requires_status("connected")
     def set_log_directory(self, path) -> None:
         """
-        Sets the size of the log file
+        Sets the log directory
 
         Parameters
         ----------
-        size: int
-            The desired name of the log file
+        path: string
+            The desired path for the log files
         """
         return self._clib.fxSetLoggerDirectory(path.encode("utf-8"), self.id)
 
