@@ -176,7 +176,6 @@ def _set_prototypes(clib: c.CDLL, firmwareVersion: Version) -> c.CDLL:
             clib.fxSetLoggerDirectory.argtypes = [c.c_char_p]
             clib.fxSetLoggerDirectory.restype = None
 
-            
         # v12 changed how versioning works and employs a development version
         # that we do not have access to. Further, the libs were uploaded to S3
         # all under 12.0.0 regardless of development version, so there are some

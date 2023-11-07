@@ -1641,8 +1641,7 @@ class Device:
             The desired name of the log file
         """
         return self._clib.fxSetLoggerSize(size, self.id)
-    
-    
+
     @minimum_required_version("12.0.0")
     @requires_status("connected")
     def set_log_directory(self, path) -> None:
