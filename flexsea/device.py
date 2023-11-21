@@ -10,6 +10,7 @@ import flexsea.utilities.constants as fxc
 from flexsea.utilities.decorators import minimum_required_version
 from flexsea.utilities.decorators import requires_device_not
 from flexsea.utilities.decorators import requires_status
+from flexsea.utilities.decorators import training_warn
 from flexsea.utilities.decorators import validate
 from flexsea.utilities.firmware import decode_firmware
 from flexsea.utilities.firmware import validate_given_firmware_version
@@ -496,6 +497,7 @@ class Device:
         """
         # There is a bug either on the C side or in the firmware where,
         # sometimes, the gains aren't set, so we try multiple times
+        returnCode = self._FAILURE
         for _ in range(5):
             returnCode = self._clib.fxSetGains(self.id, kp, ki, kd, k, b, ff)
             sleep(0.001)
@@ -1319,9 +1321,9 @@ class Device:
     # -----
     # start_training
     # -----
+    @validate
     @requires_device_not("actpack")
     @requires_status("connected")
-    @validate
     def start_training(self) -> int:
         """
         Activates training mode.
@@ -1346,14 +1348,16 @@ class Device:
         Training mode is only available if the device is flashed with
         one of Dephy's controllers.
         """
+        self._update_training_data()
+        sleep(0.25)
         return self._clib.fxStartTraining(self.id)
 
     # -----
     # activate_single_user_mode
     # -----
+    @validate
     @requires_device_not("actpack")
     @requires_status("connected")
-    @validate
     def activate_single_user_mode(self) -> int:
         """
         Puts the device into single-user mode.
@@ -1378,14 +1382,16 @@ class Device:
         Training mode is only available if the device is flashed with
         one of Dephy's controllers.
         """
+        self._update_training_data()
+        sleep(0.25)
         return self._clib.fxUseSavedTraining(self.id)
 
     # -----
     # activate_multi_user_mode
     # -----
+    @validate
     @requires_device_not("actpack")
     @requires_status("connected")
-    @validate
     def activate_multi_user_mode(self) -> int:
         """
         Puts the device into multi-user mode.
@@ -1409,6 +1415,8 @@ class Device:
         Training mode is only available if the device is flashed with
         one of Dephy's controllers.
         """
+        self._update_training_data()
+        sleep(0.25)
         return self._clib.fxDoNotUseSaveTraining(self.id)
 
     # -----
@@ -1468,7 +1476,7 @@ class Device:
         Training mode is only available if the device is flashed with
         one of Dephy's controllers.
         """
-        retCode = self._clib.fxUpdateTrainingData(self.id)
+        self._update_training_data()
         sleep(1)
 
         singleUserMode = c.c_bool()
@@ -1518,6 +1526,7 @@ class Device:
     # -----
     # _update_training_data
     # -----
+    @training_warn
     @validate
     def _update_training_data(self) -> None:
         return self._clib.fxUpdateTrainingData(self.id)
@@ -1535,7 +1544,7 @@ class Device:
         int
             The integer corresponding to a status code of success.
         """
-        return self._SUCCESS
+        return self._SUCCESS.value
 
     # -----
     # failure
@@ -1550,7 +1559,7 @@ class Device:
         int
             The integer corresponding to a status code of failure.
         """
-        return self._FAILURE
+        return self._FAILURE.value
 
     # -----
     # undefined
@@ -1566,7 +1575,7 @@ class Device:
         int
             The integer corresponding to a status code of undefined.
         """
-        return self._UNDEFINED
+        return self._UNDEFINED.value
 
     # -----
     # invalidParam
@@ -1581,7 +1590,7 @@ class Device:
         int
             The integer corresponding to a status code of invalidParam.
         """
-        return self._INVALID_PARAM
+        return self._INVALID_PARAM.value
 
     # -----
     # invalidDevice
@@ -1596,7 +1605,7 @@ class Device:
         int
             The integer corresponding to a status code of invalidDevice.
         """
-        return self._INVALID_DEVICE
+        return self._INVALID_DEVICE.value
 
     # -----
     # isLegacy

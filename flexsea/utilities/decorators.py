@@ -6,6 +6,51 @@ from semantic_version import Version
 
 
 # ============================================
+#              training_warn
+# ============================================
+def training_warn(func: Callable) -> Any:
+    """
+    Before training information is available or training commands can
+    be sent, the device must finish its setup. The purpose of this
+    wrapper is to provide a warning to the user if their command fails
+    about why it probably failed and what they can do about it.
+
+    Parameters
+    ----------
+    func : Callable
+        The method being wrapped. Must be a training-specific method.
+
+    Raises
+    ------
+    RuntimeError
+        If the wrapped method does not return a SUCCESS status code.
+
+    Returns
+    -------
+    Callable
+        The wrapped method.
+    """
+
+    @wraps(func)
+    def training_warn_wrapper(*args, **kwargs) -> Any:
+        try:
+            # The validate decorator runs the actual method and raises
+            # a RuntimeError if the method was not successfull. This
+            # try-except construction requires that the training_warn
+            # decorator be used "on top" of validate
+            retCode = func(*args, **kwargs)
+        except RuntimeError as err:
+            msg = f"Error: {func.__name__} failed. For training-specific methods, "
+            msg += "1.) the device must be running off of battery power, 2.) "
+            msg += "a Dephy controller must be present on the device, 3.) the device "
+            msg += "must be ready to provide augmentation."
+            raise RuntimeError(msg) from err
+        return retCode
+
+    return training_warn_wrapper
+
+
+# ============================================
 #            requires_device_not
 # ============================================
 def requires_device_not(device: str) -> Callable:
@@ -86,12 +131,12 @@ def validate(func: Callable) -> Callable:
     Parameters
     ----------
     func : Callable
-        The function being wrapped.
+        The method being wrapped.
 
     Raises
     ------
     RuntimeError
-        If the wrapped function does not return a SUCCESS status code.
+        If the wrapped method does not return a SUCCESS status code.
 
     Returns
     -------
@@ -127,7 +172,7 @@ def minimum_required_version(version: str) -> Callable:
     Raises
     ------
     RuntimeError
-        If the wrapped function is not a :py:class:`Device` method or
+        If the wrapped method is not a :py:class:`Device` method or
         if the given version is greater than the device's firmware
         version.
 
