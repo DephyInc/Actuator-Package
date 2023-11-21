@@ -1456,6 +1456,9 @@ class Device:
         Training mode is only available if the device is flashed with
         one of Dephy's controllers.
         """
+        retCode = self._clib.fxUpdateTrainingData(self.id)
+        sleep(1)
+
         singleUserMode = c.c_bool()
 
         retCode = self._clib.fxIsUsingSavedTrainingData(
