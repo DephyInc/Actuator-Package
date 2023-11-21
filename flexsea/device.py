@@ -8,6 +8,7 @@ from semantic_version import Version
 
 import flexsea.utilities.constants as fxc
 from flexsea.utilities.decorators import minimum_required_version
+from flexsea.utilities.decorators import requires_device_not
 from flexsea.utilities.decorators import requires_status
 from flexsea.utilities.decorators import validate
 from flexsea.utilities.firmware import decode_firmware
@@ -1120,6 +1121,7 @@ class Device:
     # num_utts
     # -----
     @property
+    @requires_device_not("actpack")
     @minimum_required_version("9.1.0")
     @requires_status("connected")
     def num_utts(self) -> int:
@@ -1139,6 +1141,7 @@ class Device:
     # -----
     # set_all_utts
     # -----
+    @requires_device_not("actpack")
     @minimum_required_version("9.1.0")
     @requires_status("connected")
     @validate
@@ -1180,6 +1183,7 @@ class Device:
     # -----
     # set_utt
     # -----
+    @requires_device_not("actpack")
     @minimum_required_version("9.1.0")
     @requires_status("connected")
     @validate
@@ -1221,6 +1225,7 @@ class Device:
     # -----
     # reset_utts
     # -----
+    @requires_device_not("actpack")
     @minimum_required_version("9.1.0")
     @requires_status("connected")
     @validate
@@ -1243,6 +1248,7 @@ class Device:
     # -----
     # save_utts
     # -----
+    @requires_device_not("actpack")
     @minimum_required_version("9.1.0")
     @requires_status("connected")
     @validate
@@ -1266,6 +1272,7 @@ class Device:
     # -----
     # read_utts
     # -----
+    @requires_device_not("actpack")
     @minimum_required_version("9.1.0")
     @requires_status("connected")
     def read_utts(self) -> List[int]:
@@ -1312,6 +1319,7 @@ class Device:
     # -----
     # start_training
     # -----
+    @requires_device_not("actpack")
     @requires_status("connected")
     @validate
     def start_training(self) -> int:
@@ -1343,6 +1351,7 @@ class Device:
     # -----
     # activate_single_user_mode
     # -----
+    @requires_device_not("actpack")
     @requires_status("connected")
     @validate
     def activate_single_user_mode(self) -> int:
@@ -1374,6 +1383,7 @@ class Device:
     # -----
     # activate_multi_user_mode
     # -----
+    @requires_device_not("actpack")
     @requires_status("connected")
     @validate
     def activate_multi_user_mode(self) -> int:
@@ -1405,6 +1415,7 @@ class Device:
     # remaining_training_steps
     # -----
     @property
+    @requires_device_not("actpack")
     @requires_status("connected")
     def remaining_training_steps(self) -> int:
         """
@@ -1435,6 +1446,7 @@ class Device:
     # -----
     # get_training_user_mode
     # -----
+    @requires_device_not("actpack")
     @requires_status("connected")
     def get_training_user_mode(self) -> str:
         """
@@ -1475,6 +1487,7 @@ class Device:
     # -----
     # get_training_state
     # -----
+    @requires_device_not("actpack")
     @requires_status("connected")
     def get_training_state(self) -> str:
         """

@@ -6,6 +6,42 @@ from semantic_version import Version
 
 
 # ============================================
+#            requires_device_not
+# ============================================
+def requires_device_not(device: str) -> Callable:
+    """
+    Certain ``Device`` class methods only work on non-Actpack devices.
+    This meta-decorator ensures this.
+
+    Parameters
+    ----------
+    device: str
+        The type of device that the physical device **cannot** be.
+
+    Raises
+    ------
+    RuntimeError
+        If the physical device has type ``device``.
+
+    Returns
+    -------
+    Callable
+        The method being wrapped.
+    """
+
+    def not_device_decorator(func: Callable) -> Callable:
+        @wraps(func)
+        def not_device_wrapper(*args, **kwargs) -> Any:
+            if getattr(args[0], "_name") == device:
+                raise RuntimeError(f"Error: {func.__name__} does not work on {device}")
+            return func(*args, **kwargs)
+
+        return not_device_wrapper
+
+    return not_device_decorator
+
+
+# ============================================
 #              requires_status
 # ============================================
 def requires_status(status: str) -> Callable:
@@ -25,7 +61,7 @@ def requires_status(status: str) -> Callable:
     Returns
     -------
     Callable
-        The function being wrapped.
+        The method being wrapped.
     """
 
     def status_decorator(func: Callable) -> Callable:
@@ -60,7 +96,7 @@ def validate(func: Callable) -> Callable:
     Returns
     -------
     Callable
-        The wrapped function.
+        The wrapped method.
     """
 
     @wraps(func)
