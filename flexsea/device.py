@@ -244,18 +244,6 @@ class Device:
         print(f"Using library file: {self.libFile}")
 
     # -----
-    # destructor
-    # -----
-    def __del__(self) -> None:
-        if self.connected:
-            try:
-                self.close()
-            except RuntimeError:
-                print("Failed to close connection. Is the device disconnected or off?")
-            else:
-                print("Closed connection to device.")
-
-    # -----
     # open
     # -----
     def open(self, bootloading: bool = False) -> None:

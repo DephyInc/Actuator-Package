@@ -1,0 +1,35 @@
+name: 'tagged-release'
+
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+
+jobs:
+  gh_tagged_release:
+    runs-on: 'ubuntu-latest'
+
+    steps:
+      - name: 'Checkout source code'
+        uses: 'actions/checkout@v3'
+
+      - name: Setup Python
+        uses: actions/setup-python@v4.5.0
+        with:
+          python-version: "3.11"
+
+      - name: Setup Poetry
+        run: python3 -m pip install poetry
+
+      - name: Build
+        run: poetry build
+
+      - name: Release
+        uses: 'marvinpinto/action-automatic-releases@latest'
+        with:
+          repo_token: '${{ secrets.GITHUB_TOKEN }}'
+          prerelease: false
+          files: |
+            dist/flexsea*.whl
+            dist/flexsea*.tar.gz
+        id: 'automatic_releases'
