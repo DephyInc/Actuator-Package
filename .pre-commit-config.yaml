@@ -30,15 +30,6 @@ repos:
     rev: 23.7.0
     hooks:
     -   id: black
-# https://stackoverflow.com/a/61238571/8087342
-# -   repo: local
-#     hooks:
-#     -   id: pylint
-#         name: pylint
-#         entry: pylint
-#         language: system
-#         types: [python]
-#         require_serial: true
 -   repo: https://github.com/PyCQA/pylint
     rev: v3.0.0a7
     hooks:
@@ -55,3 +46,4 @@ repos:
         - pandas
         - pyyaml
         - pendulum
+        - pylsl
