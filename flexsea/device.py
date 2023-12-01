@@ -244,6 +244,18 @@ class Device:
         print(f"Using library file: {self.libFile}")
 
     # -----
+    # destructor
+    # -----
+    def __del__(self) -> None:
+        if self.connected:
+            try:
+                self.close()
+            except RuntimeError:
+                print("Failed to close connection. Is the device disconnected or off?")
+            else:
+                print("Closed connection to device.")
+
+    # -----
     # open
     # -----
     def open(self, bootloading: bool = False) -> None:
@@ -1630,7 +1642,9 @@ class Device:
         """
         return self._clib.fxSetLogFileSize(size, self.id)
 
+
     @minimum_required_version("12.0.0")
+    @requires_status("connected")
     def set_log_directory(self, path) -> None:
         """
         Sets the log directory
