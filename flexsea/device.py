@@ -1640,7 +1640,7 @@ class Device:
         path: string
             The desired path for the log files
         """
-        return self._clib.fxSetLogDirectory(path.encode("utf-8"))
+        return self._clib.fxSetLogDirectory(path.encode("utf-8"), id)
 
     # -----
     # connected
