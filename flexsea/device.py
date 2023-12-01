@@ -1644,7 +1644,6 @@ class Device:
 
 
     @minimum_required_version("12.0.0")
-    @requires_status("connected")
     def set_log_directory(self, path) -> None:
         """
         Sets the log directory
@@ -1654,7 +1653,7 @@ class Device:
         path: string
             The desired path for the log files
         """
-        return self._clib.fxSetLogDirectory(path.encode("utf-8"), self.id)
+        return self._clib.fxSetLogDirectory(path.encode("utf-8"))
 
     # -----
     # connected
