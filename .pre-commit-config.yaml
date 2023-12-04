@@ -3,7 +3,7 @@
 
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v4.5.0
     hooks:
     -   id: trailing-whitespace
         exclude: |
@@ -27,20 +27,11 @@ repos:
     -   id: check-docstring-first
     -   id: check-case-conflict
 -   repo: https://github.com/psf/black
-    rev: 23.7.0
+    rev: 23.11.0
     hooks:
     -   id: black
-# https://stackoverflow.com/a/61238571/8087342
-# -   repo: local
-#     hooks:
-#     -   id: pylint
-#         name: pylint
-#         entry: pylint
-#         language: system
-#         types: [python]
-#         require_serial: true
 -   repo: https://github.com/PyCQA/pylint
-    rev: v3.0.0a7
+    rev: v3.0.1
     hooks:
     -   id: pylint
         args:
@@ -55,3 +46,4 @@ repos:
         - pandas
         - pyyaml
         - pendulum
+        - pylsl
