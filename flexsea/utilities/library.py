@@ -169,11 +169,11 @@ def _set_prototypes(clib: c.CDLL, firmwareVersion: Version) -> c.CDLL:
     # Log file specification
     if firmwareVersion >= Version("12.0.0"):
         try:
-            clib.fxSetDataLogName.argtypes = [c.c_char_p]
+            clib.fxSetDataLogName.argtypes = [c.c_char_p, c.c_uint]
             clib.fxSetDataLogName.restype = None
-            clib.fxSetLogFileSize.argtypes = [c.c_int]
+            clib.fxSetLogFileSize.argtypes = [c.c_int, c.c_int]
             clib.fxSetLogFileSize.restype = None
-            clib.fxSetLogDirectory.argtypes = [c.c_char_p]
+            clib.fxSetLogDirectory.argtypes = [c.c_char_p,c.c_uint]
             clib.fxSetLogDirectory.restype = None
 
         # v12 changed how versioning works and employs a development version
