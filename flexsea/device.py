@@ -8,7 +8,9 @@ from semantic_version import Version
 
 import flexsea.utilities.constants as fxc
 from flexsea.utilities.decorators import minimum_required_version
+from flexsea.utilities.decorators import requires_device_not
 from flexsea.utilities.decorators import requires_status
+from flexsea.utilities.decorators import training_warn
 from flexsea.utilities.decorators import validate
 from flexsea.utilities.firmware import decode_firmware
 from flexsea.utilities.firmware import validate_given_firmware_version
@@ -242,18 +244,6 @@ class Device:
 
         print(f"Using firmware version: {self.firmwareVersion}")
         print(f"Using library file: {self.libFile}")
-
-    # -----
-    # destructor
-    # -----
-    def __del__(self) -> None:
-        if self.connected:
-            try:
-                self.close()
-            except RuntimeError:
-                print("Failed to close connection. Is the device disconnected or off?")
-            else:
-                print("Closed connection to device.")
 
     # -----
     # open
@@ -495,6 +485,7 @@ class Device:
         """
         # There is a bug either on the C side or in the firmware where,
         # sometimes, the gains aren't set, so we try multiple times
+        returnCode = self._FAILURE
         for _ in range(5):
             returnCode = self._clib.fxSetGains(self.id, kp, ki, kd, k, b, ff)
             sleep(0.001)
@@ -1120,6 +1111,7 @@ class Device:
     # num_utts
     # -----
     @property
+    @requires_device_not("actpack")
     @minimum_required_version("9.1.0")
     @requires_status("connected")
     def num_utts(self) -> int:
@@ -1139,6 +1131,7 @@ class Device:
     # -----
     # set_all_utts
     # -----
+    @requires_device_not("actpack")
     @minimum_required_version("9.1.0")
     @requires_status("connected")
     @validate
@@ -1180,6 +1173,7 @@ class Device:
     # -----
     # set_utt
     # -----
+    @requires_device_not("actpack")
     @minimum_required_version("9.1.0")
     @requires_status("connected")
     @validate
@@ -1221,6 +1215,7 @@ class Device:
     # -----
     # reset_utts
     # -----
+    @requires_device_not("actpack")
     @minimum_required_version("9.1.0")
     @requires_status("connected")
     @validate
@@ -1243,6 +1238,7 @@ class Device:
     # -----
     # save_utts
     # -----
+    @requires_device_not("actpack")
     @minimum_required_version("9.1.0")
     @requires_status("connected")
     @validate
@@ -1266,6 +1262,7 @@ class Device:
     # -----
     # read_utts
     # -----
+    @requires_device_not("actpack")
     @minimum_required_version("9.1.0")
     @requires_status("connected")
     def read_utts(self) -> List[int]:
@@ -1312,8 +1309,9 @@ class Device:
     # -----
     # start_training
     # -----
-    @requires_status("connected")
     @validate
+    @requires_device_not("actpack")
+    @requires_status("connected")
     def start_training(self) -> int:
         """
         Activates training mode.
@@ -1338,13 +1336,16 @@ class Device:
         Training mode is only available if the device is flashed with
         one of Dephy's controllers.
         """
+        self._update_training_data()
+        sleep(0.25)
         return self._clib.fxStartTraining(self.id)
 
     # -----
     # activate_single_user_mode
     # -----
-    @requires_status("connected")
     @validate
+    @requires_device_not("actpack")
+    @requires_status("connected")
     def activate_single_user_mode(self) -> int:
         """
         Puts the device into single-user mode.
@@ -1369,13 +1370,16 @@ class Device:
         Training mode is only available if the device is flashed with
         one of Dephy's controllers.
         """
+        self._update_training_data()
+        sleep(0.25)
         return self._clib.fxUseSavedTraining(self.id)
 
     # -----
     # activate_multi_user_mode
     # -----
-    @requires_status("connected")
     @validate
+    @requires_device_not("actpack")
+    @requires_status("connected")
     def activate_multi_user_mode(self) -> int:
         """
         Puts the device into multi-user mode.
@@ -1399,12 +1403,15 @@ class Device:
         Training mode is only available if the device is flashed with
         one of Dephy's controllers.
         """
+        self._update_training_data()
+        sleep(0.25)
         return self._clib.fxDoNotUseSaveTraining(self.id)
 
     # -----
     # remaining_training_steps
     # -----
     @property
+    @requires_device_not("actpack")
     @requires_status("connected")
     def remaining_training_steps(self) -> int:
         """
@@ -1435,6 +1442,7 @@ class Device:
     # -----
     # get_training_user_mode
     # -----
+    @requires_device_not("actpack")
     @requires_status("connected")
     def get_training_user_mode(self) -> str:
         """
@@ -1456,6 +1464,9 @@ class Device:
         Training mode is only available if the device is flashed with
         one of Dephy's controllers.
         """
+        self._update_training_data()
+        sleep(1)
+
         singleUserMode = c.c_bool()
 
         retCode = self._clib.fxIsUsingSavedTrainingData(
@@ -1472,6 +1483,7 @@ class Device:
     # -----
     # get_training_state
     # -----
+    @requires_device_not("actpack")
     @requires_status("connected")
     def get_training_state(self) -> str:
         """
@@ -1502,6 +1514,7 @@ class Device:
     # -----
     # _update_training_data
     # -----
+    @training_warn
     @validate
     def _update_training_data(self) -> None:
         return self._clib.fxUpdateTrainingData(self.id)
@@ -1519,7 +1532,7 @@ class Device:
         int
             The integer corresponding to a status code of success.
         """
-        return self._SUCCESS
+        return self._SUCCESS.value
 
     # -----
     # failure
@@ -1534,7 +1547,7 @@ class Device:
         int
             The integer corresponding to a status code of failure.
         """
-        return self._FAILURE
+        return self._FAILURE.value
 
     # -----
     # undefined
@@ -1550,7 +1563,7 @@ class Device:
         int
             The integer corresponding to a status code of undefined.
         """
-        return self._UNDEFINED
+        return self._UNDEFINED.value
 
     # -----
     # invalidParam
@@ -1565,7 +1578,7 @@ class Device:
         int
             The integer corresponding to a status code of invalidParam.
         """
-        return self._INVALID_PARAM
+        return self._INVALID_PARAM.value
 
     # -----
     # invalidDevice
@@ -1580,7 +1593,7 @@ class Device:
         int
             The integer corresponding to a status code of invalidDevice.
         """
-        return self._INVALID_DEVICE
+        return self._INVALID_DEVICE.value
 
     # -----
     # isLegacy
