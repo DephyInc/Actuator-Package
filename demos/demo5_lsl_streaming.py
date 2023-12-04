@@ -41,7 +41,7 @@ def main():
 
     # Accessing the arguments
     print(f"Port: {args.port}")
-    print(f"Frequency: {args.freq}")
+    print(f"Frequency: {args.freq} Hz")
     print(f"API Version: {args.api}")
 
     if "windows" == platform.system().lower():
