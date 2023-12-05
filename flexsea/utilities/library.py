@@ -169,10 +169,13 @@ def _set_prototypes(clib: c.CDLL, firmwareVersion: Version) -> c.CDLL:
     # Log file specification
     if firmwareVersion >= Version("12.0.0"):
         try:
-            clib.fxSetLoggerName.argtypes = [c.c_char_p]
-            clib.fxSetLoggerName.restype = None
-            clib.fxSetLoggerSize.argtypes = [c.c_int]
-            clib.fxSetLoggerSize.restype = None
+            clib.fxSetDataLogName.argtypes = [c.c_char_p, c.c_uint]
+            clib.fxSetDataLogName.restype = None
+            clib.fxSetLogFileSize.argtypes = [c.c_int, c.c_int]
+            clib.fxSetLogFileSize.restype = None
+            clib.fxSetLogDirectory.argtypes = [c.c_char_p, c.c_uint]
+            clib.fxSetLogDirectory.restype = None
+
         # v12 changed how versioning works and employs a development version
         # that we do not have access to. Further, the libs were uploaded to S3
         # all under 12.0.0 regardless of development version, so there are some

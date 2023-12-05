@@ -1640,7 +1640,7 @@ class Device:
         name : string
             The desired name of the log file
         """
-        return self._clib.fxSetLoggerName(name.encode("utf-8"), self.id)
+        return self._clib.fxSetDataLogName(name.encode("utf-8"), self.id)
 
     @minimum_required_version("12.0.0")
     @requires_status("connected")
@@ -1653,7 +1653,20 @@ class Device:
         size: int
             The desired name of the log file
         """
-        return self._clib.fxSetLoggerSize(size, self.id)
+        return self._clib.fxSetLogFileSize(size, self.id)
+
+    @minimum_required_version("12.0.0")
+    @requires_status("connected")
+    def set_log_directory(self, path) -> None:
+        """
+        Sets the log directory
+
+        Parameters
+        ----------
+        path: string
+            The desired path for the log files
+        """
+        return self._clib.fxSetLogDirectory(path.encode("utf-8"), self.id)
 
     # -----
     # connected
