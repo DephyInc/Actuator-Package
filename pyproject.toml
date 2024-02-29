@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "flexsea"
-version = "12.0.2"
+version = "12.0.3"
 description = ""
 authors = ["Jared <jcoughlin@dephy.com>"]
 readme = "README.md"
