@@ -42,7 +42,7 @@ To see what versions are available, you can do:
 
 .. note::
 
-   Firmware version 7.2.0 is the latest long-term support release. FASTER customers should not update beyond this version unless given explicit instruction to do so from Dephy.  
+   Firmware version 7.2.0 is the latest long-term support release. FASTER customers should not update beyond this version unless given explicit instruction to do so from Dephy.
 
 See the :ref:`api docs <flexsea_api>` for more details.
 

@@ -10,6 +10,7 @@ To visualize the data stream, use PlotJuggler:
 https://github.com/Sotilrac/plotjuggler-lsl
 
 """
+
 # pylint: disable=duplicate-code
 
 import argparse
