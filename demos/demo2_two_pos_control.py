@@ -6,6 +6,7 @@ Here we demonstrate how to:
     * Read data from the device
     * Set the motor gains
 """
+
 # pylint: disable=duplicate-code
 
 import platform

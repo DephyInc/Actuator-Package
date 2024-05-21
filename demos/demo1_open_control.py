@@ -8,6 +8,7 @@ Here we loop over an array of voltages, demonstrating how to:
     * Command the motor voltage
     * Clean up once we're done
 """
+
 # pylint: disable=duplicate-code
 
 import platform
