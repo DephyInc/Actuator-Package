@@ -7,6 +7,7 @@ Here we loop over an array of currents, demonstrating how to:
     * Command the motor to stop
     * Print device data
 """
+
 # pylint: disable=duplicate-code
 
 import platform
