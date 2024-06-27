@@ -1683,3 +1683,115 @@ class Device:
         if self.connected:
             return self._clib.fxIsStreaming(self.id)
         return False
+
+    # -----
+    # request_re_config_settings
+    # -----
+    @minimum_required_version("13.0.0")
+    @validate
+    def _request_re_config_settings(self) -> int:
+        return self._clib.fxRequestRegulateConfigSettings(self.id)
+
+    # -----
+    # battery_type
+    # -----
+    @minimum_required_version("13.0.0")
+    @property
+    def battery_type(self) -> str:
+        self._request_re_config_settings()
+        sleep(1)
+        batteryType = c.c_int()
+        retCode = self._clib.fxGetBatteryType(self.id, c.byref(batteryType))
+        if retCode != self._SUCCESS.value:
+            raise RuntimeError("Could not read battery type.")
+        return fxc.batteryTypes[batteryType.value]
+
+    # -----
+    # battery_type - setter
+    # -----
+    @minimum_required_version("13.0.0")
+    @battery_type.setter
+    @validate
+    def battery_type(self, batteryType: int | c.c_int) -> None:
+        if isinstance(batteryType, c.c_int):
+            batteryType = batteryType.value
+        if batteryType not in fxc.batteryTypes:
+            raise ValueError(f"Error: invalid battery type {batteryType}")
+        self._request_re_config_settings()
+        sleep(1)
+        batteryType = c.c_int(batteryType)
+        return self._clib.fxSetBatteryType(self.id, batteryType)
+
+    # -----
+    # running_led_sequence
+    # -----
+    @minimum_required_version("13.0.0")
+    @property
+    def running_led_sequence(self) -> str:
+        self._request_re_config_settings()
+        sleep(1)
+        ledSequence = c.c_int()
+        retCode = self._clib.fxGetRunningLEDSequence(self.id, c.byref(ledSequence))
+        if retCode != self._SUCCESS.value:
+            raise RuntimeError("Could not read running led sequence.")
+        return fxc.ledSequences[ledSequence.value]
+
+    # -----
+    # init_led_sequence
+    # -----
+    @minimum_required_version("13.0.0")
+    @property
+    def init_led_sequence(self) -> str:
+        self._request_re_config_settings()
+        sleep(1)
+        ledSequence = c.c_int()
+        retCode = self._clib.fxGetInitLEDSequence(self.id, c.byref(ledSequence))
+        if retCode != self._SUCCESS.value:
+            raise RuntimeError("Could not read init led sequence.")
+        return fxc.ledSequences[ledSequence.value]
+
+    # -----
+    # init_led_sequence - setter
+    # -----
+    @minimum_required_version("13.0.0")
+    @init_led_sequence.setter
+    @validate
+    def init_led_sequence(self, ledSequence: int | c.c_int) -> None:
+        if isinstance(ledSequence, c.c_int):
+            ledSequence = ledSequence.value
+        if ledSequence not in fxc.ledSequences:
+            raise ValueError(f"Error: invalid led sequence {ledSequence}")
+        self._request_re_config_settings()
+        sleep(1)
+        ledSequence = c.c_int(ledSequence)
+        return self._clib.fxSetInitLEDSequence(self.id, ledSequence)
+
+    # -----
+    # shutoff_led_sequence
+    # -----
+    @minimum_required_version("13.0.0")
+    @property
+    def shutoff_led_sequence(self) -> str:
+        self._request_re_config_settings()
+        sleep(1)
+        ledSequence = c.c_int()
+        retCode = self._clib.fxGetShutoffLEDSequence(self.id, c.byref(ledSequence))
+        if retCode != self._SUCCESS.value:
+            raise RuntimeError("Could not read shutoff led sequence.")
+        return fxc.ledSequences[ledSequence.value]
+
+    # -----
+    # shutoff_led_sequence - setter
+    # -----
+    @minimum_required_version("13.0.0")
+    @shutoff_led_sequence.setter
+    @validate
+    def shutoff_led_sequence(self, ledSequence: int | c.c_int) -> None:
+        if isinstance(ledSequence, c.c_int):
+            ledSequence = ledSequence.value
+        if ledSequence not in fxc.ledSequences:
+            raise ValueError(f"Error: invalid ledSequence type {ledSequence}")
+        self._request_re_config_settings()
+        sleep(1)
+        ledSequence = c.c_int(ledSequence)
+        return self._clib.fxSetShutoffLEDSequence(self.id, ledSequence)

@@ -171,3 +171,69 @@ deviceNames = {
 # past v9, the number of UTTs is fixed, so we hard code it here, though it makes
 # me sad to do so
 nUttsV9 = 15
+
+
+# ============================================
+#               Battery Types
+# ============================================
+BATTERY_TYPE_UNKNOWN = c.c_int(0)
+BATTERY_TYPE_6_CELL = c.c_int(1)
+BATTERY_TYPE_8_CELL = c.c_int(2)
+BATTERY_TYPE_10_CELL = c.c_int(3)
+BATTERY_TYPE_11_CELL = c.c_int(4)
+BATTERY_TYPE_12_CELL = c.c_int(5)
+POWER_SUPPLY = c.c_int(6)
+
+batteryTypes = {
+    BATTERY_TYPE_UNKNOWN.value: "unknown",
+    BATTERY_TYPE_6_CELL.value: "6 cell",
+    BATTERY_TYPE_8_CELL.value: "8 cell",
+    BATTERY_TYPE_10_CELL.value: "10 cell",
+    BATTERY_TYPE_11_CELL.value: "11 cell",
+    BATTERY_TYPE_12_CELL.value: "12 cell",
+    POWER_SUPPLY.value: "power supply",
+}
+
+
+# ============================================
+#               LED Sequences
+# ============================================
+UNIDENTIFIED_LED_SEQUENCE = c.c_int(0)
+SET_GREEN_BREATHE = c.c_int(1)
+SET_RED_BREATHE = c.c_int(2)
+SET_CYAN_BREATHE = c.c_int(3)
+SET_BLUE_BREATHE = c.c_int(4)
+SET_WHITE_BREATHE = c.c_int(5)
+SET_YELLOW_BREATHE = c.c_int(6)
+SET_GREEN_ON = c.c_int(7)
+SET_YELLOW_ON = c.c_int(8)
+SET_RED_ON = c.c_int(9)
+SET_CYAN_ON = c.c_int(10)
+SET_CYLON = c.c_int(11)
+SET_RED_FADE = c.c_int(12)
+SET_YELLOW_FADE = c.c_int(13)
+SET_GREEN_FADE = c.c_int(14)
+SET_TO_DISPLAY_BATTERY_LEVEL = c.c_int(15)
+SET_TO_WHITE_BLINK = c.c_int(16)
+ALL_LEDS_OFF = c.c_int(17)
+
+ledSequences = {
+    UNIDENTIFIED_LED_SEQUENCE.value: "uidentified",
+    SET_GREEN_BREATHE.value: "green breathe",
+    SET_RED_BREATHE.value: "red breathe",
+    SET_CYAN_BREATHE.value: "cyan breathe",
+    SET_BLUE_BREATHE.value: "blue breathe",
+    SET_WHITE_BREATHE.value: "white breathe",
+    SET_YELLOW_BREATHE.value: "yellow breathe",
+    SET_GREEN_ON.value: "green on",
+    SET_YELLOW_ON.value: "yellow on",
+    SET_RED_ON.value: "red on",
+    SET_CYAN_ON.value: "cyan on",
+    SET_CYLON.value: "cylon",
+    SET_RED_FADE.value: "red fade",
+    SET_YELLOW_FADE.value: "yellow fade",
+    SET_GREEN_FADE.value: "green fade",
+    SET_TO_DISPLAY_BATTERY_LEVEL.value: "display battery level",
+    SET_TO_WHITE_BLINK.value: "white blink",
+    ALL_LEDS_OFF.value: "all off",
+}
