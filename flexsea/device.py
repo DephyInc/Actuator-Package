@@ -919,9 +919,8 @@ class Device:
     # -----
     # uvlo - getter
     # -----
-    @property
     @requires_status("connected")
-    def uvlo(self) -> int:
+    def get_uvlo(self) -> int:
         """
         Gets the currently set UVLO.
 
@@ -942,9 +941,8 @@ class Device:
     # -----
     # uvlo - setter
     # -----
-    @uvlo.setter
     @validate
-    def uvlo(self, value: int) -> int:
+    def set_uvlo(self, value: int) -> int:
         """
         Sets the UVLO value for the device. `value` needs to be in milli-volts.
 
@@ -1696,8 +1694,7 @@ class Device:
     # battery_type
     # -----
     @minimum_required_version("13.0.0")
-    @property
-    def battery_type(self) -> str:
+    def get_battery_type(self) -> str:
         self._request_re_config_settings()
         sleep(1)
         batteryType = c.c_int()
@@ -1710,9 +1707,8 @@ class Device:
     # battery_type - setter
     # -----
     @minimum_required_version("13.0.0")
-    @battery_type.setter
     @validate
-    def battery_type(self, batteryType: int | c.c_int) -> None:
+    def set_battery_type(self, batteryType: int | c.c_int) -> None:
         if isinstance(batteryType, c.c_int):
             batteryType = batteryType.value
         if batteryType not in fxc.batteryTypes:
@@ -1726,8 +1722,7 @@ class Device:
     # running_led_sequence
     # -----
     @minimum_required_version("13.0.0")
-    @property
-    def running_led_sequence(self) -> str:
+    def get_running_led_sequence(self) -> str:
         self._request_re_config_settings()
         sleep(1)
         ledSequence = c.c_int()
@@ -1740,8 +1735,7 @@ class Device:
     # init_led_sequence
     # -----
     @minimum_required_version("13.0.0")
-    @property
-    def init_led_sequence(self) -> str:
+    def get_init_led_sequence(self) -> str:
         self._request_re_config_settings()
         sleep(1)
         ledSequence = c.c_int()
@@ -1754,9 +1748,8 @@ class Device:
     # init_led_sequence - setter
     # -----
     @minimum_required_version("13.0.0")
-    @init_led_sequence.setter
     @validate
-    def init_led_sequence(self, ledSequence: int | c.c_int) -> None:
+    def set_init_led_sequence(self, ledSequence: int | c.c_int) -> None:
         if isinstance(ledSequence, c.c_int):
             ledSequence = ledSequence.value
         if ledSequence not in fxc.ledSequences:
@@ -1770,8 +1763,7 @@ class Device:
     # shutoff_led_sequence
     # -----
     @minimum_required_version("13.0.0")
-    @property
-    def shutoff_led_sequence(self) -> str:
+    def get_shutoff_led_sequence(self) -> str:
         self._request_re_config_settings()
         sleep(1)
         ledSequence = c.c_int()
@@ -1784,9 +1776,8 @@ class Device:
     # shutoff_led_sequence - setter
     # -----
     @minimum_required_version("13.0.0")
-    @shutoff_led_sequence.setter
     @validate
-    def shutoff_led_sequence(self, ledSequence: int | c.c_int) -> None:
+    def set_shutoff_led_sequence(self, ledSequence: int | c.c_int) -> None:
         if isinstance(ledSequence, c.c_int):
             ledSequence = ledSequence.value
         if ledSequence not in fxc.ledSequences:
