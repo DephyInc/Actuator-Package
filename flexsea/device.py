@@ -488,6 +488,8 @@ class Device:
         returnCode = self._FAILURE
         for _ in range(5):
             returnCode = self._clib.fxSetGains(self.id, kp, ki, kd, k, b, ff)
+            if returnCode == self._SUCCESS.value:
+                break
             sleep(0.001)
         if returnCode != self._SUCCESS.value:
             raise RuntimeError("Failed to set gains.")
