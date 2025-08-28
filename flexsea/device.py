@@ -898,7 +898,7 @@ class Device:
         :py:func:`success`
         :py:func:`failure`
         """
-        if not self.interactive:
+        if self.interactive:
             userInput = input(
                 "WARNING: You should not use this function unless you know what "
                 "you are doing!\nProceed?[y/n] "
@@ -977,7 +977,7 @@ class Device:
         :py:func:`success`
         :py:func:`failure`
         """
-        if not self.interactive:
+        if self.interactive:
             userInput = input(
                 "WARNING: You should not use this function unless you know what "
                 "you are doing!\nProceed?[y/n] "
