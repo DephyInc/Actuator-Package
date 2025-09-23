@@ -3,7 +3,7 @@ name: tagged-release
 on:
   push:
     tags:
-      - 'v*.*.*'   # glob, not regex
+      - 'v*.*.*'
 
 permissions:
   contents: write  # needed to create releases
@@ -14,21 +14,19 @@ concurrency:
 
 jobs:
   gh_tagged_release:
-    # extra guard so only proper semver-like tags run
-    if: ${{ github.ref_type == 'tag' && github.ref_name matches '^v[0-9]+\\.[0-9]+\\.[0-9]+$' }}
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0      # full history if your changelog step needs it
-          fetch-tags: true    # make all tags visible to the job
+          fetch-depth: 0
+          fetch-tags: true
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-          cache: 'poetry'     # built-in caching for Poetry deps
+          python-version: "3.11"
+          cache: "poetry"
 
       - name: Install Poetry
         run: |
@@ -39,8 +37,6 @@ jobs:
         run: poetry build
 
       - name: Release
-        id: automatic_releases
-        # security best practice is to pin to a commit SHA instead of 'latest'
         uses: marvinpinto/action-automatic-releases@<commit-sha>
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}

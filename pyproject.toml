@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "flexsea"
-version = "12.2.0"
+version = "12.2.2"
 description = ""
 authors = ["Jared <jcoughlin@dephy.com>"]
 readme = "README.md"
@@ -8,7 +8,7 @@ homepage = "https://github.com/DephyInc/Actuator-Package"
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.12"
 semantic-version = "^2.10.0"
 boto3 = "^1.26.110"
 pyyaml = "^6.0"
@@ -57,7 +57,7 @@ disable = [
 
 [tool.black]
 line-length = 88
-target-version = ['py311']
+target-version = ['py312']
 include = '\.pyi?$'
 exclude = '''
 /(
