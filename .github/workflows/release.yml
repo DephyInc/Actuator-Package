@@ -1,4 +1,4 @@
-name: tagged-release
+name: pypi-release
 
 on:
   push:
@@ -6,41 +6,44 @@ on:
       - 'v*.*.*'
 
 permissions:
-  contents: write  # needed to create releases
-
-concurrency:
-  group: release-${{ github.ref }}
-  cancel-in-progress: false
+  contents: read 
 
 jobs:
-  gh_tagged_release:
+  build:
     runs-on: ubuntu-22.04
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
-          fetch-tags: true
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
-          python-version: "3.11"
-          cache: "poetry"
-
+          python-version: '3.12'
+          cache: 'poetry'
       - name: Install Poetry
         run: |
           python -m pip install --upgrade pip
-          pip install poetry
-
-      - name: Build
+          pip install 'poetry==1.8.3'
+      - name: Build dists
         run: poetry build
-
-      - name: Release
-        uses: marvinpinto/action-automatic-releases@<commit-sha>
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          prerelease: false
-          files: |
-            dist/flexsea*.whl
-            dist/flexsea*.tar.gz
+          name: dists
+          path: dist/*
+
+  publish:
+    needs: build
+    runs-on: ubuntu-22.04
+    environment:
+      name: pypi
+      url: https://pypi.org/p/<your-project-name>
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dists
+          path: dist
+      - name: Publish to PyPI (OIDC)
+        uses: pypa/gh-action-pypi-publish@release/v1
