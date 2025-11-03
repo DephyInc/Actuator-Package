@@ -484,7 +484,8 @@ class Device:
             Feed forward gain.
         
         be_persistent : bool
-            Flag indicating whether the command should be sent multiple times
+            Flag indicating whether the command should be sent multiple times.
+            Default value is True. 
         """
         # There is a bug either on the C side or in the firmware where,
         # sometimes, the gains aren't set, so we try multiple times
