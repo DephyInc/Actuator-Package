@@ -1,34 +1,35 @@
 [tool.poetry]
 name = "flexsea"
-version = "12.2.2"
+version = "12.2.3"
 description = ""
-authors = ["Jared <jcoughlin@dephy.com>"]
+authors = ["Jared <jcoughlin@dephy.com>", "Carlos Asmat <casmat@dephy.com>"]
 readme = "README.md"
 homepage = "https://github.com/DephyInc/Actuator-Package"
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "^3.11"
 semantic-version = "^2.10.0"
-boto3 = "^1.26.110"
+boto3 = "^1.40.41"
 pyyaml = "^6.0"
 pendulum = [
     {version = "^2.1.2", python = "<3.12"},
     {version = "^3.0.0", python = ">=3.12"}
 ]
 pyudev = {version = "^0.24.1", platform = "linux"}
+pandas = "^2.3.3"
 
 
 [tool.poetry.group.dev.dependencies]
-black = ">=23.3,<25.0"
-pytest = "^7.3.0"
-pylint = "^2.17.2"
+black = "^25.9.0"
+pytest = "^8.4.2"
+pylint = "^3.3.8"
 pre-commit = "^3.2.2"
 nox = "^2022.11.21"
 pandas = "^2.0.0"
 seaborn = "^0.12.2"
 numpy = "^1.24.2"
-mypy = "^1.2.0"
+mypy = "^1.18.2"
 ipython = "^8.12.0"
 sphinx = "^7.0.1"
 pydata-sphinx-theme = "^0.13.3"
@@ -57,7 +58,7 @@ disable = [
 
 [tool.black]
 line-length = 88
-target-version = ['py312']
+target-version = ['py311']
 include = '\.pyi?$'
 exclude = '''
 /(
