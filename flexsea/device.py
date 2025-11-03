@@ -490,7 +490,6 @@ class Device:
         # There is a bug either on the C side or in the firmware where,
         # sometimes, the gains aren't set, so we try multiple times
         returnCode = self._FAILURE
-
         for _ in range(5):
             returnCode = self._clib.fxSetGains(self.id, kp, ki, kd, k, b, ff)
             if not be_persistent:
