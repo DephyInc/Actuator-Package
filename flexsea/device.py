@@ -459,7 +459,7 @@ class Device:
     # set_gains
     # -----
     @requires_status("connected")
-    def set_gains(self, kp: int, ki: int, kd: int, k: int, b: int, ff: int) -> None:
+    def set_gains(self, kp: int, ki: int, kd: int, k: int, b: int, ff: int, be_persistent: bool = True) -> None:
         """
         Sets the gains used by PID controllers on the device.
 
@@ -482,12 +482,18 @@ class Device:
 
         ff : int
             Feed forward gain.
+        
+        be_persistent : bool
+            Flag indicating whether the command should be sent multiple times.
+            Default value is True. 
         """
         # There is a bug either on the C side or in the firmware where,
         # sometimes, the gains aren't set, so we try multiple times
         returnCode = self._FAILURE
         for _ in range(5):
             returnCode = self._clib.fxSetGains(self.id, kp, ki, kd, k, b, ff)
+            if not be_persistent:
+                break
             sleep(0.001)
         if returnCode != self._SUCCESS.value:
             raise RuntimeError("Failed to set gains.")
