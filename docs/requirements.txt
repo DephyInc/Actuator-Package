@@ -222,9 +222,9 @@ docutils==0.20.1 ; python_version >= "3.11" and python_version < "4.0" \
 executing==1.2.0 ; python_version >= "3.11" and python_version < "4.0" \
     --hash=sha256:0314a69e37426e3608aada02473b4161d4caf5a4b244d1d0c48072b8fee7bacc \
     --hash=sha256:19da64c18d2d851112f09c287f8d3dbbdf725ab0e569077efb6cdcbd3497c107
-filelock==3.11.0 ; python_version >= "3.11" and python_version < "4.0" \
-    --hash=sha256:3618c0da67adcc0506b015fd11ef7faf1b493f0b40d87728e19986b536890c37 \
-    --hash=sha256:f08a52314748335c6460fc8fe40cd5638b85001225db78c2aa01c8c0db83b318
+filelock==3.20.3 ; python_version >= "3.11" and python_version < "4.0" \
+    --hash=sha256:18c57ee915c7ec61cff0ecf7f0f869936c7c30191bb0cf406f1341778d0834e1 \
+    --hash=sha256:4b0dda527ee31078689fc205ec4f1c1bf7d56cf88b6dc9426c4f230e46c2dce1
 fonttools==4.39.3 ; python_version >= "3.11" and python_version < "4.0" \
     --hash=sha256:64c0c05c337f826183637570ac5ab49ee220eec66cf50248e8df527edfa95aeb \
     --hash=sha256:9234b9f57b74e31b192c3fc32ef1a40750a8fbc1cd9837a7b7bfc4ca4a5c51d7
